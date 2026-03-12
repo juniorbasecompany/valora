@@ -2,15 +2,15 @@
 
 ## 1. Objetivo
 
-Transformar o modelo hoje operado em planilhas em um sistema robusto para previsão, acompanhamento do realizado e simulação da produção de ovos, com cálculo diário, rastreabilidade completa e visão consolidada por lote, segmento, local, período e empresa.
+Transformar o modelo hoje operado em planilhas em um sistema robusto para previsão, acompanhamento do realizado e simulação de uma lavoura de soja, com cálculo diário, rastreabilidade completa e visão consolidada por ciclo, segmento, local, período e empresa.
 
 O sistema deve permitir:
 
-- prever plantel, produção, qualidade e faturamento;
+- prever área plantada, desenvolvimento, produtividade, qualidade, custo e faturamento;
 - registrar o realizado sem sobrescrever a previsão;
 - comparar previsto x realizado x corrigido;
-- simular cenários de alojamento, transferência, descarte, mortalidade, aproveitamento e preço;
-- consolidar um, vários ou todos os lotes em qualquer recorte temporal.
+- simular cenários de plantio, replantio, manejo, perda, produtividade e preço;
+- consolidar um, vários ou todos os ciclos em qualquer recorte temporal.
 
 ## 2. Princípios do modelo
 
@@ -23,15 +23,15 @@ Toda apuração deve ser diária. Visões semanais, mensais, anuais ou por inter
 Os parâmetros não devem ser modelados como intervalos fechados previamente definidos. Cada valor passa a valer a partir da data do evento e permanece vigente até:
 
 - o próximo evento do mesmo tipo; ou
-- o encerramento do segmento ou lote.
+- o encerramento do segmento ou ciclo.
 
 Exemplo:
 
-- mortalidade = 0,10% a partir de 01/01;
-- em 05/01, mortalidade passa a 0,14%;
-- logo, 0,10% vale de 01/01 até 04/01, e 0,14% vale de 05/01 em diante.
+- produtividade esperada = 58 sacas/ha a partir de 01/11;
+- em 15/11, produtividade esperada passa a 55 sacas/ha;
+- logo, 58 sacas/ha vale de 01/11 até 14/11, e 55 sacas/ha vale de 15/11 em diante.
 
-Esse mesmo raciocínio se aplica a qualquer atributo configurável, técnico ou econômico. Mortalidade, aproveitamento, MI, ME, percentual de ovos >60g, peso médio, preço e capacidade são apenas exemplos possíveis do domínio.
+Esse mesmo raciocínio se aplica a qualquer atributo configurável, técnico ou econômico. Produtividade, estande, umidade, impureza, custo, preço e capacidade são apenas exemplos possíveis do domínio.
 
 ### 2.3 Fallback por escopo
 
@@ -40,7 +40,7 @@ Os parâmetros devem ser resolvidos por hierarquia de escopo.
 Ordem sugerida:
 
 1. valor específico do segmento;
-2. valor específico do lote;
+2. valor específico do ciclo;
 3. valor específico do local;
 4. valor padrão geral.
 
@@ -64,7 +64,7 @@ Deve existir uma distinção clara entre:
 - estrutura fixa do sistema, responsável por identidade, relacionamento, escopo, vigência, auditoria, versionamento e materialização;
 - conteúdo configurável, responsável por definir atributos, classificações, fórmulas, unidades, agregações e rótulos exibidos ao usuário.
 
-Assim, itens como mortalidade, aproveitamento, MI, ME, percentual de ovos >60g, peso médio e preço devem ser tratados como exemplos de atributos configuráveis do domínio, e não como nomes obrigatórios de colunas físicas.
+Assim, itens como produtividade, estande, umidade, impureza, custo e preço devem ser tratados como exemplos de atributos configuráveis do domínio, e não como nomes obrigatórios de colunas físicas.
 
 Cada atributo configurável deve permitir, no mínimo:
 
@@ -91,54 +91,55 @@ O plano deve preservar, no mínimo:
 
 ## 3. Estrutura conceitual
 
-## 3.1 Lote
+## 3.1 Ciclo
 
-Lote representa a unidade biológica e econômica principal.
+Ciclo representa a unidade agronômica e econômica principal.
 
-Cada lote deve possuir, no mínimo:
+Cada ciclo deve possuir, no mínimo:
 
 - identificação;
-- linhagem ou padrão genético;
-- data de alojamento inicial;
+- cultivar ou padrão tecnológico;
+- data de plantio inicial;
 - situação atual;
-- capacidade planejada;
-- parâmetros técnicos vinculados direta ou indiretamente.
+- área planejada;
+- parâmetros agronômicos vinculados direta ou indiretamente.
 
-## 3.2 Segmento do lote
+## 3.2 Segmento do ciclo
 
-O lote deve poder ser subdividido em segmentos operacionais.
+O ciclo deve poder ser subdividido em segmentos operacionais.
 
-Um segmento existe quando parte do lote:
+Um segmento existe quando parte do ciclo:
 
 - permanece em um local;
-- é transferida para outro local;
-- sofre descarte parcial;
-- passa a ter comportamento distinto do restante do lote.
+- é replantada ou manejada de forma distinta;
+- é colhida parcialmente;
+- passa a ter comportamento diferente do restante da área.
 
-O cálculo diário deve ocorrer no nível do segmento. O lote consolidado é a soma de seus segmentos ativos em cada data.
+O cálculo diário deve ocorrer no nível do segmento. O ciclo consolidado é a soma de seus segmentos ativos em cada data.
 
 ## 3.3 Local
 
 O local deve suportar hierarquia operacional, por exemplo:
 
 - empresa;
+- fazenda;
 - unidade;
-- granja;
-- núcleo;
-- aviário;
+- talhão;
 - subdivisão.
 
 Isso permite consolidar produção, ocupação e capacidade em diferentes níveis.
 
 ## 3.4 Classificações e composições
 
-O modelo deve permitir diferenças dentro do mesmo lote ou segmento, como:
+O modelo deve permitir diferenças dentro do mesmo ciclo ou segmento, como:
 
-- fêmeas e machos;
-- aves brancas e vermelhas;
-- outras classificações zootécnicas relevantes.
+- cultivar;
+- tecnologia da semente;
+- regime hídrico;
+- tipo de solo;
+- outras classificações agronômicas relevantes.
 
-Essas classificações podem impactar curvas, atributos técnicos, produção, peso, aproveitamento e valor econômico.
+Essas classificações podem impactar curvas, atributos técnicos, produtividade, qualidade, custo e valor econômico.
 
 As classificações devem ser configuráveis, podendo ser definidas pelo usuário sem alteração de schema. O sistema deve suportar mais de um eixo de classificação sobre a mesma entidade, inclusive com composição multinível quando necessário.
 
@@ -178,16 +179,16 @@ Essa medida deve permitir rastrear, no mínimo:
 
 ## 4.1 Eventos operacionais
 
-Eventos operacionais alteram a composição física do sistema.
+Eventos operacionais alteram a composição física ou operacional do sistema.
 
 Exemplos:
 
-- alojamento;
-- transferência;
-- unificação ou separação lógica;
-- descarte parcial;
-- encerramento do lote ou segmento;
-- ajustes de quantidade.
+- plantio;
+- replantio;
+- aplicação ou manejo relevante;
+- colheita parcial;
+- encerramento do ciclo ou segmento;
+- ajustes de área ou população.
 
 ## 4.2 Eventos de atributo e regra
 
@@ -195,7 +196,7 @@ Eventos de atributo alteram o valor vigente de um atributo configurável a parti
 
 Eventos de regra alteram a forma de tratamento de um atributo, como fórmula, agregação, fallback, unidade operacional ou comportamento no cálculo.
 
-Exemplos de atributos que podem ser governados por esses eventos incluem mortalidade, curva de produção, aproveitamento, MI, ME, percentual de ovos >60g, peso médio do ovo, preço por classe, capacidade planejada, meta técnica e meta econômica. Esses exemplos não devem ser interpretados como uma lista fechada.
+Exemplos de atributos que podem ser governados por esses eventos incluem produtividade esperada, estande, emergência, umidade, impureza, preço por classe, custo por operação, capacidade planejada, meta técnica e meta econômica. Esses exemplos não devem ser interpretados como uma lista fechada.
 
 Todos os eventos devem ser versionados, datados, auditáveis e reconstruíveis historicamente.
 
@@ -212,16 +213,16 @@ Para cada dia e para cada segmento ativo, o motor deve:
 - persistir o resultado em medida diária materializada;
 - registrar a proveniência de cada valor calculado.
 
-Entre os atributos que podem ser resolvidos por esse mecanismo estão, por exemplo, idade, quantidade inicial do dia, perdas previstas, plantel final do dia, produção total, produção aproveitável, distribuição por classe, peso, massa produzida, valor econômico, ocupação e capacidade. Esses itens são exemplos de uso do motor, não uma lista fixa de colunas.
+Entre os atributos que podem ser resolvidos por esse mecanismo estão, por exemplo, idade do ciclo, área ativa, estande, estágio fenológico, perda prevista, produtividade esperada, volume esperado, qualidade comercial, custo acumulado, valor econômico, ocupação e capacidade. Esses itens são exemplos de uso do motor, não uma lista fixa de colunas.
 
-## 5.2 Curvas por idade
+## 5.2 Curvas por idade ou estágio fenológico
 
-As curvas padrão por idade devem ser a base do modelo técnico. Sobre elas incidem os eventos vigentes e os ajustes específicos.
+As curvas padrão por idade ou estágio fenológico devem ser a base do modelo técnico. Sobre elas incidem os eventos vigentes e os ajustes específicos.
 
-Na prática, a produção não nasce de um valor fixo por lote, mas da combinação entre:
+Na prática, o resultado não nasce de um valor fixo por ciclo, mas da combinação entre:
 
-- idade;
-- padrão genético ou categoria;
+- idade ou estágio fenológico;
+- cultivar ou categoria;
 - premissas vigentes;
 - eventos operacionais;
 - parametrização específica.
@@ -258,7 +259,7 @@ O realizado deve suportar:
 - atributo informado manualmente;
 - atributo importado;
 - atributo conciliado com o previsto;
-- ocorrência operacional relevante ligada ao dia, ao segmento, ao lote, ao local ou à classificação.
+- ocorrência operacional relevante ligada ao dia, ao segmento, ao ciclo, ao local ou à classificação.
 
 A reconciliação deve mostrar pelo menos:
 
@@ -276,12 +277,12 @@ O sistema deve disponibilizar, no mínimo, as seguintes capacidades:
 
 - cadastrar atributo de negócio sem mudança de schema;
 - cadastrar indicador derivado por fórmula;
-- consolidar por lote, segmento, local, empresa, classificação e período;
+- consolidar por ciclo, segmento, local, empresa, classificação e período;
 - comparar previsto, realizado, corrigido e simulado;
 - agregar por soma, média, último valor, média ponderada, máximo ou mínimo, conforme regra do atributo;
 - rastrear origem, vigência, escopo e fórmula aplicada.
 
-Indicadores como plantel inicial e final, mortalidade diária e acumulada, produção total de ovos, produção aproveitável, MI, ME, percentual de ovos >60g, peso médio do ovo, ovos por ave alojada, faturamento, ocupação, capacidade, pirâmide etária, estabilidade mensal e concentração de alojamentos são exemplos iniciais do domínio, e não estrutura fixa obrigatória do banco.
+Indicadores como área plantada e colhida, estande, emergência, produtividade, volume colhido, umidade, impureza, custo, faturamento, ocupação, capacidade, distribuição por estágio fenológico, estabilidade mensal e concentração de plantio e colheita são exemplos iniciais do domínio, e não estrutura fixa obrigatória do banco.
 
 ## 8. Cronograma e simulação
 
@@ -289,16 +290,16 @@ O cronograma não deve ser apenas um cadastro de datas. Ele deve funcionar como 
 
 O sistema deve permitir simular cenários alterando:
 
-- datas de alojamento;
-- datas de transferência;
-- datas de descarte;
-- quantidades movimentadas;
-- curvas de mortalidade;
-- curvas de aproveitamento;
+- datas de plantio;
+- datas de replantio;
+- datas de colheita;
+- áreas movimentadas;
+- curvas de emergência, desenvolvimento ou produtividade;
+- curvas de perda ou qualidade;
 - preços;
-- capacidade dos locais.
+- capacidade dos locais e janelas operacionais.
 
-O objetivo da simulação é reduzir picos e vales, equilibrar a pirâmide etária, melhorar ocupação e estabilizar produção e faturamento.
+O objetivo da simulação é reduzir concentração operacional, equilibrar a ocupação das áreas e janelas de trabalho, melhorar produtividade e estabilizar produção, custo e faturamento.
 
 ## 9. Visões e relatórios
 
@@ -309,7 +310,7 @@ O sistema deve oferecer visões por:
 - mês;
 - ano;
 - intervalo livre;
-- lote;
+- ciclo;
 - segmento;
 - local;
 - empresa;
@@ -317,11 +318,11 @@ O sistema deve oferecer visões por:
 
 Relatórios e painéis mínimos:
 
-- produção diária prevista;
-- produção diária realizada;
+- evolução diária prevista do ciclo;
+- evolução diária realizada do ciclo;
 - previsto x realizado;
-- cronograma consolidado de alojamento, transferência e descarte;
-- pirâmide etária;
+- cronograma consolidado de plantio, manejo e colheita;
+- distribuição por estágio fenológico;
 - ocupação e capacidade por local;
 - estabilidade mensal;
 - evolução de preço e faturamento;
@@ -339,7 +340,7 @@ Mudanças em parâmetros precisam gerar nova vigência, não alteração destrut
 
 ### 10.3 Consolidar por soma, nunca por edição manual
 
-Totais de lote, local, mês ou empresa devem ser derivados do cálculo diário e não mantidos manualmente em células de consolidação.
+Totais de ciclo, local, mês ou empresa devem ser derivados do cálculo diário e não mantidos manualmente em células de consolidação.
 
 ### 10.4 Preparar o modelo para múltiplas granularidades
 
@@ -381,7 +382,7 @@ O modelo deve separar nome técnico interno de rótulo exibido ao usuário.
 
 Implementar cadastros de:
 
-- lote;
+- ciclo;
 - segmento;
 - local hierárquico;
 - classificação configurável;
@@ -412,9 +413,9 @@ Implementar cálculo diário materializado para:
 
 Implementar:
 
-- transferências;
-- descartes parciais;
-- segmentação do lote;
+- replantio;
+- colheita parcial;
+- segmentação do ciclo;
 - consolidação automática.
 
 ### Fase 5 — Realizado e reconciliação
@@ -431,8 +432,8 @@ Implementar:
 Implementar:
 
 - cenários alternativos;
-- redistribuição de alojamentos e descartes;
-- análise de estabilidade e capacidade.
+- redistribuição de plantio, manejo e colheita;
+- análise de estabilidade, janela operacional e capacidade.
 
 ### Fase 7 — Painéis e gestão
 
@@ -446,12 +447,12 @@ O plano será considerado bem implementado quando o sistema:
 - calcular diariamente com coerência técnica;
 - explicar cada valor calculado;
 - permitir criar novo atributo de negócio sem mudança de schema;
-- suportar segmentação, transferências e descartes parciais;
+- suportar segmentação, replantio e colheita parcial;
 - separar claramente previsão, realizado e simulação;
 - permitir consolidação confiável por qualquer recorte;
 - reduzir dependência de planilhas paralelas;
-- apoiar decisões de cronograma, ocupação e estabilidade produtiva.
+- apoiar decisões de cronograma, ocupação, janela operacional e estabilidade produtiva.
 
 ## 13. Resultado esperado
 
-Ao final, a empresa terá um sistema capaz de transformar conhecimento operacional hoje disperso em planilhas em um modelo único, auditável e escalável, preservando a lógica técnica do negócio e ampliando a capacidade de análise, simulação e decisão.
+Ao final, a empresa terá um sistema capaz de transformar conhecimento agronômico hoje disperso em planilhas em um modelo único, auditável e escalável, preservando a lógica técnica do negócio e ampliando a capacidade de análise, simulação e decisão.

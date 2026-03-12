@@ -66,6 +66,8 @@ Deve existir uma distinção clara entre:
 
 Assim, itens como mortalidade, aproveitamento, MI, ME, percentual de ovos >60g, peso médio e preço devem ser tratados como exemplos de atributos configuráveis do domínio, e não como nomes obrigatórios de colunas físicas.
 
+No contexto avícola, termos como lote, alojamento, aviário, mortalidade, produção, aproveitamento e classificação de ovo devem ser entendidos como parte do pacote analítico do nicho, e não como imposição estrutural da base física do sistema.
+
 Cada atributo configurável deve permitir, no mínimo:
 
 - nome exibido ao usuário;
@@ -77,6 +79,8 @@ Cada atributo configurável deve permitir, no mínimo:
 - origem permitida;
 - unidade e precisão;
 - fórmula ou referência de cálculo, quando aplicável.
+
+As regras disponíveis para o nicho avícola devem ser governadas, para evitar tanto rigidez estrutural quanto liberdade excessiva sem semântica operacional.
 
 ### 2.6 Temporalidade e histórico imutável
 
@@ -148,6 +152,8 @@ Atributo representa qualquer medida, parâmetro, indicador, restrição ou vari�
 
 O atributo não deve depender de coluna dedicada para existir. Seu comportamento deve ser definido por cadastro, incluindo tipo, escopo, vigência, fórmula, agregação e forma de exibição.
 
+No nicho avícola, isso inclui atributos como mortalidade, produção, aproveitamento, MI, ME, percentual por classe, peso, preço e capacidade, sempre tratados como conteúdo configurável.
+
 ## 3.6 Regra
 
 Regra representa a forma como um atributo é tratado pelo motor.
@@ -197,6 +203,8 @@ Eventos de regra alteram a forma de tratamento de um atributo, como fórmula, ag
 
 Exemplos de atributos que podem ser governados por esses eventos incluem mortalidade, curva de produção, aproveitamento, MI, ME, percentual de ovos >60g, peso médio do ovo, preço por classe, capacidade planejada, meta técnica e meta econômica. Esses exemplos não devem ser interpretados como uma lista fechada.
 
+A taxonomia de eventos e regras do nicho avícola deve ser configurável e governada, mesmo quando o vocabulário operacional já estiver estabilizado.
+
 Todos os eventos devem ser versionados, datados, auditáveis e reconstruíveis historicamente.
 
 ## 5. Motor de cálculo
@@ -214,9 +222,9 @@ Para cada dia e para cada segmento ativo, o motor deve:
 
 Entre os atributos que podem ser resolvidos por esse mecanismo estão, por exemplo, idade, quantidade inicial do dia, perdas previstas, plantel final do dia, produção total, produção aproveitável, distribuição por classe, peso, massa produzida, valor econômico, ocupação e capacidade. Esses itens são exemplos de uso do motor, não uma lista fixa de colunas.
 
-## 5.2 Curvas por idade
+## 5.2 Curvas por idade resolvida no dia
 
-As curvas padrão por idade devem ser a base do modelo técnico. Sobre elas incidem os eventos vigentes e os ajustes específicos.
+As curvas padrão por idade devem ser a base do modelo técnico. A idade deve ser resolvida como atributo do dia, e não como eixo temporal separado do cálculo. Sobre ela incidem os eventos vigentes e os ajustes específicos.
 
 Na prática, a produção não nasce de um valor fixo por lote, mas da combinação entre:
 
@@ -225,6 +233,8 @@ Na prática, a produção não nasce de um valor fixo por lote, mas da combinaç
 - premissas vigentes;
 - eventos operacionais;
 - parametrização específica.
+
+O eixo temporal do cálculo continua sendo sempre o dia. Idade, fase produtiva e demais referências técnicas entram como atributos, classificações ou regras aplicadas ao dia calculado.
 
 ## 5.3 Rastreabilidade do cálculo
 
@@ -282,6 +292,8 @@ O sistema deve disponibilizar, no mínimo, as seguintes capacidades:
 - rastrear origem, vigência, escopo e fórmula aplicada.
 
 Indicadores como plantel inicial e final, mortalidade diária e acumulada, produção total de ovos, produção aproveitável, MI, ME, percentual de ovos >60g, peso médio do ovo, ovos por ave alojada, faturamento, ocupação, capacidade, pirâmide etária, estabilidade mensal e concentração de alojamentos são exemplos iniciais do domínio, e não estrutura fixa obrigatória do banco.
+
+No nicho avícola, esse conjunto pode compor o pacote analítico inicial, mas deve continuar sendo evolutivo e governado por metadado.
 
 ## 8. Cronograma e simulação
 
@@ -374,6 +386,22 @@ Os nomes físicos do banco devem seguir as seguintes regras:
 Os atributos definidos pelo usuário devem ser apresentados em português e podem usar mais de uma palavra.
 
 O modelo deve separar nome técnico interno de rótulo exibido ao usuário.
+
+### 10.7 Pacote analítico avícola
+
+O nicho avícola deve ser tratado como um pacote configurável sobre o núcleo comum do sistema.
+
+Esse pacote pode reunir, por exemplo:
+
+- terminologia exibida ao usuário;
+- catálogo inicial de atributo;
+- classificação zootécnica;
+- catálogo de evento operacional;
+- conjunto de fórmula;
+- validações do domínio;
+- painel e relatório padrão.
+
+Isso permite preservar a aderência ao negócio de aves sem transformar o núcleo em uma estrutura exclusiva para avicultura.
 
 ## 11. Fases de desenvolvimento
 

@@ -1,4 +1,4 @@
-﻿# Country In Scope
+# Country In Scope
 
 Country behavior for this project:
 
@@ -10,7 +10,7 @@ Country behavior for this project:
 Canonical specificity order:
 
 1. segment
-2. lote
+2. item
 3. most specific location node
 4. parent location nodes
 5. country

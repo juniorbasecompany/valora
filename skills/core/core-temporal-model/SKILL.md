@@ -1,6 +1,6 @@
-﻿---
+---
 name: core-temporal-model
-description: Use when modeling or reviewing the fixed structural core of the system: entities, optional country-aware hierarchical scope, event-based validity, UTC persistence, auditability, integrity, and daily materialized facts for aviculture and future niches.
+description: Use when modeling or reviewing the fixed structural core of the system: entities, optional country-aware hierarchical scope, event-based validity, UTC persistence, auditability, integrity, and daily materialized facts across the supported niches.
 ---
 
 # Core Temporal Model
@@ -23,7 +23,7 @@ Read these references as needed:
 
 ## Guardrails
 
-- Do not hardcode aviculture terms into the core schema.
+- Do not hardcode niche vocabulary into the core schema.
 - Do not treat week or month as native calculation grains.
 - Do not replace structural semantics with free-form JSONB.
 - Do not overwrite past values; version and date them.

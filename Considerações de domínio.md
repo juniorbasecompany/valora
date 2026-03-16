@@ -67,7 +67,7 @@ Isso é o que permite que `mortalidade`, `produtividade`, `umidade`, `custo` ou 
 
 | Conceito comum | Aves | Soja |
 | --- | --- | --- |
-| unidade principal | lote | ciclo |
+| item | lote | ciclo |
 | subdivisão operacional | segmento do lote | segmento do ciclo |
 | local | granja, aviário | fazenda, talhão |
 | início do ciclo | alojamento | plantio |
@@ -98,7 +98,7 @@ Em soja, a lógica principal não é estoque animal, mas área cultivada, popula
 Impacto:
 
 - a abstração de quantidade precisa ser genérica;
-- o sistema não pode assumir que toda unidade principal tenha `cabeça`, `peso vivo` ou `mortalidade`;
+- o sistema não pode assumir que todo item tenha `cabeça`, `peso vivo` ou `mortalidade`;
 - a semântica do atributo precisa vir do cadastro.
 
 ### 3.3 Temporalidade operacional
@@ -179,7 +179,7 @@ Em soja, pode ser necessário descer para talhão, subárea, frente operacional,
 Impacto:
 
 - a granularidade precisa ser configurável;
-- a entidade principal e a classificação não podem ser acopladas a um único nicho.
+- o item e a classificação não podem ser acoplados a um único nicho.
 
 ### 4.3 Curva de valor econômico
 
@@ -196,7 +196,7 @@ Impacto:
 
 Se o objetivo é ter um único sistema no futuro, estas partes devem ser realmente compartilhadas:
 
-- cadastro de entidade principal;
+- cadastro de item;
 - cadastro de segmento;
 - cadastro de local hierárquico;
 - cadastro de atributo;
@@ -232,7 +232,7 @@ Assim, `aves` e `soja` passam a ser pacotes diferentes sobre o mesmo núcleo, e 
 
 Estas partes não devem ser universais nem fixas:
 
-- nome da entidade principal;
+- nome do item;
 - tipo de classificação;
 - tipo de evento;
 - tipo de curva;
@@ -306,6 +306,21 @@ Os principais riscos em um sistema único para vários nichos são:
 - cair em um modelo EAV genérico sem semântica operacional suficiente;
 - usar JSONB como substituto de modelagem estrutural;
 - transformar cada nicho em customização de código, em vez de pacote de metadado.
+
+## 7.4 Escopo multi-país
+
+Como decisão firme do projeto, o sistema também deve ser compatível com operação multi-país sem transformar isso em rigidez estrutural desnecessária.
+
+Isso implica, no mínimo:
+
+- país como nível opcional da hierarquia de local;
+- possibilidade de fallback por país quando houver padrão nacional;
+- persistência de fatos financeiros auditáveis apenas na moeda local da operação;
+- conversão cambial tratada apenas como visão derivada de consulta ou relatório;
+- persistência de timestamp em UTC no backend;
+- exibição de data e hora no timezone local da operação ou do usuário.
+
+Essa decisão vale para qualquer nicho. O comportamento de país, moeda e timezone deve nascer no núcleo compartilhado e nas regras transversais, enquanto o vocabulário operacional continua no pacote do nicho.
 
 ## 8. Principal conclusão
 

@@ -4,5 +4,5 @@ Margin analysis should support:
 
 - baseline forecast versus actuals
 - daily and period contribution margin
-- variance by lote, nucleus, location, and period
+- variance by item, location node, location, and period
 - comparison of expected and realized profitability

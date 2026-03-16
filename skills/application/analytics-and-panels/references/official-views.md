@@ -2,7 +2,7 @@
 
 The system should support views by:
 
-- lote
+- item
 - segment
 - location hierarchy
 - company

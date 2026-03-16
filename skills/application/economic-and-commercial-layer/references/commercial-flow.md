@@ -2,7 +2,7 @@
 
 Commercial-operational flow may include:
 
-- usable or incubable output
+- saleable or contract-relevant output
 - classification into commercial units
 - packaging or shipment logic
 - service window or demand commitment

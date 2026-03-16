@@ -2,10 +2,9 @@
 
 Common slices:
 
-- lote
-- nucleus
-- location
-- lineage
+- item
+- location hierarchy
+- category
 - classification
 - scenario layer
 - date range

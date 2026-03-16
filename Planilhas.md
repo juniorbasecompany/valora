@@ -132,6 +132,17 @@ O sistema passa a suportar com segurança:
 - cenários comparativos;
 - dashboards e alertas.
 
+## 5.6 Operação multi-país com fato auditável estável
+
+Como o projeto já assume escopo multi-país, a transição das planilhas para o sistema também precisa preservar uma regra importante:
+
+- fato econômico auditável persistido apenas na moeda local da operação;
+- conversão para outra moeda tratada apenas como visualização derivada;
+- país resolvido no contexto persistido quando houver fato econômico;
+- timestamp persistido em UTC com exibição no timezone local da operação ou do usuário.
+
+Isso evita que relatório convertido ou contexto momentâneo do usuário passe a substituir o fato operacional auditável.
+
 ## 6. Estruturas das planilhas que o sistema deve respeitar
 
 Para que a migração preserve a inteligência operacional já existente, o sistema precisa respeitar estes pilares observados nas planilhas:

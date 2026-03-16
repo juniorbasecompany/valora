@@ -1,4 +1,4 @@
-﻿# Economic Model
+# Economic Model
 
 Economic outputs should be daily first, then aggregated.
 
@@ -17,9 +17,9 @@ Core measures:
 - daily price reference
 - daily revenue
 - daily cost
-- cost per lote
-- cost per egg
-- cost per usable egg
+- cost per item
+- cost per commercial unit
+- cost per saleable output unit
 - gross margin
 - operating profit
 

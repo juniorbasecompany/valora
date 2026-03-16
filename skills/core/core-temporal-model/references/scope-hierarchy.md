@@ -1,9 +1,9 @@
-﻿# Scope Hierarchy
+# Scope Hierarchy
 
 Canonical resolution rule:
 
 1. segment-specific value
-2. lote-specific value
+2. item-specific value
 3. most specific location node
 4. parent location nodes up the hierarchy
 5. country-specific value

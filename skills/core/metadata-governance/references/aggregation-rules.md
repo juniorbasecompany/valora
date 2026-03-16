@@ -13,6 +13,6 @@ Common patterns:
 
 Rules:
 
-- totals for month, week, year, company, or lote must derive from daily facts.
+- totals for month, week, year, company, or item must derive from daily facts.
 - aggregation behavior is metadata, not dashboard-only logic.
 - invalid combinations must be blocked early.

@@ -90,6 +90,36 @@ O plano deve preservar, no mínimo:
 - origem do dado;
 - possibilidade de reconstruir o cálculo de uma data passada com base nas regras vigentes naquele momento.
 
+### 2.7 Moeda local e conversão de relatório
+
+Toda informação financeira auditável deve ser persistida apenas na moeda local da operação.
+
+Isso significa, no mínimo:
+
+- valor econômico original em moeda local;
+- auditoria e reconstrução histórica apenas sobre o fato local;
+- possibilidade de exibir relatórios em outra moeda por conversão na consulta;
+- conversão cambial tratada como recurso de visualização, e não como parte do fato financeiro auditável.
+
+Se a taxa histórica usada em relatório convertido mudar posteriormente, isso não altera o fato financeiro original nem a auditoria operacional da moeda local.
+
+### 2.8 UTC no backend e exibição local
+
+O sistema deve persistir timestamps em UTC e exibir datas e horários no timezone local da operação ou do usuário, conforme a necessidade da interface.
+
+Isso não altera o princípio central do modelo:
+
+- o grão operacional continua sendo o dia;
+- relatórios diários, mensais, anuais ou por período continuam sendo agregações da base diária.
+
+### 2.9 País opcional no escopo
+
+O país deve ser suportado como nível opcional da hierarquia de local.
+
+Quando ele não for necessário para a operação, pode ser omitido.
+
+Quando o fato envolver valor econômico, o país precisa estar resolvido no contexto persistido da operação para determinar a moeda local do registro.
+
 ## 3. Estrutura conceitual
 
 ## 3.1 Ciclo

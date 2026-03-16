@@ -18,9 +18,8 @@ Read these references as needed:
 1. Start from daily materialized facts.
 2. Define the official analytical grains and allowed aggregations.
 3. Specify panel contracts, locale behavior, and period behavior.
-4. Formalize weekly management outputs as governed derived views or derived snapshots when the product depends on them.
-5. Apply currency conversion only as a derived report-time concern when requested.
-6. Keep calculations consistent across daily and period views.
+4. Apply currency conversion only as a derived report-time concern when requested.
+5. Keep calculations consistent across daily and period views.
 
 ## Guardrails
 

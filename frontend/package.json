@@ -1,0 +1,6 @@
+{
+  "name": "cleber-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Frontend web app for the Cleber system."
+}

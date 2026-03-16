@@ -16,10 +16,10 @@ Cada contrato de painel deve definir, nesta ordem:
 
 ## Origem do texto exibido
 
-- o painel consome rótulo resolvido no momento da exibição, mas não é a origem do catálogo de mensagem;
+- o painel consome rótulo resolvido no momento da exibição, mas não é a origem do catálogo de mensagens;
 - rótulo de domínio deve vir do metadado governado;
 - rótulo de apresentação pode especializar o texto para o contexto visual do painel, desde que preserve a chave técnica de origem;
-- mensagem de UX, como erro, alerta, ajuda contextual e confirmação, deve vir de catálogo próprio de mensagem e não de definição ad hoc do painel;
+- mensagem de UX, como erro, alerta, ajuda contextual e confirmação, deve vir de catálogo próprio de mensagens e não de definição ad hoc do painel;
 - quando houver resolução contextual de idioma, o painel deve aplicar o fallback oficial de texto: país, local, usuário.
 
 ## Critério objetivo

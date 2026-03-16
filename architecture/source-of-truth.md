@@ -4,36 +4,46 @@
 
 A documentação do projeto tem autoridade explícita por camada.
 
-1. 'skills/' é a verdade operacional.
-2. 'architecture/' é a verdade decisória curta.
-3. 'vision/' é a explicação humana da solução.
-4. 'reference/' é material de consulta.
-5. 'archive/' é material histórico e superado.
+1. `skills/` é a verdade operacional.
+2. `architecture/` é a verdade decisória curta.
+3. `vision/` é a explicação humana da solução.
+4. `reference/` é material de consulta.
+5. `archive/` é material histórico e superado.
+
+## Convenções persistentes do agente
+
+As convenções sempre ativas de idioma, escrita e nomenclatura ficam em `.cursor/rules/`.
+
+- Essas regras complementam a documentação do projeto, mas não substituem decisão arquitetural nem contrato operacional.
 
 ## Como interpretar cada camada
 
-### 'skills/'
+### `.cursor/rules/`
 
-Use esta camada quando a pergunta for: como isso deve ser implementado ou revisado com segurança?
+Convenções persistentes de escrita, nomenclatura e comportamento do agente no projeto.
 
-### 'architecture/'
+### `skills/`
 
-Use esta camada quando a pergunta for: qual decisão estrutural vale para todo o sistema?
+Use esta camada para orientar implementação e revisão com segurança.
 
-### 'vision/'
+### `architecture/`
 
-Use esta camada quando a pergunta for: o que estamos construindo e como isso ajuda a operação?
+Use esta camada para registrar decisões estruturais que valem para todo o sistema.
 
-### 'reference/'
+### `vision/`
 
-Use esta camada quando a pergunta for: qual contexto, exemplo, plano anterior ou material-fonte ajuda a entender melhor?
+Use esta camada para explicar o que está sendo construído e como isso ajuda a operação.
 
-### 'archive/'
+### `reference/`
+
+Use esta camada para consultar contexto, exemplo, plano anterior ou material-fonte.
+
+### `archive/`
 
 Use esta camada apenas para recuperar histórico, comparar pensamento anterior ou rastrear decisão superada.
 
 ## Regra de conflito
 
-- 'reference/' não redefine 'skills/' nem 'architecture/'.
-- 'archive/' não deve orientar decisão nova sem promoção explícita.
-- Quando um detalhe importante existir apenas em 'reference/', ele deve ser promovido para 'skills/' ou 'architecture/' antes de virar base oficial.
+- `reference/` não redefine `skills/` nem `architecture/`.
+- `archive/` não deve orientar decisão nova sem promoção explícita.
+- Quando um detalhe importante existir apenas em `reference/`, ele deve ser promovido para `skills/` ou `architecture/` antes de virar base oficial.

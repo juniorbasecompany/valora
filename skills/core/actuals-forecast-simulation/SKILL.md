@@ -8,9 +8,9 @@ description: Use quando tratar a camada analítica do sistema: previsão base, r
 Use esta skill quando a tarefa tocar a camada analítica, e não apenas o modelo estrutural.
 
 Leia estas referências conforme necessário:
-- 'references/forecast-modes.md'
-- 'references/reconciliation.md'
-- 'references/scenario-model.md'
+- `references/forecast-modes.md`
+- `references/reconciliation.md`
+- `references/scenario-model.md`
 
 ## Fluxo
 
@@ -21,8 +21,8 @@ Leia estas referências conforme necessário:
 
 ## Restrições
 
-- Nunca sobrescreva a previsão base com dado realizado.
-- A simulação deve ficar isolada do histórico de produção.
+- Realizado não sobrescreve previsão base.
+- Simulação não altera histórico de produção.
 - A previsão corrigida deve declarar a regra de correção.
 
 ## Entregáveis

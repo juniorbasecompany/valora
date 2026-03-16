@@ -1,0 +1,11 @@
+---
+description: Convenções de idioma para código, comentário e Markdown
+alwaysApply: true
+---
+
+# Idioma e escrita
+
+- Use inglês para identificadores técnicos e elementos de código, como variável, função, método, classe, tabela, coluna, atributo, parâmetro, constante, `constraint`, `index` e `view`.
+- Use português para comentário e explicação escrita dentro do código.
+- Use português no conteúdo textual dos arquivos Markdown do projeto.
+- Em Markdown, preserve em inglês todo termo que representar elemento de código, identificador, estrutura técnica, comando ou exemplo de código.

@@ -29,5 +29,5 @@ O sistema deve distinguir pelo menos três categorias de texto exibido ao usuár
 
 - este contrato governa diretamente o rótulo de domínio;
 - rótulo de apresentação pode reutilizar o rótulo de domínio, mas deve declarar seu contexto próprio quando a exibição exigir ajuste;
-- mensagem de UX não deve ficar embutida no contrato do atributo, mas em catálogo próprio de mensagem com chave técnica estável;
+- mensagem de UX não deve ficar embutida no contrato do atributo, mas em catálogo próprio de mensagens com chave técnica estável;
 - todo texto exibido deve preservar chave técnica estável, mesmo quando o conteúdo textual variar por contexto.

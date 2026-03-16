@@ -22,12 +22,12 @@ Em termos de arquitetura, os dois cabem no mesmo mecanismo:
 
 ## 1.1 Estrutura fixa versus conteúdo configurável
 
-Para que o mesmo sistema funcione em vários nichos, é importante separar com clareza duas camadas:
+Para que o mesmo sistema funcione em vários nichos, é preciso separar com clareza duas camadas:
 
 - estrutura fixa do sistema;
 - conteúdo configurável do nicho.
 
-A estrutura fixa deve concentrar identidade, relacionamento, escopo, vigência, auditoria, versionamento, fato diário materializado e integridade.
+A estrutura fixa deve concentrar identidade, relacionamento, escopo, vigência, auditoria, versionamento, integridade e fato diário materializado.
 
 O conteúdo configurável deve concentrar:
 
@@ -40,7 +40,7 @@ O conteúdo configurável deve concentrar:
 - terminologia exibida ao usuário;
 - pacote analítico do nicho.
 
-Essa separação é a principal defesa contra dois erros:
+Essa separação evita dois erros principais:
 
 - transformar o sistema em um produto de aves com adaptações para soja;
 - transformar o sistema em um repositório genérico de JSONB sem semântica operacional suficiente.
@@ -61,7 +61,7 @@ Cada atributo precisa ter semântica formal mínima, incluindo:
 - unidade e precisão;
 - fórmula ou referência de cálculo, quando aplicável.
 
-Isso é o que permite que 'mortalidade', 'produtividade', 'umidade', 'custo' ou qualquer outro atributo sejam tratados pelo mesmo núcleo sem exigir mudança de esquema.
+Isso permite tratar `mortalidade`, `produtividade`, `umidade`, `custo` e outros atributos no mesmo núcleo, sem exigir mudança de esquema.
 
 ## 2. Mapeamento conceitual entre os nichos
 
@@ -213,7 +213,7 @@ Se o objetivo é ter um único sistema no futuro, estas partes devem ser realmen
 
 ## 5.1 Pacote de nicho
 
-O nicho não deve entrar como variação estrutural do banco nem como ramificação de código principal. Ele deve entrar como um pacote configurável e governado.
+O nicho não deve entrar como variação estrutural do banco nem como ramificação do código principal. Ele deve entrar como pacote configurável e governado.
 
 Esse pacote pode reunir, por exemplo:
 
@@ -226,7 +226,7 @@ Esse pacote pode reunir, por exemplo:
 - visão padrão;
 - painel padrão.
 
-Assim, 'aves' e 'soja' passam a ser pacotes diferentes sobre o mesmo núcleo, e não sistemas estruturalmente distintos.
+Assim, `aves` e `soja` passam a ser pacotes diferentes sobre o mesmo núcleo, e não sistemas estruturalmente distintos.
 
 ## 6. O que deve ser configurável por nicho
 
@@ -258,7 +258,7 @@ Mesmo com um núcleo único, alguns componentes tendem a precisar de especializa
 
 ## 7.1 Limite entre liberdade e governança
 
-Em um sistema orientado por metadado, nem tudo deve ser livre e nem tudo deve ser fixo.
+Em um sistema orientado por metadado, nem tudo deve ser livre, nem tudo deve ser fixo.
 
 Alguns pontos podem ser livres por cadastro:
 
@@ -290,7 +290,7 @@ Sem essa separação, o sistema corre o risco de ficar rígido demais ou flexív
 
 ## 7.2 Fronteira entre relacional e JSONB
 
-Para um sistema multi-nicho, a melhor leitura da arquitetura híbrida é:
+Em um sistema multi-nicho, a melhor leitura da arquitetura híbrida é:
 
 - relacional para entidade, escopo, vínculo, vigência, evento, auditoria e fato diário;
 - JSONB para carga flexível de classificação, configuração complementar e payload variável;
@@ -309,7 +309,7 @@ Os principais riscos em um sistema único para vários nichos são:
 
 ## 7.4 Escopo multi-país
 
-Como decisão firme do projeto, o sistema também deve ser compatível com operação multi-país sem transformar isso em rigidez estrutural desnecessária.
+Como decisão firme do projeto, o sistema também deve ser compatível com operação multi-país, sem transformar isso em rigidez estrutural desnecessária.
 
 Isso implica, no mínimo:
 
@@ -320,7 +320,7 @@ Isso implica, no mínimo:
 - persistência de timestamp em UTC no back-end;
 - exibição de data e hora no fuso horário local da operação ou do usuário.
 
-Essa decisão vale para qualquer nicho. O comportamento de país, moeda e fuso horário deve nascer no núcleo compartilhado e nas regras transversais, enquanto o vocabulário operacional continua no pacote do nicho.
+Essa decisão vale para qualquer nicho. País, moeda e fuso horário devem nascer no núcleo compartilhado e nas regras transversais, enquanto o vocabulário operacional continua no pacote do nicho.
 
 ## 8. Principal conclusão
 
@@ -336,6 +336,6 @@ Portanto, para suportar vários nichos no mesmo sistema, a decisão mais importa
 - o núcleo deve ser orientado por entidade, evento, atributo, regra, vigência e fato;
 - o nicho deve entrar como configuração de comportamento, terminologia, fórmula e pacote analítico.
 
-Em outras palavras, o que diferencia aves e soja não deve ser a estrutura física principal do sistema, mas sim o pacote de metadado ativo para o nicho: terminologia, catálogo de atributo, classificação, evento, fórmula, validação e visão analítica.
+Em outras palavras, o que diferencia aves e soja não deve ser a estrutura física principal do sistema, mas o pacote de metadado ativo para o nicho: terminologia, catálogo de atributo, classificação, evento, fórmula, validação e visão analítica.
 
 Se o sistema tentar fixar métricas de aves na estrutura, ele falha para soja. Se tentar jogar toda semântica apenas em JSONB, ele perde governança. O caminho mais consistente continua sendo a arquitetura híbrida já definida.

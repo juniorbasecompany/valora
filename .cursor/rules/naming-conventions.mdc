@@ -1,0 +1,10 @@
+---
+description: Convenções de nomenclatura técnica do projeto
+alwaysApply: true
+---
+
+# Nomenclatura técnica
+
+- Use nome técnico no singular como padrão.
+- Evite nomes técnicos no plural, exceto quando estritamente necessário.
+- Use o sufixo `list` quando o nome representar coleção.

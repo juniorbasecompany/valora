@@ -2,13 +2,13 @@
 
 ## 1. Objetivo deste documento
 
-Este documento explica como o plano proposto preserva a essência técnica das planilhas atuais e a transforma em um sistema robusto, auditável e escalável.
+Este documento explica como o plano preserva a essência técnica das planilhas atuais e a transforma em um sistema robusto, auditável e escalável.
 
-A ideia não é substituir o raciocínio das planilhas, e sim incorporá-lo de forma estruturada, para que o conhecimento operacional continue existindo, porém sem depender de arquivos manuais, fórmulas frágeis e consolidações difíceis de manter.
+A ideia não é substituir o raciocínio das planilhas, e sim incorporá-lo de forma estruturada, para que o conhecimento operacional continue existindo sem depender de arquivos manuais, fórmulas frágeis e consolidações difíceis de manter.
 
 ## 2. O que as planilhas já fazem bem
 
-Pelas planilhas analisadas, fica claro que elas já carregam conhecimento técnico valioso. Em especial, elas expressam:
+As planilhas analisadas já carregam conhecimento técnico valioso. Em especial, elas expressam:
 
 - visão por lote e aviário;
 - raciocínio de ciclo completo, da recria à produção e ao descarte;
@@ -22,7 +22,7 @@ Em outras palavras, as planilhas não são apenas um repositório de números. E
 
 ## 3. Onde está a fragilidade das planilhas
 
-O problema central não está na lógica, mas no meio onde essa lógica está implementada.
+O problema central não está na lógica, mas no meio em que ela está implementada.
 
 Em planilhas, normalmente surgem estas limitações:
 
@@ -47,7 +47,7 @@ A idade da ave influencia quase tudo: produção, qualidade, pico, queda, descar
 
 ### No sistema
 
-Essa mesma lógica passa a ser modelada por curvas padrão por idade, combinadas com eventos vigentes. Assim, o sistema preserva o comportamento observado nas planilhas, mas com rastreabilidade e versionamento.
+Essa mesma lógica passa a ser modelada por curvas padrão por idade, combinadas com eventos vigentes. O sistema preserva o comportamento observado nas planilhas, mas com rastreabilidade e versionamento.
 
 ## 4.2 Premissas que mudam ao longo do tempo
 
@@ -130,7 +130,7 @@ O sistema passa a suportar com segurança:
 - transferências parciais;
 - diferentes categorias de ave;
 - cenários comparativos;
-- painels e alertas.
+- painéis e alertas.
 
 ## 5.6 Operação multi-país com fato auditável estável
 
@@ -203,7 +203,7 @@ passa-se a ter:
 
 O plano não joga fora a inteligência das planilhas.
 
-Ao contrário: ele parte do entendimento de que as planilhas já expressam corretamente boa parte da lógica do negócio. O objetivo do sistema é capturar essa inteligência, dar estrutura a ela e remover os pontos frágeis que surgem quando a operação depende de arquivos manuais.
+Ao contrário: ele parte do entendimento de que as planilhas já expressam boa parte da lógica do negócio. O objetivo do sistema é capturar essa inteligência, dar estrutura a ela e remover os pontos frágeis que surgem quando a operação depende de arquivos manuais.
 
 ## 10. Resultado esperado
 

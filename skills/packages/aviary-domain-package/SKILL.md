@@ -25,8 +25,6 @@ Leia estas referências conforme necessário:
 
 ## Restrições
 
-- Não assuma que todo nicho tem conceito avícola.
-- Não transforme o vocabulário do pacote em nome estrutural de coluna.
 - Mantenha explícitas a fórmula e a validação do domínio.
 
 ## Entregáveis

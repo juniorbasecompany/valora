@@ -2,7 +2,7 @@
 
 ## 1. Objetivo
 
-Transformar o modelo hoje operado em planilhas em um sistema robusto para previsão, acompanhamento do realizado e simulação de uma lavoura de soja, com cálculo diário, rastreabilidade completa e visão consolidada por ciclo, segmento, local, período e empresa.
+Transformar o modelo hoje operado em planilhas em um sistema robusto para previsão, acompanhamento do realizado e simulação de uma lavoura de soja, com cálculo diário, rastreabilidade e visão consolidada por ciclo, segmento, local, período e empresa.
 
 O sistema deve permitir:
 
@@ -58,14 +58,14 @@ O realizado não substitui a previsão. Ele deve ser armazenado em camada própr
 
 ### 2.5 Modelo orientado por metadado
 
-O sistema deve ser orientado por metadado. Isso significa que atributos, classificações, curvas, regras e indicadores de negócio não devem nascer como colunas dedicadas por padrão.
+O sistema deve ser orientado por metadado. Isso significa que atributos, classificações, curvas, regras e indicadores de negócio não devem nascer, por padrão, como colunas dedicadas.
 
 Deve existir uma distinção clara entre:
 
 - estrutura fixa do sistema, responsável por identidade, relacionamento, escopo, vigência, auditoria, versionamento e materialização;
 - conteúdo configurável, responsável por definir atributos, classificações, fórmulas, unidades, agregações e rótulos exibidos ao usuário.
 
-Assim, itens como produtividade, estande, umidade, impureza, custo e preço devem ser tratados como exemplos de atributos configuráveis do domínio, e não como nomes obrigatórios de colunas físicas.
+Assim, itens como produtividade, estande, umidade, impureza, custo e preço devem ser tratados como atributos configuráveis do domínio, e não como nomes obrigatórios de colunas físicas.
 
 Cada atributo configurável deve permitir, no mínimo:
 
@@ -103,7 +103,7 @@ Isso significa, no mínimo:
 
 Se a taxa histórica usada em relatório convertido mudar posteriormente, isso não altera o fato financeiro original nem a auditoria operacional da moeda local.
 
-### 2.8 UTC no back-end e exibição local
+### 2.8 UTC no backend e exibição local
 
 O sistema deve persistir timestamps em UTC e exibir datas e horários no fuso horário local da operação ou do usuário, conforme a necessidade da interface.
 
@@ -227,7 +227,7 @@ Eventos de atributo alteram o valor vigente de um atributo configurável a parti
 
 Eventos de regra alteram a forma de tratamento de um atributo, como fórmula, agregação, fallback, unidade operacional ou comportamento no cálculo.
 
-Exemplos de atributos que podem ser governados por esses eventos incluem produtividade esperada, estande, emergência, umidade, impureza, preço por classe, custo por operação, capacidade planejada, meta técnica e meta econômica. Esses exemplos não devem ser interpretados como uma lista fechada.
+Exemplos de atributos governados por esses eventos incluem produtividade esperada, estande, emergência, umidade, impureza, preço por classe, custo por operação, capacidade planejada, meta técnica e meta econômica. Esses exemplos não formam uma lista fechada.
 
 Todos os eventos devem ser versionados, datados, auditáveis e reconstruíveis historicamente.
 
@@ -467,7 +467,7 @@ Implementar:
 
 ### Fase 7 — Painéis e gestão
 
-Implementar painels, relatórios gerenciais, alertas e acompanhamento operacional.
+Implementar painéis, relatórios gerenciais, alertas e acompanhamento operacional.
 
 ## 12. Critérios de sucesso
 
@@ -485,4 +485,4 @@ O plano será considerado bem implementado quando o sistema:
 
 ## 13. Resultado esperado
 
-Ao final, a empresa terá um sistema capaz de transformar conhecimento agronômico hoje disperso em planilhas em um modelo único, auditável e escalável, preservando a lógica técnica do negócio e ampliando a capacidade de análise, simulação e decisão.
+Ao final, a empresa terá um sistema capaz de transformar o conhecimento agronômico hoje disperso em planilhas em um modelo único, auditável e escalável, preservando a lógica técnica do negócio e ampliando a capacidade de análise, simulação e decisão.

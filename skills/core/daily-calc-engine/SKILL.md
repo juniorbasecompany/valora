@@ -8,9 +8,9 @@ description: Use quando implementar ou revisar o fluxo de cálculo diário: fall
 Use esta skill para o fluxo oficial de cálculo diário.
 
 Leia estas referências conforme necessário:
-- 'references/calc-flow.md'
-- 'references/provenance.md'
-- 'references/materialized-facts.md'
+- `references/calc-flow.md`
+- `references/provenance.md`
+- `references/materialized-facts.md`
 
 ## Fluxo
 
@@ -24,7 +24,6 @@ Leia estas referências conforme necessário:
 ## Restrições
 
 - O diário é o único grão nativo de cálculo.
-- Dado realizado não deve sobrescrever previsão.
 - Todo valor calculado deve ser explicável.
 
 ## Entregáveis

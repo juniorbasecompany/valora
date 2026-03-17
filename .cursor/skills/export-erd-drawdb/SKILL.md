@@ -1,29 +1,23 @@
 ---
 name: export-erd-drawdb
-description: Export the project data structure as an ERD in drawDB JSON format. Use when the user asks to export the schema to drawDB, generate ERD for drawdb.app, or create a diagram JSON compatible with https://www.drawdb.app/ and https://drawdb-io.github.io/docs/
+description: ERD do projeto em formato drawDB. Fonte de verdade em backend/sql/erd.json. Use quando o usuário pedir o ERD para drawdb.app, consultar o diagrama ou o formato JSON compatível com https://www.drawdb.app/ e https://drawdb-io.github.io/docs/
 ---
 
 # Exportar ERD no formato JSON do drawDB
 
 ## Objetivo
 
-Permitir que a estrutura de dados do projeto (esquema PostgreSQL em `backend/sql/initial_schema.sql`) seja exportada como diagrama ERD no formato JSON aceito pelo [drawDB](https://www.drawdb.app/) para visualização e edição em https://www.drawdb.app/editor.
+A fonte de verdade do ERD do projeto é `backend/sql/erd.json` (formato JSON do [drawDB](https://www.drawdb.app/)). O restante do sistema deve ser atualizado conforme o conteúdo de `erd.json`.
 
 ## Quando usar
 
-- Usuário pede para exportar o esquema/ERD para drawDB.
-- Gerar diagrama visual da base a partir do DDL.
-- Produzir JSON compatível com import do drawDB.
+- Usuário pede para consultar ou editar o ERD no drawDB.
+- Referência ao formato e à localização do diagrama (fonte de verdade).
 
 ## Fluxo
 
-1. **Fonte**: o esquema oficial está em `backend/sql/initial_schema.sql` (PostgreSQL).
-2. **Script**: executar o script de exportação que lê o DDL e gera o JSON drawDB:
-   ```bash
-   python .cursor/skills/export-erd-drawdb/scripts/script_export_drawdb_erd.py
-   ```
-   Por padrão o script lê `backend/sql/initial_schema.sql` e grava `backend/sql/erd_drawdb.json`. Caminhos podem ser passados como argumentos.
-3. **Importar no drawDB**: em https://www.drawdb.app/editor usar **File > Import** e escolher o arquivo JSON gerado.
+1. **Fonte de verdade do diagrama**: `backend/sql/erd.json`. O restante do sistema é atualizado conforme esse arquivo.
+2. **Importar no drawDB**: em https://www.drawdb.app/editor usar **File > Import** e escolher `backend/sql/erd.json`. Edições no drawDB podem ser exportadas de volta para manter o arquivo em sincronia.
 
 ## Formato JSON (resumo)
 
@@ -46,5 +40,4 @@ Para o esquema JSON completo (tipos, enums, áreas, notas), ver [reference.md](r
 
 ## Manutenção
 
-- Ao alterar `initial_schema.sql`, rodar novamente o script e reimportar o JSON no drawDB se quiser o diagrama atualizado.
-- O script usa apenas biblioteca padrão Python; não é necessário `pip install` para uso básico.
+- A fonte de verdade do diagrama é `backend/sql/erd.json`; edições no drawDB ou no repo devem refletir nesse arquivo.

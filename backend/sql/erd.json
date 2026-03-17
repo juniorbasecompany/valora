@@ -16,7 +16,7 @@
           "unique": true,
           "notNull": false,
           "increment": true,
-          "comment": ""
+          "comment": "Identificador único (PK)."
         },
         {
           "id": "6cebf197d276",
@@ -28,7 +28,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Nome técnico único do escopo."
         },
         {
           "id": "b2bfa5f229db",
@@ -40,7 +40,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Nome de exibição."
         },
         {
           "id": "ca1877e32098",
@@ -52,7 +52,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Status do escopo (ex.: active)."
         },
         {
           "id": "79a10b1f2e8a",
@@ -64,10 +64,10 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Data e hora de criação do registro (UTC)."
         }
       ],
-      "comment": "",
+      "comment": "Âmbito ou escopo de agrupamento de entidades.",
       "indices": [],
       "color": "#1a6b8a",
       "locked": false
@@ -88,7 +88,7 @@
           "unique": true,
           "notNull": false,
           "increment": true,
-          "comment": ""
+          "comment": "Identificador único (PK)."
         },
         {
           "id": "977e75edccc4",
@@ -100,7 +100,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Escopo ao qual o tipo de entidade pertence (FK)."
         },
         {
           "id": "3275722f9f32",
@@ -112,7 +112,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Nome técnico único dentro do escopo."
         },
         {
           "id": "227ad2bbe28b",
@@ -124,7 +124,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Nome de exibição."
         },
         {
           "id": "350b0a47864c",
@@ -136,7 +136,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Indica se este tipo permite segmentação."
         },
         {
           "id": "401840b89000",
@@ -148,10 +148,10 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Data e hora de criação do registro (UTC)."
         }
       ],
-      "comment": "",
+      "comment": "Tipo de entidade dentro de um escopo (ex.: produto, cliente).",
       "indices": [],
       "color": "#1a6b8a",
       "locked": false
@@ -172,7 +172,7 @@
           "unique": true,
           "notNull": false,
           "increment": true,
-          "comment": ""
+          "comment": "Identificador único (PK)."
         },
         {
           "id": "ffa3d2541cc4",
@@ -184,7 +184,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": ""
+          "comment": "Nó pai na hierarquia (FK)."
         },
         {
           "id": "ee72cca39534",
@@ -196,7 +196,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Tipo do nó (ex.: country, region)."
         },
         {
           "id": "bede2ea21131",
@@ -208,7 +208,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Nome técnico único do nó."
         },
         {
           "id": "1aeea77093fd",
@@ -220,7 +220,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Nome de exibição."
         },
         {
           "id": "6a29ef8571c3",
@@ -232,7 +232,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": ""
+          "comment": "Código ISO do país (2 letras), quando aplicável."
         },
         {
           "id": "f8df56461552",
@@ -244,7 +244,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": ""
+          "comment": "Nome do fuso horário (IANA)."
         },
         {
           "id": "128d4fffc218",
@@ -256,7 +256,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Início da vigência do nó."
         },
         {
           "id": "c3a8d86bdb81",
@@ -268,7 +268,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": ""
+          "comment": "Fim da vigência do nó (NULL = vigente)."
         },
         {
           "id": "fc0a906374b8",
@@ -280,10 +280,10 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Data e hora de criação do registro (UTC)."
         }
       ],
-      "comment": "",
+      "comment": "Nó da hierarquia de localização (país, região, etc.).",
       "indices": [],
       "color": "#1a6b8a",
       "locked": false
@@ -304,7 +304,7 @@
           "unique": true,
           "notNull": false,
           "increment": true,
-          "comment": ""
+          "comment": "Identificador único (PK)."
         },
         {
           "id": "9282a073cf4e",
@@ -316,7 +316,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Tipo de entidade (FK)."
         },
         {
           "id": "52d220d7f510",
@@ -328,7 +328,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Local ao qual o item está vinculado (FK)."
         },
         {
           "id": "7bcb4c3398da",
@@ -340,7 +340,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Código único do item dentro do tipo e local."
         },
         {
           "id": "bff5d999392b",
@@ -352,7 +352,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Data de início de vigência."
         },
         {
           "id": "e893bf3cb9f5",
@@ -364,7 +364,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": ""
+          "comment": "Data de fim de vigência (NULL = vigente)."
         },
         {
           "id": "3fd2f41de594",
@@ -376,7 +376,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Status do item (ex.: active)."
         },
         {
           "id": "1519282ac18c",
@@ -388,10 +388,10 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Data e hora de criação do registro (UTC)."
         }
       ],
-      "comment": "",
+      "comment": "Entidade de negócio: instância de um tipo de entidade em um local.",
       "indices": [],
       "color": "#1a6b8a",
       "locked": false
@@ -412,7 +412,7 @@
           "unique": true,
           "notNull": false,
           "increment": true,
-          "comment": ""
+          "comment": "Identificador único (PK)."
         },
         {
           "id": "8f3f8b98f1d0",
@@ -424,7 +424,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Item ao qual o segmento pertence (FK)."
         },
         {
           "id": "167e0b4ef8aa",
@@ -436,7 +436,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Local do segmento (FK)."
         },
         {
           "id": "bc25c80a6510",
@@ -448,7 +448,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": ""
+          "comment": "Segmento pai na hierarquia (FK)."
         },
         {
           "id": "6e5e3e266c21",
@@ -460,7 +460,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Código único do segmento dentro do item."
         },
         {
           "id": "102d399ba592",
@@ -472,7 +472,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Data de início de vigência."
         },
         {
           "id": "8633488611ec",
@@ -484,7 +484,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": ""
+          "comment": "Data de fim de vigência (NULL = vigente)."
         },
         {
           "id": "727f2c0fb4d2",
@@ -496,7 +496,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Status do segmento (ex.: active)."
         },
         {
           "id": "3fdcb5a18781",
@@ -508,7 +508,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": ""
+          "comment": "Motivo do split, quando aplicável."
         },
         {
           "id": "364c2fcf54cc",
@@ -520,10 +520,10 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Data e hora de criação do registro (UTC)."
         }
       ],
-      "comment": "",
+      "comment": "Segmento de item em um local, com possível hierarquia.",
       "indices": [],
       "color": "#1a6b8a",
       "locked": false
@@ -544,7 +544,7 @@
           "unique": true,
           "notNull": false,
           "increment": true,
-          "comment": ""
+          "comment": "Identificador único (PK)."
         },
         {
           "id": "b066a9c47095",
@@ -556,7 +556,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Escopo do evento (FK)."
         },
         {
           "id": "59c2818df67b",
@@ -568,7 +568,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": ""
+          "comment": "Item associado (FK), quando aplicável."
         },
         {
           "id": "2ef560181252",
@@ -580,7 +580,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": ""
+          "comment": "Segmento associado (FK), quando aplicável."
         },
         {
           "id": "54a578a3da78",
@@ -592,7 +592,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": ""
+          "comment": "Local associado (FK), quando aplicável."
         },
         {
           "id": "b72fbfdfce55",
@@ -604,7 +604,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Tipo do evento."
         },
         {
           "id": "5194157afe07",
@@ -616,7 +616,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Data de negócio do evento."
         },
         {
           "id": "9839b88c1f0e",
@@ -628,7 +628,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Data e hora de ocorrência (UTC)."
         },
         {
           "id": "52d968573b36",
@@ -640,7 +640,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Início da vigência do efeito do evento."
         },
         {
           "id": "64eb609b70c5",
@@ -652,7 +652,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": ""
+          "comment": "Fim da vigência do efeito (NULL = vigente)."
         },
         {
           "id": "a33500b607d9",
@@ -664,7 +664,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": ""
+          "comment": "Sistema de origem do evento."
         },
         {
           "id": "8a6d99091d50",
@@ -676,7 +676,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": ""
+          "comment": "Payload flexível de origem, mantido apenas para detalhe de evento que não substitui colunas estruturais."
         },
         {
           "id": "3cc4cc3470c8",
@@ -688,10 +688,10 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Data e hora de criação do registro (UTC)."
         }
       ],
-      "comment": "",
+      "comment": "Evento temporal associado a escopo, item, segmento ou local.",
       "indices": [],
       "color": "#1a6b8a",
       "locked": false
@@ -712,7 +712,7 @@
           "unique": true,
           "notNull": false,
           "increment": true,
-          "comment": ""
+          "comment": "Identificador único (PK)."
         },
         {
           "id": "0df1a70e0269",
@@ -724,7 +724,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Nome técnico único do cenário."
         },
         {
           "id": "5b8c0b217b42",
@@ -736,7 +736,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Tipo do cenário (ex.: budget, forecast)."
         },
         {
           "id": "6ab19393139b",
@@ -748,7 +748,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": ""
+          "comment": "Cenário pai na hierarquia (FK)."
         },
         {
           "id": "ac6a830c34d1",
@@ -760,7 +760,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Indica se é o cenário oficial."
         },
         {
           "id": "6a7c1d148079",
@@ -772,10 +772,10 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Data e hora de criação do registro (UTC)."
         }
       ],
-      "comment": "",
+      "comment": "Cenário de planejamento ou simulação (hierárquico).",
       "indices": [],
       "color": "#1a6b8a",
       "locked": false
@@ -796,7 +796,7 @@
           "unique": true,
           "notNull": false,
           "increment": true,
-          "comment": ""
+          "comment": "Identificador único (PK)."
         },
         {
           "id": "3593f5438246",
@@ -808,7 +808,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Versão do motor de cálculo."
         },
         {
           "id": "46260e6c88c5",
@@ -820,7 +820,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Versão do conjunto de regras."
         },
         {
           "id": "b7d80a5ef3db",
@@ -832,10 +832,10 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Data e hora de criação do registro (UTC)."
         }
       ],
-      "comment": "",
+      "comment": "Versão do motor e do conjunto de regras de cálculo.",
       "indices": [],
       "color": "#1a6b8a",
       "locked": false
@@ -856,7 +856,7 @@
           "unique": true,
           "notNull": false,
           "increment": true,
-          "comment": ""
+          "comment": "Identificador único (PK)."
         },
         {
           "id": "82d0bafae248",
@@ -868,7 +868,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Escopo do atributo (FK)."
         },
         {
           "id": "eae29be782ff",
@@ -880,7 +880,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Nome técnico único dentro do escopo."
         },
         {
           "id": "feb1a77e6c3c",
@@ -892,7 +892,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Nome de exibição."
         },
         {
           "id": "789b243a8d0a",
@@ -904,7 +904,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Tipo do valor (ex.: numeric, text)."
         },
         {
           "id": "1bbee6a7e703",
@@ -916,7 +916,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Papel de negócio do atributo."
         },
         {
           "id": "1932533664c9",
@@ -928,7 +928,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Grão de agregação (ex.: daily, monthly)."
         },
         {
           "id": "926efc58b9e8",
@@ -940,7 +940,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Regra de agregação (ex.: sum, avg)."
         },
         {
           "id": "9b3f917f11ba",
@@ -952,7 +952,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": ""
+          "comment": "Código da unidade de medida."
         },
         {
           "id": "5a09ed44b270",
@@ -964,7 +964,7 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": ""
+          "comment": "Escala de precisão numérica (0 a 12)."
         },
         {
           "id": "33e783139a5a",
@@ -976,7 +976,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Indica se aparece no painel por padrão."
         },
         {
           "id": "40d94c29d1f0",
@@ -988,7 +988,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Indica se exige auditoria."
         },
         {
           "id": "e3e88c15f8c5",
@@ -1000,10 +1000,10 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Data e hora de criação do registro (UTC)."
         }
       ],
-      "comment": "",
+      "comment": "Atributo governado: definição de medida ou dimensão.",
       "indices": [],
       "color": "#c4c410",
       "locked": false
@@ -1024,7 +1024,7 @@
           "unique": true,
           "notNull": false,
           "increment": true,
-          "comment": ""
+          "comment": "Identificador único (PK)."
         },
         {
           "id": "125496e28ab2",
@@ -1036,7 +1036,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Chave de partição e grão oficial de negócio para derivações analíticas."
         },
         {
           "id": "6603b19738a1",
@@ -1048,7 +1048,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Item da medida (via segmento)."
         },
         {
           "id": "8239f9f0cf14",
@@ -1060,7 +1060,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Segmento no grão do fato (FK)."
         },
         {
           "id": "d4ea5792a660",
@@ -1072,7 +1072,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Local no grão do fato."
         },
         {
           "id": "2cc8c4f66cfe",
@@ -1084,7 +1084,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Atributo medido (FK)."
         },
         {
           "id": "6931f898df07",
@@ -1096,7 +1096,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Cenário do valor (FK)."
         },
         {
           "id": "48b7a9de5278",
@@ -1108,7 +1108,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Versão de cálculo que gerou o valor (FK)."
         },
         {
           "id": "588ad7ab9074",
@@ -1120,7 +1120,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Valor numérico da medida."
         },
         {
           "id": "1a34ae3d13e3",
@@ -1132,7 +1132,7 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Código da unidade do valor."
         },
         {
           "id": "88e7e719acf6",
@@ -1144,10 +1144,10 @@
           "unique": false,
           "notNull": true,
           "increment": false,
-          "comment": ""
+          "comment": "Data e hora de criação do registro (UTC)."
         }
       ],
-      "comment": "",
+      "comment": "Tabela oficial de fatos numéricos diários. O segmento é obrigatório nesta modelagem inicial.",
       "indices": [],
       "color": "#6270f0",
       "locked": false

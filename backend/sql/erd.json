@@ -5,7 +5,7 @@
       "name": "scope",
       "comment": "Escopo do projeto: Aves, Soja, Leite...",
       "indices": [],
-      "color": "#1a6b8a",
+      "color": "#ff0000",
       "fields": [
         {
           "id": "scope.id",
@@ -64,7 +64,7 @@
       "name": "kind",
       "comment": "Tipo de entidade dentro de um escopo (ex.: produto, cliente).",
       "indices": [],
-      "color": "#1a6b8a",
+      "color": "#ff0000",
       "fields": [
         {
           "id": "kind.id",
@@ -147,7 +147,7 @@
       "name": "location",
       "comment": "Nó da hierarquia de localização (país, região, etc.).",
       "indices": [],
-      "color": "#1a6b8a",
+      "color": "#ff0000",
       "locked": false,
       "fields": [
         {
@@ -255,7 +255,7 @@
       "name": "item",
       "comment": "Entidade de negócio: instância de um tipo de entidade em um local.",
       "indices": [],
-      "color": "#1a6b8a",
+      "color": "#ff0000",
       "locked": false,
       "fields": [
         {
@@ -363,7 +363,7 @@
       "name": "segment",
       "comment": "Segmento de item em um local, com possível hierarquia.",
       "indices": [],
-      "color": "#1a6b8a",
+      "color": "#ff0000",
       "locked": false,
       "fields": [
         {
@@ -495,7 +495,7 @@
       "name": "event",
       "comment": "Evento temporal associado a escopo, item, segmento ou local.",
       "indices": [],
-      "color": "#1a6b8a",
+      "color": "#ff0000",
       "locked": false,
       "fields": [
         {
@@ -663,7 +663,7 @@
       "name": "scenario",
       "comment": "Cenário de planejamento ou simulação (hierárquico).",
       "indices": [],
-      "color": "#1a6b8a",
+      "color": "#ff0000",
       "locked": false,
       "fields": [
         {
@@ -747,7 +747,7 @@
       "name": "version",
       "comment": "Versão do motor e do conjunto de regras de cálculo.",
       "indices": [],
-      "color": "#1a6b8a",
+      "color": "#ff0000",
       "locked": false,
       "fields": [
         {
@@ -807,7 +807,7 @@
       "name": "attribute",
       "comment": "Atributo governado: definição de medida ou dimensão.",
       "indices": [],
-      "color": "#c4c410",
+      "color": "#0000ff",
       "locked": false,
       "fields": [
         {
@@ -975,7 +975,7 @@
       "name": "fact",
       "comment": "Tabela oficial de fatos numéricos diários. É o resultado do cálculo do dia.",
       "indices": [],
-      "color": "#6270f0",
+      "color": "#00ff00",
       "locked": false,
       "fields": [
         {

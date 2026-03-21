@@ -11,14 +11,14 @@ export default function AppErrorPage({ error, reset }: AppErrorPageProps) {
   const t = useTranslations("State");
 
   return (
-    <section className="rounded-2xl border border-rose-950/70 bg-rose-950/40 p-6 text-rose-50">
+    <section className="ui-notice-danger p-6">
       <div className="flex flex-col gap-3">
         <h2 className="text-xl font-semibold">{t("errorTitle")}</h2>
-        <p className="max-w-2xl text-sm leading-6 text-rose-100/80">
+        <p className="max-w-2xl text-sm leading-6 opacity-90">
           {t("errorDescription")}
         </p>
         {error.message ? (
-          <p className="rounded-xl border border-rose-900/70 bg-slate-950/40 px-4 py-3 text-sm text-rose-100/85">
+          <p className="ui-card ui-tone-danger px-4 py-3 text-sm">
             {error.message}
           </p>
         ) : null}
@@ -26,7 +26,7 @@ export default function AppErrorPage({ error, reset }: AppErrorPageProps) {
           <button
             type="button"
             onClick={reset}
-            className="rounded-xl border border-rose-800 bg-rose-900/40 px-4 py-2 text-sm font-medium text-rose-50 transition hover:bg-rose-900/60"
+            className="ui-button-danger text-sm font-medium transition"
           >
             {t("retry")}
           </button>

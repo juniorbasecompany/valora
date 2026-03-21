@@ -1,34 +1,46 @@
 import type { ReactNode } from "react";
 
 type AppTopbarProps = {
+  tenantLabel: string;
+  tenantValue: string;
   localeLabel: string;
   localeValue: string;
-  statusLabel: string;
-  statusValue: string;
+  accountLabel?: string;
+  accountValue?: string;
   actionSlot?: ReactNode;
 };
 
 export function AppTopbar({
+  tenantLabel,
+  tenantValue,
   localeLabel,
   localeValue,
-  statusLabel,
-  statusValue,
+  accountLabel,
+  accountValue,
   actionSlot
 }: AppTopbarProps) {
   return (
-    <header className="flex items-center justify-between gap-4 border-b border-slate-800 bg-slate-950/70 px-6 py-4 backdrop-blur">
+    <header className="ui-topbar flex items-center justify-between gap-4 px-6 py-4 backdrop-blur">
       <div>
-        <p className="text-xs uppercase tracking-[0.16em] text-slate-500">
-          {statusLabel}
+        <p className="text-xs uppercase tracking-[0.16em] text-[var(--color-text-subtle)]">
+          {tenantLabel}
         </p>
-        <p className="mt-1 text-sm font-medium text-slate-100">{statusValue}</p>
+        <p className="mt-1 text-sm font-medium text-[var(--color-text)]">
+          {tenantValue}
+        </p>
       </div>
 
       <div className="flex items-center gap-3">
         {actionSlot}
-        <div className="flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900 px-3 py-1.5 text-sm text-slate-300">
-          <span className="text-slate-500">{localeLabel}</span>
-          <span className="font-medium text-slate-100">{localeValue}</span>
+        {accountLabel && accountValue ? (
+          <div className="ui-pill flex items-center gap-2 px-3 py-1.5 text-sm">
+            <span className="text-[var(--color-text-subtle)]">{accountLabel}</span>
+            <span className="font-medium text-[var(--color-text)]">{accountValue}</span>
+          </div>
+        ) : null}
+        <div className="ui-pill flex items-center gap-2 px-3 py-1.5 text-sm">
+          <span className="text-[var(--color-text-subtle)]">{localeLabel}</span>
+          <span className="font-medium text-[var(--color-text)]">{localeValue}</span>
         </div>
       </div>
     </header>

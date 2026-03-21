@@ -1,18 +1,13 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { routing } from "@/i18n/routing";
-import {
-  authSessionCookieName,
-  hasSimulatedSession
-} from "@/lib/auth/session";
+import { getAuthSession } from "@/lib/auth/server-session";
 
 export default async function RootPage() {
-  const cookieStore = await cookies();
-  const sessionValue = cookieStore.get(authSessionCookieName)?.value;
   const locale = routing.defaultLocale;
+  const authSession = await getAuthSession();
 
-  if (hasSimulatedSession(sessionValue)) {
+  if (authSession) {
     redirect(`/${locale}/app`);
   }
 

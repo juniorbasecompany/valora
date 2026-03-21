@@ -26,17 +26,19 @@ export function AppSidebar({
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-full max-w-72 shrink-0 flex-col border-r border-slate-800 bg-slate-950/95">
-      <div className="border-b border-slate-800 px-5 py-5">
+    <aside className="ui-sidebar flex w-full max-w-72 shrink-0 flex-col">
+      <div className="border-b border-[var(--color-border)] px-5 py-5">
         <div className="flex flex-col gap-2">
-          <span className="inline-flex w-fit rounded-full border border-slate-800 bg-slate-900 px-2.5 py-1 text-xs font-medium text-slate-300">
+          <span className="ui-pill inline-flex w-fit px-2.5 py-1 text-xs font-medium">
             {productStage}
           </span>
           <div>
-            <h1 className="text-lg font-semibold tracking-tight text-white">
+            <h1 className="text-lg font-semibold tracking-tight text-[var(--color-text)]">
               {productName}
             </h1>
-            <p className="mt-1 text-sm text-slate-400">{workspaceLabel}</p>
+            <p className="mt-1 text-sm text-[var(--color-text-subtle)]">
+              {workspaceLabel}
+            </p>
           </div>
         </div>
       </div>
@@ -47,7 +49,7 @@ export function AppSidebar({
             <>
               <span>{navigationItem.label}</span>
               {navigationItem.statusLabel ? (
-                <span className="rounded-full border border-slate-800 px-2 py-0.5 text-[11px] text-slate-400">
+                <span className="ui-pill px-2 py-0.5 text-[11px]">
                   {navigationItem.statusLabel}
                 </span>
               ) : null}
@@ -64,10 +66,10 @@ export function AppSidebar({
               <Link
                 key={navigationItem.key}
                 href={navigationItem.href}
-                className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-sm transition ${
+                className={`ui-nav-item flex items-center justify-between px-3 py-2.5 text-sm transition ${
                   isActive
-                    ? "bg-slate-800 text-white"
-                    : "text-slate-300 hover:bg-slate-900 hover:text-white"
+                    ? "ui-nav-item-active"
+                    : ""
                 }`}
               >
                 {content}
@@ -78,7 +80,7 @@ export function AppSidebar({
           return (
             <div
               key={navigationItem.key}
-              className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-slate-500"
+              className="ui-nav-item-muted flex items-center justify-between rounded-[var(--radius-control)] px-3 py-2.5 text-sm"
             >
               {content}
             </div>

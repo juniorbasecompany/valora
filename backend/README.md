@@ -1,3 +1,29 @@
+## backend
+
+Serviço FastAPI do Valora.
+
+## Autenticação Google
+
+O backend valida o `id_token` do Google, encontra ou cria `account`, reconcilia `member` pendente por email e emite um JWT próprio da aplicação com `account_id` e `tenant_id`.
+
+## Variáveis de ambiente
+
+```bash
+POSTGRES_PASSWORD=
+GOOGLE_CLIENT_ID=
+APP_JWT_SECRET=
+```
+
+## Fluxos implementados
+
+- `POST /auth/google`
+- `POST /auth/google/select-tenant`
+- `POST /auth/google/create-tenant`
+- `POST /auth/switch-tenant`
+- `GET /auth/tenant/list`
+- `GET /auth/me`
+- `POST /auth/invites/{member_id}/accept`
+- `POST /auth/invites/{member_id}/reject`
 # backend
 
 Projeto Python do núcleo executável do sistema.

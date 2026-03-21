@@ -4,6 +4,7 @@ from fastapi import Depends, FastAPI
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from valora_backend.api.auth import router as auth_router
 from valora_backend.db import engine, get_session
 
 
@@ -28,6 +29,8 @@ def create_app() -> FastAPI:
     def health_db(session: Session = Depends(get_session)) -> dict[str, str]:
         session.execute(text("SELECT 1"))
         return {"status": "ok", "database": "connected"}
+
+    app.include_router(auth_router)
 
     return app
 

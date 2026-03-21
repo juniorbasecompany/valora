@@ -260,6 +260,27 @@ Evitar:
 - Tipografia e alinhamento devem transmitir precisão.
 - Estados e feedback precisam ser discretos, claros e rápidos.
 
+## Tema e tokens visuais
+
+- A base atual da interface deve seguir `light theme`.
+- O `light theme` não deve empurrar o produto para aparência leve demais, decorativa ou com contraste fraco.
+- A fonte única de verdade dos tokens visuais do frontend deve ficar em `frontend/src/app/globals.css`.
+- Tokens visuais devem ser semânticos e cobrir, no mínimo:
+  - cor de `background`, `surface`, `border`, `text`, ação primária e estados semânticos;
+  - `radius`;
+  - sombra;
+  - largura de borda;
+  - espaçamento estrutural;
+  - densidade básica de controles.
+- Componentes e páginas devem consumir tokens semânticos ou classes reutilizáveis baseadas nesses tokens.
+- Evitar espalhar por componente:
+  - `slate-*`, hex e cores estruturais hardcoded;
+  - `rounded-*` estrutural;
+  - sombra estrutural;
+  - combinações locais de borda e superfície que já tenham padrão canônico.
+- Quando houver dúvida entre ajustar um componente isolado ou melhorar a fundação visual, preferir melhorar a fundação.
+- A manutenção do tema deve acontecer, idealmente, por ajuste de token ou de primitive reutilizável, e não por caça manual de classes em telas.
+
 ## O que evitar
 
 - aparência de admin template genérico;

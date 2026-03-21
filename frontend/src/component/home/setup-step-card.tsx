@@ -6,9 +6,9 @@ type SetupStepCardProps = {
 };
 
 const toneClassNameByTone = {
-  neutral: "border-slate-800 text-slate-300",
-  attention: "border-amber-800/70 text-amber-200",
-  positive: "border-emerald-800/70 text-emerald-200"
+  neutral: "ui-tone-neutral",
+  attention: "ui-tone-attention",
+  positive: "ui-tone-positive"
 } as const;
 
 export function SetupStepCard({
@@ -18,14 +18,16 @@ export function SetupStepCard({
   tone = "neutral"
 }: SetupStepCardProps) {
   return (
-    <article className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+    <article className="ui-card p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-2">
-          <h3 className="text-sm font-medium text-slate-100">{title}</h3>
-          <p className="text-sm leading-6 text-slate-400">{description}</p>
+          <h3 className="text-sm font-medium text-[var(--color-text)]">{title}</h3>
+          <p className="text-sm leading-6 text-[var(--color-text-subtle)]">
+            {description}
+          </p>
         </div>
         <span
-          className={`rounded-full border px-2.5 py-1 text-xs font-medium ${toneClassNameByTone[tone]}`}
+          className={`ui-pill px-2.5 py-1 text-xs font-medium ${toneClassNameByTone[tone]}`}
         >
           {statusLabel}
         </span>

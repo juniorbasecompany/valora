@@ -9,6 +9,7 @@ from sqlalchemy import (
     Index,
     Integer,
     Text,
+    UniqueConstraint,
     text,
 )
 from sqlalchemy.orm import Mapped, mapped_column
@@ -44,7 +45,15 @@ class Account(Base):
     """Conta de utilizador do sistema (provedor de autenticação)."""
 
     __tablename__ = "account"
-    __table_args__ = {"comment": "Esté a conta do usuário do sistema."}
+    __table_args__ = (
+        UniqueConstraint("email", name="account_unique_email"),
+        UniqueConstraint(
+            "provider",
+            "provider_subject",
+            name="account_unique_provider_subject",
+        ),
+        {"comment": "Esté a conta do usuário do sistema."},
+    )
 
     id: Mapped[int] = mapped_column(
         BigInteger,
@@ -74,6 +83,11 @@ class Account(Base):
             "Indica qual foi o mecanismo de autenticação utilizado pela conta do "
             "usuário (ex.: google auth)."
         ),
+    )
+    provider_subject: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+        comment="Identificador estável da conta no provedor de autenticação.",
     )
 
 
@@ -136,6 +150,14 @@ class Member(Base):
         ForeignKey("account.id", onupdate="CASCADE", ondelete="SET NULL"),
         nullable=True,
         comment="Ligação do usuário à conta do usuário.",
+    )
+    role: Mapped[int] = mapped_column(
+        Integer,
+        CheckConstraint("role IN (1, 2, 3)"),
+        nullable=False,
+        default=3,
+        server_default=text("3"),
+        comment="Papel do usuário no licenciado: 1 master, 2 admin, 3 member.",
     )
     status: Mapped[int] = mapped_column(
         Integer,

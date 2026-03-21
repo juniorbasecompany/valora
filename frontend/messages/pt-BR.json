@@ -14,10 +14,11 @@
       "comingSoon": "em breve"
     },
     "topbar": {
+      "tenantLabel": "Tenant ativo",
+      "accountLabel": "Conta",
       "localeLabel": "Locale",
-      "statusLabel": "Estado atual",
-      "statusValue": "Home protegida por fluxo UI-first",
-      "signOut": "Sair"
+      "signOut": "Sair",
+      "signOutPending": "Saindo..."
     }
   },
   "HomePage": {
@@ -31,7 +32,7 @@
     "context": {
       "workspace": {
         "title": "Workspace atual",
-        "description": "Você já está dentro da área protegida da aplicação, com a shell pronta para crescer em módulos."
+        "description": "Você já está dentro da área autenticada da aplicação, com tenant ativo e shell pronta para crescer em módulos."
       },
       "locale": {
         "title": "Idioma e locale",
@@ -39,7 +40,7 @@
       },
       "entryFlow": {
         "title": "Fluxo atual",
-        "description": "O login UI-first já está ativo e o próximo fluxo útil é a configuração administrativa inicial."
+        "description": "O login com Google já define a conta, o tenant ativo e o próximo fluxo útil da aplicação."
       }
     },
     "setup": {
@@ -121,7 +122,7 @@
   "LoginPage": {
     "eyebrow": "Entrada do sistema",
     "title": "Faça login para entrar no workspace operacional do Valora.",
-    "description": "Esta é a primeira versão do fluxo de entrada do produto. A autenticação ainda é simulada, mas a navegação já respeita a separação entre área pública e área protegida.",
+    "description": "Use sua conta Google para entrar no Valora. O login já conecta a autenticação ao vínculo entre `account`, `tenant` e `member`.",
     "notice": {
       "authRequired": "Faça login para acessar a área protegida da aplicação.",
       "signedOut": "Sessão encerrada. Faça login novamente para continuar."
@@ -142,16 +143,32 @@
     },
     "form": {
       "title": "Entrar",
-      "description": "Nesta fase, o login valida apenas o fluxo de entrada e a proteção simulada das rotas.",
-      "emailLabel": "Email",
-      "emailPlaceholder": "voce@empresa.com",
-      "passwordLabel": "Senha",
-      "passwordPlaceholder": "Digite sua senha",
-      "submitIdle": "Entrar no sistema",
-      "submitPending": "Entrando...",
-      "helper": "Este login ainda não valida credenciais reais. Ele existe para consolidar a experiência de entrada e a navegação protegida simulada.",
-      "altLink": "Abrir a área protegida diretamente"
+      "description": "Nesta fase, o acesso inicial do produto acontece por autenticação Google e contexto organizacional real.",
+      "submitIdle": "Carregando autenticação Google...",
+      "submitPending": "Entrando com Google...",
+      "helper": "Se houver apenas um vínculo ativo, a entrada acontece direto no app. Quando existirem múltiplos vínculos ou convites, o Valora pedirá a escolha do tenant.",
+      "accessPolicy": "No primeiro acesso sem vínculo nem convite, o Valora cria automaticamente um contexto inicial para você concluir a configuração administrativa.",
+      "googleUnavailable": "O login Google não está disponível porque `NEXT_PUBLIC_GOOGLE_CLIENT_ID` ainda não foi configurado.",
+      "error": "Não foi possível concluir o login com Google. Tente novamente."
     }
+  },
+  "SelectTenantPage": {
+    "loading": "Carregando opções de acesso...",
+    "title": "Escolha como deseja entrar no Valora.",
+    "description": "Sua conta Google foi validada. Agora falta definir o tenant ativo que vai governar o contexto operacional da sessão.",
+    "activeListTitle": "Tenants ativos",
+    "inviteListTitle": "Convites pendentes",
+    "createTitle": "Preparando seu contexto inicial",
+    "createDescription": "Não encontramos tenant ativo nem convite pendente. O Valora pode criar o primeiro contexto para você seguir direto para a configuração administrativa.",
+    "createAction": "Criar tenant inicial",
+    "createPending": "Criando tenant inicial...",
+    "acceptAction": "Aceitar convite",
+    "rejectAction": "Recusar convite",
+    "selectAction": "Entrar neste tenant",
+    "processing": "Processando...",
+    "empty": "Nenhuma opção de acesso foi encontrada para esta conta.",
+    "backToLogin": "Voltar para o login",
+    "genericError": "Não foi possível concluir esta ação agora. Tente novamente."
   },
   "State": {
     "loadingDescription": "Carregando a base da aplicação.",

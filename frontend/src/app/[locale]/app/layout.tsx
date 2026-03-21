@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
 
 import { AppShell } from "@/component/app-shell/app-shell";
-import { signOutAction } from "@/app/[locale]/auth/action";
+import { LogoutButton } from "@/component/auth/logout-button";
+import { getAuthSession } from "@/lib/auth/server-session";
 
 type AppLayoutProps = {
   children: ReactNode;
@@ -15,6 +17,11 @@ export default async function AppLayout({
 }: AppLayoutProps) {
   const { locale } = await params;
   const t = await getTranslations("AppShell");
+  const authSession = await getAuthSession();
+
+  if (!authSession) {
+    redirect(`/${locale}/login?reason=auth_required`);
+  }
 
   const navigationItemList = [
     {
@@ -58,22 +65,20 @@ export default async function AppLayout({
     <AppShell
       productName={t("productName")}
       productStage={t("productStage")}
-      workspaceLabel={t("workspaceLabel")}
+      workspaceLabel={authSession.tenant.display_name}
       navigationItemList={navigationItemList}
+      tenantLabel={t("topbar.tenantLabel")}
+      tenantValue={authSession.tenant.display_name}
       localeLabel={t("topbar.localeLabel")}
       localeValue={locale}
-      statusLabel={t("topbar.statusLabel")}
-      statusValue={t("topbar.statusValue")}
+      accountLabel={t("topbar.accountLabel")}
+      accountValue={authSession.account.email}
       topbarActionSlot={
-        <form action={signOutAction}>
-          <input type="hidden" name="locale" value={locale} />
-          <button
-            type="submit"
-            className="rounded-full border border-slate-800 bg-slate-900 px-3 py-1.5 text-sm text-slate-200 transition hover:border-slate-700 hover:bg-slate-800"
-          >
-            {t("topbar.signOut")}
-          </button>
-        </form>
+        <LogoutButton
+          locale={locale}
+          label={t("topbar.signOut")}
+          pendingLabel={t("topbar.signOutPending")}
+        />
       }
     >
       {children}

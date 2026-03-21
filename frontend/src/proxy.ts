@@ -2,10 +2,7 @@ import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { routing } from "@/i18n/routing";
-import {
-  authSessionCookieName,
-  hasSimulatedSession
-} from "@/lib/auth/session";
+import { authTokenCookieName, hasAuthSession } from "@/lib/auth/session";
 
 const handleI18nRouting = createMiddleware(routing);
 
@@ -20,9 +17,10 @@ export default function proxy(request: NextRequest) {
     return response;
   }
 
-  const sessionValue = request.cookies.get(authSessionCookieName)?.value;
-  const hasSession = hasSimulatedSession(sessionValue);
+  const tokenValue = request.cookies.get(authTokenCookieName)?.value;
+  const hasSession = hasAuthSession(tokenValue);
   const isLoginPage = pathname === `/${locale}/login`;
+  const isSelectTenantPage = pathname === `/${locale}/select-tenant`;
   const isAppArea =
     pathname === `/${locale}/app` || pathname.startsWith(`/${locale}/app/`);
 
@@ -32,7 +30,7 @@ export default function proxy(request: NextRequest) {
     );
   }
 
-  if (isLoginPage && hasSession) {
+  if ((isLoginPage || isSelectTenantPage) && hasSession) {
     return NextResponse.redirect(new URL(`/${locale}/app`, request.url));
   }
 

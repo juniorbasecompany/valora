@@ -127,6 +127,30 @@
           "increment": false,
           "size": "",
           "values": []
+        },
+        {
+          "id": "provider_subject",
+          "name": "provider_subject",
+          "comment": "Identificador estável da conta no provedor de autenticação.",
+          "type": "TEXT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        }
+      ],
+      "constraints": [
+        {
+          "name": "account_unique_email",
+          "constraint": "UNIQUE (email)"
+        },
+        {
+          "name": "account_unique_provider_subject",
+          "constraint": "UNIQUE (provider, provider_subject)"
         }
       ],
       "indices": [],
@@ -223,9 +247,23 @@
           "values": []
         },
         {
+          "id": "role",
+          "name": "role",
+          "comment": "Papel do usuário no licenciado: 1 master, 2 admin, 3 member.",
+          "type": "INTEGER",
+          "default": "3",
+          "check": "role IN (1, 2, 3)",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
           "id": "status",
           "name": "status",
-          "comment": "Situação do usuário:\n1) Ativo\n2) Pendente\n3) Desativado",
+          "comment": "Situação do usuário: 1 ativo, 2 pendente, 3 desativado.",
           "type": "INTEGER",
           "default": "",
           "check": "status IN (1, 2, 3)",

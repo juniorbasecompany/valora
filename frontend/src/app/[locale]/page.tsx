@@ -1,10 +1,6 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import {
-  authSessionCookieName,
-  hasSimulatedSession
-} from "@/lib/auth/session";
+import { getAuthSession } from "@/lib/auth/server-session";
 
 type LocalePageProps = {
   params: Promise<{ locale: string }>;
@@ -12,10 +8,9 @@ type LocalePageProps = {
 
 export default async function LocalePage({ params }: LocalePageProps) {
   const { locale } = await params;
-  const cookieStore = await cookies();
-  const sessionValue = cookieStore.get(authSessionCookieName)?.value;
+  const authSession = await getAuthSession();
 
-  if (hasSimulatedSession(sessionValue)) {
+  if (authSession) {
     redirect(`/${locale}/app`);
   }
 

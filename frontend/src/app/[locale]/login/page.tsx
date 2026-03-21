@@ -1,8 +1,7 @@
-import Link from "next/link";
+import Script from "next/script";
 import { getTranslations } from "next-intl/server";
 
-import { signInAction } from "@/app/[locale]/auth/action";
-import { LoginSubmitButton } from "@/component/auth/login-submit-button";
+import { GoogleSignInPanel } from "@/component/auth/google-sign-in-panel";
 
 type LoginPageProps = {
   params: Promise<{ locale: string }>;
@@ -16,6 +15,7 @@ export default async function LoginPage({
   const { locale } = await params;
   const { reason } = await searchParams;
   const t = await getTranslations("LoginPage");
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
   const noticeMessage =
     reason === "signed_out"
@@ -25,115 +25,83 @@ export default async function LoginPage({
         : null;
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-50">
+    <main className="ui-shell min-h-screen">
+      <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
       <section className="mx-auto grid min-h-screen max-w-6xl gap-8 px-6 py-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
         <div className="flex flex-col gap-6">
-          <span className="inline-flex w-fit rounded-full border border-slate-800 bg-slate-900 px-3 py-1 text-xs font-medium text-slate-300">
+          <span className="ui-pill inline-flex w-fit px-3 py-1 text-xs font-medium">
             {t("eyebrow")}
           </span>
 
           <div className="space-y-4">
-            <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-white lg:text-5xl">
+            <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-[var(--color-text)] lg:text-5xl">
               {t("title")}
             </h1>
-            <p className="max-w-2xl text-base leading-8 text-slate-300">
+            <p className="max-w-2xl text-base leading-8 text-[var(--color-text-muted)]">
               {t("description")}
             </p>
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
-            <article className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-              <h2 className="text-sm font-medium text-slate-100">
+            <article className="ui-card p-5">
+              <h2 className="text-sm font-medium text-[var(--color-text)]">
                 {t("cards.workspace.title")}
               </h2>
-              <p className="mt-2 text-sm leading-6 text-slate-400">
+              <p className="mt-2 text-sm leading-6 text-[var(--color-text-subtle)]">
                 {t("cards.workspace.description")}
               </p>
             </article>
 
-            <article className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-              <h2 className="text-sm font-medium text-slate-100">
+            <article className="ui-card p-5">
+              <h2 className="text-sm font-medium text-[var(--color-text)]">
                 {t("cards.traceability.title")}
               </h2>
-              <p className="mt-2 text-sm leading-6 text-slate-400">
+              <p className="mt-2 text-sm leading-6 text-[var(--color-text-subtle)]">
                 {t("cards.traceability.description")}
               </p>
             </article>
 
-            <article className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
-              <h2 className="text-sm font-medium text-slate-100">
+            <article className="ui-card p-5">
+              <h2 className="text-sm font-medium text-[var(--color-text)]">
                 {t("cards.nextStep.title")}
               </h2>
-              <p className="mt-2 text-sm leading-6 text-slate-400">
+              <p className="mt-2 text-sm leading-6 text-[var(--color-text-subtle)]">
                 {t("cards.nextStep.description")}
               </p>
             </article>
           </div>
         </div>
 
-        <section className="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-slate-950/40">
+        <section className="ui-panel p-6">
           <div className="flex flex-col gap-2">
-            <h2 className="text-2xl font-semibold tracking-tight text-white">
+            <h2 className="text-2xl font-semibold tracking-tight text-[var(--color-text)]">
               {t("form.title")}
             </h2>
-            <p className="text-sm leading-6 text-slate-400">
+            <p className="text-sm leading-6 text-[var(--color-text-subtle)]">
               {t("form.description")}
             </p>
           </div>
 
           {noticeMessage ? (
-            <div className="mt-5 rounded-2xl border border-amber-900/60 bg-amber-950/40 px-4 py-3 text-sm text-amber-100">
+            <div className="ui-notice-attention mt-5 px-4 py-3 text-sm">
               {noticeMessage}
             </div>
           ) : null}
 
-          <form action={signInAction} className="mt-6 flex flex-col gap-4">
-            <input type="hidden" name="locale" value={locale} />
+          <div className="mt-6">
+            <GoogleSignInPanel
+              locale={locale}
+              clientId={googleClientId}
+              buttonLabel={t("form.submitIdle")}
+              buttonPendingLabel={t("form.submitPending")}
+              helperText={t("form.helper")}
+              unavailableText={t("form.googleUnavailable")}
+              genericErrorText={t("form.error")}
+            />
+          </div>
 
-            <label className="flex flex-col gap-2">
-              <span className="text-sm font-medium text-slate-200">
-                {t("form.emailLabel")}
-              </span>
-              <input
-                type="email"
-                name="email"
-                autoComplete="email"
-                placeholder={t("form.emailPlaceholder")}
-                className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-slate-500"
-              />
-            </label>
-
-            <label className="flex flex-col gap-2">
-              <span className="text-sm font-medium text-slate-200">
-                {t("form.passwordLabel")}
-              </span>
-              <input
-                type="password"
-                name="password"
-                autoComplete="current-password"
-                placeholder={t("form.passwordPlaceholder")}
-                className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-slate-500"
-              />
-            </label>
-
-            <div className="pt-2">
-              <LoginSubmitButton
-                idleLabel={t("form.submitIdle")}
-                pendingLabel={t("form.submitPending")}
-              />
-            </div>
-          </form>
-
-          <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-4 text-sm text-slate-400">
-            <p>{t("form.helper")}</p>
-            <p className="mt-3">
-              <Link
-                href={`/${locale}/app`}
-                className="text-slate-200 underline underline-offset-4"
-              >
-                {t("form.altLink")}
-              </Link>
-            </p>
+          <div className="ui-card mt-6 px-4 py-4 text-sm text-[var(--color-text-subtle)]">
+            <p>{t("form.accessPolicy")}</p>
           </div>
         </section>
       </section>

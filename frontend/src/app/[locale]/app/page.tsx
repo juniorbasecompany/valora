@@ -47,10 +47,10 @@ export default async function AppHomePage({ params }: AppHomePageProps) {
       <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="flex flex-col gap-4">
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold tracking-tight text-white">
+            <h2 className="text-lg font-semibold tracking-tight text-[var(--color-text)]">
               {t("setup.title")}
             </h2>
-            <p className="text-sm leading-6 text-slate-400">
+            <p className="text-sm leading-6 text-[var(--color-text-subtle)]">
               {t("setup.description")}
             </p>
           </div>
@@ -79,10 +79,10 @@ export default async function AppHomePage({ params }: AppHomePageProps) {
 
         <div className="flex flex-col gap-4">
           <div className="space-y-2">
-            <h2 className="text-lg font-semibold tracking-tight text-white">
+            <h2 className="text-lg font-semibold tracking-tight text-[var(--color-text)]">
               {t("quickAction.title")}
             </h2>
-            <p className="text-sm leading-6 text-slate-400">
+            <p className="text-sm leading-6 text-[var(--color-text-subtle)]">
               {t("quickAction.description")}
             </p>
           </div>

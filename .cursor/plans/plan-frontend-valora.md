@@ -15,6 +15,8 @@ As regras estáveis de interface e i18n continuam fora daqui:
 ## Decisões já fechadas
 
 - [x] A direção de produto da interface é **Operational Workspace com Audit Spine**.
+- [x] A fundação visual atual do frontend usa `light theme`.
+- [x] Os tokens visuais do frontend ficam centralizados em `frontend/src/app/globals.css`.
 - [x] A experiência inicial não será uma landing institucional.
 - [x] O fluxo inicial será `login -> /app -> Configuração/Administração`.
 - [x] A primeira área útil do produto será **Configuração/Administração**.
@@ -100,12 +102,14 @@ Objetivo: criar a base técnica e visual do frontend sem deixar i18n para depois
   - [x] estados base de loading e erro.
 - [x] Integrar provider de mensagens no layout raiz.
 - [x] Garantir que strings novas entram por chave, não por literal solto.
+- [x] Definir `light theme` como base atual da interface.
+- [x] Centralizar tokens visuais em `src/app/globals.css`.
 - [ ] Definir fundação visual mínima:
-  - [ ] densidade média para alta;
+  - [x] densidade média para alta;
   - [ ] tipografia;
-  - [ ] tokens de cor;
+  - [x] tokens de cor;
   - [ ] padrão de tabela;
-  - [ ] padrão de formulário;
+  - [x] padrão de formulário;
   - [ ] padrão de tabs e painel lateral.
 - [x] Preparar README do frontend com `npm run dev`, variáveis `NEXT_PUBLIC_*` e estratégia de integração com API.
 

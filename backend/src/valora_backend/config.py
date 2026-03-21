@@ -22,6 +22,26 @@ class Settings(BaseSettings):
     postgres_password: SecretStr = Field(
         validation_alias=AliasChoices("POSTGRES_PASSWORD", "postgres_password"),
     )
+    google_client_id: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("GOOGLE_CLIENT_ID", "google_client_id"),
+    )
+    jwt_secret: SecretStr = Field(
+        default=SecretStr("valora-dev-secret-change-me"),
+        validation_alias=AliasChoices("APP_JWT_SECRET", "JWT_SECRET", "jwt_secret"),
+    )
+    jwt_issuer: str = Field(
+        default="valora",
+        validation_alias=AliasChoices("APP_JWT_ISSUER", "JWT_ISSUER", "jwt_issuer"),
+    )
+    jwt_expiration_hours: int = Field(
+        default=8,
+        validation_alias=AliasChoices(
+            "APP_JWT_EXPIRATION_HOURS",
+            "JWT_EXPIRATION_HOURS",
+            "jwt_expiration_hours",
+        ),
+    )
 
     @computed_field
     @property

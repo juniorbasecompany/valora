@@ -16,10 +16,12 @@ type AppShellProps = {
   productStage: string;
   workspaceLabel: string;
   navigationItemList: NavigationItem[];
+  tenantLabel: string;
+  tenantValue: string;
   localeLabel: string;
   localeValue: string;
-  statusLabel: string;
-  statusValue: string;
+  accountLabel?: string;
+  accountValue?: string;
   topbarActionSlot?: ReactNode;
 };
 
@@ -29,14 +31,16 @@ export function AppShell({
   productStage,
   workspaceLabel,
   navigationItemList,
+  tenantLabel,
+  tenantValue,
   localeLabel,
   localeValue,
-  statusLabel,
-  statusValue,
+  accountLabel,
+  accountValue,
   topbarActionSlot
 }: AppShellProps) {
   return (
-    <div className="flex min-h-screen bg-slate-950 text-slate-50">
+    <div className="ui-shell flex min-h-screen">
       <AppSidebar
         productName={productName}
         productStage={productStage}
@@ -46,10 +50,12 @@ export function AppShell({
 
       <div className="flex min-h-screen min-w-0 flex-1 flex-col">
         <AppTopbar
+          tenantLabel={tenantLabel}
+          tenantValue={tenantValue}
           localeLabel={localeLabel}
           localeValue={localeValue}
-          statusLabel={statusLabel}
-          statusValue={statusValue}
+          accountLabel={accountLabel}
+          accountValue={accountValue}
           actionSlot={topbarActionSlot}
         />
 

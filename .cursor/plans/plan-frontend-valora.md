@@ -45,9 +45,9 @@ Chegar a um frontend que:
 
 ### O que entra agora
 
-- [ ] fundação do `frontend/`;
+- [x] fundação do `frontend/`;
 - [ ] `app shell` inicial;
-- [ ] i18n inicial;
+- [x] i18n inicial;
 - [ ] login UI-first;
 - [ ] home pós-login mínima;
 - [ ] administração/configuração para cadastro estrutural inicial.
@@ -87,19 +87,19 @@ Objetivo: criar a base técnica e visual do frontend sem deixar i18n para depois
 
 ### Implementação
 
-- [ ] Inicializar `frontend/` com `Next.js App Router`, `TypeScript` e `Tailwind CSS`.
-- [ ] Confirmar `next-intl` como base de i18n no frontend.
-- [ ] Definir locale inicial da primeira entrega.
-- [ ] Definir local de `messages/`.
-- [ ] Fechar convenção de chaves e namespaces.
-- [ ] Montar `app shell` base com:
-  - [ ] sidebar;
-  - [ ] topbar utilitária;
-  - [ ] área principal;
-  - [ ] cabeçalho de página;
-  - [ ] estados base de loading e erro.
-- [ ] Integrar provider de mensagens no layout raiz.
-- [ ] Garantir que strings novas entram por chave, não por literal solto.
+- [x] Inicializar `frontend/` com `Next.js App Router`, `TypeScript` e `Tailwind CSS`.
+- [x] Confirmar `next-intl` como base de i18n no frontend.
+- [x] Definir locale inicial da primeira entrega.
+- [x] Definir local de `messages/`.
+- [x] Fechar convenção de chaves e namespaces.
+- [x] Montar `app shell` base com:
+  - [x] sidebar;
+  - [x] topbar utilitária;
+  - [x] área principal;
+  - [x] cabeçalho de página;
+  - [x] estados base de loading e erro.
+- [x] Integrar provider de mensagens no layout raiz.
+- [x] Garantir que strings novas entram por chave, não por literal solto.
 - [ ] Definir fundação visual mínima:
   - [ ] densidade média para alta;
   - [ ] tipografia;
@@ -107,13 +107,13 @@ Objetivo: criar a base técnica e visual do frontend sem deixar i18n para depois
   - [ ] padrão de tabela;
   - [ ] padrão de formulário;
   - [ ] padrão de tabs e painel lateral.
-- [ ] Preparar README do frontend com `npm run dev`, variáveis `NEXT_PUBLIC_*` e estratégia de integração com API.
+- [x] Preparar README do frontend com `npm run dev`, variáveis `NEXT_PUBLIC_*` e estratégia de integração com API.
 
 ### Teste da fase
 
-- [ ] O frontend sobe localmente.
-- [ ] Existe uma shell navegável.
-- [ ] Pelo menos uma página já usa mensagens por chave.
+- [x] O frontend sobe localmente.
+- [x] Existe uma shell navegável.
+- [x] Pelo menos uma página já usa mensagens por chave.
 
 ## Fase 2. Login UI-first e roteamento inicial
 
@@ -121,22 +121,22 @@ Objetivo: criar a primeira entrada do produto sem depender ainda da autenticaç�
 
 ### Implementação
 
-- [ ] Criar página `login`.
-- [ ] Definir redirecionamento inicial `/ -> /login`.
-- [ ] Criar fluxo visual de entrada com estados:
-  - [ ] idle;
-  - [ ] loading;
-  - [ ] erro.
-- [ ] Implementar navegação protegida simulada no frontend.
-- [ ] Redirecionar após entrada para `/app`.
-- [ ] Garantir que as strings do fluxo de login já seguem i18n.
-- [ ] Preparar o layout para sessão real futura, sem acoplamento a mock difícil de remover.
+- [x] Criar página `login`.
+- [x] Definir redirecionamento inicial `/ -> /login`.
+- [x] Criar fluxo visual de entrada com estados:
+  - [x] idle;
+  - [x] loading;
+  - [x] erro.
+- [x] Implementar navegação protegida simulada no frontend.
+- [x] Redirecionar após entrada para `/app`.
+- [x] Garantir que as strings do fluxo de login já seguem i18n.
+- [x] Preparar o layout para sessão real futura, sem acoplamento a mock difícil de remover.
 
 ### Teste da fase
 
-- [ ] Visitante chega em `login`.
-- [ ] O fluxo `login -> /app` funciona sem backend real.
-- [ ] Rotas internas já se comportam como área autenticada.
+- [x] Visitante chega em `login`.
+- [x] O fluxo `login -> /app` funciona sem backend real.
+- [x] Rotas internas já se comportam como área autenticada.
 
 ## Fase 3. Home pós-login mínima
 
@@ -144,25 +144,25 @@ Objetivo: entregar uma home útil, enxuta e claramente orientada à próxima aç
 
 ### Implementação
 
-- [ ] Criar página principal em `/app`.
-- [ ] Mostrar contexto inicial da aplicação.
-- [ ] Exibir próximos passos de setup.
-- [ ] Exibir atalho destacado para `Configuração/Administração`.
-- [ ] Mostrar estado de setup inicial.
-- [ ] Reservar estrutura para evolução futura da home sem encher a tela de cards sem função.
-- [ ] Resolver estados de loading, vazio e erro.
+- [x] Criar página principal em `/app`.
+- [x] Mostrar contexto inicial da aplicação.
+- [x] Exibir próximos passos de setup.
+- [x] Exibir atalho destacado para `Configuração/Administração`.
+- [x] Mostrar estado de setup inicial.
+- [x] Reservar estrutura para evolução futura da home sem encher a tela de cards sem função.
+- [x] Resolver estados de loading, vazio e erro.
 
 ### Conteúdo recomendado
 
-- [ ] bloco de boas-vindas curto e funcional;
-- [ ] resumo do estado de setup;
-- [ ] atalhos principais;
-- [ ] área “o que fazer agora”.
+- [x] bloco de boas-vindas curto e funcional;
+- [x] resumo do estado de setup;
+- [x] atalhos principais;
+- [x] área “o que fazer agora”.
 
 ### Teste da fase
 
-- [ ] O usuário entende o próximo passo sem explicação externa.
-- [ ] O caminho até a área de cadastro inicial fica óbvio.
+- [x] O usuário entende o próximo passo sem explicação externa.
+- [x] O caminho até a área de cadastro inicial fica óbvio.
 
 ## Fase 4. Configuração/Administração inicial
 

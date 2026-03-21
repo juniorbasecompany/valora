@@ -1,0 +1,162 @@
+{
+  "AppShell": {
+    "productName": "Valora",
+    "productStage": "Fase 1 em andamento",
+    "workspaceLabel": "Workspace operacional e auditável",
+    "navigation": {
+      "home": "Início",
+      "operation": "Operações",
+      "record": "Registros",
+      "import": "Importações",
+      "process": "Processamento",
+      "audit": "Auditoria",
+      "configuration": "Configuração",
+      "comingSoon": "em breve"
+    },
+    "topbar": {
+      "localeLabel": "Locale",
+      "statusLabel": "Estado atual",
+      "statusValue": "Home protegida por fluxo UI-first",
+      "signOut": "Sair"
+    }
+  },
+  "HomePage": {
+    "eyebrow": "Página principal",
+    "title": "A base do sistema já está pronta para iniciar o cadastro estrutural do Valora.",
+    "description": "Esta home funciona como ponto de entrada da aplicação após o login. Ela mostra o contexto atual, o estado do setup inicial e o caminho mais curto até a configuração administrativa.",
+    "status": {
+      "title": "Setup inicial pendente",
+      "description": "O próximo passo recomendado é abrir Configuração e cadastrar licenciado, membros e escopo."
+    },
+    "context": {
+      "workspace": {
+        "title": "Workspace atual",
+        "description": "Você já está dentro da área protegida da aplicação, com a shell pronta para crescer em módulos."
+      },
+      "locale": {
+        "title": "Idioma e locale",
+        "description": "A base já usa `pt-BR` com mensagens por chave e estrutura pronta para expansão de i18n."
+      },
+      "entryFlow": {
+        "title": "Fluxo atual",
+        "description": "O login UI-first já está ativo e o próximo fluxo útil é a configuração administrativa inicial."
+      }
+    },
+    "setup": {
+      "title": "Estado do setup inicial",
+      "description": "Estas são as primeiras etapas para tirar a aplicação do estado base e prepará-la para operação real.",
+      "steps": {
+        "organization": {
+          "title": "Cadastrar o licenciado",
+          "description": "Criar a organização base que vai representar o contratante do sistema.",
+          "status": "prioritário"
+        },
+        "member": {
+          "title": "Cadastrar os membros",
+          "description": "Definir quem vai operar o sistema dentro do contexto do licenciado.",
+          "status": "pendente"
+        },
+        "scope": {
+          "title": "Configurar o escopo inicial",
+          "description": "Preparar a estrutura mínima que servirá de base para os cadastros e módulos futuros.",
+          "status": "pendente"
+        }
+      }
+    },
+    "quickAction": {
+      "title": "O que fazer agora",
+      "description": "Use estes atalhos para seguir o fluxo mais curto da primeira entrega útil.",
+      "configuration": {
+        "title": "Abrir Configuração",
+        "description": "Entre na área que concentrará os cadastros iniciais de licenciado, membros e escopo.",
+        "action": "Ir para Configuração"
+      },
+      "plan": {
+        "title": "Ver fila de setup",
+        "description": "Reveja a ordem recomendada de cadastros antes de começar a implementação das telas de administração.",
+        "action": "Ver próximos passos"
+      }
+    }
+  },
+  "ConfigurationPage": {
+    "eyebrow": "Configuração administrativa",
+    "title": "Esta área será a primeira base útil de cadastro do sistema.",
+    "description": "Aqui ficarão os cadastros iniciais feitos manualmente antes de existirem assistentes guiados, automações ou módulos operacionais completos.",
+    "status": {
+      "title": "Fase seguinte",
+      "description": "Implementar as telas reais de cadastro para `tenant`, `member` e escopo."
+    },
+    "cards": {
+      "organization": {
+        "title": "Licenciado",
+        "description": "Representa a organização contratante e será o primeiro cadastro estrutural da aplicação."
+      },
+      "member": {
+        "title": "Membros",
+        "description": "Representa quem atua no sistema dentro do contexto do licenciado."
+      },
+      "scope": {
+        "title": "Escopo",
+        "description": "Concentra a estrutura mínima que servirá de base para os módulos e cadastros posteriores."
+      }
+    },
+    "queue": {
+      "organization": {
+        "title": "Cadastro de licenciado",
+        "description": "Primeira tela real a ser entregue dentro da área de configuração.",
+        "status": "primeiro"
+      },
+      "member": {
+        "title": "Cadastro de membros",
+        "description": "Entra logo depois para ligar usuários ao contexto organizacional inicial.",
+        "status": "depois"
+      },
+      "scope": {
+        "title": "Cadastro de escopo",
+        "description": "Fecha a base estrutural mínima antes do avanço para módulos operacionais.",
+        "status": "depois"
+      }
+    }
+  },
+  "LoginPage": {
+    "eyebrow": "Entrada do sistema",
+    "title": "Faça login para entrar no workspace operacional do Valora.",
+    "description": "Esta é a primeira versão do fluxo de entrada do produto. A autenticação ainda é simulada, mas a navegação já respeita a separação entre área pública e área protegida.",
+    "notice": {
+      "authRequired": "Faça login para acessar a área protegida da aplicação.",
+      "signedOut": "Sessão encerrada. Faça login novamente para continuar."
+    },
+    "cards": {
+      "workspace": {
+        "title": "Workspace sério desde o começo",
+        "description": "A navegação já está preparada para crescer em módulos sem parecer um template genérico de painel."
+      },
+      "traceability": {
+        "title": "Base orientada a rastreabilidade",
+        "description": "O frontend nasce pronto para receber histórico, auditoria e explicação contextual nas próximas fases."
+      },
+      "nextStep": {
+        "title": "Próxima entrega útil",
+        "description": "Depois do login, o usuário cairá na página principal e seguirá para a configuração administrativa inicial."
+      }
+    },
+    "form": {
+      "title": "Entrar",
+      "description": "Nesta fase, o login valida apenas o fluxo de entrada e a proteção simulada das rotas.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "voce@empresa.com",
+      "passwordLabel": "Senha",
+      "passwordPlaceholder": "Digite sua senha",
+      "submitIdle": "Entrar no sistema",
+      "submitPending": "Entrando...",
+      "helper": "Este login ainda não valida credenciais reais. Ele existe para consolidar a experiência de entrada e a navegação protegida simulada.",
+      "altLink": "Abrir a área protegida diretamente"
+    }
+  },
+  "State": {
+    "loadingDescription": "Carregando a base da aplicação.",
+    "errorTitle": "Não foi possível carregar esta área.",
+    "errorDescription": "Ocorreu um problema ao renderizar a interface. Você pode tentar novamente sem sair do fluxo atual.",
+    "retry": "Tentar novamente"
+  }
+}

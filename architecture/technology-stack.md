@@ -1,0 +1,21 @@
+# Stack de tecnologia
+
+Decisão canónica de runtime para o front e o back. **Versões concretas** vivem em `frontend/package.json` e `backend/pyproject.toml`; este documento não as substitui.
+
+## Frontend
+
+- **Next.js**, **React**, **TypeScript**, **Tailwind CSS**.
+
+## Backend
+
+- **FastAPI**, **SQLAlchemy**, **Alembic**, **PostgreSQL** (`psycopg`), **Pydantic** (incl. `pydantic-settings` conforme o projeto), servidor ASGI **Uvicorn**.
+- **Python**: conforme `requires-python` em `backend/pyproject.toml` (actualmente `>=3.12`).
+
+## Integração
+
+- O cliente web fala com o backend por **API HTTP** (padrão REST/JSON).
+- `frontend/` e `backend/` são **projetos separados** no mesmo monorepo, sem misturar dependências.
+
+## Relação com o resto da arquitectura
+
+- Regras de domínio, auditoria e rastreabilidade continuam em [system-principles.md](system-principles.md) e nas skills; este ficheiro fixa só **quais tecnologias** entram na implementação.

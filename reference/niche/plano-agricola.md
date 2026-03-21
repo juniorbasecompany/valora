@@ -402,7 +402,7 @@ Os nomes físicos do banco devem seguir as seguintes regras:
 - sem underline;
 - sem camelCase.
 
-Os atributos definidos pelo usuário devem ser apresentados em português e podem usar mais de uma palavra.
+Os atributos definidos pelo usuário devem ser apresentados em português do Brasil e podem usar mais de uma palavra.
 
 O modelo deve separar nome técnico interno de rótulo exibido ao usuário.
 

@@ -1,6 +1,6 @@
 {
-  "name": "cleber-frontend",
+  "name": "valora-frontend",
   "version": "0.1.0",
   "private": true,
-  "description": "Frontend web app for the Cleber system."
+  "description": "Frontend web app for the Valora system."
 }

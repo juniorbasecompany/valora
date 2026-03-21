@@ -30,6 +30,63 @@ Referência baseada no código-fonte do [drawdb-io/drawdb](https://github.com/dr
 | `locked` | não         | boolean| Tabela bloqueada. |
 | `hidden` | não         | boolean| Ocultar no canvas. |
 
+### Extensão do projeto: `constraints`
+
+Não faz parte do esquema oficial do drawDB; o editor costuma **aceitar e preservar** chaves extras ao importar o JSON. Ao reexportar pelo drawDB, esses atributos podem ser omitidos — tratar `backend/erd/erd.json` no repositório como fonte de verdade.
+
+#### Onde no JSON
+
+- Dentro de **um** elemento de `tables[]` (objeto da tabela).
+- Mesmo nível de chaves como `id`, `name`, `fields`, `indices`, `comment`, `color`, etc.
+- **Não** colocar dentro de `fields[]`; cada field já tem o seu próprio `check` (texto livre por coluna).
+- Ordem recomendada das chaves no objeto da tabela: manter a ordem já usada no ficheiro; ao adicionar, costuma-se inserir `constraints` **logo após** o fecho do array `fields`, antes de `indices`, para leitura humana.
+
+#### Formato e conteúdo coerente
+
+| Campo         | Obrigatório | Tipo   | Descrição |
+|---------------|-------------|--------|-----------|
+| `constraints` | não       | array  | Lista de regras em nível de tabela (várias colunas). |
+
+Cada elemento da lista é um **objeto** com:
+
+| Campo        | Obrigatório | Tipo   | Descrição |
+|--------------|-------------|--------|-----------|
+| `name`       | sim         | string | Identificador **curto** da constraint, adequado para uso no banco de dados. **Prefixo obrigatório:** o `name` da tabela (mesmo objeto JSON), depois `_` e o sufixo (snake_case). Ex.: tabela `member` → `member_name_required`. Se o nome da tabela tiver `.`, normalizar (ex.: `core.scope` → prefixo `core_scope`). **Único** entre os itens de `constraints` dessa tabela. Pode ser usado em DDL como `ALTER TABLE ... ADD CONSTRAINT name ...`. |
+| `constraint` | sim         | string | **Apenas** a expressão SQL/DDL (ex.: `CHECK (...)`, `UNIQUE (...)`, `UNIQUE (...) WHERE ...`), **sem** descrições em português, explicações ou comentários. O conteúdo deve ser sintaxe SQL válida para o dialeto usado (ex.: PostgreSQL). |
+
+Regras de coerência (JSON / diagrama):
+
+1. Cada item **tem** as duas chaves `name` e `constraint` (não omitir uma delas; não usar outro nome de chave).
+2. Valores **string**; evitar `name` ou `constraint` vazios após remoção de espaços, salvo convenção explícita do projeto.
+3. **Unicidade:** não duplicar o mesmo `name` em dois objetos da mesma lista `constraints` da mesma tabela.
+4. **Alinhamento com colunas:** dentro de `constraint`, referir colunas pelos **mesmos** nomes que em `fields[].name` dessa tabela (ex.: `display_name`, não um alias inventado só no JSON).
+5. **Prefixo do `name` com o nome da tabela:** cada `name` de constraint deve começar pelo `name` da tabela (normalizado se necessário) + `_` + sufixo, para evitar colisões globais no catálogo do banco e manter rastreabilidade.
+6. **`constraint` apenas SQL/DDL:** o valor de `constraint` deve conter **somente** a expressão SQL/DDL (ex.: `CHECK (...)`, `UNIQUE (...)`, `UNIQUE (...) WHERE ...`), **sem** descrições em português, explicações, comentários ou prefixos como "DDL sugerido (PostgreSQL):". A documentação textual da regra fica no campo `comment` da tabela ou em `fields[].check` quando aplicável.
+7. **`fields[].check`:** para regra que cita uma única coluna, pode bastar o `check` do field; quando a regra envolve **mais de uma** coluna da tabela, usar `constraints` e, se quiser, um `check` curto na(s) coluna(s) a remeter à entrada em `constraints`.
+
+#### Exemplo mínimo
+
+```json
+"name": "member",
+"fields": [ ... ],
+"constraints": [
+  {
+    "name": "member_name_required",
+    "constraint": "CHECK (status = 2 OR (name IS NOT NULL AND btrim(name) <> ''))"
+  },
+  {
+    "name": "member_unique_tenant_account",
+    "constraint": "UNIQUE (tenant_id, account_id) WHERE account_id IS NOT NULL"
+  }
+],
+"indices": []
+```
+
+**Importante:**
+- `name` (da constraint): prefixo = `name` da tabela + `_` + sufixo em snake_case; adequado para DDL (sem espaços).
+- `constraint`: **apenas** SQL/DDL, sem descrições em português. Exemplos válidos: `CHECK (...)`, `UNIQUE (...)`, `UNIQUE (...) WHERE ...`, `FOREIGN KEY (...) REFERENCES ...`.
+- **Não incluir** em `constraint`: explicações como "Quando account_id não é NULL, a dupla (tenant_id, account_id) deve ser única" ou "DDL sugerido (PostgreSQL):".
+
 ## Campo / Coluna (`tables[].fields[]`)
 
 | Campo      | Obrigatório | Tipo    | Descrição |

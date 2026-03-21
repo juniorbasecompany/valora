@@ -1,23 +1,33 @@
 ---
 name: export-erd-drawdb
-description: ERD do projeto em formato drawDB. Fonte de verdade em backend/sql/erd.json. Use quando o usuário pedir o ERD para drawdb.app, consultar o diagrama ou o formato JSON compatível com https://www.drawdb.app/ e https://drawdb-io.github.io/docs/
+description: ERD do projeto em formato drawDB. Fonte de verdade em backend/erd/erd.json. Use quando o usuário pedir o ERD para drawdb.app, consultar ou editar o diagrama, incluir ou alterar extensões JSON (ex. tables[].constraints) ou o formato compatível com https://www.drawdb.app/ e https://drawdb-io.github.io/docs/
 ---
 
 # Exportar ERD no formato JSON do drawDB
 
 ## Objetivo
 
-A fonte de verdade do ERD do projeto é `backend/sql/erd.json` (formato JSON do [drawDB](https://www.drawdb.app/)). O restante do sistema deve ser atualizado conforme o conteúdo de `erd.json`.
+A fonte de verdade do ERD do projeto é `backend/erd/erd.json` (formato JSON do [drawDB](https://www.drawdb.app/)). O restante do sistema deve ser atualizado conforme o conteúdo de `erd.json`.
 
 ## Quando usar
 
 - Usuário pede para consultar ou editar o ERD no drawDB.
+- Usuário pede para **incluir ou alterar** entradas em `tables[].constraints` em `backend/erd/erd.json`.
 - Referência ao formato e à localização do diagrama (fonte de verdade).
+
+## Constraints no `erd.json` (padrão JSON)
+
+- **Onde:** no objeto de cada tabela em `tables[]`, chave opcional `constraints`, **no mesmo nível** que `fields`, `indices`, `comment`, etc. (não dentro de `fields[]`). Convém declarar **depois** do array `fields` dessa tabela para ler colunas já definidas.
+- **Tipo:** `constraints` é um **array** de objetos. Cada objeto tem exatamente as chaves **`name`** e **`constraint`**, ambas **string** (não `null`; usar `""` só se o projeto aceitar vazio — o padrão desejado é texto não vazio).
+- **`name`:** identificador **curto** da constraint, adequado para uso no banco de dados. **Prefixo obrigatório:** o valor de `name` da própria tabela (o campo `name` do objeto em `tables[]`), seguido de `_` e de um sufixo descritivo em snake_case (ex.: tabela `member` → `member_name_required_unless_pending`, `member_unique_tenant_account`). Se o `name` da tabela tiver `.` (ex.: `core.scope`), normalizar para identificador (ex.: `core_scope_...`). Deve ser **único dentro da mesma tabela**. Pode ser usado diretamente em DDL como `ALTER TABLE ... ADD CONSTRAINT name ...`.
+- **`constraint`:** **apenas** a expressão SQL/DDL (ex.: `CHECK (...)`, `UNIQUE (...)`, `UNIQUE (...) WHERE ...`), **sem** descrições em português, explicações ou comentários. Para **coerência com o diagrama**, os nomes de coluna mencionados devem coincidir com algum `fields[].name` **dessa mesma tabela**.
+- **Relação com `fields[].check`:** anotação por coluna continua no campo `check` do field; regras que envolvem **várias colunas** da mesma tabela ficam em `constraints`. Opcional: em colunas afetadas, deixar em `check` uma frase curta em português que aponte para a entrada em `constraints`.
+- Detalhes e exemplo: [reference.md — Extensão do projeto: constraints](reference.md).
 
 ## Fluxo
 
-1. **Fonte de verdade do diagrama**: `backend/sql/erd.json`. O restante do sistema é atualizado conforme esse arquivo.
-2. **Importar no drawDB**: em https://www.drawdb.app/editor usar **File > Import** e escolher `backend/sql/erd.json`. Edições no drawDB podem ser exportadas de volta para manter o arquivo em sincronia.
+1. **Fonte de verdade do diagrama**: `backend/erd/erd.json`. O restante do sistema é atualizado conforme esse arquivo.
+2. **Importar no drawDB**: em https://www.drawdb.app/editor usar **File > Import** e escolher `backend/erd/erd.json`. Edições no drawDB podem ser exportadas de volta para manter o arquivo em sincronia.
 
 ## Formato JSON (resumo)
 
@@ -27,6 +37,8 @@ O drawDB espera um objeto com:
 - `relationships`: lista de relacionamentos (startTableId, startFieldId, endTableId, endFieldId, cardinality, etc.).
 - `notes`: array (pode ser `[]`).
 - `subjectAreas`: array (pode ser `[]`).
+
+**Extensão do projeto:** em cada objeto de `tables[]`, campo opcional `constraints` (lista de objetos com `name` e `constraint`). Onde colocar, formato e coerência com as colunas: ver secção *Extensão do projeto: constraints* em [reference.md](reference.md).
 
 Cada **field** em `tables[].fields` deve ter: `id`, `name`, `type`, `default`, `check`, `primary`, `unique`, `notNull`, `increment`, `comment`.  
 Cada **relationship** deve ter: `id`, `name`, `startTableId`, `startFieldId`, `endTableId`, `endFieldId`, `cardinality`, `updateConstraint`, `deleteConstraint`.
@@ -40,4 +52,4 @@ Para o esquema JSON completo (tipos, enums, áreas, notas), ver [reference.md](r
 
 ## Manutenção
 
-- A fonte de verdade do diagrama é `backend/sql/erd.json`; edições no drawDB ou no repo devem refletir nesse arquivo.
+- A fonte de verdade do diagrama é `backend/erd/erd.json`; edições no drawDB ou no repo devem refletir nesse arquivo.

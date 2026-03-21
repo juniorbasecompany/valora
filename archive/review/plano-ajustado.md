@@ -22,7 +22,7 @@ Em termos práticos, eu classificaria assim:
 
 ### 1. Acompanhamento operacional e BI
 
-Na pasta 'C:\jr\GoogleDrive\jr\Cleber\app', a planilha 'Sao Joao - Acomp22 - V1 (1).xlsx' concentra a lógica mais próxima do resultado da imagem.
+Na pasta 'C:\jr\GoogleDrive\jr\Valora\app', a planilha 'Sao Joao - Acomp22 - V1 (1).xlsx' concentra a lógica mais próxima do resultado da imagem.
 
 Ela já tem uma estrutura importante:
 

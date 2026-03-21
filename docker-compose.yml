@@ -1,0 +1,23 @@
+# PostgreSQL de desenvolvimento.
+# Uso: docker compose up -d
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: valora
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: valora
+    ports:
+      - "5432:5432"
+    volumes:
+      - valora_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U valora -d valora"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  valora_postgres_data:

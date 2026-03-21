@@ -27,23 +27,23 @@ uv run uvicorn valora_backend.main:app --reload
 
 O PostgreSQL de desenvolvimento roda em **Docker Compose**. Na raiz do repositório:
 
+1. Copie [`.env.example`](../.env.example) para `.env` na raiz e defina **`POSTGRES_PASSWORD`** (valor local, não commitado).
+2. Suba o serviço:
+
 ```bash
 docker compose up -d
 ```
 
-Isso sobe o Postgres com o banco **valora**, usuário `valora`, senha `soma` e porta **5434** no host (mapeada para 5432 no container).
+Isso sobe o Postgres com o banco **valora**, utilizador `valora` e porta **5434** no host (mapeada para 5432 no container). A senha é apenas a que estiver em `POSTGRES_PASSWORD` no `.env` da raiz.
 
 ### Variáveis de ambiente
 
-O backend e o Alembic leem a URL do banco em `DATABASE_URL`. Se não estiver definida, usam o valor padrão compatível com o Compose local:
+- **`POSTGRES_PASSWORD`** (obrigatória para o backend e para o Compose): defina-a no ficheiro **`.env` na raiz do monorepo** (copiado de `.env.example`). O mesmo ficheiro é lido pelo Docker Compose e por [config.py](src/valora_backend/config.py), que monta a URL do PostgreSQL (`database_url`) com host `localhost`, porta `5434`, utilizador `valora` e base `valora`.
+- Opcionalmente pode existir um **`backend/.env`** com a mesma variável; a ordem de leitura em `Settings` é `../.env` e depois `.env` na pasta `backend`.
 
-- Host: `localhost`
-- Porta no host: `5434` (container continua em `5432` internamente)
-- Banco: `valora`
-- Usuário: `valora`
-- Senha: `soma`
+Ficheiros `.env` estão no `.gitignore` e não devem ser commitados.
 
-Para sobrescrever (por exemplo em outro ambiente), copie `backend/.env.example` para `backend/.env` e ajuste conforme necessário. O arquivo `.env` está no `.gitignore` e não deve conter credenciais de produção.
+**Quem já tinha o Postgres a correr com outra senha:** mantenha no novo `.env` a **mesma** `POSTGRES_PASSWORD` que o volume Docker já usa, ou altere a senha no servidor (`ALTER USER …`) para coincidir com o valor novo no `.env`.
 
 ### Migrations (quando configurado)
 
@@ -58,4 +58,4 @@ alembic upgrade head
 
 - `pyproject.toml`: dependências e configuração do projeto Python.
 - `src/valora_backend/`: pacote da aplicação.
-- `src/valora_backend/config.py`: configuração via `pydantic-settings` (ex.: `DATABASE_URL`).
+- `src/valora_backend/config.py`: configuração via `pydantic-settings` (`POSTGRES_PASSWORD` → URL do banco em `database_url`).

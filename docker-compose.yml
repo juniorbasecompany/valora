@@ -1,12 +1,14 @@
 # PostgreSQL de desenvolvimento.
-# Uso: docker compose up -d
+# Uso: copie `.env.example` para `.env` na raiz e defina `POSTGRES_PASSWORD`, depois:
+#   docker compose up -d
+# O Compose carrega variáveis de `.env` para substituição e para o container.
 
 services:
   postgres:
     image: postgres:17
     environment:
       POSTGRES_USER: valora
-      POSTGRES_PASSWORD: soma
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env at repo root}
       POSTGRES_DB: valora
     ports:
       - "5434:5432"

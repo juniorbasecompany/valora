@@ -11,7 +11,7 @@
 | Bloco | Situação |
 |-------|----------|
 | A — Decisões de modelo (ERD) | Feito no ERD |
-| B — Docker e config | Feito (`docker-compose.yml`, `config.py`, README backend, `.env.example`) |
+| B — Docker e config | Feito (`docker-compose.yml`, `config.py`, README backend, `.env.example` na raiz) |
 | B' — Renomeação cleber → valora | Feito (incl. pasta local e GitHub) |
 | C — SQLAlchemy | Pendente |
 | D — Alembic | Pendente |
@@ -25,7 +25,7 @@
 - **Stack:** [architecture/technology-stack.md](../../architecture/technology-stack.md) — FastAPI, SQLAlchemy, Alembic, PostgreSQL, `psycopg`, `pydantic-settings`.
 - **Fase 1:** apenas tabelas `tenant`, `account`, `member`; restantes tabelas do ERD ficam para migrations posteriores.
 - **Tipos:** PKs e FKs de identity em **BIGINT** (alinhado no ERD).
-- **Postgres em desenvolvimento:** Docker Compose na raiz do monorepo; base de dados **`valora`**, utilizador **`valora`**, senha de desenvolvimento **`soma`**; URL padrão em `Settings` e documentação.
+- **Postgres em desenvolvimento:** Docker Compose na raiz do monorepo; base de dados **`valora`**, utilizador **`valora`**; a senha define-se só no ficheiro **`.env`** local (variável **`POSTGRES_PASSWORD`**, ver `.env.example` na raiz); `Settings` monta a URL a partir desta variável (nada de credenciais no Git).
 - **Pacote Python:** `valora_backend` (antes `cleber_backend`).
 - **Planos do projeto:** criar e manter ficheiros Markdown em **`.cursor/plans/`** (este repositório), com commit no Git.
 
@@ -77,11 +77,11 @@ Marque cada item quando aprovar / concluir.
 
 ### B — Docker, configuração e infraestrutura
 
-**Ideia:** o PostgreSQL de desenvolvimento roda em **container** (Compose). O backend e o Alembic, executados na máquina de desenvolvimento, usam `DATABASE_URL` com host **localhost** (ou `127.0.0.1`) e a **porta mapeada** pelo Compose (no host: **5434** → 5432 no container). Se no futuro o backend também rodar em container na mesma rede do Compose, o host passa a ser o **nome do serviço** do Postgres no `docker-compose.yml`.
+**Ideia:** o PostgreSQL de desenvolvimento roda em **container** (Compose). O backend e o Alembic, executados na máquina de desenvolvimento, obtêm a URL do banco a partir de **`POSTGRES_PASSWORD`** no `.env` local (montada em `Settings.database_url`), com host **localhost** (ou `127.0.0.1`) e **porta mapeada** pelo Compose (no host: **5434** → 5432 no container). Se no futuro o backend também rodar em container na mesma rede do Compose, o host passa a ser o **nome do serviço** do Postgres no `docker-compose.yml`.
 
 - [x] **B.1** `docker-compose.yml` na raiz do monorepo com serviço PostgreSQL, volume, healthcheck, porta, variáveis `POSTGRES_*`.
-- [x] **B.2** Módulo `backend/src/valora_backend/config.py` com `pydantic-settings` e `DATABASE_URL`.
-- [x] **B.3** Documentação em [backend/README.md](../../backend/README.md) e `backend/.env.example`.
+- [x] **B.2** Módulo `backend/src/valora_backend/config.py` com `pydantic-settings` e `POSTGRES_PASSWORD` → `database_url`.
+- [x] **B.3** Documentação em [backend/README.md](../../backend/README.md), [`.env.example`](../../.env.example) na raiz e `backend/.env.example`.
 
 ### B' — Renomeação do projeto (cleber → valora)
 

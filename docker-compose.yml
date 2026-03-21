@@ -6,7 +6,7 @@ services:
     image: postgres:17
     environment:
       POSTGRES_USER: valora
-      POSTGRES_PASSWORD: dev
+      POSTGRES_PASSWORD: soma
       POSTGRES_DB: valora
     ports:
       - "5434:5432"

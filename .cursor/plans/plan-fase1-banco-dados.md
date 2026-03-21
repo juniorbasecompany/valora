@@ -25,7 +25,7 @@
 - **Stack:** [architecture/technology-stack.md](../../architecture/technology-stack.md) — FastAPI, SQLAlchemy, Alembic, PostgreSQL, `psycopg`, `pydantic-settings`.
 - **Fase 1:** apenas tabelas `tenant`, `account`, `member`; restantes tabelas do ERD ficam para migrations posteriores.
 - **Tipos:** PKs e FKs de identity em **BIGINT** (alinhado no ERD).
-- **Postgres em desenvolvimento:** Docker Compose na raiz do monorepo; base de dados **`valora`**, utilizador **`valora`** (dev); URL padrão em `Settings` e documentação.
+- **Postgres em desenvolvimento:** Docker Compose na raiz do monorepo; base de dados **`valora`**, utilizador **`valora`**, senha de desenvolvimento **`soma`**; URL padrão em `Settings` e documentação.
 - **Pacote Python:** `valora_backend` (antes `cleber_backend`).
 - **Planos do projeto:** criar e manter ficheiros Markdown em **`.cursor/plans/`** (este repositório), com commit no Git.
 

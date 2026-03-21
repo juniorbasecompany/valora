@@ -13,4 +13,4 @@ class Settings(BaseSettings):
     )
 
     # URL do PostgreSQL; quando omitida, usa valor padrão compatível com docker-compose local.
-    database_url: str = "postgresql+psycopg://valora:dev@localhost:5434/valora"
+    database_url: str = "postgresql+psycopg://valora:soma@localhost:5434/valora"

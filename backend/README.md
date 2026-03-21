@@ -31,7 +31,7 @@ O PostgreSQL de desenvolvimento roda em **Docker Compose**. Na raiz do repositó
 docker compose up -d
 ```
 
-Isso sobe o Postgres com o banco **valora**, usuário `valora`, senha `dev` e porta **5434** no host (mapeada para 5432 no container).
+Isso sobe o Postgres com o banco **valora**, usuário `valora`, senha `soma` e porta **5434** no host (mapeada para 5432 no container).
 
 ### Variáveis de ambiente
 
@@ -41,7 +41,7 @@ O backend e o Alembic leem a URL do banco em `DATABASE_URL`. Se não estiver def
 - Porta no host: `5434` (container continua em `5432` internamente)
 - Banco: `valora`
 - Usuário: `valora`
-- Senha: `dev`
+- Senha: `soma`
 
 Para sobrescrever (por exemplo em outro ambiente), copie `backend/.env.example` para `backend/.env` e ajuste conforme necessário. O arquivo `.env` está no `.gitignore` e não deve conter credenciais de produção.
 

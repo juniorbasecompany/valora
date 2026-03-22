@@ -143,10 +143,19 @@
       "title": "Edición de miembros",
       "description": "Los cambios solo afectan al licenciatario activo de tu sesión. El correo sigue siendo la referencia de acceso del vínculo."
     },
+    "tab": {
+      "general": "General",
+      "history": "Historial",
+      "listAriaLabel": "Secciones de la configuración de miembros"
+    },
     "list": {
       "title": "Directorio del licenciatario",
       "description": "Selecciona un miembro para revisar o actualizar el registro.",
       "empty": "No se encontraron miembros para el licenciatario activo."
+    },
+    "history": {
+      "title": "Historial de cambios",
+      "description": "Una línea de tiempo de los cambios de registro aparecerá aquí cuando la auditoría del directorio esté disponible. Hasta entonces, esta pestaña queda como referencia de layout y trazabilidad."
     },
     "section": {
       "profile": {
@@ -175,11 +184,16 @@
     },
     "action": {
       "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "undoDelete": "Desmarcar eliminación",
       "save": "Guardar",
       "saving": "Guardando..."
     },
     "readOnlyNotice": "Puedes revisar el directorio de miembros, pero solo los miembros master o administrador pueden editar registros.",
+    "protectedRecordNotice": "Este registro está protegido por los permisos actuales. Selecciona otro miembro para editar.",
     "savedNotice": "Miembro actualizado correctamente.",
+    "deletedNotice": "Miembro eliminado correctamente.",
+    "deletePendingNotice": "Este miembro se eliminará al guardar. Desmarca la eliminación para volver al modo normal de edición.",
     "selectPrompt": "Selecciona un miembro de la lista para editar el registro.",
     "role": {
       "master": "Master",
@@ -193,6 +207,7 @@
     },
     "error": {
       "save": "No se pudo guardar el miembro. Inténtalo de nuevo.",
+      "delete": "No se pudo eliminar el miembro. Inténtalo de nuevo.",
       "validation": "Este campo no puede quedar vacío."
     },
     "discardConfirm": "¿Descartar los cambios no guardados?"
@@ -234,14 +249,17 @@
     "action": {
       "cancel": "Cancelar",
       "delete": "Eliminar",
+      "undoDelete": "Desmarcar eliminación",
       "save": "Guardar",
       "saving": "Guardando...",
       "back": "Volver a Configuración"
     },
     "readOnlyNotice": "Puedes ver los datos del licenciatario, pero solo los miembros master o administrador pueden editarlos.",
     "savedNotice": "Licenciatario actualizado correctamente.",
+    "deletePendingNotice": "Este licenciatario se eliminará al guardar. Desmarca la eliminación para continuar editando normalmente.",
     "error": {
       "save": "No se pudieron guardar los cambios. Inténtalo de nuevo.",
+      "delete": "No se pudo eliminar el licenciatario. Inténtalo de nuevo.",
       "validation": "Este campo no puede quedar vacío."
     },
     "discardConfirm": "¿Descartar los cambios no guardados?"

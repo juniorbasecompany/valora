@@ -143,10 +143,19 @@
       "title": "Editing members",
       "description": "Changes only affect the active tenant in your session. Email remains the access reference for the relationship."
     },
+    "tab": {
+      "general": "General",
+      "history": "History",
+      "listAriaLabel": "Member settings sections"
+    },
     "list": {
       "title": "Tenant directory",
       "description": "Select a member to review or update the record.",
       "empty": "No members were found for the active tenant."
+    },
+    "history": {
+      "title": "Change history",
+      "description": "A timeline of record changes will appear here when directory auditing is available. Until then, this tab stays as a layout and traceability placeholder."
     },
     "section": {
       "profile": {
@@ -175,11 +184,16 @@
     },
     "action": {
       "cancel": "Cancel",
+      "delete": "Delete",
+      "undoDelete": "Undo delete",
       "save": "Save",
       "saving": "Saving..."
     },
     "readOnlyNotice": "You can review the member directory, but only master or admin members can edit records.",
+    "protectedRecordNotice": "This record is protected by the current permissions. Select another member to edit.",
     "savedNotice": "Member updated successfully.",
+    "deletedNotice": "Member deleted successfully.",
+    "deletePendingNotice": "This member will be deleted when you save. Undo the delete mark to return to normal editing.",
     "selectPrompt": "Select a member from the list to edit the record.",
     "role": {
       "master": "Master",
@@ -193,6 +207,7 @@
     },
     "error": {
       "save": "Could not save the member. Try again.",
+      "delete": "Could not delete the member. Try again.",
       "validation": "This field cannot be empty."
     },
     "discardConfirm": "Discard unsaved changes?"
@@ -234,14 +249,17 @@
     "action": {
       "cancel": "Cancel",
       "delete": "Delete",
+      "undoDelete": "Undo delete",
       "save": "Save",
       "saving": "Saving...",
       "back": "Back to Configuration"
     },
     "readOnlyNotice": "You can view tenant data, but only master or admin members can edit it.",
     "savedNotice": "Tenant updated successfully.",
+    "deletePendingNotice": "This tenant will be deleted when you save. Undo the delete mark to continue editing normally.",
     "error": {
       "save": "Could not save changes. Try again.",
+      "delete": "Could not delete the tenant. Try again.",
       "validation": "This field cannot be empty."
     },
     "discardConfirm": "Discard unsaved changes?"

@@ -119,6 +119,11 @@ class TenantCurrentResponse(BaseModel):
     name: str
     display_name: str
     can_edit: bool
+    can_delete: bool
+
+
+class TenantDeleteResponse(BaseModel):
+    deleted_tenant_id: int
 
 
 class TenantUpdateRequest(BaseModel):
@@ -147,6 +152,7 @@ class TenantMemberRecord(BaseModel):
     account_id: int | None
     can_edit: bool
     can_edit_access: bool
+    can_delete: bool
 
 
 class TenantMemberDirectoryResponse(BaseModel):
@@ -604,6 +610,10 @@ def _member_can_edit_tenant(member: Member) -> bool:
     return member.role in (MASTER_ROLE, ADMIN_ROLE)
 
 
+def _member_can_delete_tenant(member: Member) -> bool:
+    return member.role == MASTER_ROLE
+
+
 def _member_can_edit_member_profile(actor: Member, target: Member) -> bool:
     if actor.role == MASTER_ROLE:
         return True
@@ -615,6 +625,10 @@ def _member_can_edit_member_profile(actor: Member, target: Member) -> bool:
 
 
 def _member_can_edit_member_access(actor: Member, target: Member) -> bool:
+    return actor.role == MASTER_ROLE and actor.id != target.id
+
+
+def _member_can_delete_member(actor: Member, target: Member) -> bool:
     return actor.role == MASTER_ROLE and actor.id != target.id
 
 
@@ -630,6 +644,7 @@ def _serialize_tenant_member(actor: Member, target: Member) -> TenantMemberRecor
         account_id=target.account_id,
         can_edit=_member_can_edit_member_profile(actor, target),
         can_edit_access=_member_can_edit_member_access(actor, target),
+        can_delete=_member_can_delete_member(actor, target),
     )
 
 
@@ -678,6 +693,7 @@ def get_current_tenant_detail(
         name=tenant.name,
         display_name=tenant.display_name,
         can_edit=_member_can_edit_tenant(member),
+        can_delete=_member_can_delete_tenant(member),
     )
 
 
@@ -713,7 +729,30 @@ def patch_current_tenant(
         name=tenant.name,
         display_name=tenant.display_name,
         can_edit=_member_can_edit_tenant(member),
+        can_delete=_member_can_delete_tenant(member),
     )
+
+
+@router.delete("/tenant/current", response_model=TenantDeleteResponse)
+def delete_current_tenant(
+    member: Member = Depends(get_current_member),
+    tenant: Tenant = Depends(get_current_tenant),
+    session: Session = Depends(get_session),
+):
+    if not _member_can_delete_tenant(member):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only master members can delete tenant",
+        )
+
+    member_list = list(session.scalars(select(Member).where(Member.tenant_id == tenant.id)))
+    for tenant_member in member_list:
+        session.delete(tenant_member)
+
+    session.delete(tenant)
+    session.commit()
+
+    return TenantDeleteResponse(deleted_tenant_id=tenant.id)
 
 
 @router.patch(
@@ -758,6 +797,34 @@ def patch_current_tenant_member(
     target_member.display_name = body.display_name
     session.add(target_member)
     commit_session_with_null_if_empty(session)
+
+    return _build_tenant_member_directory(session, actor=current_member)
+
+
+@router.delete(
+    "/tenant/current/members/{member_id}",
+    response_model=TenantMemberDirectoryResponse,
+)
+def delete_current_tenant_member(
+    member_id: int,
+    current_member: Member = Depends(get_current_member),
+    session: Session = Depends(get_session),
+):
+    target_member = session.get(Member, member_id)
+    if not target_member or target_member.tenant_id != current_member.tenant_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Member not found for current tenant",
+        )
+
+    if not _member_can_delete_member(current_member, target_member):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only master members can delete another member",
+        )
+
+    session.delete(target_member)
+    session.commit()
 
     return _build_tenant_member_directory(session, actor=current_member)
 

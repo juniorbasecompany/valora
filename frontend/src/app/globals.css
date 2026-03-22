@@ -598,6 +598,12 @@ svg {
   color: var(--color-danger-text);
 }
 
+.ui-delete-pending {
+  border-color: var(--color-danger-border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 240, 239, 0.92));
+}
+
 .ui-tone-construction {
   border-color: var(--color-construction-border);
   background:

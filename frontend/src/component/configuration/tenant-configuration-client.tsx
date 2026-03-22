@@ -33,12 +33,15 @@ export type TenantConfigurationCopy = {
   metadataIdLabel: string;
   cancel: string;
   delete: string;
+  undoDelete: string;
   save: string;
   saving: string;
   back: string;
   readOnlyNotice: string;
   savedNotice: string;
   saveError: string;
+  deletePendingNotice: string;
+  deleteError: string;
   validationError: string;
   discardConfirm: string;
 };
@@ -98,6 +101,7 @@ export function TenantConfigurationClient({
       display: initialTenant.display_name,
       legal: initialTenant.name
     });
+    setIsDeletePending(false);
   }, [initialTenant]);
 
   const [fieldError, setFieldError] = useState<{
@@ -107,6 +111,7 @@ export function TenantConfigurationClient({
   const [formError, setFormError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeletePending, setIsDeletePending] = useState(false);
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -116,9 +121,10 @@ export function TenantConfigurationClient({
   const isDirty = useMemo(() => {
     return (
       displayName.trim() !== baseline.display.trim() ||
-      legalName.trim() !== baseline.legal.trim()
+      legalName.trim() !== baseline.legal.trim() ||
+      isDeletePending
     );
-  }, [baseline.display, baseline.legal, displayName, legalName]);
+  }, [baseline.display, baseline.legal, displayName, isDeletePending, legalName]);
 
   const setTab = useCallback(
     (next: "general" | "history") => {
@@ -146,22 +152,38 @@ export function TenantConfigurationClient({
   const handleSave = useCallback(async () => {
     setFormError(null);
     setSaveSuccess(false);
-    if (!validate()) {
+    if (!isDeletePending && !validate()) {
       return;
     }
     setIsSaving(true);
     try {
-      const response = await fetch("/api/auth/tenant/current", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          display_name: displayName.trim(),
-          name: legalName.trim()
-        })
-      });
+      const response = await fetch(
+        "/api/auth/tenant/current",
+        isDeletePending
+          ? {
+              method: "DELETE"
+            }
+          : {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                display_name: displayName.trim(),
+                name: legalName.trim()
+              })
+            }
+      );
       const data: unknown = await response.json().catch(() => ({}));
       if (!response.ok) {
-        setFormError(parseErrorDetail(data, copy.saveError));
+        setFormError(
+          parseErrorDetail(data, isDeletePending ? copy.deleteError : copy.saveError)
+        );
+        return;
+      }
+      if (isDeletePending) {
+        await fetch("/api/auth/logout", {
+          method: "POST"
+        }).catch(() => null);
+        router.replace(`/${locale}/login?reason=signed_out`);
         return;
       }
       const updated = data as TenantCurrentResponse;
@@ -172,20 +194,33 @@ export function TenantConfigurationClient({
         display: updated.display_name,
         legal: updated.name
       });
+      setIsDeletePending(false);
       setSaveSuccess(true);
       router.refresh();
     } catch {
-      setFormError(copy.saveError);
+      setFormError(isDeletePending ? copy.deleteError : copy.saveError);
     } finally {
       setIsSaving(false);
     }
   }, [
+    copy.deleteError,
     copy.saveError,
     displayName,
+    isDeletePending,
     legalName,
+    locale,
     router,
     validate
   ]);
+
+  const handleToggleDelete = useCallback(() => {
+    if (!tenant.can_delete || isSaving) {
+      return;
+    }
+    setFormError(null);
+    setSaveSuccess(false);
+    setIsDeletePending((previous) => !previous);
+  }, [isSaving, tenant.can_delete]);
 
   const handleBack = useCallback(
     (event: MouseEvent<HTMLAnchorElement>) => {
@@ -259,10 +294,16 @@ export function TenantConfigurationClient({
           aria-labelledby="tenant-tab-general"
           className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.85fr)]"
         >
-          <div className="ui-panel flex flex-col gap-6 px-6 py-6">
+          <div className={`ui-panel flex flex-col gap-6 px-6 py-6 ${isDeletePending ? "ui-delete-pending" : ""}`}>
             {!tenant.can_edit ? (
               <div className="ui-notice-attention px-4 py-3 text-sm">
                 {copy.readOnlyNotice}
+              </div>
+            ) : null}
+
+            {isDeletePending ? (
+              <div className="ui-tone-danger rounded-[var(--radius-card)] border px-4 py-3 text-sm">
+                {copy.deletePendingNotice}
               </div>
             ) : null}
 
@@ -309,7 +350,7 @@ export function TenantConfigurationClient({
                     }));
                     setSaveSuccess(false);
                   }}
-                  disabled={!tenant.can_edit}
+                  disabled={isDeletePending || !tenant.can_edit}
                   autoComplete="organization"
                   aria-invalid={Boolean(fieldError.displayName)}
                   aria-describedby="tenant-display-name-hint"
@@ -361,7 +402,7 @@ export function TenantConfigurationClient({
                     }));
                     setSaveSuccess(false);
                   }}
-                  disabled={!tenant.can_edit}
+                  disabled={isDeletePending || !tenant.can_edit}
                   autoComplete="organization-title"
                   aria-invalid={Boolean(fieldError.legalName)}
                   aria-describedby="tenant-legal-name-hint"
@@ -393,7 +434,7 @@ export function TenantConfigurationClient({
           </div>
 
           <aside className="flex flex-col gap-4">
-            <div className="ui-panel p-5">
+            <div className={`ui-panel p-5 ${isDeletePending ? "ui-delete-pending" : ""}`}>
               <div className="flex items-start gap-4">
                 <span className="ui-icon-badge">
                   <PreviewIcon className="h-[1.05rem] w-[1.05rem]" />
@@ -507,9 +548,10 @@ export function TenantConfigurationClient({
                 <button
                   type="button"
                   className="ui-button-danger"
-                  disabled
+                  onClick={handleToggleDelete}
+                  disabled={!tenant.can_delete || isSaving}
                 >
-                  {copy.delete}
+                  {isDeletePending ? copy.undoDelete : copy.delete}
                 </button>
                 <button
                   type="button"

@@ -34,3 +34,27 @@ export async function PATCH(
 
   return NextResponse.json(result.data);
 }
+
+export async function DELETE(
+  request: NextRequest,
+  context: { params: Promise<{ memberId: string }> }
+) {
+  const authResult = requireToken(request);
+  if (!authResult.ok) {
+    return authResult.error;
+  }
+
+  const { memberId } = await context.params;
+  const result = await backendFetch<TenantMemberDirectoryResponse>(
+    `/auth/tenant/current/members/${memberId}`,
+    {
+      method: "DELETE",
+      token: authResult.token
+    }
+  );
+  if (!result.ok) {
+    return result.error;
+  }
+
+  return NextResponse.json(result.data);
+}

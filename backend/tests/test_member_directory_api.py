@@ -4,7 +4,7 @@ from collections.abc import Generator
 from contextlib import contextmanager
 
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -142,8 +142,10 @@ def test_get_current_tenant_member_directory_exposes_capabilities() -> None:
 
     assert payload["can_edit"] is True
     assert member_map[member_id_by_key["master"]]["can_edit_access"] is False
+    assert member_map[member_id_by_key["master"]]["can_delete"] is False
     assert member_map[member_id_by_key["admin"]]["can_edit"] is True
     assert member_map[member_id_by_key["admin"]]["can_edit_access"] is True
+    assert member_map[member_id_by_key["admin"]]["can_delete"] is True
     assert member_map[member_id_by_key["pending"]]["status"] == "PENDING"
 
 
@@ -207,3 +209,45 @@ def test_master_cannot_activate_member_without_linked_account() -> None:
     assert response.json()["detail"] == (
         "Pending members without a linked account cannot become active"
     )
+
+
+def test_master_can_delete_another_member() -> None:
+    with build_test_client(current_member_key="master") as (
+        client,
+        session,
+        member_id_by_key,
+    ):
+        response = client.delete(
+            f"/auth/tenant/current/members/{member_id_by_key['member']}"
+        )
+        session.expire_all()
+        deleted_member = session.get(Member, member_id_by_key["member"])
+
+    assert response.status_code == 200
+    assert deleted_member is None
+    payload = response.json()
+    assert all(item["id"] != member_id_by_key["member"] for item in payload["item_list"])
+
+
+def test_master_cannot_delete_self_member_record() -> None:
+    with build_test_client(current_member_key="master") as (client, _, member_id_by_key):
+        response = client.delete(
+            f"/auth/tenant/current/members/{member_id_by_key['master']}"
+        )
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == "Only master members can delete another member"
+
+
+def test_master_can_delete_current_tenant_tree() -> None:
+    with build_test_client(current_member_key="master") as (client, session, _):
+        tenant_id = session.scalar(select(Tenant.id))
+        response = client.delete("/auth/tenant/current")
+        session.expire_all()
+        remaining_tenant = session.get(Tenant, tenant_id)
+        remaining_member_count = session.query(Member).count()
+
+    assert response.status_code == 200
+    assert response.json() == {"deleted_tenant_id": tenant_id}
+    assert remaining_tenant is None
+    assert remaining_member_count == 0

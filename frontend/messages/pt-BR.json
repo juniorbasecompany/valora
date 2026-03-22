@@ -143,10 +143,19 @@
       "title": "Edição de membros",
       "description": "As alterações afetam apenas o licenciado ativo da sua sessão. O email segue como referência de acesso do vínculo."
     },
+    "tab": {
+      "general": "Geral",
+      "history": "Histórico",
+      "listAriaLabel": "Seções das configurações de membros"
+    },
     "list": {
       "title": "Diretório do licenciado",
       "description": "Selecione um membro para revisar ou atualizar o cadastro.",
       "empty": "Nenhum membro foi encontrado para o licenciado ativo."
+    },
+    "history": {
+      "title": "Histórico de alterações",
+      "description": "Uma linha do tempo das alterações de cadastro aparecerá aqui quando a auditoria do diretório estiver disponível. Até lá, esta aba permanece como referência de layout e rastreabilidade."
     },
     "section": {
       "profile": {
@@ -175,11 +184,16 @@
     },
     "action": {
       "cancel": "Cancelar",
+      "delete": "Apagar",
+      "undoDelete": "Desmarcar exclusão",
       "save": "Salvar",
       "saving": "Salvando..."
     },
     "readOnlyNotice": "Você pode consultar o diretório de membros, mas só membros master ou administrador podem editar cadastros.",
+    "protectedRecordNotice": "Este registro está protegido pelas permissões atuais. Selecione outro membro para editar.",
     "savedNotice": "Membro atualizado com sucesso.",
+    "deletedNotice": "Membro apagado com sucesso.",
+    "deletePendingNotice": "Este membro será apagado ao salvar. Desmarque a exclusão para voltar ao modo normal de edição.",
     "selectPrompt": "Selecione um membro na lista para editar o cadastro.",
     "role": {
       "master": "Master",
@@ -193,6 +207,7 @@
     },
     "error": {
       "save": "Não foi possível salvar o membro. Tente novamente.",
+      "delete": "Não foi possível apagar o membro. Tente novamente.",
       "validation": "Este campo não pode ficar vazio."
     },
     "discardConfirm": "Descartar alterações não salvas?"
@@ -234,14 +249,17 @@
     "action": {
       "cancel": "Cancelar",
       "delete": "Apagar",
+      "undoDelete": "Desmarcar exclusão",
       "save": "Salvar",
       "saving": "Salvando...",
       "back": "Voltar para Configuração"
     },
     "readOnlyNotice": "Você pode ver os dados do licenciado, mas só membros master ou administrador podem editar.",
     "savedNotice": "Licenciado atualizado com sucesso.",
+    "deletePendingNotice": "Este licenciado será apagado ao salvar. Desmarque a exclusão para continuar editando normalmente.",
     "error": {
       "save": "Não foi possível salvar. Tente novamente.",
+      "delete": "Não foi possível apagar o licenciado. Tente novamente.",
       "validation": "Este campo não pode ficar vazio."
     },
     "discardConfirm": "Descartar alterações não salvas?"

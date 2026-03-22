@@ -44,12 +44,15 @@ export default async function TenantConfigurationPage({
     metadataIdLabel: t("metadata.idLabel"),
     cancel: t("action.cancel"),
     delete: t("action.delete"),
+    undoDelete: t("action.undoDelete"),
     save: t("action.save"),
     saving: t("action.saving"),
     back: t("action.back"),
     readOnlyNotice: t("readOnlyNotice"),
     savedNotice: t("savedNotice"),
+    deletePendingNotice: t("deletePendingNotice"),
     saveError: t("error.save"),
+    deleteError: t("error.delete"),
     validationError: t("error.validation"),
     discardConfirm: t("discardConfirm")
   };

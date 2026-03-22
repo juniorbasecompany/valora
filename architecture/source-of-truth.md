@@ -30,6 +30,8 @@ Use esta camada para orientar implementação e revisão com segurança.
 
 Use esta camada para registrar decisões estruturais que valem para todo o sistema.
 
+- Padrão oficial de painéis de configuração: `architecture/configuration-panels.md`.
+
 ### `vision/`
 
 Use esta camada para explicar o que está sendo construído e como isso ajuda a operação.

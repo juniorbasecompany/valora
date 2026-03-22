@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { backendFetch, requireToken } from "@/lib/backend-fetch";
-import type { TenantCurrentResponse } from "@/lib/auth/types";
+import type { TenantCurrentResponse, TenantDeleteResponse } from "@/lib/auth/types";
 
 export async function GET(request: NextRequest) {
   const authResult = requireToken(request);
@@ -37,6 +37,23 @@ export async function PATCH(request: NextRequest) {
     method: "PATCH",
     token: authResult.token,
     body
+  });
+  if (!result.ok) {
+    return result.error;
+  }
+
+  return NextResponse.json(result.data);
+}
+
+export async function DELETE(request: NextRequest) {
+  const authResult = requireToken(request);
+  if (!authResult.ok) {
+    return authResult.error;
+  }
+
+  const result = await backendFetch<TenantDeleteResponse>("/auth/tenant/current", {
+    method: "DELETE",
+    token: authResult.token
   });
   if (!result.ok) {
     return result.error;

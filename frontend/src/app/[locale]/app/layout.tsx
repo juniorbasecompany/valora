@@ -70,6 +70,8 @@ export default async function AppLayout({
           currentLocale={locale}
           localeList={[...routing.locales]}
           accountName={
+            authSession.member.display_name ||
+            authSession.member.name ||
             authSession.account.display_name ||
             authSession.account.name ||
             authSession.account.email

@@ -260,22 +260,24 @@ export function AccountMenu({
           className="ui-menu-panel absolute right-0 top-[calc(100%+0.375rem)] flex max-h-[min(70vh,28rem)] min-w-[19rem] max-w-[min(calc(100vw-2rem),22rem)] flex-col gap-0 overflow-hidden p-0"
         >
           <div className="max-h-[min(52vh,20rem)] overflow-y-auto overscroll-contain px-1 py-2">
-            <section className="px-3 pb-2">
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <p className="ui-menu-section-title m-0">
-                  {copy.tenantSectionLabel}
-                </p>
-                {isLoadingTenantList ? (
-                  <span className="text-xs text-[var(--color-text-subtle)]">
-                    {copy.loadingTenantList}
-                  </span>
-                ) : null}
-                {switchingTenantId !== null ? (
-                  <span className="text-xs text-[var(--color-text-subtle)]">
-                    {copy.switchingTenant}
-                  </span>
-                ) : null}
-              </div>
+            <section
+              className="px-3 pb-2"
+              aria-label={copy.tenantSectionLabel}
+            >
+              {isLoadingTenantList || switchingTenantId !== null ? (
+                <div className="mb-2 flex justify-end">
+                  {isLoadingTenantList ? (
+                    <span className="text-xs text-[var(--color-text-subtle)]">
+                      {copy.loadingTenantList}
+                    </span>
+                  ) : null}
+                  {switchingTenantId !== null ? (
+                    <span className="text-xs text-[var(--color-text-subtle)]">
+                      {copy.switchingTenant}
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
 
               {tenantListError ? (
                 <p className="m-0 rounded-[var(--radius-control)] border border-[var(--color-danger-border)] bg-[var(--color-danger-surface)] px-3 py-2 text-sm text-[var(--color-danger-text)]">
@@ -316,17 +318,17 @@ export function AccountMenu({
               ) : null}
             </section>
 
-            <section className="border-t border-[var(--color-border)] px-3 py-2">
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <p className="ui-menu-section-title m-0">
-                  {copy.localeSectionLabel}
-                </p>
-                {switchingLocale ? (
+            <section
+              className="border-t border-[var(--color-border)] px-3 py-2"
+              aria-label={copy.localeSectionLabel}
+            >
+              {switchingLocale ? (
+                <div className="mb-2 flex justify-end">
                   <span className="text-xs text-[var(--color-text-subtle)]">
                     {copy.switchingLocale}
                   </span>
-                ) : null}
-              </div>
+                </div>
+              ) : null}
 
               <div className="flex flex-col gap-0.5">
                 {localeList.map((locale) => {

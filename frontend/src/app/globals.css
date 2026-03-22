@@ -164,14 +164,6 @@ textarea {
     0 0 0 1px rgba(15, 23, 42, 0.04);
 }
 
-.ui-menu-section-title {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-text-subtle);
-}
-
 .ui-menu-item {
   border: var(--border-width-default) solid transparent;
   border-radius: var(--radius-control);

@@ -42,6 +42,8 @@ export default async function TenantConfigurationPage({
     legalNameLabel: t("section.legal.nameLabel"),
     legalNameHint: t("section.legal.nameHint"),
     metadataIdLabel: t("metadata.idLabel"),
+    cancel: t("action.cancel"),
+    delete: t("action.delete"),
     save: t("action.save"),
     saving: t("action.saving"),
     back: t("action.back"),

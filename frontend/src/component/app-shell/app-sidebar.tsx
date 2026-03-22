@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -22,41 +23,56 @@ type NavigationIconKind =
 
 type AppSidebarProps = {
   productName: string;
-  productStage: string;
   workspaceLabel: string;
   navigationItemList: NavigationItem[];
+  accountSlot?: ReactNode;
+  mode?: "desktop" | "drawer";
+  onNavigate?: () => void;
 };
 
 export function AppSidebar({
   productName,
-  productStage,
   workspaceLabel,
-  navigationItemList
+  navigationItemList,
+  accountSlot,
+  mode = "desktop",
+  onNavigate
 }: AppSidebarProps) {
   const pathname = usePathname();
+  const isDrawer = mode === "drawer";
 
   return (
-    <aside className="ui-sidebar flex h-full w-full max-w-[19.5rem] shrink-0 flex-col">
-      <div className="relative border-b border-[var(--color-border)] px-5 py-6">
-        <div className="relative flex items-start gap-4">
-          <div className="shrink-0 rounded-[1.25rem] border border-[rgba(37,117,216,0.12)] bg-white/80 p-1.5 shadow-[var(--shadow-xs)]">
-            <ValoraMark />
-          </div>
+    <aside
+      className={`ui-sidebar flex h-full w-full min-w-0 shrink-0 flex-col ${
+        isDrawer
+          ? ""
+          : "max-w-[19.5rem] border-r border-[var(--color-border)]"
+      }`}
+    >
+      <div className="relative z-20 overflow-visible border-b border-[var(--color-border)] px-5 py-6">
+        <div className="relative flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <span className="ui-pill ui-pill-construction inline-flex w-fit px-3 py-1 text-[11px] font-semibold tracking-[0.08em]">
-              {productStage}
-            </span>
-            <h1 className="ui-header-title mt-4 text-[1.7rem] font-semibold tracking-[-0.03em] text-[var(--color-text)]">
+            <h1 className="ui-header-title text-[2.15rem] font-semibold tracking-[-0.04em] leading-none text-[var(--color-text)]">
               {productName}
             </h1>
-            <p className="mt-2 max-w-[14rem] text-sm leading-6 text-[var(--color-text-subtle)]">
+            <p className="mt-3 max-w-[14rem] text-[1.04rem] font-medium leading-6 text-[var(--color-text)]">
               {workspaceLabel}
             </p>
+
+            {accountSlot ? (
+              <div className="mt-3.5 max-w-full">
+                {accountSlot}
+              </div>
+            ) : null}
+          </div>
+
+          <div className="shrink-0">
+            <ValoraMark />
           </div>
         </div>
       </div>
 
-      <nav className="flex flex-1 flex-col gap-2 overflow-y-auto px-3 py-5">
+      <nav className="relative z-0 flex flex-1 flex-col gap-2 overflow-y-auto px-3 py-5">
         {navigationItemList.map((navigationItem) => {
           const isPlanned = !navigationItem.href;
           const navigationIconKind = navigationItem.key as NavigationIconKind;
@@ -64,7 +80,7 @@ export function AppSidebar({
             <>
               <span className="flex min-w-0 items-center gap-3">
                 <span
-                  className={`ui-icon-badge h-10 w-10 rounded-[1rem] ${
+                  className={`ui-icon-badge h-10 w-10 rounded-[0.72rem] ${
                     isPlanned
                       ? "ui-icon-badge-construction"
                       : ""
@@ -103,6 +119,7 @@ export function AppSidebar({
               <Link
                 key={navigationItem.key}
                 href={navigationItem.href}
+                onClick={onNavigate}
                 className={`ui-nav-item flex items-center justify-between gap-3 px-3 py-3 text-sm ${
                   isActive
                     ? "ui-nav-item-active"

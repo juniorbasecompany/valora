@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { MouseEvent } from "react";
+import { createPortal } from "react-dom";
 
 import { PageHeader } from "@/component/app-shell/page-header";
 import { StatusPanel } from "@/component/app-shell/status-panel";
@@ -30,6 +31,8 @@ export type TenantConfigurationCopy = {
   legalNameLabel: string;
   legalNameHint: string;
   metadataIdLabel: string;
+  cancel: string;
+  delete: string;
   save: string;
   saving: string;
   back: string;
@@ -104,6 +107,11 @@ export function TenantConfigurationClient({
   const [formError, setFormError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setPortalTarget(document.getElementById("app-shell-footer-slot"));
+  }, []);
 
   const isDirty = useMemo(() => {
     return (
@@ -193,7 +201,7 @@ export function TenantConfigurationClient({
   const previewLegalName = legalName.trim() || tenant.name;
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className={`flex flex-col gap-6 ${tab === "general" ? "pb-56 lg:pb-0" : ""}`}>
       <PageHeader
         eyebrow={copy.eyebrow}
         title={pageTitle}
@@ -381,23 +389,7 @@ export function TenantConfigurationClient({
               </p>
             </section>
 
-            <div className="flex flex-wrap items-center gap-3 border-t border-[var(--color-border)] pt-6">
-              <button
-                type="button"
-                className="ui-button-primary"
-                onClick={() => void handleSave()}
-                disabled={!tenant.can_edit || isSaving || !isDirty}
-              >
-                {isSaving ? copy.saving : copy.save}
-              </button>
-              <Link
-                href={configurationPath}
-                className="ui-button-secondary inline-flex items-center justify-center"
-                onClick={handleBack}
-              >
-                {copy.back}
-              </Link>
-            </div>
+            <div className="border-t border-[var(--color-border)] pt-6" />
           </div>
 
           <aside className="flex flex-col gap-4">
@@ -497,6 +489,41 @@ export function TenantConfigurationClient({
           />
         </div>
       )}
+
+      {tab === "general" && portalTarget
+        ? createPortal(
+            <div className="mx-auto flex w-full max-w-[112rem] flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-5 lg:px-8">
+              <div className="flex shrink-0 items-center">
+                <Link
+                  href={configurationPath}
+                  className="ui-button-secondary inline-flex items-center justify-center"
+                  onClick={handleBack}
+                >
+                  {copy.cancel}
+                </Link>
+              </div>
+
+              <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+                <button
+                  type="button"
+                  className="ui-button-danger"
+                  disabled
+                >
+                  {copy.delete}
+                </button>
+                <button
+                  type="button"
+                  className="ui-button-primary"
+                  onClick={() => void handleSave()}
+                  disabled={!tenant.can_edit || isSaving || !isDirty}
+                >
+                  {isSaving ? copy.saving : copy.save}
+                </button>
+              </div>
+            </div>,
+            portalTarget
+          )
+        : null}
     </section>
   );
 }

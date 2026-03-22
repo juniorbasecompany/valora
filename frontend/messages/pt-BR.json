@@ -17,6 +17,8 @@
       "tenantLabel": "Licenciado ativo",
       "accountLabel": "Conta",
       "localeLabel": "Idioma e região",
+      "openNavigation": "Abrir navegação",
+      "closeNavigation": "Fechar navegação",
       "signOut": "Sair",
       "signOutPending": "Saindo..."
     },
@@ -167,6 +169,8 @@
       "idLabel": "Identificador interno"
     },
     "action": {
+      "cancel": "Cancelar",
+      "delete": "Apagar",
       "save": "Salvar",
       "saving": "Salvando...",
       "back": "Voltar para Configuração"

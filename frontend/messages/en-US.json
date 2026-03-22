@@ -17,6 +17,8 @@
       "tenantLabel": "Active tenant",
       "accountLabel": "Account",
       "localeLabel": "Language and region",
+      "openNavigation": "Open navigation",
+      "closeNavigation": "Close navigation",
       "signOut": "Sign out",
       "signOutPending": "Signing out..."
     },
@@ -167,6 +169,8 @@
       "idLabel": "Internal identifier"
     },
     "action": {
+      "cancel": "Cancel",
+      "delete": "Delete",
       "save": "Save",
       "saving": "Saving...",
       "back": "Back to Configuration"

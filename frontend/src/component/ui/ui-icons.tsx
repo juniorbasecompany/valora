@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 type IconProps = {
   className?: string;
 };
@@ -17,6 +19,8 @@ function mergeClassName(className?: string, fallback = "h-5 w-5") {
 }
 
 export function ValoraMark({ className }: IconProps) {
+  const gradientId = useId();
+
   return (
     <svg
       className={mergeClassName(className, "h-11 w-11")}
@@ -26,12 +30,12 @@ export function ValoraMark({ className }: IconProps) {
       aria-hidden
     >
       <defs>
-        <linearGradient id="valora-mark" x1="6" y1="6" x2="42" y2="42">
+        <linearGradient id={gradientId} x1="6" y1="6" x2="42" y2="42">
           <stop stopColor="#1E7CE3" />
           <stop offset="1" stopColor="#0E4C8C" />
         </linearGradient>
       </defs>
-      <rect x="4" y="4" width="40" height="40" rx="14" fill="url(#valora-mark)" />
+      <rect x="4" y="4" width="40" height="40" rx="14" fill={`url(#${gradientId})`} />
       <path
         d="M14 15L22.6 33H26.2L34 15H29.9L24.3 28.3L18.2 15H14Z"
         fill="white"
@@ -398,3 +402,4 @@ export function NavigationIcon({
       return <DashboardIcon className={className} />;
   }
 }
+

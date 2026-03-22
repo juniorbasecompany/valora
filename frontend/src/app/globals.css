@@ -18,8 +18,11 @@
   --color-text-muted: #324560;
   --color-text-subtle: #67778e;
   --color-primary: #123d69;
-  --color-primary-hover: #0d3152;
+  --color-primary-hover: #10385d;
   --color-primary-foreground: #ffffff;
+  --color-secondary-action: #748292;
+  --color-secondary-action-hover: #647181;
+  --color-secondary-action-foreground: #ffffff;
   --color-accent: #2575d8;
   --color-accent-strong: #0f549f;
   --color-accent-soft: #e8f1ff;
@@ -32,6 +35,9 @@
   --color-positive-surface: #e9f8ef;
   --color-positive-border: #8ad0a2;
   --color-positive-text: #1b6a42;
+  --color-danger-action: #cf5b54;
+  --color-danger-action-hover: #bb4a43;
+  --color-danger-action-foreground: #ffffff;
   --color-danger-surface: #fff0ef;
   --color-danger-surface-hover: #ffe4e2;
   --color-danger-border: #f0b0ac;
@@ -41,10 +47,10 @@
   --color-construction-border: #e8bd6a;
   --color-construction-text: #8e5f10;
 
-  --radius-control: 0.95rem;
-  --radius-card: 1.15rem;
-  --radius-panel: 1.45rem;
-  --radius-shell: 1.5rem;
+  --radius-control: 0.3rem;
+  --radius-card: 0.4rem;
+  --radius-panel: 0.5rem;
+  --radius-shell: 0.5rem;
 
   --border-width-default: 1px;
   --border-width-strong: 1.5px;
@@ -133,7 +139,6 @@ svg {
 
 .ui-sidebar {
   position: relative;
-  border-right: var(--border-width-default) solid var(--color-border);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(247, 250, 253, 0.92));
   backdrop-filter: blur(18px);
@@ -157,6 +162,22 @@ svg {
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.8),
     0 16px 40px rgba(19, 32, 51, 0.06);
+}
+
+.ui-shell-footer {
+  position: relative;
+  z-index: 30;
+  flex-shrink: 0;
+  border-top: var(--border-width-default) solid var(--color-border);
+  background: rgba(245, 248, 252, 0.78);
+  box-shadow:
+    0 -1px 0 rgba(255, 255, 255, 0.82),
+    0 -16px 40px rgba(19, 32, 51, 0.06);
+  backdrop-filter: blur(18px);
+}
+
+.ui-scroll-stable {
+  scrollbar-gutter: stable both-edges;
 }
 
 .ui-panel {
@@ -254,7 +275,6 @@ svg {
   transition:
     border-color 0.16s ease,
     background-color 0.16s ease,
-    transform 0.16s ease,
     box-shadow 0.16s ease;
 }
 
@@ -262,7 +282,6 @@ svg {
   border-color: var(--color-border-strong);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(239, 245, 251, 0.98));
-  transform: translateY(-1px);
 }
 
 .ui-menu-trigger:focus-visible {
@@ -417,23 +436,20 @@ svg {
   padding-inline: var(--space-control-x);
   border: var(--border-width-default) solid var(--color-primary);
   border-radius: var(--radius-control);
-  background:
-    linear-gradient(180deg, #1a4e84 0%, var(--color-primary) 100%);
+  background: var(--color-primary);
   color: var(--color-primary-foreground);
   box-shadow: var(--shadow-xs);
   font-weight: 600;
   transition:
-    transform 0.16s ease,
     border-color 0.16s ease,
     background-color 0.16s ease,
-    box-shadow 0.16s ease,
+    color 0.16s ease,
     opacity 0.16s ease;
 }
 
 .ui-button-primary:hover {
   background: var(--color-primary-hover);
   border-color: var(--color-primary-hover);
-  transform: translateY(-1px);
 }
 
 .ui-button-secondary {
@@ -444,27 +460,23 @@ svg {
   min-height: var(--density-control-min-height);
   padding-block: var(--space-control-y);
   padding-inline: var(--space-control-x);
-  border: var(--border-width-default) solid var(--color-border);
+  border: var(--border-width-default) solid var(--color-secondary-action);
   border-radius: var(--radius-control);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 249, 252, 0.96));
-  color: var(--color-text-muted);
+  background: var(--color-secondary-action);
+  color: var(--color-secondary-action-foreground);
   box-shadow: var(--shadow-xs);
   font-weight: 600;
   transition:
-    transform 0.16s ease,
     border-color 0.16s ease,
     background-color 0.16s ease,
-    box-shadow 0.16s ease,
+    color 0.16s ease,
     opacity 0.16s ease;
 }
 
 .ui-button-secondary:hover {
-  border-color: var(--color-border-strong);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(238, 244, 252, 0.98));
-  color: var(--color-text);
-  transform: translateY(-1px);
+  border-color: var(--color-secondary-action-hover);
+  background: var(--color-secondary-action-hover);
+  color: var(--color-secondary-action-foreground);
 }
 
 .ui-button-danger {
@@ -475,24 +487,23 @@ svg {
   min-height: var(--density-control-min-height);
   padding-block: var(--space-control-y);
   padding-inline: var(--space-control-x);
-  border: var(--border-width-default) solid var(--color-danger-border);
+  border: var(--border-width-default) solid var(--color-danger-action);
   border-radius: var(--radius-control);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), var(--color-danger-surface));
-  color: var(--color-danger-text);
+  background: var(--color-danger-action);
+  color: var(--color-danger-action-foreground);
+  box-shadow: var(--shadow-xs);
   font-weight: 600;
   transition:
-    transform 0.16s ease,
     border-color 0.16s ease,
     background-color 0.16s ease,
-    box-shadow 0.16s ease,
+    color 0.16s ease,
     opacity 0.16s ease;
 }
 
 .ui-button-danger:hover {
-  border-color: var(--color-danger-border-strong);
-  background: var(--color-danger-surface-hover);
-  transform: translateY(-1px);
+  border-color: var(--color-danger-action-hover);
+  background: var(--color-danger-action-hover);
+  color: var(--color-danger-action-foreground);
 }
 
 .ui-button-primary:disabled,
@@ -606,7 +617,7 @@ svg {
   align-items: center;
   justify-content: center;
   border: 1px solid rgba(37, 117, 216, 0.16);
-  border-radius: 0.95rem;
+  border-radius: var(--radius-control);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(232, 241, 255, 0.98));
   color: var(--color-accent-strong);
@@ -624,7 +635,7 @@ svg {
   align-items: center;
   justify-content: center;
   border: 1px solid rgba(37, 117, 216, 0.16);
-  border-radius: 1rem;
+  border-radius: 0.72rem;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(232, 241, 255, 0.96));
   color: var(--color-accent-strong);
@@ -703,6 +714,15 @@ svg {
 }
 
 @media (max-width: 1024px) {
+  .ui-shell-footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 80;
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+  }
+
   body::before {
     opacity: 0.12;
   }

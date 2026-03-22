@@ -24,6 +24,7 @@ type LocaleFlagMenuProps = {
   currentLocale: string;
   localeList: string[];
   copy: LocaleFlagMenuCopy;
+  placement?: "default" | "sidebar";
   /** Quando definido com `onOpenChange`, o menu fica controlado pelo pai (ex.: exclusão mútua com outro dropdown). */
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -39,6 +40,7 @@ export function LocaleFlagMenu({
   currentLocale,
   localeList,
   copy,
+  placement = "default",
   open: openProp,
   onOpenChange
 }: LocaleFlagMenuProps) {
@@ -46,6 +48,7 @@ export function LocaleFlagMenu({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const isSidebar = placement === "sidebar";
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = openProp !== undefined;
   const isOpen = isControlled ? openProp : internalOpen;
@@ -105,8 +108,16 @@ export function LocaleFlagMenu({
       isActive ? "ui-menu-item-active" : ""
     }`;
 
+  const panelClassName =
+    placement === "sidebar"
+      ? "ui-menu-panel absolute left-0 top-[calc(100%+0.625rem)] z-[70] flex w-[min(calc(100vw-4rem),17rem)] max-w-[17rem] flex-col gap-0 overflow-hidden p-2"
+      : "ui-menu-panel absolute right-0 top-[calc(100%+0.375rem)] z-40 flex w-[min(calc(100vw-2rem),22rem)] flex-col gap-0 overflow-hidden p-2 sm:min-w-[19rem] sm:max-w-[min(calc(100vw-2rem),22rem)] sm:w-auto";
+
   return (
-    <div ref={containerRef} className="relative isolate">
+    <div
+      ref={containerRef}
+      className={`relative isolate inline-flex shrink-0 ${isSidebar ? "z-50" : ""}`}
+    >
       <button
         type="button"
         aria-expanded={isOpen}
@@ -114,7 +125,11 @@ export function LocaleFlagMenu({
         aria-label={copy.triggerAriaLabel}
         data-state={isOpen ? "open" : "closed"}
         onClick={() => setOpen(!isOpen)}
-        className="ui-menu-trigger inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-control)]"
+        className={`inline-flex shrink-0 items-center justify-center ${
+          isSidebar
+            ? "h-auto w-auto rounded-none border-0 bg-transparent p-0 shadow-none"
+            : "ui-menu-trigger h-9 w-9 rounded-[var(--radius-control)]"
+        }`}
       >
         <LocaleFlagSvg locale={currentLocale} size="trigger" />
       </button>
@@ -123,7 +138,7 @@ export function LocaleFlagMenu({
         <div
           role="menu"
           aria-label={copy.menuAriaLabel}
-          className="ui-menu-panel absolute right-0 top-[calc(100%+0.375rem)] z-40 flex min-w-[19rem] max-w-[min(calc(100vw-2rem),22rem)] flex-col gap-0 overflow-hidden p-2"
+          className={panelClassName}
         >
           {switchingLocale ? (
             <div className="mb-1 flex justify-end px-1">

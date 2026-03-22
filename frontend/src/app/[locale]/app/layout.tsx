@@ -60,13 +60,13 @@ export default async function AppLayout({
   return (
     <AppShell
       productName={t("productName")}
-      productStage={t("productStage")}
       workspaceLabel={authSession.tenant.display_name}
       navigationItemList={navigationItemList}
-      tenantLabel={t("topbar.tenantLabel")}
-      tenantValue={authSession.tenant.display_name}
+      mobileNavigationOpenLabel={t("topbar.openNavigation")}
+      mobileNavigationCloseLabel={t("topbar.closeNavigation")}
       accountSlot={
         <AccountMenu
+          placement="sidebar"
           currentLocale={locale}
           localeList={[...routing.locales]}
           accountName={

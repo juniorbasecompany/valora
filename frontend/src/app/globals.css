@@ -118,6 +118,15 @@ textarea {
   color: var(--color-text-subtle);
 }
 
+.ui-topbar-chip {
+  min-height: 2.5rem;
+  border: var(--border-width-default) solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-background-muted);
+  color: var(--color-text-muted);
+  box-shadow: var(--shadow-xs);
+}
+
 .ui-nav-item {
   border: var(--border-width-default) solid transparent;
   border-radius: var(--radius-control);

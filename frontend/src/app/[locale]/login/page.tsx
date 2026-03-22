@@ -1,7 +1,9 @@
 import Script from "next/script";
 import { getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
 
 import { GoogleSignInPanel } from "@/component/auth/google-sign-in-panel";
+import { getAuthSession } from "@/lib/auth/server-session";
 
 type LoginPageProps = {
   params: Promise<{ locale: string }>;
@@ -15,7 +17,12 @@ export default async function LoginPage({
   const { locale } = await params;
   const { reason } = await searchParams;
   const t = await getTranslations("LoginPage");
+  const authSession = await getAuthSession();
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
+  if (authSession) {
+    redirect(`/${locale}/app`);
+  }
 
   const noticeMessage =
     reason === "signed_out"

@@ -19,8 +19,6 @@ export default function proxy(request: NextRequest) {
 
   const tokenValue = request.cookies.get(authTokenCookieName)?.value;
   const hasSession = hasAuthSession(tokenValue);
-  const isLoginPage = pathname === `/${locale}/login`;
-  const isSelectTenantPage = pathname === `/${locale}/select-tenant`;
   const isAppArea =
     pathname === `/${locale}/app` || pathname.startsWith(`/${locale}/app/`);
 
@@ -28,10 +26,6 @@ export default function proxy(request: NextRequest) {
     return NextResponse.redirect(
       new URL(`/${locale}/login?reason=auth_required`, request.url)
     );
-  }
-
-  if ((isLoginPage || isSelectTenantPage) && hasSession) {
-    return NextResponse.redirect(new URL(`/${locale}/app`, request.url));
   }
 
   return response;

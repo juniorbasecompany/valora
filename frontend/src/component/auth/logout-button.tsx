@@ -33,7 +33,7 @@ export function LogoutButton({
       type="button"
       onClick={handleClick}
       disabled={isPending}
-      className="ui-button-secondary rounded-full text-sm transition disabled:opacity-60"
+      className="ui-topbar-chip px-4 py-2 text-sm font-medium transition hover:border-[var(--color-border-strong)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text)] disabled:opacity-60"
     >
       {isPending ? pendingLabel : label}
     </button>

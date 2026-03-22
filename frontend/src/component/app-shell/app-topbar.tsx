@@ -33,12 +33,12 @@ export function AppTopbar({
       <div className="flex items-center gap-3">
         {actionSlot}
         {accountLabel && accountValue ? (
-          <div className="ui-pill flex items-center gap-2 px-3 py-1.5 text-sm">
+          <div className="ui-topbar-chip flex items-center gap-2 px-4 py-2 text-sm">
             <span className="text-[var(--color-text-subtle)]">{accountLabel}</span>
             <span className="font-medium text-[var(--color-text)]">{accountValue}</span>
           </div>
         ) : null}
-        <div className="ui-pill flex items-center gap-2 px-3 py-1.5 text-sm">
+        <div className="ui-topbar-chip flex items-center gap-2 px-4 py-2 text-sm">
           <span className="text-[var(--color-text-subtle)]">{localeLabel}</span>
           <span className="font-medium text-[var(--color-text)]">{localeValue}</span>
         </div>

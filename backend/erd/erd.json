@@ -425,6 +425,20 @@
           "increment": false,
           "size": "",
           "values": []
+        },
+        {
+          "id": "sort_order",
+          "name": "sort_order",
+          "comment": "Ordem de exibição do local na hierarquia.",
+          "type": "INTEGER",
+          "default": "0",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
         }
       ],
       "x": -198.68443080041436,

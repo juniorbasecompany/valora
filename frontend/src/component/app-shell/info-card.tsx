@@ -22,11 +22,11 @@ export function InfoCard({
     <article className="ui-card flex h-full flex-col gap-4 p-5">
       <div className="flex items-start gap-4">
         {iconSlot ? <div className="ui-icon-badge shrink-0">{iconSlot}</div> : null}
-        <div className="space-y-2">
-          <h2 className="text-[0.98rem] font-semibold tracking-[-0.02em] text-[var(--color-text)]">
+        <div className="ui-section-copy">
+          <h2 className="ui-header-title ui-title-section">
             {title}
           </h2>
-          <p className="text-sm leading-6 text-[var(--color-text-subtle)]">
+          <p className="ui-copy-body">
             {description}
           </p>
         </div>

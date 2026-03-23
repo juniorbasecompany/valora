@@ -26,7 +26,7 @@ export function AppTopbar({
               <span className="h-2 w-2 rounded-full bg-[var(--color-accent)] shadow-[0_0_0_4px_rgba(37,117,216,0.12)]" />
               {tenantLabel}
             </span>
-            <p className="ui-header-title mt-2 truncate text-base font-semibold tracking-[-0.02em] text-[var(--color-text)] sm:mt-3 sm:text-lg">
+            <p className="ui-header-title ui-title-section mt-2 truncate sm:mt-3 sm:text-lg">
               {tenantValue}
             </p>
           </div>

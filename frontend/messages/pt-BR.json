@@ -197,6 +197,11 @@
       "title": "Edição de membros",
       "description": "As alterações afetam apenas o licenciado ativo da sua sessão. O email segue como referência de acesso do vínculo."
     },
+    "tab": {
+      "general": "Geral",
+      "history": "Histórico",
+      "listAriaLabel": "Abas do painel de membros"
+    },
     "list": {
       "title": "Diretório do licenciado",
       "description": "Selecione um membro para revisar ou atualizar o cadastro.",
@@ -267,6 +272,11 @@
     "status": {
       "title": "Edição de escopos",
       "description": "As alterações afetam apenas o licenciado ativo da sua sessão. Use este diretório para criar, revisar e manter os escopos estruturais."
+    },
+    "tab": {
+      "general": "Geral",
+      "history": "Histórico",
+      "listAriaLabel": "Abas do painel de escopos"
     },
     "list": {
       "title": "Diretório de escopos",
@@ -380,6 +390,11 @@
     "status": {
       "title": "Edição do licenciado",
       "description": "As atualizações são salvas para o licenciado ativo. Troque de licenciado pelo seletor do cabeçalho se precisar de outro contexto."
+    },
+    "tab": {
+      "general": "Geral",
+      "history": "Histórico",
+      "listAriaLabel": "Abas do painel do licenciado"
     },
     "history": {
       "title": "Histórico de alterações",

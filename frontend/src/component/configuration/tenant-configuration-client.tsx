@@ -250,7 +250,7 @@ export function TenantConfigurationClient({
       />
 
       <div
-        className="ui-panel flex flex-wrap gap-1 p-1.5"
+        className="ui-panel ui-tab-list"
         role="tablist"
         aria-label={copy.tabListAriaLabel}
       >
@@ -291,9 +291,12 @@ export function TenantConfigurationClient({
           id="tenant-panel-general"
           role="tabpanel"
           aria-labelledby="tenant-tab-general"
-          className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.85fr)]"
+          className="ui-layout-record xl:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.85fr)]"
         >
-          <div className={`ui-panel flex flex-col gap-6 px-6 py-6 ${isDeletePending ? "ui-delete-pending" : ""}`}>
+          <div
+            className="ui-panel ui-panel-editor px-6 py-6"
+            data-delete-pending={isDeletePending ? "true" : undefined}
+          >
             {!tenant.can_edit ? (
               <div className="ui-notice-attention px-4 py-3 text-sm">
                 {copy.readOnlyNotice}
@@ -301,7 +304,7 @@ export function TenantConfigurationClient({
             ) : null}
 
             {saveSuccess ? (
-              <div className="ui-tone-positive rounded-[var(--radius-card)] border px-4 py-3 text-sm">
+              <div className="ui-status-panel ui-tone-positive text-sm">
                 {copy.savedNotice}
               </div>
             ) : null}
@@ -310,25 +313,22 @@ export function TenantConfigurationClient({
               <div className="ui-notice-danger px-4 py-3 text-sm">{formError}</div>
             ) : null}
 
-            <section className="ui-card border-[rgba(37,117,216,0.12)] px-5 py-5">
-              <div className="flex items-start gap-4">
+            <section className="ui-card ui-form-section ui-border-accent">
+              <div className="ui-section-header">
                 <span className="ui-icon-badge">
                   <PreviewIcon className="h-[1.05rem] w-[1.05rem]" />
                 </span>
-                <div>
-                  <h2 className="text-base font-semibold tracking-[-0.02em] text-[var(--color-text)]">
+                <div className="ui-section-copy">
+                  <h2 className="ui-header-title ui-title-section">
                     {copy.sectionDisplayTitle}
                   </h2>
-                  <p className="mt-1 text-sm leading-6 text-[var(--color-text-subtle)]">
+                  <p className="ui-copy-body">
                     {copy.sectionDisplayDescription}
                   </p>
                 </div>
               </div>
-              <div className="mt-5 space-y-2">
-                <label
-                  className="text-sm font-semibold text-[var(--color-text-muted)]"
-                  htmlFor="tenant-display-name"
-                >
+              <div className="ui-field">
+                <label className="ui-field-label" htmlFor="tenant-display-name">
                   {copy.displayNameLabel}
                 </label>
                 <input
@@ -348,39 +348,31 @@ export function TenantConfigurationClient({
                   aria-invalid={Boolean(fieldError.displayName)}
                   aria-describedby="tenant-display-name-hint"
                 />
-                <p
-                  id="tenant-display-name-hint"
-                  className="text-xs leading-5 text-[var(--color-text-subtle)]"
-                >
+                <p id="tenant-display-name-hint" className="ui-field-hint">
                   {copy.displayNameHint}
                 </p>
                 {fieldError.displayName ? (
-                  <p className="text-sm text-[var(--color-danger-text)]">
-                    {fieldError.displayName}
-                  </p>
+                  <p className="ui-field-error">{fieldError.displayName}</p>
                 ) : null}
               </div>
             </section>
 
-            <section className="ui-card border-[rgba(37,117,216,0.12)] px-5 py-5">
-              <div className="flex items-start gap-4">
+            <section className="ui-card ui-form-section ui-border-accent">
+              <div className="ui-section-header">
                 <span className="ui-icon-badge">
                   <BuildingIcon className="h-[1.05rem] w-[1.05rem]" />
                 </span>
-                <div>
-                  <h2 className="text-base font-semibold tracking-[-0.02em] text-[var(--color-text)]">
+                <div className="ui-section-copy">
+                  <h2 className="ui-header-title ui-title-section">
                     {copy.sectionLegalTitle}
                   </h2>
-                  <p className="mt-1 text-sm leading-6 text-[var(--color-text-subtle)]">
+                  <p className="ui-copy-body">
                     {copy.sectionLegalDescription}
                   </p>
                 </div>
               </div>
-              <div className="mt-5 space-y-2">
-                <label
-                  className="text-sm font-semibold text-[var(--color-text-muted)]"
-                  htmlFor="tenant-legal-name"
-                >
+              <div className="ui-field">
+                <label className="ui-field-label" htmlFor="tenant-legal-name">
                   {copy.legalNameLabel}
                 </label>
                 <input
@@ -400,21 +392,16 @@ export function TenantConfigurationClient({
                   aria-invalid={Boolean(fieldError.legalName)}
                   aria-describedby="tenant-legal-name-hint"
                 />
-                <p
-                  id="tenant-legal-name-hint"
-                  className="text-xs leading-5 text-[var(--color-text-subtle)]"
-                >
+                <p id="tenant-legal-name-hint" className="ui-field-hint">
                   {copy.legalNameHint}
                 </p>
                 {fieldError.legalName ? (
-                  <p className="text-sm text-[var(--color-danger-text)]">
-                    {fieldError.legalName}
-                  </p>
+                  <p className="ui-field-error">{fieldError.legalName}</p>
                 ) : null}
               </div>
             </section>
 
-            <section className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white/70 px-5 py-4 shadow-[var(--shadow-xs)]">
+            <section className="ui-metadata-card">
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-subtle)]">
                 {copy.metadataIdLabel}
               </p>
@@ -426,24 +413,27 @@ export function TenantConfigurationClient({
             <div className="border-t border-[var(--color-border)] pt-6" />
           </div>
 
-          <aside className="flex flex-col gap-4">
-            <div className={`ui-panel p-5 ${isDeletePending ? "ui-delete-pending" : ""}`}>
-              <div className="flex items-start gap-4">
+          <aside className="ui-panel-context">
+            <div
+              className="ui-panel ui-panel-context p-5"
+              data-delete-pending={isDeletePending ? "true" : undefined}
+            >
+              <div className="ui-section-header">
                 <span className="ui-icon-badge">
                   <PreviewIcon className="h-[1.05rem] w-[1.05rem]" />
                 </span>
-                <div>
-                  <h2 className="text-base font-semibold tracking-[-0.02em] text-[var(--color-text)]">
+                <div className="ui-section-copy">
+                  <h2 className="ui-header-title ui-title-section">
                     {copy.displayNameLabel}
                   </h2>
-                  <p className="mt-1 text-sm leading-6 text-[var(--color-text-subtle)]">
+                  <p className="ui-copy-body">
                     {copy.displayNameHint}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-5 space-y-3">
-                <div className="rounded-[var(--radius-card)] border border-[rgba(37,117,216,0.14)] bg-[var(--color-accent-soft)]/55 px-4 py-4">
+              <div className="ui-preview-stack">
+                <div className="ui-preview-card ui-preview-card-accent">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-subtle)]">
                     {copy.displayNameLabel}
                   </p>
@@ -452,7 +442,7 @@ export function TenantConfigurationClient({
                   </p>
                 </div>
 
-                <div className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white/75 px-4 py-4">
+                <div className="ui-preview-card">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-subtle)]">
                     {copy.legalNameLabel}
                   </p>
@@ -464,15 +454,15 @@ export function TenantConfigurationClient({
             </div>
 
             <div className="ui-card ui-card-coming-soon p-5">
-              <div className="flex items-start gap-4">
+              <div className="ui-section-header">
                 <span className="ui-icon-badge ui-icon-badge-construction">
                   <HistoryIcon className="h-[1.05rem] w-[1.05rem]" />
                 </span>
-                <div>
-                  <h2 className="text-base font-semibold tracking-[-0.02em] text-[var(--color-text)]">
+                <div className="ui-section-copy">
+                  <h2 className="ui-header-title ui-title-section">
                     {copy.historyTitle}
                   </h2>
-                  <p className="mt-1 text-sm leading-6 text-[var(--color-text-subtle)]">
+                  <p className="ui-copy-body">
                     {copy.historyDescription}
                   </p>
                 </div>
@@ -485,18 +475,18 @@ export function TenantConfigurationClient({
           id="tenant-panel-history"
           role="tabpanel"
           aria-labelledby="tenant-tab-history"
-          className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)]"
+          className="ui-layout-record xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)]"
         >
           <div className="ui-panel px-6 py-6">
-            <div className="flex items-start gap-4">
+            <div className="ui-section-header">
               <span className="ui-icon-badge ui-icon-badge-construction">
                 <HistoryIcon className="h-[1.05rem] w-[1.05rem]" />
               </span>
-              <div>
-                <h2 className="text-base font-semibold tracking-[-0.02em] text-[var(--color-text)]">
+              <div className="ui-section-copy">
+                <h2 className="ui-header-title ui-title-section">
                   {copy.historyTitle}
                 </h2>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--color-text-subtle)]">
+                <p className="ui-copy-body mt-2 max-w-2xl">
                   {copy.historyDescription}
                 </p>
               </div>
@@ -526,7 +516,7 @@ export function TenantConfigurationClient({
 
       {tab === "general" && portalTarget
         ? createPortal(
-            <div className="mx-auto flex w-full max-w-[112rem] flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-5 lg:px-8">
+            <div className="ui-action-footer">
               <div className="flex shrink-0 items-center">
                 <Link
                   href={configurationPath}

@@ -667,7 +667,7 @@ export function LocationConfigurationClient({
         }
       />
 
-      <div className="grid gap-6 2xl:grid-cols-[minmax(18rem,0.84fr)_minmax(0,1.16fr)_minmax(18rem,0.84fr)]">
+      <div className="ui-layout-directory 2xl:grid-cols-[minmax(18rem,0.84fr)_minmax(0,1.16fr)_minmax(18rem,0.84fr)]">
         <aside className="ui-panel flex flex-col gap-4 px-5 py-5">
           {!directory ? (
             <div className="ui-panel px-4 py-4 text-sm text-[var(--color-text-muted)]">
@@ -693,7 +693,12 @@ export function LocationConfigurationClient({
                       <button type="button" className="flex w-12 shrink-0 items-center justify-center rounded-[var(--radius-card)] border border-[var(--color-border-strong)] bg-white/80 text-[var(--color-text-muted)] transition hover:border-[var(--color-border-strong)] hover:bg-[var(--color-background-muted)] disabled:cursor-not-allowed disabled:opacity-45" draggable={item.can_move && !isSaving && !isMoving} onDragStart={(event: DragEvent<HTMLButtonElement>) => { setDraggedLocationId(item.id); event.dataTransfer.effectAllowed = "move"; }} onDragEnd={() => { setDraggedLocationId(null); setDropKey(null); }} disabled={!item.can_move || isSaving || isMoving} aria-label={copy.dragDropHint} title={copy.dragDropHint}>
                         <GripDotsIcon />
                       </button>
-                      <div className={`flex flex-1 items-stretch gap-3 rounded-[var(--radius-card)] border px-4 py-3 ${dropKey === insideKey ? "border-[rgba(37,117,216,0.38)] bg-[var(--color-accent-soft)]/75" : isSelected ? "border-[rgba(37,117,216,0.24)] bg-[var(--color-accent-soft)]/65" : "border-[var(--color-border)] bg-white/75"}`} onDragOver={(event) => { if (!draggedLocationId || draggedLocationId === item.id) { return; } event.preventDefault(); setDropKey(insideKey); }} onDrop={(event) => { event.preventDefault(); if (!draggedLocationId || draggedLocationId === item.id) { return; } void moveLocation(draggedLocationId, item.id, item.children_count); }}>
+                      <div
+                        className={`ui-directory-item flex flex-1 items-stretch gap-3 ${dropKey === insideKey ? "border-[rgba(37,117,216,0.38)] bg-[var(--color-accent-soft)]/75" : ""}`}
+                        data-selected={isSelected ? "true" : undefined}
+                        onDragOver={(event) => { if (!draggedLocationId || draggedLocationId === item.id) { return; } event.preventDefault(); setDropKey(insideKey); }}
+                        onDrop={(event) => { event.preventDefault(); if (!draggedLocationId || draggedLocationId === item.id) { return; } void moveLocation(draggedLocationId, item.id, item.children_count); }}
+                      >
                         {item.children_count > 0 ? (
                           <button type="button" className="mt-1 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[var(--color-border)] text-[11px]" onClick={() => setExpandedIdSet((previous) => { const next = new Set(previous); if (next.has(item.id)) { next.delete(item.id); } else { next.add(item.id); } return next; })}>
                             {expandedIdSet.has(item.id) ? "-" : "+"}
@@ -731,15 +736,14 @@ export function LocationConfigurationClient({
         </aside>
           <div
             ref={editorPanelRef}
-            className={`ui-panel ui-scroll-stable ui-editor-panel-sticky relative isolate flex flex-col gap-6 px-6 py-6 scroll-mt-24 sm:scroll-mt-28 lg:scroll-mt-0 ${
-              isDeletePending ? "ui-delete-pending" : ""
-            }`}
+            className="ui-panel ui-panel-editor ui-scroll-stable ui-editor-panel-sticky relative isolate px-6 py-6 scroll-mt-24 sm:scroll-mt-28 lg:scroll-mt-0"
+            data-delete-pending={isDeletePending ? "true" : undefined}
           >
             <div className="flex flex-col gap-6">
-              {successMessage ? <div className="ui-tone-positive rounded-[var(--radius-card)] border px-4 py-3 text-sm">{successMessage}</div> : null}
+              {successMessage ? <div className="ui-status-panel ui-tone-positive text-sm">{successMessage}</div> : null}
               {formError ? <div className="ui-notice-danger px-4 py-3 text-sm">{formError}</div> : null}
 
-              <section className="ui-card relative isolate px-5 py-5">
+              <section className="ui-card ui-form-section ui-border-accent relative isolate">
                 {isEditorFlashActive ? (
                   <>
                     <span
@@ -763,27 +767,27 @@ export function LocationConfigurationClient({
                 ) : null}
 
                 <div className="relative z-10">
-                  <div className="flex items-start gap-4">
+                  <div className="ui-section-header">
                     <span className="ui-icon-badge"><PreviewIcon className="h-[1.05rem] w-[1.05rem]" /></span>
-                    <div>
-                      <h2 className="text-base font-semibold tracking-[-0.02em] text-[var(--color-text)]">{copy.sectionIdentityTitle}</h2>
-                      <p className="mt-1 text-sm leading-6 text-[var(--color-text-subtle)]">{copy.sectionIdentityDescription}</p>
+                    <div className="ui-section-copy">
+                      <h2 className="ui-header-title ui-title-section">{copy.sectionIdentityTitle}</h2>
+                      <p className="ui-copy-body">{copy.sectionIdentityDescription}</p>
                     </div>
                   </div>
 
-                  <div className="mt-5 grid gap-5">
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-[var(--color-text-muted)]" htmlFor="location-name">{copy.nameLabel}</label>
+                  <div className="ui-form-fields">
+                    <div className="ui-field">
+                      <label className="ui-field-label" htmlFor="location-name">{copy.nameLabel}</label>
                       <input id="location-name" className="ui-input w-full" value={name} onChange={(event) => { setName(event.target.value); setFieldError((previous) => ({ ...previous, name: undefined })); setSuccessMessage(null); }} disabled={isDeletePending || !canEditForm} aria-invalid={Boolean(fieldError.name)} />
-                      <p className="text-xs leading-5 text-[var(--color-text-subtle)]">{copy.nameHint}</p>
-                      {fieldError.name ? <p className="text-sm text-[var(--color-danger-text)]">{fieldError.name}</p> : null}
+                      <p className="ui-field-hint">{copy.nameHint}</p>
+                      {fieldError.name ? <p className="ui-field-error">{fieldError.name}</p> : null}
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-[var(--color-text-muted)]" htmlFor="location-display-name">{copy.displayNameLabel}</label>
+                    <div className="ui-field">
+                      <label className="ui-field-label" htmlFor="location-display-name">{copy.displayNameLabel}</label>
                       <textarea id="location-display-name" className="ui-input min-h-28 w-full resize-y" value={displayName} onChange={(event) => { setDisplayName(event.target.value); setFieldError((previous) => ({ ...previous, displayName: undefined })); setSuccessMessage(null); }} disabled={isDeletePending || !canEditForm} aria-invalid={Boolean(fieldError.displayName)} />
-                      <p className="text-xs leading-5 text-[var(--color-text-subtle)]">{copy.displayNameHint}</p>
-                      {fieldError.displayName ? <p className="text-sm text-[var(--color-danger-text)]">{fieldError.displayName}</p> : null}
+                      <p className="ui-field-hint">{copy.displayNameHint}</p>
+                      {fieldError.displayName ? <p className="ui-field-error">{fieldError.displayName}</p> : null}
                     </div>
                   </div>
                 </div>
@@ -792,24 +796,24 @@ export function LocationConfigurationClient({
 
           </div>
 
-          <aside className="flex flex-col gap-4">
+          <aside className="ui-panel-context">
             {selectedLocation && !isCreateMode ? (
-              <div className="ui-panel p-5">
-                <div className="grid gap-3">
-                  <div className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white/75 px-4 py-4">
+              <div className="ui-panel ui-panel-context p-5">
+                <div className="ui-metadata-grid">
+                  <div className="ui-metadata-card">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-subtle)]">{copy.metadataIdLabel}</p>
                     <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">{selectedLocation.id}</p>
                   </div>
-                  <div className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white/75 px-4 py-4">
+                  <div className="ui-metadata-card">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-subtle)]">{copy.metadataPathLabel}</p>
                     <p className="mt-2 text-sm text-[var(--color-text)]">{selectedLocation.path_labels.join(" / ")}</p>
                   </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white/75 px-4 py-4">
+                  <div className="ui-metadata-grid ui-metadata-grid-2">
+                    <div className="ui-metadata-card">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-subtle)]">{copy.metadataChildrenLabel}</p>
                       <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">{selectedLocation.children_count}</p>
                     </div>
-                    <div className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white/75 px-4 py-4">
+                    <div className="ui-metadata-card">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-subtle)]">{copy.metadataDescendantsLabel}</p>
                       <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">{selectedLocation.descendants_count}</p>
                     </div>
@@ -819,11 +823,11 @@ export function LocationConfigurationClient({
             ) : null}
 
             <div className="ui-card ui-card-coming-soon p-5">
-              <div className="flex items-start gap-4">
+              <div className="ui-section-header">
                 <span className="ui-icon-badge ui-icon-badge-construction"><HistoryIcon className="h-[1.05rem] w-[1.05rem]" /></span>
-                <div>
-                  <h2 className="text-base font-semibold tracking-[-0.02em] text-[var(--color-text)]">{copy.historyTitle}</h2>
-                  <p className="mt-1 text-sm leading-6 text-[var(--color-text-subtle)]">{copy.historyDescription}</p>
+                <div className="ui-section-copy">
+                  <h2 className="ui-header-title ui-title-section">{copy.historyTitle}</h2>
+                  <p className="ui-copy-body">{copy.historyDescription}</p>
                 </div>
               </div>
             </div>
@@ -832,7 +836,7 @@ export function LocationConfigurationClient({
 
       {portalTarget
         ? createPortal(
-            <div className="mx-auto flex w-full max-w-[112rem] flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-5 lg:px-8">
+            <div className="ui-action-footer">
               <Link href={configurationPath} className="ui-button-secondary inline-flex items-center justify-center" onClick={(event: MouseEvent<HTMLAnchorElement>) => { if (isDirty && !window.confirm(copy.discardConfirm)) { event.preventDefault(); } }}>{copy.cancel}</Link>
               <div className="flex gap-2">
                 {!isCreateMode && selectedLocation ? (

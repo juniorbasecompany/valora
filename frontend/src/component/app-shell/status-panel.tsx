@@ -32,14 +32,12 @@ export function StatusPanel({
   const toneMeta = toneMetaByTone[tone];
 
   return (
-    <div
-      className={`rounded-[var(--radius-card)] border px-4 py-4 text-sm shadow-[var(--shadow-xs)] ${toneMeta.className}`}
-    >
+    <div className={`ui-status-panel ${toneMeta.className}`}>
       <div className="flex items-start gap-3">
         <span className={toneMeta.iconClassName}>
           <toneMeta.Icon className="h-[1.05rem] w-[1.05rem]" />
         </span>
-        <div className="space-y-1">
+        <div className="ui-section-copy">
           <div className="font-semibold tracking-[-0.01em]">{title}</div>
           <div className="leading-6 opacity-85">{description}</div>
         </div>

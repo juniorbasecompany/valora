@@ -50,7 +50,7 @@ export function SetupStepCard({
         ) : null}
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-base font-semibold tracking-[-0.02em] text-[var(--color-text)]">
+            <h3 className="ui-header-title ui-title-section">
               {title}
             </h3>
             <span
@@ -63,7 +63,7 @@ export function SetupStepCard({
               {statusLabel}
             </span>
           </div>
-          <p className="text-sm leading-6 text-[var(--color-text-subtle)]">
+          <p className="ui-copy-body">
             {description}
           </p>
         </div>

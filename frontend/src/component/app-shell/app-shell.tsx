@@ -58,7 +58,7 @@ export function AppShell({
         </div>
 
         <main className="ui-scroll-stable flex-1 overflow-y-auto overflow-x-hidden">
-          <div className="mx-auto flex w-full max-w-[112rem] flex-col gap-6 px-4 pb-5 pt-24 sm:gap-7 sm:px-5 sm:pb-6 sm:pt-28 lg:px-8 lg:py-8">
+          <div className="ui-shell-content">
             {children}
           </div>
         </main>

@@ -489,7 +489,7 @@ export function MemberConfigurationClient({
       />
 
       <div
-        className="ui-panel flex flex-wrap gap-1 p-1.5"
+        className="ui-panel ui-tab-list"
         role="tablist"
         aria-label={copy.tabListAriaLabel}
       >
@@ -526,7 +526,7 @@ export function MemberConfigurationClient({
           <div id="member-panel-general" role="tabpanel" aria-labelledby="member-tab-general">
             <div className="flex flex-col gap-4">
               {successMessage ? (
-                <div className="ui-tone-positive rounded-[var(--radius-card)] border px-4 py-3 text-sm">
+                <div className="ui-status-panel ui-tone-positive text-sm">
                   {successMessage}
                 </div>
               ) : null}
@@ -543,18 +543,18 @@ export function MemberConfigurationClient({
             id="member-panel-general"
             role="tabpanel"
             aria-labelledby="member-tab-general"
-            className="grid gap-6 2xl:grid-cols-[minmax(18rem,0.82fr)_minmax(0,1.18fr)_minmax(18rem,0.82fr)]"
+            className="ui-layout-directory 2xl:grid-cols-[minmax(18rem,0.82fr)_minmax(0,1.18fr)_minmax(18rem,0.82fr)]"
           >
             <aside className="ui-panel flex flex-col gap-4 px-5 py-5">
-              <div className="flex items-start gap-4">
+              <div className="ui-section-header">
                 <span className="ui-icon-badge">
                   <UsersIcon className="h-[1.05rem] w-[1.05rem]" />
                 </span>
-                <div>
-                  <h2 className="text-base font-semibold tracking-[-0.02em] text-[var(--color-text)]">
+                <div className="ui-section-copy">
+                  <h2 className="ui-header-title ui-title-section">
                     {copy.listTitle}
                   </h2>
-                  <p className="mt-1 text-sm leading-6 text-[var(--color-text-subtle)]">
+                  <p className="ui-copy-body">
                     {copy.listDescription}
                   </p>
                 </div>
@@ -578,13 +578,11 @@ export function MemberConfigurationClient({
                       key={item.id}
                       type="button"
                       onClick={() => handleSelectMember(item)}
-                      className={`rounded-[var(--radius-card)] border px-4 py-4 text-left transition ${
-                        item.id === selectedMember?.id
-                          ? isDeletePending
-                            ? "border-[rgba(208,56,44,0.2)] bg-[rgba(255,240,239,0.9)] shadow-[var(--shadow-xs)]"
-                            : "border-[rgba(37,117,216,0.2)] bg-[var(--color-accent-soft)]/65 shadow-[var(--shadow-xs)]"
-                          : "border-[var(--color-border)] bg-white/72 hover:border-[var(--color-border-strong)] hover:bg-[var(--color-background-muted)]"
-                      }`}
+                      className="ui-directory-item"
+                      data-selected={item.id === selectedMember?.id ? "true" : undefined}
+                      data-delete-pending={
+                        item.id === selectedMember?.id && isDeletePending ? "true" : undefined
+                      }
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
@@ -603,10 +601,10 @@ export function MemberConfigurationClient({
                       </div>
 
                       <div className="mt-3 flex flex-wrap gap-2">
-                        <span className="ui-tone-neutral rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
+                        <span className="ui-badge ui-badge-neutral px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
                           {roleLabel}
                         </span>
-                        <span className="ui-tone-neutral rounded-full border px-2.5 py-1 text-[11px] font-semibold">
+                        <span className="ui-badge ui-badge-neutral px-2.5 py-1 text-[11px] font-semibold">
                           #{item.id}
                         </span>
                       </div>
@@ -617,12 +615,11 @@ export function MemberConfigurationClient({
             </aside>
 
             <div
-              className={`ui-panel flex flex-col gap-6 px-6 py-6 ${
-                isDeletePending ? "ui-delete-pending" : ""
-              }`}
+              className="ui-panel ui-panel-editor px-6 py-6"
+              data-delete-pending={isDeletePending ? "true" : undefined}
             >
               {successMessage ? (
-                <div className="ui-tone-positive rounded-[var(--radius-card)] border px-4 py-3 text-sm">
+                <div className="ui-status-panel ui-tone-positive text-sm">
                   {successMessage}
                 </div>
               ) : null}
@@ -639,33 +636,30 @@ export function MemberConfigurationClient({
                         {copy.protectedRecordNotice}
                       </div>
                     ) : !selectedMember.can_edit_access ? (
-                      <div className="ui-tone-neutral rounded-[var(--radius-card)] border px-4 py-3 text-sm">
+                      <div className="ui-status-panel ui-tone-neutral text-sm">
                         {copy.accessManagedNotice}
                       </div>
                     ) : null
                   ) : null}
 
-                  <section className="ui-card border-[rgba(37,117,216,0.12)] px-5 py-5">
-                    <div className="flex items-start gap-4">
+                  <section className="ui-card ui-form-section ui-border-accent">
+                    <div className="ui-section-header">
                       <span className="ui-icon-badge">
                         <PreviewIcon className="h-[1.05rem] w-[1.05rem]" />
                       </span>
-                      <div>
-                        <h2 className="text-base font-semibold tracking-[-0.02em] text-[var(--color-text)]">
+                      <div className="ui-section-copy">
+                        <h2 className="ui-header-title ui-title-section">
                           {copy.sectionProfileTitle}
                         </h2>
-                        <p className="mt-1 text-sm leading-6 text-[var(--color-text-subtle)]">
+                        <p className="ui-copy-body">
                           {copy.sectionProfileDescription}
                         </p>
                       </div>
                     </div>
 
-                    <div className="mt-5 grid gap-5 md:grid-cols-2">
-                      <div className="space-y-2">
-                        <label
-                          className="text-sm font-semibold text-[var(--color-text-muted)]"
-                          htmlFor="member-display-name"
-                        >
+                    <div className="ui-form-fields md:grid-cols-2">
+                      <div className="ui-field">
+                        <label className="ui-field-label" htmlFor="member-display-name">
                           {copy.displayNameLabel}
                         </label>
                         <input
@@ -684,21 +678,16 @@ export function MemberConfigurationClient({
                           autoComplete="nickname"
                           aria-invalid={Boolean(fieldError.displayName)}
                         />
-                        <p className="text-xs leading-5 text-[var(--color-text-subtle)]">
+                        <p className="ui-field-hint">
                           {copy.displayNameHint}
                         </p>
                         {fieldError.displayName ? (
-                          <p className="text-sm text-[var(--color-danger-text)]">
-                            {fieldError.displayName}
-                          </p>
+                          <p className="ui-field-error">{fieldError.displayName}</p>
                         ) : null}
                       </div>
 
-                      <div className="space-y-2">
-                        <label
-                          className="text-sm font-semibold text-[var(--color-text-muted)]"
-                          htmlFor="member-name"
-                        >
+                      <div className="ui-field">
+                        <label className="ui-field-label" htmlFor="member-name">
                           {copy.nameLabel}
                         </label>
                         <input
@@ -717,39 +706,34 @@ export function MemberConfigurationClient({
                           autoComplete="name"
                           aria-invalid={Boolean(fieldError.name)}
                         />
-                        <p className="text-xs leading-5 text-[var(--color-text-subtle)]">
+                        <p className="ui-field-hint">
                           {copy.nameHint}
                         </p>
                         {fieldError.name ? (
-                          <p className="text-sm text-[var(--color-danger-text)]">
-                            {fieldError.name}
-                          </p>
+                          <p className="ui-field-error">{fieldError.name}</p>
                         ) : null}
                       </div>
                     </div>
                   </section>
 
-                  <section className="ui-card border-[rgba(37,117,216,0.12)] px-5 py-5">
-                    <div className="flex items-start gap-4">
+                  <section className="ui-card ui-form-section ui-border-accent">
+                    <div className="ui-section-header">
                       <span className="ui-icon-badge">
                         <UsersIcon className="h-[1.05rem] w-[1.05rem]" />
                       </span>
-                      <div>
-                        <h2 className="text-base font-semibold tracking-[-0.02em] text-[var(--color-text)]">
+                      <div className="ui-section-copy">
+                        <h2 className="ui-header-title ui-title-section">
                           {copy.sectionAccessTitle}
                         </h2>
-                        <p className="mt-1 text-sm leading-6 text-[var(--color-text-subtle)]">
+                        <p className="ui-copy-body">
                           {copy.sectionAccessDescription}
                         </p>
                       </div>
                     </div>
 
-                    <div className="mt-5 grid gap-5 md:grid-cols-3">
-                      <div className="space-y-2 md:col-span-3">
-                        <label
-                          className="text-sm font-semibold text-[var(--color-text-muted)]"
-                          htmlFor="member-email"
-                        >
+                    <div className="ui-form-fields md:grid-cols-3">
+                      <div className="ui-field md:col-span-3">
+                        <label className="ui-field-label" htmlFor="member-email">
                           {copy.emailLabel}
                         </label>
                         <input
@@ -759,16 +743,13 @@ export function MemberConfigurationClient({
                           disabled
                           readOnly
                         />
-                        <p className="text-xs leading-5 text-[var(--color-text-subtle)]">
+                        <p className="ui-field-hint">
                           {copy.emailHint}
                         </p>
                       </div>
 
-                      <div className="space-y-2">
-                        <label
-                          className="text-sm font-semibold text-[var(--color-text-muted)]"
-                          htmlFor="member-role"
-                        >
+                      <div className="ui-field">
+                        <label className="ui-field-label" htmlFor="member-role">
                           {copy.roleLabel}
                         </label>
                         <select
@@ -789,11 +770,8 @@ export function MemberConfigurationClient({
                         </select>
                       </div>
 
-                      <div className="space-y-2">
-                        <label
-                          className="text-sm font-semibold text-[var(--color-text-muted)]"
-                          htmlFor="member-status"
-                        >
+                      <div className="ui-field">
+                        <label className="ui-field-label" htmlFor="member-status">
                           {copy.statusLabel}
                         </label>
                         <select
@@ -814,7 +792,7 @@ export function MemberConfigurationClient({
                         </select>
                       </div>
 
-                      <div className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white/75 px-4 py-4">
+                      <div className="ui-metadata-card">
                         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-subtle)]">
                           {selectedMember.account_id
                             ? copy.accountLinked
@@ -836,25 +814,28 @@ export function MemberConfigurationClient({
               )}
             </div>
 
-            <aside className="flex flex-col gap-4">
-              <div className={`ui-panel p-5 ${isDeletePending ? "ui-delete-pending" : ""}`}>
-                <div className="flex items-start gap-4">
+            <aside className="ui-panel-context">
+              <div
+                className="ui-panel ui-panel-context p-5"
+                data-delete-pending={isDeletePending ? "true" : undefined}
+              >
+                <div className="ui-section-header">
                   <span className="ui-icon-badge">
                     <PreviewIcon className="h-[1.05rem] w-[1.05rem]" />
                   </span>
-                  <div>
-                    <h2 className="text-base font-semibold tracking-[-0.02em] text-[var(--color-text)]">
+                  <div className="ui-section-copy">
+                    <h2 className="ui-header-title ui-title-section">
                       {copy.displayNameLabel}
                     </h2>
-                    <p className="mt-1 text-sm leading-6 text-[var(--color-text-subtle)]">
+                    <p className="ui-copy-body">
                       {copy.displayNameHint}
                     </p>
                   </div>
                 </div>
 
                 {selectedMember ? (
-                  <div className="mt-5 space-y-3">
-                    <div className="rounded-[var(--radius-card)] border border-[rgba(37,117,216,0.14)] bg-[var(--color-accent-soft)]/55 px-4 py-4">
+                  <div className="ui-preview-stack">
+                    <div className="ui-preview-card ui-preview-card-accent">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-subtle)]">
                         {copy.displayNameLabel}
                       </p>
@@ -863,7 +844,7 @@ export function MemberConfigurationClient({
                       </p>
 
                       <div className="mt-3 flex flex-wrap gap-2">
-                        <span className="ui-tone-neutral rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
+                        <span className="ui-badge ui-badge-neutral px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
                           {previewRoleLabel}
                         </span>
                         <span
@@ -874,7 +855,7 @@ export function MemberConfigurationClient({
                       </div>
                     </div>
 
-                    <div className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white/75 px-4 py-4">
+                    <div className="ui-preview-card">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-subtle)]">
                         {copy.nameLabel}
                       </p>
@@ -889,8 +870,8 @@ export function MemberConfigurationClient({
                       </p>
                     </div>
 
-                    <div className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white/75 px-4 py-4">
-                      <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="ui-metadata-card">
+                      <div className="ui-metadata-grid ui-metadata-grid-2">
                         <div>
                           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-subtle)]">
                             {copy.memberIdLabel}
@@ -918,15 +899,15 @@ export function MemberConfigurationClient({
               </div>
 
               <div className="ui-card ui-card-coming-soon p-5">
-                <div className="flex items-start gap-4">
+                <div className="ui-section-header">
                   <span className="ui-icon-badge ui-icon-badge-construction">
                     <HistoryIcon className="h-[1.05rem] w-[1.05rem]" />
                   </span>
-                  <div>
-                    <h2 className="text-base font-semibold tracking-[-0.02em] text-[var(--color-text)]">
+                  <div className="ui-section-copy">
+                    <h2 className="ui-header-title ui-title-section">
                       {copy.historyTitle}
                     </h2>
-                    <p className="mt-1 text-sm leading-6 text-[var(--color-text-subtle)]">
+                    <p className="ui-copy-body">
                       {copy.historyDescription}
                     </p>
                   </div>
@@ -940,18 +921,18 @@ export function MemberConfigurationClient({
           id="member-panel-history"
           role="tabpanel"
           aria-labelledby="member-tab-history"
-          className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.82fr)]"
+          className="ui-layout-record xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.82fr)]"
         >
           <div className="ui-panel px-6 py-6">
-            <div className="flex items-start gap-4">
+            <div className="ui-section-header">
               <span className="ui-icon-badge ui-icon-badge-construction">
                 <HistoryIcon className="h-[1.05rem] w-[1.05rem]" />
               </span>
-              <div>
-                <h2 className="text-base font-semibold tracking-[-0.02em] text-[var(--color-text)]">
+              <div className="ui-section-copy">
+                <h2 className="ui-header-title ui-title-section">
                   {copy.historyTitle}
                 </h2>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--color-text-subtle)]">
+                <p className="ui-copy-body mt-2 max-w-2xl">
                   {copy.historyDescription}
                 </p>
               </div>
@@ -987,7 +968,7 @@ export function MemberConfigurationClient({
                   {resolveMemberLabel(selectedMember)}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="ui-tone-neutral rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
+                  <span className="ui-badge ui-badge-neutral px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
                     {copy.roleLabels[
                       selectedMember.role_name as keyof typeof copy.roleLabels
                     ] ?? selectedMember.role_name}
@@ -1008,7 +989,7 @@ export function MemberConfigurationClient({
 
       {tab === "general" && portalTarget
         ? createPortal(
-            <div className="mx-auto flex w-full max-w-[112rem] flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-5 lg:px-8">
+            <div className="ui-action-footer">
               <div className="flex shrink-0 items-center">
                 <Link
                   href={configurationPath}

@@ -7,7 +7,8 @@ import { SetupStepCard } from "@/component/home/setup-step-card";
 import {
   BuildingIcon,
   ScopeIcon,
-  UsersIcon
+  UsersIcon,
+  WorkflowIcon
 } from "@/component/ui/ui-icons";
 
 type ConfigurationPageProps = {
@@ -20,6 +21,7 @@ export default async function ConfigurationPage({ params }: ConfigurationPagePro
   const tenantEditorHref = `/${locale}/app/configuration/tenant`;
   const memberEditorHref = `/${locale}/app/configuration/member`;
   const scopeEditorHref = `/${locale}/app/configuration/scope`;
+  const locationEditorHref = `/${locale}/app/configuration/location`;
 
   return (
     <section className="flex flex-col gap-6">
@@ -36,7 +38,7 @@ export default async function ConfigurationPage({ params }: ConfigurationPagePro
         }
       />
 
-      <section className="grid gap-4 xl:grid-cols-3">
+      <section className="grid gap-4 xl:grid-cols-4">
         <InfoCard
           title={t("cards.organization.title")}
           description={t("cards.organization.description")}
@@ -55,6 +57,13 @@ export default async function ConfigurationPage({ params }: ConfigurationPagePro
           iconSlot={<ScopeIcon className="h-[1.05rem] w-[1.05rem]" />}
           actionHref={scopeEditorHref}
           actionLabel={t("openScopeEditor")}
+        />
+        <InfoCard
+          title={t("cards.location.title")}
+          description={t("cards.location.description")}
+          iconSlot={<WorkflowIcon className="h-[1.05rem] w-[1.05rem]" />}
+          actionHref={locationEditorHref}
+          actionLabel={t("openLocationEditor")}
         />
       </section>
 
@@ -85,6 +94,15 @@ export default async function ConfigurationPage({ params }: ConfigurationPagePro
           actionHref={scopeEditorHref}
           actionLabel={t("openScopeEditor")}
           iconSlot={<ScopeIcon className="h-[1.05rem] w-[1.05rem]" />}
+        />
+        <SetupStepCard
+          title={t("queue.location.title")}
+          description={t("queue.location.description")}
+          statusLabel={t("queue.location.status")}
+          tone="attention"
+          actionHref={locationEditorHref}
+          actionLabel={t("openLocationEditor")}
+          iconSlot={<WorkflowIcon className="h-[1.05rem] w-[1.05rem]" />}
         />
       </section>
     </section>

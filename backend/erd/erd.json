@@ -499,7 +499,7 @@
       "endFieldId": "parent_location_id",
       "cardinality": "one_to_many",
       "updateConstraint": "Cascade",
-      "deleteConstraint": "Cascade"
+      "deleteConstraint": "Restrict"
     }
   ],
   "notes": [],

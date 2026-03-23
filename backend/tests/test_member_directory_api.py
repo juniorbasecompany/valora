@@ -12,7 +12,7 @@ from valora_backend.auth.dependencies import get_current_member, get_current_ten
 from valora_backend.db import get_session
 from valora_backend.main import create_app
 from valora_backend.model.base import Base
-from valora_backend.model.identity import Account, Member, Scope, Tenant
+from valora_backend.model.identity import Account, Location, Member, Scope, Tenant
 
 
 @contextmanager
@@ -328,3 +328,207 @@ def test_member_cannot_create_scope() -> None:
 
     assert response.status_code == 403
     assert response.json()["detail"] == "Insufficient permissions to create scope"
+
+
+def test_admin_can_create_move_update_and_delete_locations() -> None:
+    with build_test_client(current_member_key="admin") as (client, session, _):
+        scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
+        assert scope_id is not None
+
+        list_response = client.get(f"/auth/tenant/current/scopes/{scope_id}/locations")
+        root_response = client.post(
+            f"/auth/tenant/current/scopes/{scope_id}/locations",
+            json={
+                "name": "Fazenda Norte",
+                "display_name": "Fazenda Norte principal",
+                "parent_location_id": None,
+            },
+        )
+        session.expire_all()
+        root_location = session.scalar(
+            select(Location).where(Location.name == "Fazenda Norte")
+        )
+        assert root_location is not None
+
+        child_response = client.post(
+            f"/auth/tenant/current/scopes/{scope_id}/locations",
+            json={
+                "name": "Aviário B",
+                "display_name": "Aviário de postura B",
+                "parent_location_id": root_location.id,
+            },
+        )
+        session.expire_all()
+        child_location = session.scalar(select(Location).where(Location.name == "Aviário B"))
+        assert child_location is not None
+
+        move_response = client.post(
+            f"/auth/tenant/current/scopes/{scope_id}/locations/{child_location.id}/move",
+            json={
+                "parent_location_id": None,
+                "target_index": 0,
+            },
+        )
+        update_response = client.patch(
+            f"/auth/tenant/current/scopes/{scope_id}/locations/{child_location.id}",
+            json={
+                "name": "Aviário B",
+                "display_name": "Aviário de postura reformado",
+                "parent_location_id": None,
+            },
+        )
+        delete_response = client.delete(
+            f"/auth/tenant/current/scopes/{scope_id}/locations/{root_location.id}"
+        )
+        session.expire_all()
+        deleted_root = session.get(Location, root_location.id)
+        updated_child = session.get(Location, child_location.id)
+
+    assert list_response.status_code == 200
+    assert list_response.json()["can_create"] is True
+    assert list_response.json()["item_list"] == []
+
+    assert root_response.status_code == 200
+    root_payload = root_response.json()
+    assert any(item["name"] == "Fazenda Norte" for item in root_payload["item_list"])
+
+    assert child_response.status_code == 200
+    child_payload = child_response.json()
+    created_child = next(
+        item for item in child_payload["item_list"] if item["name"] == "Aviário B"
+    )
+    assert created_child["parent_location_id"] == root_location.id
+    assert created_child["path_labels"] == ["Fazenda Norte", "Aviário B"]
+
+    assert move_response.status_code == 200
+    moved_child = next(
+        item for item in move_response.json()["item_list"] if item["id"] == child_location.id
+    )
+    assert moved_child["parent_location_id"] is None
+    assert moved_child["sort_order"] == 0
+
+    assert update_response.status_code == 200
+    assert updated_child is not None
+    assert updated_child.display_name == "Aviário de postura reformado"
+
+    assert delete_response.status_code == 200
+    assert deleted_root is None
+
+
+def test_location_delete_is_blocked_when_location_has_children() -> None:
+    with build_test_client(current_member_key="admin") as (client, session, _):
+        scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
+        assert scope_id is not None
+
+        client.post(
+            f"/auth/tenant/current/scopes/{scope_id}/locations",
+            json={
+                "name": "Granja Sul",
+                "display_name": "Granja Sul",
+                "parent_location_id": None,
+            },
+        )
+        session.expire_all()
+        parent_location = session.scalar(select(Location).where(Location.name == "Granja Sul"))
+        assert parent_location is not None
+
+        client.post(
+            f"/auth/tenant/current/scopes/{scope_id}/locations",
+            json={
+                "name": "Núcleo 1",
+                "display_name": "Núcleo 1",
+                "parent_location_id": parent_location.id,
+            },
+        )
+
+        response = client.delete(
+            f"/auth/tenant/current/scopes/{scope_id}/locations/{parent_location.id}"
+        )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == (
+        "Cannot delete location while it still has child locations"
+    )
+
+
+def test_location_move_cannot_create_cycle() -> None:
+    with build_test_client(current_member_key="admin") as (client, session, _):
+        scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
+        assert scope_id is not None
+
+        client.post(
+            f"/auth/tenant/current/scopes/{scope_id}/locations",
+            json={
+                "name": "Unidade Oeste",
+                "display_name": "Unidade Oeste",
+                "parent_location_id": None,
+            },
+        )
+        session.expire_all()
+        parent_location = session.scalar(
+            select(Location).where(Location.name == "Unidade Oeste")
+        )
+        assert parent_location is not None
+
+        client.post(
+            f"/auth/tenant/current/scopes/{scope_id}/locations",
+            json={
+                "name": "Setor A",
+                "display_name": "Setor A",
+                "parent_location_id": parent_location.id,
+            },
+        )
+        session.expire_all()
+        child_location = session.scalar(select(Location).where(Location.name == "Setor A"))
+        assert child_location is not None
+
+        response = client.post(
+            f"/auth/tenant/current/scopes/{scope_id}/locations/{parent_location.id}/move",
+            json={
+                "parent_location_id": child_location.id,
+                "target_index": 0,
+            },
+        )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == (
+        "Location cannot move under one of its descendants"
+    )
+
+
+def test_scope_delete_is_blocked_when_scope_has_locations() -> None:
+    with build_test_client(current_member_key="admin") as (client, session, _):
+        scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
+        assert scope_id is not None
+
+        client.post(
+            f"/auth/tenant/current/scopes/{scope_id}/locations",
+            json={
+                "name": "Matriz",
+                "display_name": "Matriz operacional",
+                "parent_location_id": None,
+            },
+        )
+
+        response = client.delete(f"/auth/tenant/current/scopes/{scope_id}")
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Cannot delete scope while it still has locations"
+
+
+def test_member_cannot_create_location() -> None:
+    with build_test_client(current_member_key="member") as (client, session, _):
+        scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
+        assert scope_id is not None
+
+        response = client.post(
+            f"/auth/tenant/current/scopes/{scope_id}/locations",
+            json={
+                "name": "Base",
+                "display_name": "Base",
+                "parent_location_id": None,
+            },
+        )
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == "Insufficient permissions to create location"

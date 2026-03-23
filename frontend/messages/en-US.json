@@ -100,6 +100,7 @@
     "openTenantEditor": "Edit tenant",
     "openMemberEditor": "Edit members",
     "openScopeEditor": "Edit scopes",
+    "openLocationEditor": "Edit locations",
     "status": {
       "title": "Next phase",
       "description": "Tenant, member, and scope records can already be maintained in this initial area."
@@ -116,6 +117,10 @@
       "scope": {
         "title": "Scope",
         "description": "Concentrates the minimum structure that will support later modules and records."
+      },
+      "location": {
+        "title": "Locations",
+        "description": "Organizes the hierarchical location tree inside each scope for later operational records."
       }
     },
     "queue": {
@@ -132,6 +137,11 @@
       "scope": {
         "title": "Scope registration",
         "description": "Closes the minimum structural foundation before advancing to operational modules.",
+        "status": "available"
+      },
+      "location": {
+        "title": "Location registration",
+        "description": "Prepares the editable location hierarchy that will support future hierarchical records.",
         "status": "available"
       }
     }
@@ -267,6 +277,106 @@
       "validation": "This field cannot be empty."
     },
     "discardConfirm": "Discard unsaved changes?"
+  },
+  "LocationConfigurationPage": {
+    "eyebrow": "Configuration",
+    "title": "Locations",
+    "description": "Edit the hierarchical location directory of the active tenant. Each location belongs to a scope and can be nested under another location in the same scope.",
+    "status": {
+      "title": "Editing locations",
+      "description": "Changes only affect the active tenant in your session. Use drag and drop to reorder siblings or move a location under a different parent."
+    },
+    "tab": {
+      "general": "General",
+      "history": "History",
+      "listAriaLabel": "Location settings sections"
+    },
+    "scope": {
+      "label": "Scope",
+      "hint": "Choose the structural scope whose location tree you want to edit."
+    },
+    "list": {
+      "title": "Location directory",
+      "description": "Select a scope, browse the tree, and choose a location to review or update.",
+      "empty": "No locations were found for the selected scope.",
+      "emptyScope": "Create a scope first before editing the location hierarchy."
+    },
+    "tree": {
+      "searchLabel": "Search the tree",
+      "searchPlaceholder": "Search by name or path"
+    },
+    "history": {
+      "title": "Change history",
+      "description": "A timeline of location hierarchy changes will appear here when structural auditing is available. Until then, this tab stays as a layout and traceability placeholder."
+    },
+    "section": {
+      "identity": {
+        "title": "Identity",
+        "description": "Short name and operational description shown throughout the hierarchy.",
+        "nameLabel": "Location name",
+        "nameHint": "Use a short label such as North Farm, Shed B, or Plot 12.",
+        "displayNameLabel": "Location description",
+        "displayNameHint": "Add context that helps users recognize the location quickly."
+      },
+      "structure": {
+        "title": "Structure",
+        "description": "Define the position of this location inside the selected scope tree.",
+        "parentLabel": "Parent location",
+        "parentHint": "Choose the parent location or keep it at the root level.",
+        "rootOptionLabel": "No parent (root location)",
+        "parentSearchLabel": "Find parent",
+        "parentSearchPlaceholder": "Search possible parents",
+        "noParentCandidates": "No locations matched this search."
+      }
+    },
+    "metadata": {
+      "idLabel": "Location identifier",
+      "pathLabel": "Hierarchy path",
+      "childrenLabel": "Direct children",
+      "descendantsLabel": "Total descendants"
+    },
+    "reorder": {
+      "title": "Reorder and create",
+      "description": "Reorder siblings with drag and drop, or create new locations relative to the current selection."
+    },
+    "dragDropHint": "Drag a handle to reorder before or after a sibling, or drop on a row to move under that location.",
+    "action": {
+      "cancel": "Cancel",
+      "newRoot": "New root",
+      "newChild": "New child",
+      "newSibling": "New sibling",
+      "delete": "Delete",
+      "undoDelete": "Undo delete",
+      "save": "Save",
+      "saving": "Saving...",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "moving": "Moving...",
+      "moveToRoot": "Move to root"
+    },
+    "selectPrompt": "Select a location from the tree to edit the record.",
+    "readOnlyNotice": "You can review the location directory, but only master or admin members can create or edit hierarchical records.",
+    "savedNotice": "Location updated successfully.",
+    "createdNotice": "Location created successfully.",
+    "deletedNotice": "Location deleted successfully.",
+    "movedNotice": "Location moved successfully.",
+    "childDeleteBlocked": "Locations with children cannot be deleted until their branch is reorganized.",
+    "moveBlocked": "This location cannot be moved with the current permissions.",
+    "newLocationTitle": "New location",
+    "error": {
+      "load": "Could not load the location directory. Try again.",
+      "save": "Could not save the location. Try again.",
+      "create": "Could not create the location. Try again.",
+      "delete": "Could not delete the location. Try again.",
+      "move": "Could not move the location. Try again.",
+      "validation": "This field cannot be empty."
+    },
+    "discardConfirm": "Discard unsaved changes?",
+    "drop": {
+      "before": "Drop before",
+      "inside": "Drop inside",
+      "after": "Drop after"
+    }
   },
   "TenantConfigurationPage": {
     "eyebrow": "Configuration",

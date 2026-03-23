@@ -100,6 +100,7 @@
     "openTenantEditor": "Editar licenciado",
     "openMemberEditor": "Editar membros",
     "openScopeEditor": "Editar escopos",
+    "openLocationEditor": "Editar locais",
     "status": {
       "title": "Fase seguinte",
       "description": "Licenciado, membros e escopos já podem ser mantidos nesta área inicial."
@@ -116,6 +117,10 @@
       "scope": {
         "title": "Escopo",
         "description": "Concentra a estrutura mínima que servirá de base para os módulos e cadastros posteriores."
+      },
+      "location": {
+        "title": "Locais",
+        "description": "Organiza a árvore hierárquica de locais dentro de cada escopo para os cadastros operacionais futuros."
       }
     },
     "queue": {
@@ -132,6 +137,11 @@
       "scope": {
         "title": "Cadastro de escopo",
         "description": "Fecha a base estrutural mínima antes do avanço para módulos operacionais.",
+        "status": "disponível"
+      },
+      "location": {
+        "title": "Cadastro de locais",
+        "description": "Prepara a hierarquia editável de locais que servirá de base para outros cadastros hierárquicos.",
         "status": "disponível"
       }
     }
@@ -267,6 +277,106 @@
       "validation": "Este campo não pode ficar vazio."
     },
     "discardConfirm": "Descartar alterações não salvas?"
+  },
+  "LocationConfigurationPage": {
+    "eyebrow": "Configuração",
+    "title": "Locais",
+    "description": "Edite o diretório hierárquico de locais do licenciado ativo. Cada local pertence a um escopo e pode ficar abaixo de outro local no mesmo escopo.",
+    "status": {
+      "title": "Edição de locais",
+      "description": "As alterações afetam apenas o licenciado ativo da sua sessão. Use arrastar e soltar para reordenar irmãos ou mover um local para outro pai."
+    },
+    "tab": {
+      "general": "Geral",
+      "history": "Histórico",
+      "listAriaLabel": "Seções das configurações de locais"
+    },
+    "scope": {
+      "label": "Escopo",
+      "hint": "Escolha o escopo estrutural cuja árvore de locais você quer editar."
+    },
+    "list": {
+      "title": "Diretório de locais",
+      "description": "Selecione um escopo, navegue pela árvore e escolha um local para revisar ou atualizar.",
+      "empty": "Nenhum local foi encontrado para o escopo selecionado.",
+      "emptyScope": "Crie um escopo antes de editar a hierarquia de locais."
+    },
+    "tree": {
+      "searchLabel": "Buscar na árvore",
+      "searchPlaceholder": "Buscar por nome ou caminho"
+    },
+    "history": {
+      "title": "Histórico de alterações",
+      "description": "Uma linha do tempo das alterações de hierarquia aparecerá aqui quando a auditoria estrutural estiver disponível. Até lá, esta aba permanece como referência de layout e rastreabilidade."
+    },
+    "section": {
+      "identity": {
+        "title": "Identificação",
+        "description": "Nome curto e descrição operacional exibidos ao longo da hierarquia.",
+        "nameLabel": "Nome do local",
+        "nameHint": "Use um rótulo curto, como Fazenda Norte, Aviário B ou Talhão 12.",
+        "displayNameLabel": "Descrição do local",
+        "displayNameHint": "Adicione contexto para o usuário reconhecer o local com rapidez."
+      },
+      "structure": {
+        "title": "Estrutura",
+        "description": "Defina a posição deste local dentro da árvore do escopo selecionado.",
+        "parentLabel": "Local pai",
+        "parentHint": "Escolha o local pai ou mantenha este cadastro no nível raiz.",
+        "rootOptionLabel": "Sem pai (local raiz)",
+        "parentSearchLabel": "Buscar pai",
+        "parentSearchPlaceholder": "Buscar pais possíveis",
+        "noParentCandidates": "Nenhum local correspondeu a esta busca."
+      }
+    },
+    "metadata": {
+      "idLabel": "Identificador do local",
+      "pathLabel": "Caminho hierárquico",
+      "childrenLabel": "Filhos diretos",
+      "descendantsLabel": "Descendentes totais"
+    },
+    "reorder": {
+      "title": "Reordenar e criar",
+      "description": "Reordene irmãos com arrastar e soltar ou crie novos locais a partir da seleção atual."
+    },
+    "dragDropHint": "Arraste a alça para reordenar antes ou depois de um irmão, ou solte sobre uma linha para mover para baixo desse local.",
+    "action": {
+      "cancel": "Cancelar",
+      "newRoot": "Novo raiz",
+      "newChild": "Novo filho",
+      "newSibling": "Novo irmão",
+      "delete": "Apagar",
+      "undoDelete": "Desmarcar exclusão",
+      "save": "Salvar",
+      "saving": "Salvando...",
+      "moveUp": "Mover para cima",
+      "moveDown": "Mover para baixo",
+      "moving": "Movendo...",
+      "moveToRoot": "Mover para raiz"
+    },
+    "selectPrompt": "Selecione um local na árvore para editar o cadastro.",
+    "readOnlyNotice": "Você pode consultar o diretório de locais, mas só membros master ou administrador podem criar ou editar cadastros hierárquicos.",
+    "savedNotice": "Local atualizado com sucesso.",
+    "createdNotice": "Local criado com sucesso.",
+    "deletedNotice": "Local apagado com sucesso.",
+    "movedNotice": "Local movido com sucesso.",
+    "childDeleteBlocked": "Locais com filhos não podem ser apagados até que o ramo seja reorganizado.",
+    "moveBlocked": "Este local não pode ser movido com as permissões atuais.",
+    "newLocationTitle": "Novo local",
+    "error": {
+      "load": "Não foi possível carregar o diretório de locais. Tente novamente.",
+      "save": "Não foi possível salvar o local. Tente novamente.",
+      "create": "Não foi possível criar o local. Tente novamente.",
+      "delete": "Não foi possível apagar o local. Tente novamente.",
+      "move": "Não foi possível mover o local. Tente novamente.",
+      "validation": "Este campo não pode ficar vazio."
+    },
+    "discardConfirm": "Descartar alterações não salvas?",
+    "drop": {
+      "before": "Soltar antes",
+      "inside": "Soltar dentro",
+      "after": "Soltar depois"
+    }
   },
   "TenantConfigurationPage": {
     "eyebrow": "Configuração",

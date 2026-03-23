@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections import defaultdict
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import or_, select
@@ -25,7 +27,7 @@ from valora_backend.auth.service import (
     tenant_display_name,
 )
 from valora_backend.db import get_session
-from valora_backend.model.identity import Account, Member, Scope, Tenant
+from valora_backend.model.identity import Account, Location, Member, Scope, Tenant
 from valora_backend.model.null_if_empty import commit_session_with_null_if_empty
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -212,6 +214,71 @@ class TenantScopeUpsertRequest(BaseModel):
         if not cleaned:
             raise ValueError("must not be empty")
         return cleaned
+
+
+class TenantLocationRecord(BaseModel):
+    id: int
+    parent_location_id: int | None
+    name: str
+    display_name: str
+    sort_order: int
+    depth: int
+    path_labels: list[str] = Field(default_factory=list)
+    children_count: int
+    descendants_count: int
+    can_edit: bool
+    can_delete: bool
+    can_create_child: bool
+    can_move: bool
+
+
+class TenantLocationDirectoryResponse(BaseModel):
+    scope_id: int
+    scope_name: str
+    scope_display_name: str
+    can_edit: bool
+    can_create: bool
+    item_list: list[TenantLocationRecord] = Field(default_factory=list)
+
+
+class TenantLocationUpsertRequest(BaseModel):
+    name: str
+    display_name: str
+    parent_location_id: int | None = None
+
+    @field_validator("name", "display_name")
+    @classmethod
+    def strip_non_empty_location_value(cls, value: str) -> str:
+        cleaned = value.strip()
+        if not cleaned:
+            raise ValueError("must not be empty")
+        return cleaned
+
+    @field_validator("parent_location_id")
+    @classmethod
+    def validate_parent_location_id(cls, value: int | None) -> int | None:
+        if value is not None and value < 1:
+            raise ValueError("invalid parent location id")
+        return value
+
+
+class TenantLocationMoveRequest(BaseModel):
+    parent_location_id: int | None = None
+    target_index: int = 0
+
+    @field_validator("parent_location_id")
+    @classmethod
+    def validate_move_parent_location_id(cls, value: int | None) -> int | None:
+        if value is not None and value < 1:
+            raise ValueError("invalid parent location id")
+        return value
+
+    @field_validator("target_index")
+    @classmethod
+    def validate_target_index(cls, value: int) -> int:
+        if value < 0:
+            raise ValueError("target index must be non-negative")
+        return value
 
 
 class AuthSessionResponse(BaseModel):
@@ -663,6 +730,14 @@ def _member_can_delete_scope(member: Member) -> bool:
     return member.role in (MASTER_ROLE, ADMIN_ROLE)
 
 
+def _member_can_edit_location(member: Member) -> bool:
+    return _member_can_edit_scope(member)
+
+
+def _member_can_delete_location(member: Member) -> bool:
+    return _member_can_delete_scope(member)
+
+
 def _serialize_tenant_member(actor: Member, target: Member) -> TenantMemberRecord:
     return TenantMemberRecord(
         id=target.id,
@@ -724,6 +799,231 @@ def _build_tenant_scope_directory(
         can_edit=_member_can_edit_scope(actor),
         can_create=_member_can_edit_scope(actor),
         item_list=[_serialize_tenant_scope(actor, item) for item in scope_list],
+    )
+
+
+def _location_sort_key(item: Location) -> tuple[int, str, int]:
+    return (item.sort_order, item.name.lower(), item.id)
+
+
+def _location_label(item: Location) -> str:
+    name = item.name.strip()
+    if name:
+        return name
+
+    display_name = item.display_name.strip()
+    if display_name:
+        return display_name
+
+    return f"#{item.id}"
+
+
+def _get_tenant_scope_for_location(
+    session: Session, *, actor: Member, scope_id: int
+) -> Scope:
+    target_scope = session.get(Scope, scope_id)
+    if not target_scope or target_scope.tenant_id != actor.tenant_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Scope not found for current tenant",
+        )
+
+    return target_scope
+
+
+def _get_scope_location_list(session: Session, *, scope_id: int) -> list[Location]:
+    return list(
+        session.scalars(
+            select(Location)
+            .where(Location.scope_id == scope_id)
+            .order_by(Location.sort_order, Location.name, Location.id)
+        )
+    )
+
+
+def _get_scope_location_or_404(
+    session: Session, *, scope_id: int, location_id: int
+) -> Location:
+    target_location = session.get(Location, location_id)
+    if not target_location or target_location.scope_id != scope_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Location not found for current scope",
+        )
+
+    return target_location
+
+
+def _validate_location_parent_change(
+    location_map: dict[int, Location],
+    *,
+    parent_location_id: int | None,
+    moving_location_id: int | None,
+) -> None:
+    if parent_location_id is None:
+        return
+
+    parent_location = location_map.get(parent_location_id)
+    if parent_location is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Parent location not found for current scope",
+        )
+
+    if moving_location_id is None:
+        return
+
+    if parent_location.id == moving_location_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Location cannot be its own parent",
+        )
+
+    current_parent = parent_location
+    while current_parent.parent_location_id is not None:
+        if current_parent.parent_location_id == moving_location_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Location cannot move under one of its descendants",
+            )
+        current_parent = location_map.get(current_parent.parent_location_id)
+        if current_parent is None:
+            break
+
+
+def _resequence_location_siblings(sibling_list: list[Location]) -> None:
+    for index, sibling in enumerate(sibling_list):
+        sibling.sort_order = index
+
+
+def _move_location_in_scope(
+    session: Session,
+    *,
+    target_location: Location,
+    parent_location_id: int | None,
+    target_index: int | None,
+) -> None:
+    location_list = _get_scope_location_list(session, scope_id=target_location.scope_id)
+    location_map = {item.id: item for item in location_list}
+    location_map[target_location.id] = target_location
+
+    _validate_location_parent_change(
+        location_map,
+        parent_location_id=parent_location_id,
+        moving_location_id=target_location.id,
+    )
+
+    current_parent_id = target_location.parent_location_id
+    origin_sibling_list = sorted(
+        [
+            item
+            for item in location_list
+            if item.parent_location_id == current_parent_id and item.id != target_location.id
+        ],
+        key=_location_sort_key,
+    )
+    destination_sibling_list = sorted(
+        [
+            item
+            for item in location_list
+            if item.parent_location_id == parent_location_id and item.id != target_location.id
+        ],
+        key=_location_sort_key,
+    )
+
+    resolved_target_index = len(destination_sibling_list)
+    if target_index is not None:
+        if target_index > len(destination_sibling_list):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Target index is outside the valid sibling range",
+            )
+        resolved_target_index = target_index
+
+    target_location.parent_location_id = parent_location_id
+    destination_sibling_list.insert(resolved_target_index, target_location)
+    _resequence_location_siblings(destination_sibling_list)
+    for sibling in destination_sibling_list:
+        session.add(sibling)
+
+    if current_parent_id != parent_location_id:
+        _resequence_location_siblings(origin_sibling_list)
+        for sibling in origin_sibling_list:
+            session.add(sibling)
+
+
+def _normalize_scope_location_order(session: Session, *, scope_id: int) -> None:
+    location_list = _get_scope_location_list(session, scope_id=scope_id)
+    child_list_by_parent_id: defaultdict[int | None, list[Location]] = defaultdict(list)
+    for item in sorted(location_list, key=_location_sort_key):
+        child_list_by_parent_id[item.parent_location_id].append(item)
+
+    for sibling_list in child_list_by_parent_id.values():
+        _resequence_location_siblings(sibling_list)
+        for sibling in sibling_list:
+            session.add(sibling)
+
+
+def _build_tenant_location_directory(
+    session: Session, *, actor: Member, scope: Scope
+) -> TenantLocationDirectoryResponse:
+    location_list = _get_scope_location_list(session, scope_id=scope.id)
+    child_list_by_parent_id: defaultdict[int | None, list[Location]] = defaultdict(list)
+    for item in sorted(location_list, key=_location_sort_key):
+        child_list_by_parent_id[item.parent_location_id].append(item)
+
+    item_list: list[TenantLocationRecord] = []
+    visited_location_id_set: set[int] = set()
+    can_edit_location = _member_can_edit_location(actor)
+
+    def append_branch(
+        location: Location, *, depth: int, path_prefix: list[str]
+    ) -> int:
+        visited_location_id_set.add(location.id)
+        path_labels = [*path_prefix, _location_label(location)]
+        child_list = child_list_by_parent_id.get(location.id, [])
+        record = TenantLocationRecord(
+            id=location.id,
+            parent_location_id=location.parent_location_id,
+            name=location.name,
+            display_name=location.display_name,
+            sort_order=location.sort_order,
+            depth=depth,
+            path_labels=path_labels,
+            children_count=len(child_list),
+            descendants_count=0,
+            can_edit=can_edit_location,
+            can_delete=_member_can_delete_location(actor) and len(child_list) == 0,
+            can_create_child=can_edit_location,
+            can_move=can_edit_location,
+        )
+        item_list.append(record)
+
+        descendant_count = 0
+        for child in child_list:
+            descendant_count += 1 + append_branch(
+                child,
+                depth=depth + 1,
+                path_prefix=path_labels,
+            )
+
+        record.descendants_count = descendant_count
+        return descendant_count
+
+    for root_location in child_list_by_parent_id.get(None, []):
+        append_branch(root_location, depth=0, path_prefix=[])
+
+    for dangling_location in sorted(location_list, key=_location_sort_key):
+        if dangling_location.id not in visited_location_id_set:
+            append_branch(dangling_location, depth=0, path_prefix=[])
+
+    return TenantLocationDirectoryResponse(
+        scope_id=scope.id,
+        scope_name=scope.name,
+        scope_display_name=scope.display_name,
+        can_edit=can_edit_location,
+        can_create=can_edit_location,
+        item_list=item_list,
     )
 
 
@@ -962,12 +1262,11 @@ def delete_current_tenant_scope(
     current_member: Member = Depends(get_current_member),
     session: Session = Depends(get_session),
 ):
-    target_scope = session.get(Scope, scope_id)
-    if not target_scope or target_scope.tenant_id != current_member.tenant_id:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Scope not found for current tenant",
-        )
+    target_scope = _get_tenant_scope_for_location(
+        session,
+        actor=current_member,
+        scope_id=scope_id,
+    )
 
     if not _member_can_delete_scope(current_member):
         raise HTTPException(
@@ -975,10 +1274,229 @@ def delete_current_tenant_scope(
             detail="Insufficient permissions to delete scope",
         )
 
+    has_location = session.scalar(
+        select(Location.id).where(Location.scope_id == target_scope.id).limit(1)
+    )
+    if has_location is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete scope while it still has locations",
+        )
+
     session.delete(target_scope)
     session.commit()
 
     return _build_tenant_scope_directory(session, actor=current_member)
+
+
+@router.get(
+    "/tenant/current/scopes/{scope_id}/locations",
+    response_model=TenantLocationDirectoryResponse,
+)
+def get_current_scope_location_directory(
+    scope_id: int,
+    current_member: Member = Depends(get_current_member),
+    session: Session = Depends(get_session),
+):
+    target_scope = _get_tenant_scope_for_location(
+        session,
+        actor=current_member,
+        scope_id=scope_id,
+    )
+    return _build_tenant_location_directory(
+        session,
+        actor=current_member,
+        scope=target_scope,
+    )
+
+
+@router.post(
+    "/tenant/current/scopes/{scope_id}/locations",
+    response_model=TenantLocationDirectoryResponse,
+)
+def create_current_scope_location(
+    scope_id: int,
+    body: TenantLocationUpsertRequest,
+    current_member: Member = Depends(get_current_member),
+    session: Session = Depends(get_session),
+):
+    target_scope = _get_tenant_scope_for_location(
+        session,
+        actor=current_member,
+        scope_id=scope_id,
+    )
+    if not _member_can_edit_location(current_member):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions to create location",
+        )
+
+    location_list = _get_scope_location_list(session, scope_id=target_scope.id)
+    _validate_location_parent_change(
+        {item.id: item for item in location_list},
+        parent_location_id=body.parent_location_id,
+        moving_location_id=None,
+    )
+    location = Location(
+        name=body.name,
+        display_name=body.display_name,
+        scope_id=target_scope.id,
+        parent_location_id=body.parent_location_id,
+        sort_order=sum(
+            1
+            for item in location_list
+            if item.parent_location_id == body.parent_location_id
+        ),
+    )
+    session.add(location)
+    commit_session_with_null_if_empty(session)
+
+    return _build_tenant_location_directory(
+        session,
+        actor=current_member,
+        scope=target_scope,
+    )
+
+
+@router.patch(
+    "/tenant/current/scopes/{scope_id}/locations/{location_id}",
+    response_model=TenantLocationDirectoryResponse,
+)
+def patch_current_scope_location(
+    scope_id: int,
+    location_id: int,
+    body: TenantLocationUpsertRequest,
+    current_member: Member = Depends(get_current_member),
+    session: Session = Depends(get_session),
+):
+    target_scope = _get_tenant_scope_for_location(
+        session,
+        actor=current_member,
+        scope_id=scope_id,
+    )
+    target_location = _get_scope_location_or_404(
+        session,
+        scope_id=target_scope.id,
+        location_id=location_id,
+    )
+    if not _member_can_edit_location(current_member):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions to update location",
+        )
+
+    if target_location.parent_location_id != body.parent_location_id:
+        _move_location_in_scope(
+            session,
+            target_location=target_location,
+            parent_location_id=body.parent_location_id,
+            target_index=None,
+        )
+
+    target_location.name = body.name
+    target_location.display_name = body.display_name
+    session.add(target_location)
+    commit_session_with_null_if_empty(session)
+
+    return _build_tenant_location_directory(
+        session,
+        actor=current_member,
+        scope=target_scope,
+    )
+
+
+@router.post(
+    "/tenant/current/scopes/{scope_id}/locations/{location_id}/move",
+    response_model=TenantLocationDirectoryResponse,
+)
+def move_current_scope_location(
+    scope_id: int,
+    location_id: int,
+    body: TenantLocationMoveRequest,
+    current_member: Member = Depends(get_current_member),
+    session: Session = Depends(get_session),
+):
+    target_scope = _get_tenant_scope_for_location(
+        session,
+        actor=current_member,
+        scope_id=scope_id,
+    )
+    target_location = _get_scope_location_or_404(
+        session,
+        scope_id=target_scope.id,
+        location_id=location_id,
+    )
+    if not _member_can_edit_location(current_member):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions to move location",
+        )
+
+    _move_location_in_scope(
+        session,
+        target_location=target_location,
+        parent_location_id=body.parent_location_id,
+        target_index=body.target_index,
+    )
+    commit_session_with_null_if_empty(session)
+
+    return _build_tenant_location_directory(
+        session,
+        actor=current_member,
+        scope=target_scope,
+    )
+
+
+@router.delete(
+    "/tenant/current/scopes/{scope_id}/locations/{location_id}",
+    response_model=TenantLocationDirectoryResponse,
+)
+def delete_current_scope_location(
+    scope_id: int,
+    location_id: int,
+    current_member: Member = Depends(get_current_member),
+    session: Session = Depends(get_session),
+):
+    target_scope = _get_tenant_scope_for_location(
+        session,
+        actor=current_member,
+        scope_id=scope_id,
+    )
+    target_location = _get_scope_location_or_404(
+        session,
+        scope_id=target_scope.id,
+        location_id=location_id,
+    )
+    if not _member_can_delete_location(current_member):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions to delete location",
+        )
+
+    has_child = session.scalar(
+        select(Location.id)
+        .where(
+            Location.scope_id == target_scope.id,
+            Location.parent_location_id == target_location.id,
+        )
+        .limit(1)
+    )
+    if has_child is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete location while it still has child locations",
+        )
+
+    session.delete(target_location)
+    session.flush()
+    _normalize_scope_location_order(session, scope_id=target_scope.id)
+    commit_session_with_null_if_empty(session)
+
+    return _build_tenant_location_directory(
+        session,
+        actor=current_member,
+        scope=target_scope,
+    )
 
 
 @router.get("/me", response_model=AuthSessionResponse)

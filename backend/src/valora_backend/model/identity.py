@@ -1,4 +1,4 @@
-# Modelos estruturais iniciais: tenant, account, member e scope.
+# Modelos estruturais iniciais: tenant, account, member, scope e location.
 
 from __future__ import annotations
 
@@ -6,6 +6,7 @@ from sqlalchemy import (
     BigInteger,
     CheckConstraint,
     ForeignKey,
+    ForeignKeyConstraint,
     Index,
     Integer,
     Text,
@@ -203,4 +204,85 @@ class Member(Base):
             "2) Pendente\n"
             "3) Desativado"
         ),
+    )
+
+
+class Location(Base):
+    """Local hierárquico configurado dentro de um escopo."""
+
+    __tablename__ = "location"
+    __table_args__ = (
+        CheckConstraint(
+            "parent_location_id IS NULL OR parent_location_id <> id",
+            name="location_parent_self_chk",
+        ),
+        UniqueConstraint(
+            "scope_id",
+            "id",
+            name="location_scope_id_unique",
+        ),
+        ForeignKeyConstraint(
+            ["scope_id", "parent_location_id"],
+            ["location.scope_id", "location.id"],
+            name="location_parent_same_scope_fk",
+            onupdate="CASCADE",
+            ondelete="RESTRICT",
+        ),
+        Index(
+            "location_scope_parent_sort_idx",
+            "scope_id",
+            "parent_location_id",
+            "sort_order",
+            "id",
+        ),
+        Index(
+            "location_scope_parent_name_idx",
+            "scope_id",
+            "parent_location_id",
+            "name",
+        ),
+        {
+            "comment": (
+                "Local onde ocorre a operação: fazenda, unidade, talhão, "
+                "aviário, subdivisão..."
+            )
+        },
+    )
+
+    id: Mapped[int] = mapped_column(
+        BigInteger,
+        primary_key=True,
+        autoincrement=True,
+        comment="Identificador do local.",
+    )
+    name: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+        comment=(
+            "Nome curto do local dentro da hierarquia: Fazenda Norte, "
+            "Talhão 12, Aviário B..."
+        ),
+    )
+    display_name: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+        comment="Descrição do local com mais contexto para a operação.",
+    )
+    scope_id: Mapped[int] = mapped_column(
+        BigInteger,
+        ForeignKey("scope.id", onupdate="CASCADE", ondelete="RESTRICT"),
+        nullable=False,
+        comment="Ligação do local ao escopo.",
+    )
+    parent_location_id: Mapped[int | None] = mapped_column(
+        BigInteger,
+        nullable=True,
+        comment="Ligação do local ao local pai na mesma hierarquia e escopo.",
+    )
+    sort_order: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default=text("0"),
+        comment="Ordem técnica de exibição entre irmãos na hierarquia.",
     )

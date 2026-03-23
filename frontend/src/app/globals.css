@@ -2995,7 +2995,7 @@ svg {
 
   .ui-mobile-shell-nav {
     grid-template-columns: auto minmax(0, 1fr) auto;
-    gap-row: 0.5rem;
+    row-gap: 0.5rem;
     padding-inline: 0.625rem;
   }
 }

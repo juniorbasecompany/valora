@@ -16,7 +16,7 @@ As regras estáveis de interface e i18n continuam fora daqui:
 
 - [x] A direção de produto da interface é **Operational Workspace com Audit Spine**.
 - [x] A fundação visual atual do frontend usa `light theme`.
-- [x] Os tokens visuais do frontend ficam centralizados em `frontend/src/app/globals.css`.
+- [x] Os tokens visuais do frontend ficam centralizados em `frontend/src/app/styles/base.css` (`:root`).
 - [x] A experiência inicial não será uma landing institucional.
 - [x] O fluxo inicial será `login -> /app -> Configuração/Administração`.
 - [x] A primeira área útil do produto será **Configuração/Administração**.
@@ -103,8 +103,8 @@ Objetivo: criar a base técnica e visual do frontend sem deixar i18n para depois
 - [x] Integrar provider de mensagens no layout raiz.
 - [x] Garantir que strings novas entram por chave, não por literal solto.
 - [x] Definir `light theme` como base atual da interface.
-- [x] Centralizar tokens visuais em `src/app/globals.css`.
-- [ ] Fechar arquitetura CSS semântica em `src/app/globals.css`:
+- [x] Centralizar tokens visuais em `src/app/styles/base.css`.
+- [ ] Fechar arquitetura CSS semântica em `src/app/styles/` (`base.css`, `horizontal-primitive.css`, `vertical-semantic-component.css`, `semantic-utility-extension.css`):
   - [ ] tokens semânticos;
   - [ ] primitives de layout;
   - [ ] superfícies e bordas reutilizáveis;
@@ -289,7 +289,7 @@ Objetivo: transformar a home de ponto de entrada em briefing operacional.
 - [ ] Não misturar idioma da UI, locale de formatação e contexto operacional.
 - [ ] Manter i18n aplicado desde o início, sem literais soltas em UI nova.
 - [ ] Preparar o frontend para evolução sem retrabalho grande de layout.
-- [ ] Toda decisão visual recorrente deve nascer em `src/app/globals.css`, não em `className` local de componente.
+- [ ] Toda decisão visual recorrente deve nascer no folha adequado em `src/app/styles/`, não em `className` local de componente.
 - [ ] Componentes devem expor semântica e estado; layout, superfície, borda e variantes compartilhadas devem vir de classes globais reutilizáveis.
 
 ## Decisões futuras que não bloqueiam a Fase 1

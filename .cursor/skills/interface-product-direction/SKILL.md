@@ -206,7 +206,7 @@ Diferenciais importantes:
 
 Sempre que for possível, **semântica, estrutura de markup e comportamento** devem ser definidos em **componentes reutilizáveis**, e não recriados localmente em cada tela.
 
-A **aparência, o layout recorrente e as variações visuais compartilhadas** devem ficar centralizados em `frontend/src/app/globals.css`, por meio de tokens, primitives e classes semânticas reutilizáveis.
+A **aparência, o layout recorrente e as variações visuais compartilhadas** devem ficar centralizados em `frontend/src/app/styles/`, por meio de tokens (`base.css`), primitives horizontais, componentes verticais e extensões utilitárias nos folhas correspondentes.
 
 Isto vale especialmente para:
 
@@ -233,7 +233,7 @@ Ao implementar UI nova:
 - preferir estender um componente existente antes de criar uma variação solta na página;
 - criar componente novo quando o padrão tiver potencial real de reutilização;
 - evitar copiar markup, estilos e lógica de interação entre telas;
-- concentrar comportamento e API no componente, e concentrar variantes visuais e estruturais reutilizáveis no `globals.css`;
+- concentrar comportamento e API no componente, e concentrar variantes visuais e estruturais reutilizáveis nos folhas em `frontend/src/app/styles/` (ver mapa na secção de camadas);
 - manter consistência entre estados, feedback, acessibilidade e atalhos do mesmo padrão.
 
 ## IA contextual
@@ -266,7 +266,7 @@ Evitar:
 
 - A base atual da interface deve seguir `light theme`.
 - O `light theme` não deve empurrar o produto para aparência leve demais, decorativa ou com contraste fraco.
-- A fonte única de verdade dos tokens visuais do frontend deve ficar em `frontend/src/app/globals.css`.
+- A fonte única de verdade dos tokens visuais do frontend deve ficar em `frontend/src/app/styles/base.css`, no bloco `:root` (o layout importa só esse arquivo; ele importa Tailwind e os demais folhas).
 - Tokens visuais devem ser semânticos e cobrir, no mínimo:
   - cor de `background`, `surface`, `border`, `text`, ação primária e estados semânticos;
   - `radius`;
@@ -285,17 +285,16 @@ Evitar:
 
 ### Arquitetura CSS obrigatória
 
-- Ajuste estrutural ou visual recorrente deve acontecer em `frontend/src/app/globals.css`, não dentro do JSX do componente.
+- Ajuste estrutural ou visual recorrente deve acontecer no folha adequado em `frontend/src/app/styles/`, não dentro do JSX do componente.
 - O componente deve declarar o papel semântico do elemento e seus estados; o CSS define apresentação, layout e acabamento visual.
 - Decisões como borda, ausência de borda, sombra, raio, fundo, espaçamento estrutural, largura e composição de layout não devem nascer como utilitário solto no componente quando fizerem parte do padrão da interface.
-- Se um menu precisar de borda, o padrão deve existir como classe reutilizável ou modificador em `globals.css`, por exemplo `ui-menu` com uma variação compartilhada de borda.
+- Se um menu precisar de borda, o padrão deve existir como classe reutilizável ou modificador em `vertical-semantic-component.css` (ou em `semantic-utility-extension.css` quando for extensão de composição ou breakpoint compartilhado), por exemplo `ui-menu` com uma variação compartilhada de borda.
 - O mesmo princípio vale para todos os elementos de interface: menu, painel, editor, toolbar, título, aba, card, lista, formulário e cabeçalho.
-- Organizar `globals.css` nesta ordem:
-  - tokens semânticos;
-  - primitives de layout;
-  - superfícies e bordas reutilizáveis;
-  - componentes semânticos `ui-*`;
-  - modificadores e estados compartilhados.
+- Organizar o CSS global por arquivo em `frontend/src/app/styles/`:
+  - `base.css`: `@import "tailwindcss"`, imports dos outros folhas, tokens em `:root`, reset global;
+  - `horizontal-primitive.css`: primitives horizontais, superfícies e bordas genéricas;
+  - `vertical-semantic-component.css`: componentes semânticos `ui-*` e a maior parte dos modificadores estáveis;
+  - `semantic-utility-extension.css`: extensões utilitárias, composições recorrentes e `media queries` de layout.
 - Em revisão de frontend, tratar como desvio:
   - componente com decisão visual estrutural repetível embutida em `className`;
   - mesma solução de borda, painel ou espaçamento reescrita em mais de um lugar;
@@ -303,9 +302,19 @@ Evitar:
 
 ### Convenção de camadas e nomes
 
-Usar cinco camadas estáveis em `frontend/src/app/globals.css`.
+Usar **cinco camadas conceituais** estáveis, refletidas nos folhas em `frontend/src/app/styles/`:
+
+| Camada | Onde implementar |
+|--------|-------------------|
+| 1. Tokens horizontais | `base.css` (`:root`) |
+| 2. Primitives horizontais | `horizontal-primitive.css` |
+| 3. Componentes verticais semânticos | `vertical-semantic-component.css` |
+| 4. Modificadores verticais | principalmente `vertical-semantic-component.css`; extensões de composição ou responsivo em `semantic-utility-extension.css` quando couber |
+| 5. Estados | convenção `data-*`, `aria-*`, `is-*` no arquivo onde vive o seletor do componente |
 
 #### 1. Tokens horizontais
+
+**Arquivo:** `frontend/src/app/styles/base.css` (`:root`).
 
 Guardam matéria-prima visual que pode servir a qualquer parte do produto.
 
@@ -330,6 +339,8 @@ Exemplos:
 
 #### 2. Primitives horizontais
 
+**Arquivo:** `frontend/src/app/styles/horizontal-primitive.css`.
+
 Agrupam decisões visuais reutilizáveis, ainda sem falar de um elemento específico.
 
 Padrões de nome:
@@ -351,6 +362,8 @@ Exemplos:
 - `ui-layout-two-column`
 
 #### 3. Componentes verticais semânticos
+
+**Arquivo:** `frontend/src/app/styles/vertical-semantic-component.css`.
 
 Representam elementos reais da interface. Esta é a camada que o JSX deve preferir expor.
 
@@ -376,6 +389,8 @@ Regra:
 
 #### 4. Modificadores verticais
 
+**Arquivo:** principalmente `frontend/src/app/styles/vertical-semantic-component.css`; quando o modificador for sobretudo composição ou ajuste por breakpoint compartilhado, usar `semantic-utility-extension.css`.
+
 Especializam um elemento sem quebrar sua semântica base.
 
 Padrões de nome:
@@ -395,6 +410,8 @@ Regra:
 - se a variação só existe porque um único componente foi desenhado de forma isolada, ela ainda não merece nome.
 
 #### 5. Estados
+
+**Arquivo:** o folha que contém o seletor base do componente (qualquer um dos três folhas de UI acima).
 
 Preferir atributos nativos ou semânticos quando existirem.
 

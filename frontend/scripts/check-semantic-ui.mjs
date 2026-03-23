@@ -141,7 +141,7 @@ async function main() {
   }
 
   console.error(
-    "Semantic UI check failed. Move all JSX/TSX class composition to ui-* primitives/components in globals.css."
+    "Semantic UI check failed. Move all JSX/TSX class composition to ui-* primitives/components in frontend/src/app/styles/ (see .cursor/skills/interface-product-direction/SKILL.md)."
   );
 
   for (const finding of findingList) {

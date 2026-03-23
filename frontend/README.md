@@ -28,6 +28,7 @@ O frontend foi inicializado com:
 ## Estrutura inicial
 
 - `src/app/`: rotas e layout base da aplicação;
+- `src/app/styles/`: CSS global semântico (`base.css` e folhas importadas);
 - `src/component/app-shell/`: componentes reutilizáveis da shell base;
 - `src/i18n/`: configuração inicial de locale e request;
 - `messages/`: catálogo de mensagens por locale.
@@ -35,19 +36,22 @@ O frontend foi inicializado com:
 ## Tema e tokens visuais
 
 - A base visual atual do frontend usa `light theme`.
-- A fonte única de verdade dos tokens visuais fica em `src/app/globals.css`.
-- Esse ponto central deve concentrar tokens semânticos de cor e primitives recorrentes de layout, como `radius`, borda, sombra e densidade.
-- Além dos tokens, `src/app/globals.css` deve concentrar as classes estruturais e semânticas da interface.
-- Ajustes de layout e de aspecto visual devem ser feitos em `src/app/globals.css`, não diretamente nos componentes.
+- O layout raiz importa apenas `src/app/styles/base.css`, que por sua vez importa os demais folhas em `src/app/styles/`.
+- A fonte única de verdade dos **tokens** visuais (`:root`) e do **reset** global fica em `src/app/styles/base.css` (junto com `@import "tailwindcss"`).
+- Distribuição por arquivo em `src/app/styles/`:
+  - `base.css`: entrada; Tailwind; tokens em `:root`; reset de `html`, `body` e elementos base;
+  - `horizontal-primitive.css`: primitives horizontais reutilizáveis (`ui-surface-*`, `ui-border-*`, linhas e grades genéricas, tamanhos de ícone, `@keyframes ui-pulse`, etc.);
+  - `vertical-semantic-component.css`: componentes verticais semânticos (`ui-shell`, `ui-menu`, `ui-panel`, formulários, botões, inputs, navegação, etc.);
+  - `semantic-utility-extension.css`: extensões utilitárias (`ui-stack-*`, grids compactos, composições recorrentes, `media queries` de layout).
+- Ajustes de layout e de aspecto visual recorrentes devem ir para o arquivo adequado dessa pasta, não para `className` solto no componente.
 - Componentes devem preferir consumir tokens semânticos e classes reutilizáveis `ui-*`, evitando espalhar cores estruturais, bordas, espaçamentos estruturais e primitives hardcoded por página.
 - O JSX deve indicar o papel do elemento, por exemplo `ui-menu`, `ui-panel`, `ui-title`, `ui-form-section`, e combinar apenas modificadores reutilizáveis.
-- Se houver uma variação recorrente, ela deve ganhar classe própria em `src/app/globals.css`, em vez de ser redesenhada dentro do componente.
-- Organização recomendada para `src/app/globals.css`:
-  - tokens semânticos;
-  - primitives de layout;
-  - superfícies e bordas reutilizáveis;
-  - componentes semânticos `ui-*`;
-  - modificadores e estados compartilhados.
+- Se houver uma variação recorrente, ela deve ganhar classe própria no CSS global correspondente, em vez de ser redesenhada dentro do componente.
+- Organização conceitual (espelhada nos arquivos acima):
+  - tokens semânticos e reset → `base.css`;
+  - primitives de layout e superfícies/bordas horizontais → `horizontal-primitive.css`;
+  - componentes semânticos `ui-*` e a maior parte dos modificadores estáveis → `vertical-semantic-component.css`;
+  - extensões utilitárias, composições e ajustes responsivos compartilhados → `semantic-utility-extension.css`.
 - Convenção de nomes recomendada:
   - tokens horizontais: `--color-*`, `--font-*`, `--space-*`, `--radius-*`, `--shadow-*`, `--border-width-*`, `--density-*`;
   - primitives horizontais: `ui-surface-*`, `ui-border-*`, `ui-tone-*`, `ui-layout-*`, `ui-density-*`;

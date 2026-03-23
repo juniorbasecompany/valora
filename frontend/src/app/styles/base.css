@@ -1,0 +1,291 @@
+@import "tailwindcss";
+@import "./horizontal-primitive.css";
+@import "./vertical-semantic-component.css";
+@import "./semantic-utility-extension.css";
+
+:root {
+    color-scheme: light;
+    --font-sans: "Segoe UI Variable Text", "Aptos", "Segoe UI", sans-serif;
+    --font-display: "Segoe UI Variable Display", "Aptos Display", "Segoe UI",
+        sans-serif;
+
+    --color-background: #edf3f8;
+    --color-background-muted: #f5f8fc;
+    --color-surface: rgba(255, 255, 255, 0.96);
+    --color-surface-muted: #f8fbfe;
+    --color-surface-strong: #dfe8f2;
+    --color-surface-overlay: rgba(255, 255, 255, 0.8);
+    --color-border: #d5e0eb;
+    --color-border-strong: #b2c4d7;
+    --color-text: #132033;
+    --color-text-muted: #324560;
+    --color-text-subtle: #67778e;
+    --color-primary: #123d69;
+    --color-primary-hover: #10385d;
+    --color-primary-foreground: #ffffff;
+    --color-secondary-action: #748292;
+    --color-secondary-action-hover: #647181;
+    --color-secondary-action-foreground: #ffffff;
+    --color-accent: #2575d8;
+    --color-accent-strong: #0f549f;
+    --color-accent-soft: #e8f1ff;
+    --color-focus-ring: #2575d8;
+    --shadow-focus-ring: 0 0 0 4px rgba(37, 117, 216, 0.14);
+
+    --color-attention-surface: #fff6e5;
+    --color-attention-border: #efc572;
+    --color-attention-text: #8b5a09;
+    --color-positive-surface: #e9f8ef;
+    --color-positive-border: #8ad0a2;
+    --color-positive-text: #1b6a42;
+    --color-danger-action: #cf5b54;
+    --color-danger-action-hover: #bb4a43;
+    --color-danger-action-foreground: #ffffff;
+    --color-danger-surface: #fff0ef;
+    --color-danger-surface-hover: #ffe4e2;
+    --color-danger-border: #f0b0ac;
+    --color-danger-border-strong: #d14b43;
+    --color-danger-text: #9f2f2b;
+    --color-construction-surface: #fff7ea;
+    --color-construction-border: #e8bd6a;
+    --color-construction-text: #8e5f10;
+
+    --radius-control: 0;
+    --radius-card: 0;
+    --radius-panel: 0;
+    --radius-shell: 0;
+    --radius-indicator: 999px;
+    --radius-skeleton-line: 0.5rem;
+    --radius-skeleton-pill: 0.85rem;
+    --radius-skeleton-tile: 1rem;
+
+    --border-width-default: 1px;
+    --border-width-strong: 1.5px;
+    --border-width-emphasis: 2px;
+
+    --shadow-xs: 0 1px 2px rgba(19, 32, 51, 0.04), 0 10px 22px rgba(19, 32, 51, 0.04);
+    --shadow-sm: 0 18px 40px rgba(19, 32, 51, 0.08);
+    --shadow-md: 0 28px 64px rgba(19, 32, 51, 0.14);
+    --shadow-lg: 0 40px 90px rgba(19, 32, 51, 0.18);
+
+    --space-section: 1.75rem;
+    --space-card: 1.35rem;
+    --space-panel: 1.75rem;
+    --space-control-x: 1rem;
+    --space-control-y: 0.82rem;
+    --space-directory-indent-step: 1.1rem;
+    --density-control-min-height: 2.75rem;
+
+    --measure-copy: 40rem;
+    --measure-copy-wide: 48rem;
+    --measure-copy-hero: 42rem;
+    --measure-auth-layout: 80rem;
+    --measure-auth-google-slot: min(100%, 340px);
+    --measure-shell-workspace: 14rem;
+    --measure-menu-inline-label: 13.5rem;
+    --measure-account-name-sidebar: 10rem;
+    --measure-page-header-side: 20rem;
+
+    --layout-shell-max-width: 112rem;
+    --layout-sidebar-width: 19.5rem;
+    --layout-drawer-width: min(var(--layout-sidebar-width), calc(100vw - 1rem));
+    --layout-menu-max-width: min(calc(100vw - 3rem), 22rem);
+    --layout-menu-max-width-narrow: min(calc(100vw - 3rem), 18rem);
+    --layout-menu-max-width-compact: min(calc(100vw - 4rem), 17rem);
+
+    --offset-menu-default: calc(100% + 0.375rem);
+    --offset-menu-sidebar: calc(100% + 0.625rem);
+
+    --blur-overlay-strong: 18px;
+    --blur-overlay-medium: 16px;
+    --blur-overlay-soft: 3px;
+    --blur-glow-strong: 32px;
+
+    --z-base: 0;
+    --z-content: 10;
+    --z-shell-header: 20;
+    --z-shell-footer: 30;
+    --z-menu-floating: 40;
+    --z-mobile-anchor: 50;
+    --z-menu-overlay: 70;
+    --z-menu-context: 80;
+    --z-menu-panel: 100;
+    --z-drawer: 120;
+
+    --color-selection-surface: rgba(37, 117, 216, 0.16);
+    --color-accent-border-subtle: rgba(37, 117, 216, 0.12);
+    --color-accent-border-soft: rgba(37, 117, 216, 0.14);
+    --color-accent-border-default: rgba(37, 117, 216, 0.16);
+    --color-accent-border-strong: rgba(37, 117, 216, 0.18);
+    --color-accent-border-active: rgba(37, 117, 216, 0.22);
+    --color-accent-border-focus: rgba(37, 117, 216, 0.38);
+    --color-accent-border-flash: rgba(37, 117, 216, 0.46);
+    --color-accent-surface-soft: rgba(232, 241, 255, 0.45);
+    --color-accent-surface-muted: rgba(232, 241, 255, 0.55);
+    --color-accent-surface-default: rgba(232, 241, 255, 0.65);
+    --color-accent-surface-strong: rgba(232, 241, 255, 0.75);
+    --color-accent-drop-slot: rgb(from var(--color-accent) r g b / 0.7);
+    --color-accent-hover-border: rgb(from var(--color-accent) r g b / 0.28);
+    --color-accent-hover-surface: rgb(from var(--color-accent-soft) r g b / 0.45);
+    --color-construction-border-strong: rgba(232, 189, 106, 0.72);
+    --color-danger-focus-ring-soft: rgba(209, 75, 67, 0.08);
+    --color-surface-glass-soft: rgba(255, 255, 255, 0.72);
+    --color-surface-glass-strong: rgba(255, 255, 255, 0.8);
+    --color-surface-glass-stronger: rgba(255, 255, 255, 0.82);
+    --color-shell-topbar-surface: rgba(245, 248, 252, 0.72);
+    --color-shell-footer-surface: rgba(245, 248, 252, 0.78);
+    --color-auth-google-skeleton: rgb(from var(--color-border) r g b / 0.25);
+    --color-auth-remember-surface: rgb(from var(--color-background-muted) r g b / 0.7);
+    --color-shadow-outline: rgba(19, 32, 51, 0.03);
+    --color-accent-border-emphasis: rgba(37, 117, 216, 0.2);
+    --color-construction-border-default: rgba(232, 189, 106, 0.6);
+    --color-construction-border-soft: rgba(232, 189, 106, 0.45);
+    --color-danger-border-soft: rgba(209, 75, 67, 0.2);
+    --color-editor-flash-shadow: rgba(15, 23, 42, 0.12);
+    --color-hover-border: rgba(178, 196, 215, 0.7);
+    --color-overlay-scrim: rgba(19, 32, 51, 0.38);
+    --color-positive-border-soft: rgba(138, 208, 162, 0.5);
+    --color-surface-glass: rgba(255, 255, 255, 0.7);
+    --color-surface-glass-frame: rgba(255, 255, 255, 0.85);
+    --color-surface-glass-muted: rgba(255, 255, 255, 0.75);
+    --color-surface-glass-panel: rgba(255, 255, 255, 0.88);
+
+    --shadow-surface-inset: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    --shadow-shell-topbar:
+        0 1px 0 rgba(255, 255, 255, 0.8),
+        0 16px 40px rgba(19, 32, 51, 0.06);
+    --shadow-shell-footer:
+        0 -1px 0 rgba(255, 255, 255, 0.82),
+        0 -16px 40px rgba(19, 32, 51, 0.06);
+    --shadow-focus-ring-danger: 0 0 0 4px var(--color-danger-focus-ring-soft);
+    --shadow-status-dot-ring: 0 0 0 4px var(--color-accent-border-subtle);
+    --shadow-editor-flash:
+        0 0 0 6px var(--color-accent-border-strong),
+        0 22px 48px var(--color-editor-flash-shadow);
+    --shadow-menu-panel:
+        var(--shadow-md),
+        0 0 0 1px var(--color-shadow-outline);
+
+    --gradient-app-background:
+        radial-gradient(circle at top left, rgba(37, 117, 216, 0.14), transparent 28rem),
+        radial-gradient(circle at top right, rgba(30, 135, 120, 0.1), transparent 30rem),
+        linear-gradient(180deg, #f5f8fc 0%, #edf3f8 40%, #eef3f7 100%);
+    --gradient-app-grid:
+        linear-gradient(rgba(255, 255, 255, 0.72) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.72) 1px, transparent 1px);
+    --gradient-surface-default: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.95));
+    --gradient-surface-card: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 252, 255, 0.94));
+    --gradient-surface-construction: linear-gradient(180deg, rgba(255, 247, 232, 0.95), rgba(255, 241, 213, 0.9));
+    --gradient-surface-sidebar-glow:
+        linear-gradient(180deg, rgba(37, 117, 216, 0.06), transparent 22%),
+        radial-gradient(circle at left top, rgba(232, 189, 106, 0.12), transparent 18rem);
+    --gradient-surface-panel-line:
+        linear-gradient(90deg,
+            rgba(37, 117, 216, 0.18),
+            rgba(255, 255, 255, 0.7),
+            rgba(30, 135, 120, 0.08));
+    --gradient-surface-card-soon: linear-gradient(180deg, rgba(255, 247, 234, 0.92), rgba(255, 255, 255, 0.98));
+    --gradient-surface-card-stripe:
+        repeating-linear-gradient(135deg,
+            rgba(232, 189, 106, 0.12),
+            rgba(232, 189, 106, 0.12) 12px,
+            transparent 12px,
+            transparent 24px);
+    --gradient-surface-topbar-chip: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(236, 243, 252, 0.94));
+    --gradient-surface-menu-trigger-active: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(239, 245, 251, 0.98));
+    --gradient-surface-nav-soon: linear-gradient(180deg, rgba(255, 247, 232, 0.84), rgba(255, 255, 255, 0.96));
+    --gradient-surface-input: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(248, 251, 255, 0.98));
+    --gradient-surface-input-disabled: linear-gradient(180deg, rgba(246, 248, 251, 0.98), rgba(239, 244, 249, 0.96));
+    --gradient-tone-neutral: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(237, 244, 252, 0.9));
+    --gradient-tone-attention: linear-gradient(180deg, rgba(255, 255, 255, 0.94), var(--color-attention-surface));
+    --gradient-tone-positive: linear-gradient(180deg, rgba(255, 255, 255, 0.94), var(--color-positive-surface));
+    --gradient-tone-danger: linear-gradient(180deg, rgba(255, 255, 255, 0.94), var(--color-danger-surface));
+    --gradient-tone-construction: linear-gradient(180deg, rgba(255, 255, 255, 0.94), var(--color-construction-surface));
+    --gradient-surface-attention-soft: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 246, 229, 0.96));
+    --gradient-surface-positive-soft: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(233, 248, 239, 0.96));
+    --gradient-surface-construction-soft: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 247, 234, 0.96));
+    --gradient-surface-avatar: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(232, 241, 255, 0.98));
+    --gradient-surface-icon-badge: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(232, 241, 255, 0.96));
+    --gradient-surface-muted: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(243, 247, 252, 0.94));
+    --gradient-surface-accent: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(232, 241, 255, 0.98));
+    --gradient-accent-emphasis: linear-gradient(180deg, var(--color-accent), var(--color-accent-strong));
+    --gradient-editor-flash-fill:
+        linear-gradient(180deg,
+            rgba(37, 117, 216, 0.18),
+            rgba(37, 117, 216, 0.07) 45%,
+            rgba(37, 117, 216, 0.01) 100%);
+    --gradient-surface-badge: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(243, 247, 251, 0.96));
+    --gradient-surface-badge-neutral: var(--gradient-tone-neutral);
+    --gradient-surface-brandmark: linear-gradient(180deg, #4f8eea 0%, #2b63bb 100%);
+    --gradient-surface-context: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(237, 244, 252, 0.92));
+    --gradient-surface-delete-pending: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 240, 239, 0.92));
+    --gradient-surface-header-glow: radial-gradient(circle, rgba(37, 117, 216, 0.22), transparent 68%);
+    --gradient-surface-menu-panel: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 250, 253, 0.98));
+    --gradient-surface-menu-trigger-base: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 249, 252, 0.96));
+    --gradient-surface-preview: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 249, 253, 0.95));
+    --gradient-surface-preview-glow: radial-gradient(circle at top right, rgba(37, 117, 216, 0.18), transparent 70%);
+    --gradient-surface-sidebar: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(247, 250, 253, 0.92));
+    --gradient-surface-skeleton:
+        linear-gradient(90deg, rgba(223, 232, 242, 0.9), rgba(243, 247, 252, 0.95), rgba(223, 232, 242, 0.9));
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    min-height: 100%;
+}
+
+body {
+    position: relative;
+    margin: 0;
+    background: var(--gradient-app-background);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: var(--gradient-app-grid);
+    background-size: 44px 44px;
+    opacity: 0.18;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+svg {
+    display: block;
+}
+
+::selection {
+    background: var(--color-selection-surface);
+}
+
+:focus-visible {
+    outline: none;
+}
+

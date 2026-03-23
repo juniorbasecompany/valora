@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
-import "./globals.css";
+import "./styles/base.css";
 
 export const metadata: Metadata = {
   title: "Valora",

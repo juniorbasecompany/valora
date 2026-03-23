@@ -17,7 +17,6 @@ type LocaleFlagMenuCopy = {
   triggerAriaLabel: string;
   menuAriaLabel: string;
   switchingLocale: string;
-  activeLabel: string;
 };
 
 type LocaleFlagMenuProps = {
@@ -104,14 +103,14 @@ export function LocaleFlagMenu({
   }
 
   const optionClass = (isActive: boolean) =>
-    `ui-menu-item inline-flex max-w-full self-start items-center gap-3 px-3 py-2 text-left text-sm ${
+    `ui-menu-item appearance-none self-stretch whitespace-nowrap rounded-none border-0 shadow-none inline-flex items-center justify-start px-4 py-2.5 text-left text-sm ${
       isActive ? "ui-menu-item-active" : ""
     }`;
 
   const panelClassName =
     placement === "sidebar"
-      ? "ui-menu-panel absolute left-0 top-[calc(100%+0.625rem)] z-[70] flex w-max max-w-[min(calc(100vw-4rem),17rem)] flex-col gap-0 overflow-hidden p-2"
-      : "ui-menu-panel absolute right-0 top-[calc(100%+0.375rem)] z-40 flex w-max max-w-[min(calc(100vw-2rem),22rem)] flex-col gap-0 overflow-hidden p-2";
+      ? "ui-menu-panel absolute left-0 top-[calc(100%+0.625rem)] z-[70] inline-flex w-auto max-w-[min(calc(100vw-4rem),17rem)] flex-col gap-0 overflow-hidden rounded-none p-0"
+      : "ui-menu-panel absolute right-0 top-[calc(100%+0.375rem)] z-40 inline-flex w-auto max-w-[min(calc(100vw-2rem),22rem)] flex-col gap-0 overflow-hidden rounded-none p-0";
 
   return (
     <div
@@ -128,7 +127,7 @@ export function LocaleFlagMenu({
         className={`inline-flex shrink-0 items-center justify-center ${
           isSidebar
             ? "h-auto w-auto rounded-none border-0 bg-transparent p-0 shadow-none"
-            : "ui-menu-trigger h-9 w-9 rounded-[var(--radius-control)]"
+            : "ui-menu-trigger h-9 w-9 rounded-none"
         }`}
       >
         <LocaleFlagSvg locale={currentLocale} size="trigger" />
@@ -141,14 +140,14 @@ export function LocaleFlagMenu({
           className={panelClassName}
         >
           {switchingLocale ? (
-            <div className="mb-1 flex justify-end px-1">
+            <div className="flex justify-end px-4 py-2.5">
               <span className="text-xs text-[var(--color-text-subtle)]">
                 {copy.switchingLocale}
               </span>
             </div>
           ) : null}
 
-          <div className="flex flex-col items-start gap-0.5">
+          <div className="inline-flex flex-col items-stretch self-start gap-0">
             {localeList.map((locale) => {
               const isActive = locale === currentLocale;
               const localeLabel = localeLabelMap[locale] || locale;
@@ -162,13 +161,7 @@ export function LocaleFlagMenu({
                   disabled={switchingLocale !== null}
                   className={optionClass(isActive)}
                 >
-                  <span className="flex min-w-0 items-center gap-2 truncate">
-                    <LocaleFlagSvg locale={locale} size="menu" />
-                    <span className="truncate">{localeLabel}</span>
-                  </span>
-                  {isActive ? (
-                    <span className="ui-menu-badge">{copy.activeLabel}</span>
-                  ) : null}
+                  <span className="min-w-0 truncate">{localeLabel}</span>
                 </button>
               );
             })}

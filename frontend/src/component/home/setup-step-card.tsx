@@ -54,9 +54,9 @@ export function SetupStepCard({
               {title}
             </h3>
             <span
-              className={`ui-pill px-2.5 py-1 text-[11px] font-semibold ${
+              className={`ui-badge px-2.5 py-1 text-[11px] font-semibold ${
                 isPlanned && tone === "neutral"
-                  ? "ui-pill-construction"
+                  ? "ui-badge-construction"
                   : toneClassNameByTone[tone]
               }`}
             >

@@ -91,7 +91,7 @@
       "title": "O que fazer agora",
       "description": "Use estes atalhos para seguir o fluxo mais curto da primeira entrega útil.",
       "configuration": {
-        "title": "Abrir Configuração",
+        "title": "Abrir configuração",
         "description": "Entre na área que concentrará os cadastros iniciais de licenciado, membros e escopo.",
         "action": "Ir para Configuração"
       },
@@ -155,6 +155,40 @@
       }
     }
   },
+  "ModulePlaceholderPage": {
+    "eyebrow": "Módulo",
+    "description": "{module} já está ligado à navegação principal e usa esta tela provisória até a primeira entrega funcional do fluxo.",
+    "status": {
+      "title": "Destino navegável disponível",
+      "description": "Esta página permite validar navegação, estado ativo do menu e evolução incremental do módulo."
+    },
+    "cards": {
+      "entry": {
+        "title": "Entrada já conectada",
+        "description": "{module} agora tem URL própria, item ativo na navegação lateral e placeholder clicável para revisão do fluxo."
+      },
+      "state": {
+        "title": "Comportamento visual alinhado",
+        "description": "Hover, seleção e barra lateral seguem o mesmo padrão visual dos demais menus da aplicação."
+      },
+      "next": {
+        "title": "Próxima evolução",
+        "description": "A próxima entrega deste módulo pode substituir este placeholder pela primeira rotina real sem refazer a navegação global."
+      }
+    },
+    "actions": {
+      "home": {
+        "title": "Voltar para o ponto de entrada",
+        "description": "Retorne ao início para revisar o contexto atual e os próximos passos da configuração inicial.",
+        "label": "Ir para Início"
+      },
+      "configuration": {
+        "title": "Abrir Configuração",
+        "description": "Continue pela área administrativa enquanto os fluxos funcionais deste módulo ainda estão em evolução.",
+        "label": "Ir para Configuração"
+      }
+    }
+  },
   "MemberConfigurationPage": {
     "eyebrow": "Configuração",
     "title": "Membros",
@@ -163,11 +197,6 @@
       "title": "Edição de membros",
       "description": "As alterações afetam apenas o licenciado ativo da sua sessão. O email segue como referência de acesso do vínculo."
     },
-    "tab": {
-      "general": "Geral",
-      "history": "Histórico",
-      "listAriaLabel": "Seções das configurações de membros"
-    },
     "list": {
       "title": "Diretório do licenciado",
       "description": "Selecione um membro para revisar ou atualizar o cadastro.",
@@ -175,7 +204,7 @@
     },
     "history": {
       "title": "Histórico de alterações",
-      "description": "Uma linha do tempo das alterações de cadastro aparecerá aqui quando a auditoria do diretório estiver disponível. Até lá, esta aba permanece como referência de layout e rastreabilidade."
+      "description": "Uma linha do tempo das alterações de cadastro aparecerá aqui quando a auditoria do diretório estiver disponível. Até lá, este bloco permanece como referência de layout e rastreabilidade."
     },
     "section": {
       "profile": {
@@ -239,11 +268,6 @@
       "title": "Edição de escopos",
       "description": "As alterações afetam apenas o licenciado ativo da sua sessão. Use este diretório para criar, revisar e manter os escopos estruturais."
     },
-    "tab": {
-      "general": "Geral",
-      "history": "Histórico",
-      "listAriaLabel": "Seções das configurações de escopo"
-    },
     "list": {
       "title": "Diretório de escopos",
       "description": "Selecione um escopo para revisar ou atualizar o cadastro estrutural.",
@@ -251,7 +275,7 @@
     },
     "history": {
       "title": "Histórico de alterações",
-      "description": "Uma linha do tempo das alterações de escopo aparecerá aqui quando a auditoria estrutural estiver disponível. Até lá, esta aba permanece como referência de layout e rastreabilidade."
+      "description": "Uma linha do tempo das alterações de escopo aparecerá aqui quando a auditoria estrutural estiver disponível. Até lá, este bloco permanece como referência de layout e rastreabilidade."
     },
     "section": {
       "identity": {
@@ -357,14 +381,9 @@
       "title": "Edição do licenciado",
       "description": "As atualizações são salvas para o licenciado ativo. Troque de licenciado pelo seletor do cabeçalho se precisar de outro contexto."
     },
-    "tab": {
-      "general": "Geral",
-      "history": "Histórico",
-      "listAriaLabel": "Seções das configurações do licenciado"
-    },
     "history": {
       "title": "Histórico de alterações",
-      "description": "Uma linha do tempo de quem alterou o quê aparecerá aqui quando a API de auditoria estiver disponível. Até lá, use esta aba como espaço reservado para rastreabilidade ao lado do formulário."
+      "description": "Uma linha do tempo de quem alterou o quê aparecerá aqui quando a API de auditoria estiver disponível. Até lá, este bloco permanece como referência de layout e rastreabilidade ao lado do formulário."
     },
     "section": {
       "display": {

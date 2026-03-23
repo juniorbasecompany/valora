@@ -180,6 +180,18 @@ svg {
   scrollbar-gutter: stable both-edges;
 }
 
+@media (min-width: 1024px) {
+  .ui-panel.ui-editor-panel-sticky {
+    position: sticky;
+    top: 2rem;
+    align-self: start;
+    max-height: calc(100dvh - 7rem);
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+  }
+}
+
 .ui-panel {
   position: relative;
   overflow: hidden;

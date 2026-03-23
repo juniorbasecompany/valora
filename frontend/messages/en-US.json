@@ -91,7 +91,7 @@
       "title": "What to do now",
       "description": "Use these shortcuts to follow the shortest path toward the first useful delivery.",
       "configuration": {
-        "title": "Open Configuration",
+        "title": "Open configuration",
         "description": "Go to the area that will concentrate the initial tenant, member, and scope records.",
         "action": "Go to Configuration"
       },
@@ -155,6 +155,40 @@
       }
     }
   },
+  "ModulePlaceholderPage": {
+    "eyebrow": "Module",
+    "description": "{module} is already connected to the main navigation and uses this placeholder screen until the first functional flow is delivered.",
+    "status": {
+      "title": "Navigable destination available",
+      "description": "This page is enough to validate navigation, active menu state, and incremental rollout of the module."
+    },
+    "cards": {
+      "entry": {
+        "title": "Entry point already connected",
+        "description": "{module} now has its own URL, active sidebar item, and a clickable placeholder for flow review."
+      },
+      "state": {
+        "title": "Visual behavior aligned",
+        "description": "Hover, selected state, and the left indicator follow the same visual rules used by the other menus in the application."
+      },
+      "next": {
+        "title": "Next evolution",
+        "description": "The next delivery for this module can replace this placeholder with the first real workflow without rebuilding global navigation."
+      }
+    },
+    "actions": {
+      "home": {
+        "title": "Return to the entry point",
+        "description": "Go back to Home to review the current context and the next steps for the initial setup.",
+        "label": "Go to Home"
+      },
+      "configuration": {
+        "title": "Open Configuration",
+        "description": "Keep moving through the administrative area while this module's functional flows are still evolving.",
+        "label": "Go to Configuration"
+      }
+    }
+  },
   "MemberConfigurationPage": {
     "eyebrow": "Configuration",
     "title": "Members",
@@ -163,11 +197,6 @@
       "title": "Editing members",
       "description": "Changes only affect the active tenant in your session. Email remains the access reference for the relationship."
     },
-    "tab": {
-      "general": "General",
-      "history": "History",
-      "listAriaLabel": "Member settings sections"
-    },
     "list": {
       "title": "Tenant directory",
       "description": "Select a member to review or update the record.",
@@ -175,7 +204,7 @@
     },
     "history": {
       "title": "Change history",
-      "description": "A timeline of record changes will appear here when directory auditing is available. Until then, this tab stays as a layout and traceability placeholder."
+      "description": "A timeline of record changes will appear here when directory auditing is available. Until then, this block stays as a layout and traceability placeholder."
     },
     "section": {
       "profile": {
@@ -239,11 +268,6 @@
       "title": "Editing scopes",
       "description": "Changes only affect the active tenant in your session. Use this directory to create, review, and maintain structural scopes."
     },
-    "tab": {
-      "general": "General",
-      "history": "History",
-      "listAriaLabel": "Scope settings sections"
-    },
     "list": {
       "title": "Scope directory",
       "description": "Select a scope to review or update the structural record.",
@@ -251,7 +275,7 @@
     },
     "history": {
       "title": "Change history",
-      "description": "A timeline of scope changes will appear here when structural auditing is available. Until then, this tab stays as a layout and traceability placeholder."
+      "description": "A timeline of scope changes will appear here when structural auditing is available. Until then, this block stays as a layout and traceability placeholder."
     },
     "section": {
       "identity": {
@@ -357,14 +381,9 @@
       "title": "Editing tenant",
       "description": "Updates are saved for the active tenant. Switch tenant from the header selector if you need another context."
     },
-    "tab": {
-      "general": "General",
-      "history": "History",
-      "listAriaLabel": "Tenant settings sections"
-    },
     "history": {
       "title": "Change history",
-      "description": "A timeline of who changed what will appear here when the audit API is available. Until then, use this tab as the reserved space for traceability next to the form."
+      "description": "A timeline of who changed what will appear here when the audit API is available. Until then, this block remains the reserved space for layout and traceability next to the form."
     },
     "section": {
       "display": {

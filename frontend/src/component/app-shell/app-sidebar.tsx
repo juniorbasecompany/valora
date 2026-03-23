@@ -9,8 +9,7 @@ import { NavigationIcon, ValoraMark } from "@/component/ui/ui-icons";
 type NavigationItem = {
   key: string;
   label: string;
-  href?: string;
-  statusLabel?: string;
+  href: string;
 };
 
 type NavigationIconKind =
@@ -85,72 +84,37 @@ export function AppSidebar({
         </div>
       </div>
 
-      <nav className="relative z-0 flex flex-1 flex-col gap-2 overflow-y-auto px-3 py-5">
+      <nav className="relative z-0 flex flex-1 flex-col gap-0 overflow-y-auto px-0 py-0">
         {navigationItemList.map((navigationItem) => {
-          const isPlanned = !navigationItem.href;
           const navigationIconKind = navigationItem.key as NavigationIconKind;
-          const content = (
-            <>
-              <span className="flex min-w-0 items-center gap-3">
-                <span
-                  className={`ui-icon-badge h-10 w-10 rounded-[0.72rem] ${
-                    isPlanned
-                      ? "ui-icon-badge-construction"
-                      : ""
-                  }`}
-                >
-                  <NavigationIcon
-                    kind={navigationIconKind}
-                    className="h-[1.05rem] w-[1.05rem]"
-                  />
-                </span>
-                <span className="min-w-0 truncate text-sm font-medium">
-                  {navigationItem.label}
-                </span>
-              </span>
-              {navigationItem.statusLabel ? (
-                <span
-                  className={`ui-pill px-2.5 py-1 text-[11px] font-semibold ${
-                    isPlanned
-                      ? "ui-pill-construction"
-                      : ""
-                  }`}
-                >
-                  {navigationItem.statusLabel}
-                </span>
-              ) : null}
-            </>
-          );
-
-          if (navigationItem.href) {
-            const isActive =
-              pathname === navigationItem.href ||
-              (navigationItem.href !== "/" &&
-                pathname.startsWith(`${navigationItem.href}/`));
-
-            return (
-              <Link
-                key={navigationItem.key}
-                href={navigationItem.href}
-                onClick={onNavigate}
-                className={`ui-nav-item flex items-center justify-between gap-3 px-3 py-3 text-sm ${
-                  isActive
-                    ? "ui-nav-item-active"
-                    : ""
-                }`}
-              >
-                {content}
-              </Link>
-            );
-          }
+          const isHomeItem = navigationItem.key === "home";
+          const isActive = isHomeItem
+            ? pathname === navigationItem.href
+            : pathname === navigationItem.href ||
+              pathname.startsWith(`${navigationItem.href}/`);
 
           return (
-            <div
+            <Link
               key={navigationItem.key}
-              className="ui-nav-item ui-nav-item-coming-soon ui-nav-item-muted flex items-center justify-between gap-3 px-3 py-3 text-sm"
+              href={navigationItem.href}
+              aria-current={isActive ? "page" : undefined}
+              onClick={onNavigate}
+              className={`ui-nav-item rounded-none border-0 shadow-none flex items-center gap-3 px-4 py-2.5 text-sm ${
+                isActive
+                  ? "ui-nav-item-active"
+                  : ""
+              }`}
             >
-              {content}
-            </div>
+              <span className="ui-nav-item-icon">
+                <NavigationIcon
+                  kind={navigationIconKind}
+                  className="h-[1.1rem] w-[1.1rem]"
+                />
+              </span>
+              <span className="min-w-0 truncate text-sm">
+                {navigationItem.label}
+              </span>
+            </Link>
           );
         })}
       </nav>

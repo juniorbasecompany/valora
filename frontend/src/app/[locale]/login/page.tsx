@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { GoogleSignInPanel } from "@/component/auth/google-sign-in-panel";
 import { LoginLocaleBar } from "@/component/i18n/login-locale-bar";
+import { Badge } from "@/component/ui/badge";
 import {
   AuditIcon,
   SparkIcon,
@@ -48,9 +49,9 @@ export default async function LoginPage({
             <div className="rounded-[1.35rem] border border-[rgba(37,117,216,0.12)] bg-white/85 p-1.5 shadow-[var(--shadow-xs)]">
               <ValoraMark />
             </div>
-            <span className="ui-pill inline-flex w-fit px-3 py-1.5 text-xs font-semibold tracking-[0.08em] text-[var(--color-accent-strong)]">
+            <Badge>
               {t("eyebrow")}
-            </span>
+            </Badge>
           </div>
 
           <div className="space-y-4">

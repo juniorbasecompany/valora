@@ -16,7 +16,6 @@ type AccountMenuCopy = {
   localeFlagMenuAriaLabel: string;
   configurationLabel: string;
   switchingLocale: string;
-  activeLabel: string;
   signOutLabel: string;
   signOutPendingLabel: string;
 };
@@ -126,8 +125,8 @@ export function AccountMenu({
 
   const panelClassName =
     placement === "sidebar"
-      ? "ui-menu-panel absolute left-0 top-[calc(100%+0.375rem)] z-40 flex w-max max-w-[min(calc(100vw-3rem),18rem)] flex-col gap-0 overflow-hidden p-2"
-      : "ui-menu-panel absolute left-0 top-[calc(100%+0.375rem)] flex w-max max-w-[min(calc(100vw-3rem),18rem)] flex-col gap-0 overflow-hidden p-2";
+      ? "ui-menu-panel absolute left-0 top-[calc(100%+0.375rem)] z-40 inline-flex w-auto max-w-[min(calc(100vw-3rem),18rem)] flex-col gap-0 overflow-hidden rounded-none p-0"
+      : "ui-menu-panel absolute left-0 top-[calc(100%+0.375rem)] inline-flex w-auto max-w-[min(calc(100vw-3rem),18rem)] flex-col gap-0 overflow-hidden rounded-none p-0";
 
   return (
     <div ref={containerRef} className="relative isolate w-full max-w-full">
@@ -148,7 +147,7 @@ export function AccountMenu({
             className={`inline-flex min-w-0 items-center text-sm font-medium text-[var(--color-text)] ${
               isSidebar
                 ? "w-auto max-w-full gap-1 rounded-none border-0 bg-transparent px-0 py-0 shadow-none leading-none transition-colors duration-150 hover:text-[var(--color-primary)] focus-visible:text-[var(--color-primary)]"
-                : "w-full ui-menu-trigger gap-3 rounded-[var(--radius-control)] pl-2 pr-2.5 sm:pl-2.5 sm:pr-3"
+                : "w-full ui-menu-trigger gap-3 rounded-none pl-2 pr-2.5 sm:pl-2.5 sm:pr-3"
             }`}
           >
             {!isSidebar ? (
@@ -176,12 +175,12 @@ export function AccountMenu({
 
           {isAccountMenuOpen ? (
             <div role="menu" aria-label={accountName} className={panelClassName}>
-              <div className="flex flex-col items-start gap-0.5">
+              <div className="inline-flex flex-col items-stretch self-start gap-0">
                 <Link
                   href={configurationHref}
                   role="menuitem"
                   onClick={() => setActiveMenu(null)}
-                  className="ui-menu-item inline-flex max-w-full self-start items-center rounded-[var(--radius-control)] px-3 py-2 text-sm font-medium text-[var(--color-text)]"
+                  className="ui-menu-item self-stretch whitespace-nowrap rounded-none border-0 shadow-none inline-flex items-center px-4 py-2.5 text-sm font-medium text-[var(--color-text)]"
                 >
                   {copy.configurationLabel}
                 </Link>
@@ -191,7 +190,7 @@ export function AccountMenu({
                   role="menuitem"
                   onClick={() => void handleSignOut()}
                   disabled={isSigningOut}
-                  className="ui-menu-item ui-menu-sign-out inline-flex max-w-full self-start items-center rounded-[var(--radius-control)] px-3 py-2 text-left text-sm font-medium disabled:opacity-60"
+                  className="ui-menu-item ui-menu-sign-out appearance-none self-stretch whitespace-nowrap rounded-none border-0 shadow-none inline-flex items-center px-4 py-2.5 text-left text-sm font-medium disabled:opacity-60"
                 >
                   {isSigningOut
                     ? copy.signOutPendingLabel
@@ -203,7 +202,7 @@ export function AccountMenu({
         </div>
 
         <div
-          className={`${isSidebar ? "order-1 shrink-0 self-center" : "order-2 shrink-0"}`}
+          className={`${isSidebar ? "order-1 shrink-0 self-end" : "order-2 shrink-0"}`}
         >
           <LocaleFlagMenu
             key={currentLocale}
@@ -222,8 +221,7 @@ export function AccountMenu({
             copy={{
               triggerAriaLabel: copy.localeFlagTriggerAriaLabel,
               menuAriaLabel: copy.localeFlagMenuAriaLabel,
-              switchingLocale: copy.switchingLocale,
-              activeLabel: copy.activeLabel
+              switchingLocale: copy.switchingLocale
             }}
           />
         </div>

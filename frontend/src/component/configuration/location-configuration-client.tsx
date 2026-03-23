@@ -731,7 +731,7 @@ export function LocationConfigurationClient({
         </aside>
           <div
             ref={editorPanelRef}
-            className={`ui-panel relative isolate flex flex-col gap-6 px-6 py-6 scroll-mt-24 sm:scroll-mt-28 lg:scroll-mt-0 ${
+            className={`ui-panel ui-scroll-stable ui-editor-panel-sticky relative isolate flex flex-col gap-6 px-6 py-6 scroll-mt-24 sm:scroll-mt-28 lg:scroll-mt-0 ${
               isDeletePending ? "ui-delete-pending" : ""
             }`}
           >

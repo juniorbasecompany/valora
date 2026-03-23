@@ -23,7 +23,6 @@ type WorkspaceContextMenuCopy = {
   scopeListError: string;
   emptyScopeList: string;
   switchingScope: string;
-  activeLabel: string;
   noScopeLabel: string;
 };
 
@@ -275,7 +274,7 @@ export function WorkspaceContextMenu({
   }
 
   const optionClass = (isActive: boolean) =>
-    `ui-menu-item inline-flex max-w-full self-start items-center gap-3 px-3 py-2 text-left text-sm ${
+    `ui-menu-item appearance-none self-stretch whitespace-nowrap rounded-none border-0 shadow-none inline-flex items-center justify-start px-4 py-2.5 text-left text-sm ${
       isActive ? "ui-menu-item-active" : ""
     }`;
 
@@ -311,10 +310,10 @@ export function WorkspaceContextMenu({
             <div
               role="menu"
               aria-label={copy.tenantMenuAriaLabel}
-              className="ui-menu-panel absolute left-0 top-[calc(100%+0.375rem)] z-[80] flex w-max max-w-[min(calc(100vw-3rem),22rem)] flex-col gap-0 overflow-hidden p-2"
+              className="ui-menu-panel absolute left-0 top-[calc(100%+0.375rem)] z-[80] inline-flex w-auto max-w-[min(calc(100vw-3rem),22rem)] flex-col gap-0 overflow-hidden rounded-none p-0"
             >
               {isLoadingTenantList || switchingTenantId !== null ? (
-                <div className="mb-1 flex justify-end px-1">
+                <div className="flex justify-end px-4 py-2.5">
                   <span className="text-xs text-[var(--color-text-subtle)]">
                     {isLoadingTenantList
                       ? copy.loadingTenantList
@@ -324,13 +323,13 @@ export function WorkspaceContextMenu({
               ) : null}
 
               {tenantListError ? (
-                <p className="m-0 rounded-[var(--radius-control)] border border-[var(--color-danger-border)] bg-[var(--color-danger-surface)] px-3 py-2 text-sm text-[var(--color-danger-text)]">
+                <p className="m-0 border border-[var(--color-danger-border)] bg-[var(--color-danger-surface)] px-4 py-2.5 text-sm text-[var(--color-danger-text)]">
                   {tenantListError}
                 </p>
               ) : null}
 
               {!isLoadingTenantList && !tenantListError ? (
-                <div className="flex flex-col items-start gap-0.5">
+                <div className="inline-flex flex-col items-stretch self-start gap-0">
                   {tenantList.map((tenant) => {
                     const isActive = tenant.tenant_id === currentTenantId;
 
@@ -346,17 +345,12 @@ export function WorkspaceContextMenu({
                         <span className="min-w-0 truncate">
                           {getTenantDisplayName(tenant)}
                         </span>
-                        {isActive ? (
-                          <span className="ui-menu-badge">
-                            {copy.activeLabel}
-                          </span>
-                        ) : null}
                       </button>
                     );
                   })}
 
                   {tenantList.length === 0 ? (
-                    <p className="m-0 px-3 py-2 text-sm text-[var(--color-text-subtle)]">
+                    <p className="m-0 px-4 py-2.5 text-sm text-[var(--color-text-subtle)]">
                       {copy.emptyTenantList}
                     </p>
                   ) : null}
@@ -394,10 +388,10 @@ export function WorkspaceContextMenu({
             <div
               role="menu"
               aria-label={copy.scopeMenuAriaLabel}
-              className="ui-menu-panel absolute left-0 top-[calc(100%+0.375rem)] z-[80] flex w-max max-w-[min(calc(100vw-3rem),22rem)] flex-col gap-0 overflow-hidden p-2"
+              className="ui-menu-panel absolute left-0 top-[calc(100%+0.375rem)] z-[80] inline-flex w-auto max-w-[min(calc(100vw-3rem),22rem)] flex-col gap-0 overflow-hidden rounded-none p-0"
             >
               {isLoadingScopeList || switchingScopeId !== null ? (
-                <div className="mb-1 flex justify-end px-1">
+                <div className="flex justify-end px-4 py-2.5">
                   <span className="text-xs text-[var(--color-text-subtle)]">
                     {isLoadingScopeList
                       ? copy.loadingScopeList
@@ -407,13 +401,13 @@ export function WorkspaceContextMenu({
               ) : null}
 
               {scopeListError ? (
-                <p className="m-0 rounded-[var(--radius-control)] border border-[var(--color-danger-border)] bg-[var(--color-danger-surface)] px-3 py-2 text-sm text-[var(--color-danger-text)]">
+                <p className="m-0 border border-[var(--color-danger-border)] bg-[var(--color-danger-surface)] px-4 py-2.5 text-sm text-[var(--color-danger-text)]">
                   {scopeListError}
                 </p>
               ) : null}
 
               {!isLoadingScopeList && !scopeListError ? (
-                <div className="flex flex-col items-start gap-0.5">
+                <div className="inline-flex flex-col items-stretch self-start gap-0">
                   {scopeList.map((scope) => {
                     const isActive = selectedScope?.id === scope.id;
 
@@ -429,17 +423,12 @@ export function WorkspaceContextMenu({
                         <span className="min-w-0 truncate">
                           {getScopeDisplayName(scope)}
                         </span>
-                        {isActive ? (
-                          <span className="ui-menu-badge">
-                            {copy.activeLabel}
-                          </span>
-                        ) : null}
                       </button>
                     );
                   })}
 
                   {scopeList.length === 0 ? (
-                    <p className="m-0 px-3 py-2 text-sm text-[var(--color-text-subtle)]">
+                    <p className="m-0 px-4 py-2.5 text-sm text-[var(--color-text-subtle)]">
                       {copy.emptyScopeList}
                     </p>
                   ) : null}

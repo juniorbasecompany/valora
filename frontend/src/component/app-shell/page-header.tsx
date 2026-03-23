@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { InfoIcon } from "@/component/ui/ui-icons";
+
 type PageHeaderProps = {
   eyebrow?: string;
   title: string;
@@ -19,8 +21,9 @@ export function PageHeader({
 
       <div className="relative flex max-w-3xl flex-col gap-4">
         {eyebrow ? (
-          <span className="ui-pill inline-flex w-fit px-3.5 py-1.5 text-xs font-semibold tracking-[0.08em] text-[var(--color-accent-strong)]">
-            {eyebrow}
+          <span className="ui-context-label max-w-full">
+            <InfoIcon className="h-3 w-3" />
+            <span>{eyebrow}</span>
           </span>
         ) : null}
 

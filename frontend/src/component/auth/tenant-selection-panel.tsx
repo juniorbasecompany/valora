@@ -520,7 +520,7 @@ export function TenantSelectionPanel({
                       >
                         {getRoleLabel(invite.role)}
                       </span>
-                      <span className="ui-pill ui-pill-construction px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
+                      <span className="ui-badge ui-badge-construction px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
                         {invite.status}
                       </span>
                     </div>

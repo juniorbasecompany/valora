@@ -272,6 +272,24 @@ export function SparkIcon({ className }: IconProps) {
   );
 }
 
+export function InfoIcon({ className }: IconProps) {
+  return (
+    <svg
+      className={mergeClassName(className)}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 10.4v5" />
+      <circle cx="12" cy="7.6" r="0.75" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
 export function ArrowUpRightIcon({ className }: IconProps) {
   return (
     <svg

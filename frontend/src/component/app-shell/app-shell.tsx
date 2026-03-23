@@ -6,8 +6,7 @@ import { MobileShellNav } from "@/component/app-shell/mobile-shell-nav";
 type NavigationItem = {
   key: string;
   label: string;
-  href?: string;
-  statusLabel?: string;
+  href: string;
 };
 
 type AppShellProps = {

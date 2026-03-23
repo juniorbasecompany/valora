@@ -21,8 +21,7 @@ export function LoginLocaleBar({ currentLocale }: LoginLocaleBarProps) {
         copy={{
           triggerAriaLabel: t("localeFlagTriggerAriaLabel"),
           menuAriaLabel: t("localeFlagMenuAriaLabel"),
-          switchingLocale: t("switchingLocale"),
-          activeLabel: t("activeLabel")
+          switchingLocale: t("switchingLocale")
         }}
       />
     </div>

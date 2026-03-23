@@ -9,8 +9,7 @@ import { AppSidebar } from "@/component/app-shell/app-sidebar";
 type NavigationItem = {
   key: string;
   label: string;
-  href?: string;
-  statusLabel?: string;
+  href: string;
 };
 
 type MobileShellNavProps = {

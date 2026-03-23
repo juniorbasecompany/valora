@@ -7,7 +7,8 @@ type LocaleFlagSvgProps = {
 
 const sizeClassMap = {
   menu: "h-[1.125rem] w-6",
-  trigger: "h-5 w-[1.35rem]"
+  /** Sem altura fixa (`h-5`): proporção 22×15 evita caixa mais alta que o texto na topbar/sidebar */
+  trigger: "aspect-[22/15] w-[1.35rem] h-auto"
 } as const;
 
 function BrazilFlagSvg({ className }: { className?: string }) {

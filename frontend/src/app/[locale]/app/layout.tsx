@@ -6,6 +6,7 @@ import { AppShell } from "@/component/app-shell/app-shell";
 import { AccountMenu } from "@/component/app-shell/account-menu";
 import { WorkspaceContextMenu } from "@/component/app-shell/workspace-context-menu";
 import { getAuthSession, getTenantScopeDirectory } from "@/lib/auth/server-session";
+import { appModuleKeyList } from "@/lib/app-shell/module-navigation";
 import { routing } from "@/i18n/routing";
 
 type AppLayoutProps = {
@@ -34,14 +35,16 @@ export default async function AppLayout({
   }
 
   const scopeDirectory = await getTenantScopeDirectory();
+  const currentScopeId =
+    scopeDirectory?.current_scope_id ?? authSession.member.current_scope_id ?? null;
   const currentScope =
     scopeDirectory?.item_list.find(
       (scope) =>
-        scope.id ===
-        (scopeDirectory.current_scope_id ?? authSession.member.current_scope_id ?? null)
+        scope.id === currentScopeId
     ) ??
     scopeDirectory?.item_list[0] ??
     null;
+  const contentContextKey = `tenant:${authSession.tenant.id}:scope:${currentScopeId ?? "none"}`;
   const mobileWorkspaceLabel = currentScope
     ? `${authSession.tenant.display_name} - ${getScopeDisplayName(currentScope)}`
     : authSession.tenant.display_name;
@@ -52,31 +55,11 @@ export default async function AppLayout({
       label: t("navigation.home"),
       href: `/${locale}/app`
     },
-    {
-      key: "operation",
-      label: t("navigation.operation"),
-      statusLabel: t("navigation.comingSoon")
-    },
-    {
-      key: "record",
-      label: t("navigation.record"),
-      statusLabel: t("navigation.comingSoon")
-    },
-    {
-      key: "import",
-      label: t("navigation.import"),
-      statusLabel: t("navigation.comingSoon")
-    },
-    {
-      key: "process",
-      label: t("navigation.process"),
-      statusLabel: t("navigation.comingSoon")
-    },
-    {
-      key: "audit",
-      label: t("navigation.audit"),
-      statusLabel: t("navigation.comingSoon")
-    },
+    ...appModuleKeyList.map((key) => ({
+      key,
+      label: t(`navigation.${key}`),
+      href: `/${locale}/app/${key}`
+    }))
   ];
 
   return (
@@ -107,7 +90,6 @@ export default async function AppLayout({
             scopeListError: t("menu.scopeListError"),
             emptyScopeList: t("menu.emptyScopeList"),
             switchingScope: t("menu.switchingScope"),
-            activeLabel: t("menu.activeLabel"),
             noScopeLabel: t("menu.noScopeLabel")
           }}
         />
@@ -133,14 +115,15 @@ export default async function AppLayout({
             localeFlagMenuAriaLabel: t("menu.localeFlagMenuAriaLabel"),
             configurationLabel: t("menu.configurationLabel"),
             switchingLocale: t("menu.switchingLocale"),
-            activeLabel: t("menu.activeLabel"),
             signOutLabel: t("topbar.signOut"),
             signOutPendingLabel: t("topbar.signOutPending")
           }}
         />
       }
     >
-      {children}
+      <div key={contentContextKey} className="contents">
+        {children}
+      </div>
     </AppShell>
   );
 }

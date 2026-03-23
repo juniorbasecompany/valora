@@ -47,10 +47,10 @@
   --color-construction-border: #e8bd6a;
   --color-construction-text: #8e5f10;
 
-  --radius-control: 0.3rem;
-  --radius-card: 0.4rem;
-  --radius-panel: 0.5rem;
-  --radius-shell: 0.5rem;
+  --radius-control: 0;
+  --radius-card: 0;
+  --radius-panel: 0;
+  --radius-shell: 0;
 
   --border-width-default: 1px;
   --border-width-strong: 1.5px;
@@ -68,8 +68,11 @@
   --density-control-min-height: 2.75rem;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+  border-radius: 0 !important;
 }
 
 html,

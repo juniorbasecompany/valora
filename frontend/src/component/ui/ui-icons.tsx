@@ -35,7 +35,7 @@ export function ValoraMark({ className }: IconProps) {
           <stop offset="1" stopColor="#0E4C8C" />
         </linearGradient>
       </defs>
-      <rect x="4" y="4" width="40" height="40" rx="14" fill={`url(#${gradientId})`} />
+      <rect x="4" y="4" width="40" height="40" rx="0" fill={`url(#${gradientId})`} />
       <path
         d="M14 15L22.6 33H26.2L34 15H29.9L24.3 28.3L18.2 15H14Z"
         fill="white"
@@ -98,7 +98,7 @@ export function RecordsIcon({ className }: IconProps) {
       strokeLinejoin="round"
       aria-hidden
     >
-      <rect x="5" y="4" width="14" height="16" rx="3" />
+      <rect x="5" y="4" width="14" height="16" rx="0" />
       <path d="M8.5 9h7M8.5 12.5h7M8.5 16h4.5" />
     </svg>
   );
@@ -246,9 +246,9 @@ export function WorkflowIcon({ className }: IconProps) {
       strokeLinejoin="round"
       aria-hidden
     >
-      <rect x="4" y="4.5" width="6" height="5" rx="1.4" />
-      <rect x="14" y="9.5" width="6" height="5" rx="1.4" />
-      <rect x="4" y="14.5" width="6" height="5" rx="1.4" />
+      <rect x="4" y="4.5" width="6" height="5" rx="0" />
+      <rect x="14" y="9.5" width="6" height="5" rx="0" />
+      <rect x="4" y="14.5" width="6" height="5" rx="0" />
       <path d="M10 7h2a2 2 0 0 1 2 2v1M10 17h2a2 2 0 0 0 2-2v-1" />
     </svg>
   );
@@ -375,7 +375,7 @@ export function LockIcon({ className }: IconProps) {
       strokeLinejoin="round"
       aria-hidden
     >
-      <rect x="5.5" y="10.5" width="13" height="9" rx="2" />
+      <rect x="5.5" y="10.5" width="13" height="9" rx="0" />
       <path d="M8.5 10.5V8.3a3.5 3.5 0 0 1 7 0v2.2" />
     </svg>
   );

@@ -99,7 +99,7 @@ export function AppSidebar({
               href={navigationItem.href}
               aria-current={isActive ? "page" : undefined}
               onClick={onNavigate}
-              className={`ui-nav-item rounded-none border-0 shadow-none flex items-center gap-3 px-4 py-2.5 text-sm ${
+              className={`ui-nav-item rounded-none border-0 shadow-none flex items-center gap-3 py-2.5 pl-5 pr-4 text-sm ${
                 isActive
                   ? "ui-nav-item-active"
                   : ""

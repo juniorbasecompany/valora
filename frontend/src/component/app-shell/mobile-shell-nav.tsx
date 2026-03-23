@@ -72,7 +72,7 @@ export function MobileShellNav({
 
   return (
     <>
-      <div className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-x-3 gap-y-0 rounded-[0.96rem] border border-[var(--color-border)] bg-[rgba(255,255,255,0.88)] px-3 py-2.5 shadow-[var(--shadow-sm)] backdrop-blur-[18px] lg:hidden max-[22rem]:grid-cols-[auto_minmax(0,1fr)_auto] max-[22rem]:gap-y-2 max-[22rem]:px-2.5">
+      <div className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-x-3 gap-y-0 rounded-none border border-[var(--color-border)] bg-[rgba(255,255,255,0.88)] px-3 py-2.5 shadow-[var(--shadow-sm)] backdrop-blur-[18px] lg:hidden max-[22rem]:grid-cols-[auto_minmax(0,1fr)_auto] max-[22rem]:gap-y-2 max-[22rem]:px-2.5">
         <button
           type="button"
           aria-expanded={isOpen}
@@ -94,7 +94,7 @@ export function MobileShellNav({
           {productName}
         </div>
 
-        <div className="col-start-4 row-start-1 inline-flex h-10 w-10 shrink-0 items-center justify-center justify-self-end rounded-[0.72rem] border border-[rgba(37,117,216,0.12)] bg-[linear-gradient(180deg,#4f8eea_0%,#2b63bb_100%)] text-lg font-bold tracking-[-0.04em] text-white shadow-[var(--shadow-xs)] max-[22rem]:col-start-3 max-[22rem]:row-start-1">
+        <div className="col-start-4 row-start-1 inline-flex h-10 w-10 shrink-0 items-center justify-center justify-self-end rounded-none border border-[rgba(37,117,216,0.12)] bg-[linear-gradient(180deg,#4f8eea_0%,#2b63bb_100%)] text-lg font-bold tracking-[-0.04em] text-white shadow-[var(--shadow-xs)] max-[22rem]:col-start-3 max-[22rem]:row-start-1">
           V
         </div>
       </div>

@@ -67,7 +67,7 @@ function FallbackGlobeSvg({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
     >
-      <rect width="22" height="15" rx="2" fill="var(--color-border)" />
+      <rect width="22" height="15" fill="var(--color-border)" />
       <circle
         cx="11"
         cy="7.5"
@@ -93,7 +93,7 @@ export function LocaleFlagSvg({
 }: LocaleFlagSvgProps) {
   const merged = [
     sizeClassMap[size],
-    "shrink-0 overflow-hidden rounded-[2px]",
+    "shrink-0 overflow-hidden rounded-none",
     className
   ]
     .filter(Boolean)

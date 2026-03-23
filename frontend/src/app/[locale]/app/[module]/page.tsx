@@ -37,7 +37,7 @@ export default async function ModulePlaceholderPage({
   const moduleLabel = moduleLabelByKey[module];
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="ui-page-stack">
       <PageHeader
         eyebrow={t("eyebrow")}
         title={moduleLabel}
@@ -51,38 +51,38 @@ export default async function ModulePlaceholderPage({
         }
       />
 
-      <section className="grid gap-4 xl:grid-cols-3">
+      <section className="ui-grid-cards-3">
         <InfoCard
           title={t("cards.entry.title")}
           description={t("cards.entry.description", { module: moduleLabel })}
-          iconSlot={<NavigationIcon kind={module} className="h-[1.05rem] w-[1.05rem]" />}
+          iconSlot={<NavigationIcon kind={module} className="ui-icon-sm" />}
         />
         <InfoCard
           title={t("cards.state.title")}
           description={t("cards.state.description")}
-          iconSlot={<WorkflowIcon className="h-[1.05rem] w-[1.05rem]" />}
+          iconSlot={<WorkflowIcon className="ui-icon-sm" />}
         />
         <InfoCard
           title={t("cards.next.title")}
           description={t("cards.next.description")}
-          iconSlot={<SparkIcon className="h-[1.05rem] w-[1.05rem]" />}
+          iconSlot={<SparkIcon className="ui-icon-sm" />}
         />
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-2">
+      <section className="ui-grid-cards-2">
         <QuickActionCard
           title={t("actions.home.title")}
           description={t("actions.home.description")}
           href={`/${locale}/app`}
           actionLabel={t("actions.home.label")}
-          iconSlot={<NavigationIcon kind="home" className="h-[1.05rem] w-[1.05rem]" />}
+          iconSlot={<NavigationIcon kind="home" className="ui-icon-sm" />}
         />
         <QuickActionCard
           title={t("actions.configuration.title")}
           description={t("actions.configuration.description")}
           href={`/${locale}/app/configuration`}
           actionLabel={t("actions.configuration.label")}
-          iconSlot={<SparkIcon className="h-[1.05rem] w-[1.05rem]" />}
+          iconSlot={<SparkIcon className="ui-icon-sm" />}
         />
       </section>
     </section>

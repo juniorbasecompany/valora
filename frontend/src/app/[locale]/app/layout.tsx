@@ -121,7 +121,7 @@ export default async function AppLayout({
         />
       }
     >
-      <div key={contentContextKey} className="contents">
+      <div key={contentContextKey} className="ui-contents">
         {children}
       </div>
     </AppShell>

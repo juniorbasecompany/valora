@@ -24,7 +24,7 @@ export default async function ConfigurationPage({ params }: ConfigurationPagePro
   const locationEditorHref = `/${locale}/app/configuration/location`;
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="ui-page-stack">
       <PageHeader
         eyebrow={t("eyebrow")}
         title={t("title")}
@@ -38,36 +38,36 @@ export default async function ConfigurationPage({ params }: ConfigurationPagePro
         }
       />
 
-      <section className="grid gap-4 xl:grid-cols-4">
+      <section className="ui-grid-cards-4">
         <InfoCard
           title={t("cards.organization.title")}
           description={t("cards.organization.description")}
-          iconSlot={<BuildingIcon className="h-[1.05rem] w-[1.05rem]" />}
+          iconSlot={<BuildingIcon className="ui-icon-sm" />}
         />
         <InfoCard
           title={t("cards.member.title")}
           description={t("cards.member.description")}
-          iconSlot={<UsersIcon className="h-[1.05rem] w-[1.05rem]" />}
+          iconSlot={<UsersIcon className="ui-icon-sm" />}
           actionHref={memberEditorHref}
           actionLabel={t("openMemberEditor")}
         />
         <InfoCard
           title={t("cards.scope.title")}
           description={t("cards.scope.description")}
-          iconSlot={<ScopeIcon className="h-[1.05rem] w-[1.05rem]" />}
+          iconSlot={<ScopeIcon className="ui-icon-sm" />}
           actionHref={scopeEditorHref}
           actionLabel={t("openScopeEditor")}
         />
         <InfoCard
           title={t("cards.location.title")}
           description={t("cards.location.description")}
-          iconSlot={<WorkflowIcon className="h-[1.05rem] w-[1.05rem]" />}
+          iconSlot={<WorkflowIcon className="ui-icon-sm" />}
           actionHref={locationEditorHref}
           actionLabel={t("openLocationEditor")}
         />
       </section>
 
-      <section className="ui-panel grid gap-4 p-6">
+      <section className="ui-panel ui-panel-stack">
         <SetupStepCard
           title={t("queue.organization.title")}
           description={t("queue.organization.description")}
@@ -75,7 +75,7 @@ export default async function ConfigurationPage({ params }: ConfigurationPagePro
           tone="attention"
           actionHref={tenantEditorHref}
           actionLabel={t("openTenantEditor")}
-          iconSlot={<BuildingIcon className="h-[1.05rem] w-[1.05rem]" />}
+          iconSlot={<BuildingIcon className="ui-icon-sm" />}
         />
         <SetupStepCard
           title={t("queue.member.title")}
@@ -84,7 +84,7 @@ export default async function ConfigurationPage({ params }: ConfigurationPagePro
           tone="attention"
           actionHref={memberEditorHref}
           actionLabel={t("openMemberEditor")}
-          iconSlot={<UsersIcon className="h-[1.05rem] w-[1.05rem]" />}
+          iconSlot={<UsersIcon className="ui-icon-sm" />}
         />
         <SetupStepCard
           title={t("queue.scope.title")}
@@ -93,7 +93,7 @@ export default async function ConfigurationPage({ params }: ConfigurationPagePro
           tone="attention"
           actionHref={scopeEditorHref}
           actionLabel={t("openScopeEditor")}
-          iconSlot={<ScopeIcon className="h-[1.05rem] w-[1.05rem]" />}
+          iconSlot={<ScopeIcon className="ui-icon-sm" />}
         />
         <SetupStepCard
           title={t("queue.location.title")}
@@ -102,7 +102,7 @@ export default async function ConfigurationPage({ params }: ConfigurationPagePro
           tone="attention"
           actionHref={locationEditorHref}
           actionLabel={t("openLocationEditor")}
-          iconSlot={<WorkflowIcon className="h-[1.05rem] w-[1.05rem]" />}
+          iconSlot={<WorkflowIcon className="ui-icon-sm" />}
         />
       </section>
     </section>

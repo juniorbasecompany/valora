@@ -20,9 +20,9 @@ export default async function SelectTenantPage({
   }
 
   return (
-    <main className="ui-shell min-h-screen">
-      <section className="mx-auto flex min-h-screen max-w-5xl px-6 py-12">
-        <div className="my-auto w-full">
+    <main className="ui-shell ui-shell-page">
+      <section className="ui-centered-page">
+        <div className="ui-centered-page-main">
           <TenantSelectionPanel
             locale={locale}
             copy={{

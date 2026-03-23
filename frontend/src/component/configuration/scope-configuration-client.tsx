@@ -485,7 +485,7 @@ export function ScopeConfigurationClient({
       : selectedScope?.can_edit ?? false;
 
   return (
-    <section className={`flex flex-col gap-6 ${tab === "general" ? "pb-56 lg:pb-0" : ""}`}>
+    <section className={`ui-page-stack ${tab === "general" ? "ui-page-stack-footer" : ""}`}>
       <PageHeader
         eyebrow={copy.eyebrow}
         title={pageTitle}
@@ -510,7 +510,7 @@ export function ScopeConfigurationClient({
           id="scope-tab-general"
           aria-selected={tab === "general"}
           aria-controls="scope-panel-general"
-          className={`ui-tab px-4 py-2.5 text-sm font-semibold ${
+          className={`ui-tab ${
             tab === "general" ? "ui-tab-active" : ""
           }`}
           onClick={() => setTab("general")}
@@ -523,7 +523,7 @@ export function ScopeConfigurationClient({
           id="scope-tab-history"
           aria-selected={tab === "history"}
           aria-controls="scope-panel-history"
-          className={`ui-tab px-4 py-2.5 text-sm font-semibold ${
+          className={`ui-tab ${
             tab === "history" ? "ui-tab-active" : ""
           }`}
           onClick={() => setTab("history")}
@@ -537,13 +537,13 @@ export function ScopeConfigurationClient({
           id="scope-panel-general"
           role="tabpanel"
           aria-labelledby="scope-tab-general"
-          className="ui-layout-directory 2xl:grid-cols-[minmax(18rem,0.82fr)_minmax(0,1.18fr)_minmax(18rem,0.82fr)]"
+          className="ui-layout-directory ui-layout-directory-editor"
         >
-          <aside className="ui-panel flex flex-col gap-4 px-5 py-5">
-            <div className="flex items-start justify-between gap-4">
+          <aside className="ui-panel ui-stack-lg ui-panel-context-card">
+            <div className="ui-row-between">
               <div className="ui-section-header">
                 <span className="ui-icon-badge">
-                  <ScopeIcon className="h-[1.05rem] w-[1.05rem]" />
+                  <ScopeIcon className="ui-icon-sm" />
                 </span>
                 <div className="ui-section-copy">
                   <h2 className="ui-header-title ui-title-section">
@@ -568,7 +568,7 @@ export function ScopeConfigurationClient({
             </div>
 
             {!directory.can_edit ? (
-              <div className="ui-notice-attention px-4 py-3 text-sm">
+              <div className="ui-notice-attention ui-notice-block">
                 {copy.readOnlyNotice}
               </div>
             ) : null}
@@ -579,16 +579,16 @@ export function ScopeConfigurationClient({
                 onClick={handleStartCreate}
                 className="ui-directory-create"
               >
-                <p className="text-sm font-semibold text-[var(--color-text)]">
+                <p className="ui-directory-title">
                   {copy.newScope}
                 </p>
-                <p className="mt-1 text-xs text-[var(--color-text-subtle)]">
+                <p className="ui-directory-caption">
                   {copy.sectionIdentityDescription}
                 </p>
               </button>
             ) : null}
 
-            <div className="grid gap-3">
+            <div className="ui-grid-list-md">
               {directory.item_list.map((item) => (
                 <button
                   key={item.id}
@@ -600,14 +600,14 @@ export function ScopeConfigurationClient({
                     item.id === selectedScope?.id && isDeletePending ? "true" : undefined
                   }
                 >
-                  <p className="truncate text-sm font-semibold text-[var(--color-text)]">
+                  <p className="ui-directory-title">
                     {resolveScopeLabel(item)}
                   </p>
-                  <p className="mt-1 text-xs leading-5 text-[var(--color-text-subtle)]">
+                  <p className="ui-directory-caption-wrap">
                     {item.display_name}
                   </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <span className="ui-badge ui-badge-neutral px-2.5 py-1 text-[11px] font-semibold">
+                  <div className="ui-directory-meta">
+                    <span className="ui-badge ui-badge-neutral">
                       #{item.id}
                     </span>
                   </div>
@@ -615,7 +615,7 @@ export function ScopeConfigurationClient({
               ))}
 
               {directory.item_list.length === 0 && !directory.can_create ? (
-                <div className="ui-panel px-4 py-4 text-sm text-[var(--color-text-muted)]">
+                <div className="ui-panel ui-empty-panel ui-panel-body-compact">
                   {copy.empty}
                 </div>
               ) : null}
@@ -623,17 +623,17 @@ export function ScopeConfigurationClient({
           </aside>
 
           <div
-            className="ui-panel ui-panel-editor px-6 py-6"
+            className="ui-panel ui-panel-editor"
             data-delete-pending={isDeletePending ? "true" : undefined}
           >
             {successMessage ? (
-              <div className="ui-status-panel ui-tone-positive text-sm">
+              <div className="ui-status-panel ui-tone-positive ui-status-copy">
                 {successMessage}
               </div>
             ) : null}
 
             {formError ? (
-              <div className="ui-notice-danger px-4 py-3 text-sm">{formError}</div>
+              <div className="ui-notice-danger ui-notice-block">{formError}</div>
             ) : null}
 
               {selectedScopeKey ? (
@@ -641,7 +641,7 @@ export function ScopeConfigurationClient({
                 <section className="ui-card ui-form-section ui-border-accent">
                   <div className="ui-section-header">
                     <span className="ui-icon-badge">
-                      <PreviewIcon className="h-[1.05rem] w-[1.05rem]" />
+                      <PreviewIcon className="ui-icon-sm" />
                     </span>
                     <div className="ui-section-copy">
                       <h2 className="ui-header-title ui-title-section">
@@ -660,7 +660,7 @@ export function ScopeConfigurationClient({
                       </label>
                       <input
                         id="scope-name"
-                        className="ui-input w-full"
+                        className="ui-input"
                         value={name}
                         onChange={(event) => {
                           setName(event.target.value);
@@ -687,7 +687,7 @@ export function ScopeConfigurationClient({
                       </label>
                       <textarea
                         id="scope-display-name"
-                        className="ui-input min-h-28 w-full resize-y"
+                        className="ui-input ui-input-textarea"
                         value={displayName}
                         onChange={(event) => {
                           setDisplayName(event.target.value);
@@ -730,12 +730,12 @@ export function ScopeConfigurationClient({
 
           <aside className="ui-panel-context">
             <div
-              className="ui-panel ui-panel-context p-5"
+              className="ui-panel ui-panel-context ui-panel-context-body"
               data-delete-pending={isDeletePending ? "true" : undefined}
             >
               <div className="ui-section-header">
                 <span className="ui-icon-badge">
-                  <PreviewIcon className="h-[1.05rem] w-[1.05rem]" />
+                  <PreviewIcon className="ui-icon-sm" />
                 </span>
                 <div className="ui-section-copy">
                   <h2 className="ui-header-title ui-title-section">
@@ -768,16 +768,16 @@ export function ScopeConfigurationClient({
                   </div>
                 </div>
               ) : (
-                <p className="ui-copy-body mt-5">
+                <p className="ui-copy-body ui-space-top-xl">
                   {copy.selectPrompt}
                 </p>
               )}
             </div>
 
-            <div className="ui-card ui-card-coming-soon p-5">
+            <div className="ui-card ui-card-coming-soon ui-panel-body-compact">
               <div className="ui-section-header">
                 <span className="ui-icon-badge ui-icon-badge-construction">
-                  <HistoryIcon className="h-[1.05rem] w-[1.05rem]" />
+                  <HistoryIcon className="ui-icon-sm" />
                 </span>
                 <div className="ui-section-copy">
                   <h2 className="ui-header-title ui-title-section">
@@ -796,35 +796,35 @@ export function ScopeConfigurationClient({
           id="scope-panel-history"
           role="tabpanel"
           aria-labelledby="scope-tab-history"
-          className="ui-layout-record xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.82fr)]"
+          className="ui-layout-record ui-layout-record-history"
         >
-          <div className="ui-panel px-6 py-6">
+          <div className="ui-panel ui-panel-body">
             <div className="ui-section-header">
               <span className="ui-icon-badge ui-icon-badge-construction">
-                <HistoryIcon className="h-[1.05rem] w-[1.05rem]" />
+                <HistoryIcon className="ui-icon-sm" />
               </span>
               <div className="ui-section-copy">
                 <h2 className="ui-header-title ui-title-section">
                   {copy.historyTitle}
                 </h2>
-                <p className="ui-copy-body mt-2 max-w-2xl">
+                <p className="ui-copy-body ui-history-description">
                   {copy.historyDescription}
                 </p>
               </div>
             </div>
 
-            <div className="mt-6 grid gap-3">
+            <div className="ui-history-list">
               {Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="ui-card ui-card-coming-soon px-4 py-4">
-                  <div className="ui-skeleton h-4 w-28 animate-pulse rounded" />
-                  <div className="ui-skeleton mt-3 h-4 w-full max-w-xl animate-pulse rounded" />
-                  <div className="ui-skeleton mt-2 h-4 w-5/6 animate-pulse rounded" />
+                <div key={index} className="ui-card ui-card-coming-soon ui-history-card">
+                  <div className="ui-skeleton ui-skeleton-label ui-pulse" />
+                  <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-medium ui-space-top-md ui-pulse" />
+                  <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-short ui-space-top-sm ui-pulse" />
                 </div>
               ))}
             </div>
           </div>
 
-          <aside className="flex flex-col gap-4">
+          <aside className="ui-history-card-side">
             <StatusPanel
               title={copy.statusTitle}
               description={copy.statusDescription}
@@ -832,11 +832,11 @@ export function ScopeConfigurationClient({
             />
 
             {selectedScopeKey ? (
-              <div className="ui-panel p-5">
+              <div className="ui-panel ui-panel-context-body">
                 <p className="ui-metadata-label">
                   {copy.nameLabel}
                 </p>
-                <p className="ui-header-title mt-2 text-xl tracking-[-0.03em]">
+                <p className="ui-header-title ui-history-card-title">
                   {previewLabel}
                 </p>
               </div>
@@ -848,17 +848,17 @@ export function ScopeConfigurationClient({
       {tab === "general" && portalTarget
         ? createPortal(
             <div className="ui-action-footer">
-              <div className="flex shrink-0 items-center">
+              <div className="ui-action-footer-start">
                 <Link
                   href={configurationPath}
-                  className="ui-button-secondary inline-flex items-center justify-center"
+                  className="ui-button-secondary"
                   onClick={handleBack}
                 >
                   {copy.cancel}
                 </Link>
               </div>
 
-              <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+              <div className="ui-action-footer-end">
                 {!isCreateMode && selectedScope ? (
                   <button
                     type="button"

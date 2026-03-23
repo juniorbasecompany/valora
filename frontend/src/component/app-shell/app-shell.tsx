@@ -33,8 +33,8 @@ export function AppShell({
   accountSlot
 }: AppShellProps) {
   return (
-    <div className="ui-shell flex min-h-dvh flex-col overflow-hidden lg:h-screen lg:flex-row">
-      <div className="hidden lg:flex lg:h-full lg:max-w-[19.5rem] lg:shrink-0 lg:relative lg:z-40">
+    <div className="ui-shell ui-shell-frame">
+      <div className="ui-shell-desktop-sidebar">
         <AppSidebar
           productName={productName}
           workspaceLabel={workspaceLabel}
@@ -44,8 +44,8 @@ export function AppShell({
         />
       </div>
 
-      <div className="relative z-0 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-        <div className="fixed left-4 right-4 top-4 z-50 lg:hidden">
+      <div className="ui-shell-main">
+        <div className="ui-shell-mobile-anchor">
           <MobileShellNav
             productName={productName}
             workspaceLabel={mobileWorkspaceLabel ?? workspaceLabel}
@@ -57,7 +57,7 @@ export function AppShell({
           />
         </div>
 
-        <main className="ui-scroll-stable flex-1 overflow-y-auto overflow-x-hidden">
+        <main className="ui-scroll-stable ui-shell-main-scroll">
           <div className="ui-shell-content">
             {children}
           </div>
@@ -65,7 +65,7 @@ export function AppShell({
 
         <footer
           id="app-shell-footer-slot"
-          className="ui-shell-footer empty:hidden"
+          className="ui-shell-footer"
         />
       </div>
     </div>

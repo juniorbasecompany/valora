@@ -40,12 +40,12 @@ export default async function LoginPage({
         : null;
 
   return (
-    <main className="ui-shell relative min-h-screen">
+    <main className="ui-shell ui-shell-page">
       <LoginLocaleBar currentLocale={locale} />
       <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
       <section className="ui-auth-layout">
         <div className="ui-panel ui-auth-hero">
-          <div className="flex items-center gap-4">
+          <div className="ui-row-center">
             <div className="ui-auth-mark">
               <ValoraMark />
             </div>
@@ -54,11 +54,11 @@ export default async function LoginPage({
             </Badge>
           </div>
 
-          <div className="space-y-4">
-            <h1 className="ui-header-title ui-title-page max-w-3xl lg:text-[3.3rem]">
+          <div className="ui-heading-stack-lg">
+            <h1 className="ui-header-title ui-title-page ui-title-page-hero">
               {t("title")}
             </h1>
-            <p className="ui-page-description max-w-2xl text-base leading-8">
+            <p className="ui-copy-hero">
               {t("description")}
             </p>
           </div>
@@ -66,7 +66,7 @@ export default async function LoginPage({
           <div className="ui-auth-card-grid">
             <article className="ui-card ui-auth-card">
               <div className="ui-icon-badge">
-                <SparkIcon className="h-[1.05rem] w-[1.05rem]" />
+                <SparkIcon className="ui-icon-sm" />
               </div>
               <h2 className="ui-header-title ui-title-section">
                 {t("cards.workspace.title")}
@@ -78,7 +78,7 @@ export default async function LoginPage({
 
             <article className="ui-card ui-auth-card">
               <div className="ui-icon-badge ui-icon-badge-attention">
-                <AuditIcon className="h-[1.05rem] w-[1.05rem]" />
+                <AuditIcon className="ui-icon-sm" />
               </div>
               <h2 className="ui-header-title ui-title-section">
                 {t("cards.traceability.title")}
@@ -90,7 +90,7 @@ export default async function LoginPage({
 
             <article className="ui-card ui-auth-card">
               <div className="ui-icon-badge">
-                <WorkflowIcon className="h-[1.05rem] w-[1.05rem]" />
+                <WorkflowIcon className="ui-icon-sm" />
               </div>
               <h2 className="ui-header-title ui-title-section">
                 {t("cards.nextStep.title")}
@@ -104,7 +104,7 @@ export default async function LoginPage({
 
         <section className="ui-panel ui-auth-panel">
           <div className="ui-section-copy">
-            <h2 className="ui-header-title ui-title-section text-2xl">
+            <h2 className="ui-header-title ui-title-section ui-title-section-xl">
               {t("form.title")}
             </h2>
             <p className="ui-copy-body">
@@ -113,7 +113,7 @@ export default async function LoginPage({
           </div>
 
           {noticeMessage ? (
-            <div className="ui-notice-attention px-4 py-3 text-sm">
+            <div className="ui-notice-attention ui-notice-block">
               {noticeMessage}
             </div>
           ) : null}

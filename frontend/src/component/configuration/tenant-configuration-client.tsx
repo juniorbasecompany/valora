@@ -235,7 +235,7 @@ export function TenantConfigurationClient({
   const previewLegalName = legalName.trim() || tenant.name;
 
   return (
-    <section className={`flex flex-col gap-6 ${tab === "general" ? "pb-56 lg:pb-0" : ""}`}>
+    <section className={`ui-page-stack ${tab === "general" ? "ui-page-stack-footer" : ""}`}>
       <PageHeader
         eyebrow={copy.eyebrow}
         title={pageTitle}
@@ -260,7 +260,7 @@ export function TenantConfigurationClient({
           id="tenant-tab-general"
           aria-selected={tab === "general"}
           aria-controls="tenant-panel-general"
-          className={`ui-tab px-4 py-2.5 text-sm font-semibold ${
+          className={`ui-tab ${
             tab === "general"
               ? "ui-tab-active"
               : ""
@@ -275,7 +275,7 @@ export function TenantConfigurationClient({
           id="tenant-tab-history"
           aria-selected={tab === "history"}
           aria-controls="tenant-panel-history"
-          className={`ui-tab px-4 py-2.5 text-sm font-semibold ${
+          className={`ui-tab ${
             tab === "history"
               ? "ui-tab-active"
               : ""
@@ -291,32 +291,32 @@ export function TenantConfigurationClient({
           id="tenant-panel-general"
           role="tabpanel"
           aria-labelledby="tenant-tab-general"
-          className="ui-layout-record xl:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.85fr)]"
+          className="ui-layout-record ui-layout-record-editor"
         >
           <div
-            className="ui-panel ui-panel-editor px-6 py-6"
+            className="ui-panel ui-panel-editor"
             data-delete-pending={isDeletePending ? "true" : undefined}
           >
             {!tenant.can_edit ? (
-              <div className="ui-notice-attention px-4 py-3 text-sm">
+              <div className="ui-notice-attention ui-notice-block">
                 {copy.readOnlyNotice}
               </div>
             ) : null}
 
             {saveSuccess ? (
-              <div className="ui-status-panel ui-tone-positive text-sm">
+              <div className="ui-status-panel ui-tone-positive ui-status-copy">
                 {copy.savedNotice}
               </div>
             ) : null}
 
             {formError ? (
-              <div className="ui-notice-danger px-4 py-3 text-sm">{formError}</div>
+              <div className="ui-notice-danger ui-notice-block">{formError}</div>
             ) : null}
 
             <section className="ui-card ui-form-section ui-border-accent">
               <div className="ui-section-header">
                 <span className="ui-icon-badge">
-                  <PreviewIcon className="h-[1.05rem] w-[1.05rem]" />
+                  <PreviewIcon className="ui-icon-sm" />
                 </span>
                 <div className="ui-section-copy">
                   <h2 className="ui-header-title ui-title-section">
@@ -333,7 +333,7 @@ export function TenantConfigurationClient({
                 </label>
                 <input
                   id="tenant-display-name"
-                  className="ui-input w-full"
+                  className="ui-input"
                   value={displayName}
                   onChange={(event) => {
                     setDisplayName(event.target.value);
@@ -360,7 +360,7 @@ export function TenantConfigurationClient({
             <section className="ui-card ui-form-section ui-border-accent">
               <div className="ui-section-header">
                 <span className="ui-icon-badge">
-                  <BuildingIcon className="h-[1.05rem] w-[1.05rem]" />
+                  <BuildingIcon className="ui-icon-sm" />
                 </span>
                 <div className="ui-section-copy">
                   <h2 className="ui-header-title ui-title-section">
@@ -377,7 +377,7 @@ export function TenantConfigurationClient({
                 </label>
                 <input
                   id="tenant-legal-name"
-                  className="ui-input w-full"
+                  className="ui-input"
                   value={legalName}
                   onChange={(event) => {
                     setLegalName(event.target.value);
@@ -415,12 +415,12 @@ export function TenantConfigurationClient({
 
           <aside className="ui-panel-context">
             <div
-              className="ui-panel ui-panel-context p-5"
+              className="ui-panel ui-panel-context ui-panel-context-body"
               data-delete-pending={isDeletePending ? "true" : undefined}
             >
               <div className="ui-section-header">
                 <span className="ui-icon-badge">
-                  <PreviewIcon className="h-[1.05rem] w-[1.05rem]" />
+                  <PreviewIcon className="ui-icon-sm" />
                 </span>
                 <div className="ui-section-copy">
                   <h2 className="ui-header-title ui-title-section">
@@ -453,10 +453,10 @@ export function TenantConfigurationClient({
               </div>
             </div>
 
-            <div className="ui-card ui-card-coming-soon p-5">
+            <div className="ui-card ui-card-coming-soon ui-panel-body-compact">
               <div className="ui-section-header">
                 <span className="ui-icon-badge ui-icon-badge-construction">
-                  <HistoryIcon className="h-[1.05rem] w-[1.05rem]" />
+                  <HistoryIcon className="ui-icon-sm" />
                 </span>
                 <div className="ui-section-copy">
                   <h2 className="ui-header-title ui-title-section">
@@ -475,32 +475,32 @@ export function TenantConfigurationClient({
           id="tenant-panel-history"
           role="tabpanel"
           aria-labelledby="tenant-tab-history"
-          className="ui-layout-record xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)]"
+          className="ui-layout-record ui-layout-record-history"
         >
-          <div className="ui-panel px-6 py-6">
+          <div className="ui-panel ui-panel-body">
             <div className="ui-section-header">
               <span className="ui-icon-badge ui-icon-badge-construction">
-                <HistoryIcon className="h-[1.05rem] w-[1.05rem]" />
+                <HistoryIcon className="ui-icon-sm" />
               </span>
               <div className="ui-section-copy">
                 <h2 className="ui-header-title ui-title-section">
                   {copy.historyTitle}
                 </h2>
-                <p className="ui-copy-body mt-2 max-w-2xl">
+                <p className="ui-copy-body ui-history-description">
                   {copy.historyDescription}
                 </p>
               </div>
             </div>
 
-            <div className="mt-6 grid gap-3">
+            <div className="ui-history-list">
               {Array.from({ length: 3 }).map((_, index) => (
                 <div
                   key={index}
-                  className="ui-card ui-card-coming-soon px-4 py-4"
+                  className="ui-card ui-card-coming-soon ui-history-card"
                 >
-                  <div className="ui-skeleton h-4 w-28 animate-pulse rounded" />
-                  <div className="ui-skeleton mt-3 h-4 w-full max-w-xl animate-pulse rounded" />
-                  <div className="ui-skeleton mt-2 h-4 w-5/6 animate-pulse rounded" />
+                  <div className="ui-skeleton ui-skeleton-label ui-pulse" />
+                  <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-medium ui-space-top-md ui-pulse" />
+                  <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-short ui-space-top-sm ui-pulse" />
                 </div>
               ))}
             </div>
@@ -517,17 +517,17 @@ export function TenantConfigurationClient({
       {tab === "general" && portalTarget
         ? createPortal(
             <div className="ui-action-footer">
-              <div className="flex shrink-0 items-center">
+              <div className="ui-action-footer-start">
                 <Link
                   href={configurationPath}
-                  className="ui-button-secondary inline-flex items-center justify-center"
+                  className="ui-button-secondary"
                   onClick={handleBack}
                 >
                   {copy.cancel}
                 </Link>
               </div>
 
-              <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+              <div className="ui-action-footer-end">
                 <button
                   type="button"
                   className="ui-button-danger"

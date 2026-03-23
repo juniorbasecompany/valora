@@ -44,25 +44,25 @@ export function AppSidebar({
 
   return (
     <aside
-      className={`ui-sidebar flex h-full w-full min-w-0 shrink-0 flex-col ${isDrawer ? "" : "ui-shell-sidebar"}`}
+      className={`ui-sidebar ui-shell-sidebar-frame ${isDrawer ? "" : "ui-shell-sidebar"}`}
     >
       <div className="ui-shell-sidebar-header">
-        <div className="relative">
+        <div className="ui-menu-root">
           <div className="ui-shell-brand">
-            <div className="min-w-0 flex-1">
+            <div className="ui-shell-brand-copy">
               <h1 className="ui-header-title ui-shell-brand-title">
                 {productName}
               </h1>
             </div>
 
-            <div className="shrink-0 self-start">
+            <div className="ui-shell-brand-mark">
               <ValoraMark />
             </div>
           </div>
 
-          <div className="mt-3 min-w-0">
+          <div className="ui-shell-sidebar-stack">
             {workspaceSlot ? (
-              <div className="max-w-full">
+              <div className="ui-shell-workspace-slot">
                 {workspaceSlot}
               </div>
             ) : (
@@ -72,7 +72,7 @@ export function AppSidebar({
             )}
 
             {accountSlot ? (
-              <div className="mt-3.5 max-w-full">
+              <div className="ui-shell-account-slot">
                 {accountSlot}
               </div>
             ) : null}
@@ -80,7 +80,7 @@ export function AppSidebar({
         </div>
       </div>
 
-      <nav className="relative z-0 flex flex-1 flex-col gap-0 overflow-y-auto px-0 py-0">
+      <nav className="ui-sidebar-navigation">
         {navigationItemList.map((navigationItem) => {
           const navigationIconKind = navigationItem.key as NavigationIconKind;
           const isHomeItem = navigationItem.key === "home";
@@ -95,7 +95,7 @@ export function AppSidebar({
               href={navigationItem.href}
               aria-current={isActive ? "page" : undefined}
               onClick={onNavigate}
-              className={`ui-nav-item rounded-none border-0 shadow-none flex items-center gap-3 py-2.5 pl-5 pr-4 text-sm ${
+              className={`ui-nav-item ${
                 isActive
                   ? "ui-nav-item-active"
                   : ""
@@ -104,10 +104,10 @@ export function AppSidebar({
               <span className="ui-nav-item-icon">
                 <NavigationIcon
                   kind={navigationIconKind}
-                  className="h-[1.1rem] w-[1.1rem]"
+                  className="ui-icon-nav"
                 />
               </span>
-              <span className="min-w-0 truncate text-sm">
+              <span className="ui-nav-item-label">
                 {navigationItem.label}
               </span>
             </Link>

@@ -14,7 +14,7 @@ type NavigationIconProps = IconProps & {
     | "audit";
 };
 
-function mergeClassName(className?: string, fallback = "h-5 w-5") {
+function mergeClassName(className?: string, fallback = "ui-icon-sm") {
   return [fallback, className].filter(Boolean).join(" ");
 }
 
@@ -23,7 +23,7 @@ export function ValoraMark({ className }: IconProps) {
 
   return (
     <svg
-      className={mergeClassName(className, "h-11 w-11")}
+      className={mergeClassName(className, "ui-mark-size")}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -293,7 +293,7 @@ export function InfoIcon({ className }: IconProps) {
 export function ArrowUpRightIcon({ className }: IconProps) {
   return (
     <svg
-      className={mergeClassName(className, "h-4 w-4")}
+      className={mergeClassName(className, "ui-icon-arrow")}
       viewBox="0 0 16 16"
       fill="none"
       stroke="currentColor"

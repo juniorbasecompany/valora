@@ -171,40 +171,39 @@ export function GoogleSignInPanel({
   }, [clientId, genericErrorText, handleCredential, isUnavailable]);
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex flex-col gap-2">
+    <div className="ui-stack-xl">
+      <div className="ui-stack-sm">
         <div className="ui-auth-helper">
           {helperText}
         </div>
         {errorMessage ? (
-          <div className="ui-notice-attention px-4 py-3 text-sm">
+          <div className="ui-notice-attention ui-notice-block">
             {errorMessage}
           </div>
         ) : null}
         {isUnavailable ? (
-          <div className="ui-notice-attention px-4 py-3 text-sm">
+          <div className="ui-notice-attention ui-notice-block">
             {unavailableText}
           </div>
         ) : null}
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="ui-stack-md">
         {!isUnavailable ? (
           <div className="ui-auth-google-slot" aria-busy={!isReady}>
             {!isReady ? (
               <>
                 <div
-                  className="ui-auth-google-skeleton motion-safe:animate-pulse"
+                  className="ui-auth-google-skeleton ui-pulse"
                   aria-hidden
                 />
-                <span className="sr-only">{buttonLabel}</span>
+                <span className="ui-sr-only">{buttonLabel}</span>
               </>
             ) : null}
             <div
               ref={buttonContainerRef}
-              className={`relative z-10 flex h-full w-full items-center ${
-                isPending ? "pointer-events-none opacity-60" : ""
-              }`}
+              className="ui-auth-google-button"
+              data-pending={isPending ? "true" : undefined}
             />
           </div>
         ) : null}
@@ -219,7 +218,7 @@ export function GoogleSignInPanel({
             checked={rememberMe}
             onChange={(event) => setRememberMe(event.target.checked)}
             disabled={isUnavailable || isPending}
-            className="ui-auth-checkbox focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] disabled:opacity-50"
+            className="ui-auth-checkbox"
           />
           <span>{rememberMeLabel}</span>
         </label>

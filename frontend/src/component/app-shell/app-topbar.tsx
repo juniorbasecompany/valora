@@ -16,24 +16,24 @@ export function AppTopbar({
   actionSlot
 }: AppTopbarProps) {
   return (
-    <header className="ui-topbar relative z-30 px-4 py-4 backdrop-blur sm:px-5 lg:px-8">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="flex min-w-0 items-start gap-3">
-          {leadingSlot ? <div className="shrink-0 pt-0.5">{leadingSlot}</div> : null}
+    <header className="ui-topbar ui-panel-body ui-z-30">
+      <div className="ui-topbar-layout">
+        <div className="ui-topbar-context">
+          {leadingSlot ? <div className="ui-topbar-leading">{leadingSlot}</div> : null}
 
-          <div className="min-w-0">
-            <span className="ui-topbar-chip inline-flex items-center gap-2 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] sm:text-[11px]">
+          <div className="ui-min-w-0">
+            <span className="ui-topbar-chip ui-row-center-sm">
               <span className="ui-topbar-status-dot" />
               {tenantLabel}
             </span>
-            <p className="ui-header-title ui-title-section mt-2 truncate sm:mt-3 sm:text-lg">
+            <p className="ui-header-title ui-title-section ui-topbar-title">
               {tenantValue}
             </p>
           </div>
         </div>
 
         {actionSlot || accountSlot ? (
-          <div className="flex w-full flex-wrap items-center justify-end gap-2 md:w-auto md:flex-nowrap md:gap-3">
+          <div className="ui-topbar-actions">
             {actionSlot}
             {accountSlot}
           </div>

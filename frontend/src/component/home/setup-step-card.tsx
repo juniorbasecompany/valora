@@ -31,11 +31,11 @@ export function SetupStepCard({
   const isPlanned = !actionHref;
 
   return (
-    <article className={`ui-card flex h-full flex-col gap-4 p-5 ${isPlanned ? "ui-card-coming-soon" : ""}`}>
-      <div className="relative flex items-start gap-4">
+    <article className={`ui-card ui-card-stack ${isPlanned ? "ui-card-coming-soon" : ""}`}>
+      <div className="ui-card-main">
         {iconSlot ? (
           <div
-            className={`ui-icon-badge shrink-0 ${
+            className={`ui-icon-badge ui-shrink-0 ${
               tone === "attention"
                 ? "ui-icon-badge-attention"
                 : tone === "positive"
@@ -48,13 +48,13 @@ export function SetupStepCard({
             {iconSlot}
           </div>
         ) : null}
-        <div className="min-w-0 flex-1 space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="ui-card-copy">
+          <div className="ui-row-wrap">
             <h3 className="ui-header-title ui-title-section">
               {title}
             </h3>
             <span
-              className={`ui-badge px-2.5 py-1 text-[11px] font-semibold ${
+              className={`ui-badge ${
                 isPlanned && tone === "neutral"
                   ? "ui-badge-construction"
                   : toneClassNameByTone[tone]
@@ -69,14 +69,14 @@ export function SetupStepCard({
         </div>
       </div>
       {actionHref && actionLabel ? (
-        <div className="mt-auto">
-          <Link className="ui-link text-sm font-semibold" href={actionHref}>
+        <div className="ui-card-action">
+          <Link className="ui-link" href={actionHref}>
             {actionLabel}
             <ArrowUpRightIcon />
           </Link>
         </div>
       ) : (
-        <div className="ui-dashed-divider mt-auto w-full" />
+        <div className="ui-dashed-divider ui-card-divider-fill" />
       )}
     </article>
   );

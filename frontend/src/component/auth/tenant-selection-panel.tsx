@@ -404,17 +404,17 @@ export function TenantSelectionPanel({
   }
 
   return (
-    <section className="flex flex-col gap-6">
-      <header className="ui-panel px-6 py-6 lg:px-7 lg:py-7">
-        <div className="flex items-start gap-4">
+    <section className="ui-page-stack">
+      <header className="ui-panel ui-auth-selection-header">
+        <div className="ui-row-start-lg">
           <div className="ui-auth-mark">
             <ValoraMark />
           </div>
           <div className="ui-section-copy">
-            <h1 className="ui-header-title ui-title-page text-3xl">
+            <h1 className="ui-header-title ui-title-page ui-title-page-section">
               {copy.title}
             </h1>
-            <p className="ui-page-description max-w-2xl">
+            <p className="ui-page-description ui-copy-limit-wide">
               {copy.description}
             </p>
           </div>
@@ -422,17 +422,17 @@ export function TenantSelectionPanel({
       </header>
 
       {errorMessage ? (
-        <div className="ui-notice-attention px-4 py-3 text-sm">{errorMessage}</div>
+        <div className="ui-notice-attention ui-notice-block">{errorMessage}</div>
       ) : null}
 
       {isCreateFlow ? (
         <article className="ui-panel ui-auth-card">
           <div className="ui-section-header">
             <span className="ui-icon-badge">
-              <SparkIcon className="h-[1.05rem] w-[1.05rem]" />
+              <SparkIcon className="ui-icon-sm" />
             </span>
             <div className="ui-section-copy">
-              <h2 className="ui-header-title ui-title-section text-lg">
+              <h2 className="ui-header-title ui-title-section-lg">
                 {copy.createTitle}
               </h2>
               <p className="ui-copy-body">
@@ -445,7 +445,7 @@ export function TenantSelectionPanel({
               type="button"
               onClick={() => void handleCreateTenant()}
               disabled={isProcessing}
-              className="ui-button-primary inline-flex items-center text-sm font-medium transition disabled:opacity-60"
+              className="ui-button-primary"
             >
               {isProcessing ? copy.createPending : copy.createAction}
             </button>
@@ -454,13 +454,13 @@ export function TenantSelectionPanel({
       ) : null}
 
       {tenantList.length > 0 ? (
-        <section className="ui-panel flex flex-col gap-4 p-6">
-          <div className="ui-section-header items-center">
+        <section className="ui-panel ui-auth-selection-card">
+          <div className="ui-section-header ui-section-header-center">
             <span className="ui-icon-badge">
-              <BuildingIcon className="h-[1.05rem] w-[1.05rem]" />
+              <BuildingIcon className="ui-icon-sm" />
             </span>
             <div className="ui-section-copy">
-              <h2 className="ui-header-title ui-title-section text-xl">
+              <h2 className="ui-header-title ui-title-section-lg">
                 {copy.activeListTitle}
               </h2>
             </div>
@@ -469,11 +469,11 @@ export function TenantSelectionPanel({
             {tenantList.map((tenant) => (
               <article
                 key={tenant.tenant_id}
-                className="ui-preview-card ui-preview-card-accent flex flex-col gap-4"
+                className="ui-preview-card ui-preview-card-accent ui-stack-lg"
               >
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                  <div className="flex flex-col gap-3">
-                    <h3 className="ui-header-title ui-title-section text-base">
+                <div className="ui-preview-card-row">
+                  <div className="ui-preview-card-copy">
+                    <h3 className="ui-header-title ui-title-section">
                       {getTenantDisplayName(tenant)}
                     </h3>
                     <Badge tone={getRoleTone(tenant.role)}>
@@ -485,7 +485,7 @@ export function TenantSelectionPanel({
                       type="button"
                       onClick={() => void handleSelectTenant(tenant.tenant_id)}
                       disabled={isProcessing}
-                      className="ui-button-secondary inline-flex items-center text-sm font-medium transition disabled:opacity-60"
+                      className="ui-button-secondary"
                     >
                       {isProcessing ? copy.processing : copy.selectAction}
                     </button>
@@ -498,13 +498,13 @@ export function TenantSelectionPanel({
       ) : null}
 
       {inviteList.length > 0 ? (
-        <section className="ui-panel flex flex-col gap-4 p-6">
-          <div className="ui-section-header items-center">
+        <section className="ui-panel ui-auth-selection-card">
+          <div className="ui-section-header ui-section-header-center">
             <span className="ui-icon-badge ui-icon-badge-attention">
-              <ClockIcon className="h-[1.05rem] w-[1.05rem]" />
+              <ClockIcon className="ui-icon-sm" />
             </span>
             <div className="ui-section-copy">
-              <h2 className="ui-header-title ui-title-section text-xl">
+              <h2 className="ui-header-title ui-title-section-lg">
                 {copy.inviteListTitle}
               </h2>
             </div>
@@ -513,14 +513,14 @@ export function TenantSelectionPanel({
             {inviteList.map((invite) => (
               <article
                 key={invite.member_id}
-                className="ui-preview-card flex flex-col gap-4"
+                className="ui-preview-card ui-stack-lg"
               >
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                  <div className="flex flex-col gap-3">
-                    <h3 className="ui-header-title ui-title-section text-base">
+                <div className="ui-preview-card-row">
+                  <div className="ui-preview-card-copy">
+                    <h3 className="ui-header-title ui-title-section">
                       {getTenantDisplayName(invite)}
                     </h3>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="ui-badge-row">
                       <Badge tone={getRoleTone(invite.role)}>
                         {getRoleLabel(invite.role)}
                       </Badge>
@@ -529,12 +529,12 @@ export function TenantSelectionPanel({
                       </Badge>
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="ui-button-row">
                     <button
                       type="button"
                       onClick={() => void handleAcceptInvite(invite)}
                       disabled={isProcessing}
-                      className="ui-button-primary inline-flex items-center text-sm font-medium transition disabled:opacity-60"
+                      className="ui-button-primary"
                     >
                       {isProcessing ? copy.processing : copy.acceptAction}
                     </button>
@@ -542,7 +542,7 @@ export function TenantSelectionPanel({
                       type="button"
                       onClick={() => void handleRejectInvite(invite)}
                       disabled={isProcessing}
-                      className="ui-button-secondary inline-flex items-center text-sm font-medium transition disabled:opacity-60"
+                      className="ui-button-secondary"
                     >
                       {isProcessing ? copy.processing : copy.rejectAction}
                     </button>
@@ -567,7 +567,7 @@ export function TenantSelectionPanel({
             clearSelectionState();
             router.replace(`/${locale}/login`);
           }}
-          className="ui-link text-sm"
+          className="ui-link ui-auth-selection-back"
         >
           {copy.backToLogin}
         </button>

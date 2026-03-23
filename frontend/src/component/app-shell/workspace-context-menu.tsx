@@ -274,14 +274,14 @@ export function WorkspaceContextMenu({
   }
 
   const optionClass = (isActive: boolean) =>
-    `ui-menu-item appearance-none self-stretch whitespace-nowrap rounded-none border-0 shadow-none inline-flex items-center justify-start px-4 py-2.5 text-left text-sm ${
+    `ui-menu-item ${
       isActive ? "ui-menu-item-active" : ""
     }`;
 
   return (
-    <div ref={containerRef} className="relative w-full">
-      <div className="flex w-full flex-wrap items-start gap-x-3 gap-y-1.5">
-        <div className="relative max-w-full shrink-0">
+    <div ref={containerRef} className="ui-menu-root ui-fill-width">
+      <div className="ui-workspace-menu-row">
+        <div className="ui-workspace-menu-anchor">
           <button
             type="button"
             aria-expanded={isTenantMenuOpen}
@@ -303,7 +303,7 @@ export function WorkspaceContextMenu({
             <div
               role="menu"
               aria-label={copy.tenantMenuAriaLabel}
-              className="ui-menu-panel absolute left-0 top-[calc(100%+0.375rem)] z-[80] inline-flex w-auto max-w-[min(calc(100vw-3rem),22rem)] flex-col gap-0 overflow-hidden rounded-none p-0"
+              className="ui-menu-panel ui-menu-panel-start ui-menu-panel-wide ui-menu-panel-context"
             >
               {isLoadingTenantList || switchingTenantId !== null ? (
                 <div className="ui-menu-feedback">
@@ -322,7 +322,7 @@ export function WorkspaceContextMenu({
               ) : null}
 
               {!isLoadingTenantList && !tenantListError ? (
-                <div className="inline-flex flex-col items-stretch self-start gap-0">
+                <div className="ui-menu-list">
                   {tenantList.map((tenant) => {
                     const isActive = tenant.tenant_id === currentTenantId;
 
@@ -335,7 +335,7 @@ export function WorkspaceContextMenu({
                         disabled={switchingTenantId !== null}
                         className={optionClass(isActive)}
                       >
-                        <span className="min-w-0 truncate">
+                        <span className="ui-menu-label">
                           {getTenantDisplayName(tenant)}
                         </span>
                       </button>
@@ -353,7 +353,7 @@ export function WorkspaceContextMenu({
           ) : null}
         </div>
 
-        <div className="relative ml-auto max-w-full shrink-0">
+        <div className="ui-workspace-menu-anchor-end">
           <button
             type="button"
             aria-expanded={isScopeMenuOpen}
@@ -377,7 +377,7 @@ export function WorkspaceContextMenu({
             <div
               role="menu"
               aria-label={copy.scopeMenuAriaLabel}
-              className="ui-menu-panel absolute left-0 top-[calc(100%+0.375rem)] z-[80] inline-flex w-auto max-w-[min(calc(100vw-3rem),22rem)] flex-col gap-0 overflow-hidden rounded-none p-0"
+              className="ui-menu-panel ui-menu-panel-start ui-menu-panel-wide ui-menu-panel-context"
             >
               {isLoadingScopeList || switchingScopeId !== null ? (
                 <div className="ui-menu-feedback">
@@ -396,7 +396,7 @@ export function WorkspaceContextMenu({
               ) : null}
 
               {!isLoadingScopeList && !scopeListError ? (
-                <div className="inline-flex flex-col items-stretch self-start gap-0">
+                <div className="ui-menu-list">
                   {scopeList.map((scope) => {
                     const isActive = selectedScope?.id === scope.id;
 
@@ -409,7 +409,7 @@ export function WorkspaceContextMenu({
                         disabled={switchingScopeId !== null}
                         className={optionClass(isActive)}
                       >
-                        <span className="min-w-0 truncate">
+                        <span className="ui-menu-label">
                           {getScopeDisplayName(scope)}
                         </span>
                       </button>

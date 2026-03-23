@@ -474,7 +474,7 @@ export function MemberConfigurationClient({
     : false;
 
   return (
-    <section className={`flex flex-col gap-6 ${tab === "general" ? "pb-56 lg:pb-0" : ""}`}>
+    <section className={`ui-page-stack ${tab === "general" ? "ui-page-stack-footer" : ""}`}>
       <PageHeader
         eyebrow={copy.eyebrow}
         title={pageTitle}
@@ -499,7 +499,7 @@ export function MemberConfigurationClient({
           id="member-tab-general"
           aria-selected={tab === "general"}
           aria-controls="member-panel-general"
-          className={`ui-tab px-4 py-2.5 text-sm font-semibold ${
+          className={`ui-tab ${
             tab === "general" ? "ui-tab-active" : ""
           }`}
           onClick={() => setTab("general")}
@@ -512,7 +512,7 @@ export function MemberConfigurationClient({
           id="member-tab-history"
           aria-selected={tab === "history"}
           aria-controls="member-panel-history"
-          className={`ui-tab px-4 py-2.5 text-sm font-semibold ${
+          className={`ui-tab ${
             tab === "history" ? "ui-tab-active" : ""
           }`}
           onClick={() => setTab("history")}
@@ -524,14 +524,14 @@ export function MemberConfigurationClient({
       {tab === "general" ? (
         directory.item_list.length === 0 ? (
           <div id="member-panel-general" role="tabpanel" aria-labelledby="member-tab-general">
-            <div className="flex flex-col gap-4">
+            <div className="ui-stack-lg">
               {successMessage ? (
-                <div className="ui-status-panel ui-tone-positive text-sm">
+                <div className="ui-status-panel ui-tone-positive ui-status-copy">
                   {successMessage}
                 </div>
               ) : null}
               {formError ? (
-                <div className="ui-notice-danger px-4 py-3 text-sm">{formError}</div>
+                <div className="ui-notice-danger ui-notice-block">{formError}</div>
               ) : null}
               <div className="ui-panel ui-empty-panel">
                 {copy.empty}
@@ -543,12 +543,12 @@ export function MemberConfigurationClient({
             id="member-panel-general"
             role="tabpanel"
             aria-labelledby="member-tab-general"
-            className="ui-layout-directory 2xl:grid-cols-[minmax(18rem,0.82fr)_minmax(0,1.18fr)_minmax(18rem,0.82fr)]"
+            className="ui-layout-directory ui-layout-directory-editor"
           >
-            <aside className="ui-panel flex flex-col gap-4 px-5 py-5">
+            <aside className="ui-panel ui-stack-lg ui-panel-context-card">
               <div className="ui-section-header">
                 <span className="ui-icon-badge">
-                  <UsersIcon className="h-[1.05rem] w-[1.05rem]" />
+                  <UsersIcon className="ui-icon-sm" />
                 </span>
                 <div className="ui-section-copy">
                   <h2 className="ui-header-title ui-title-section">
@@ -561,12 +561,12 @@ export function MemberConfigurationClient({
               </div>
 
               {!directory.can_edit ? (
-                <div className="ui-notice-attention px-4 py-3 text-sm">
+                <div className="ui-notice-attention ui-notice-block">
                   {copy.readOnlyNotice}
                 </div>
               ) : null}
 
-              <div className="grid gap-3">
+              <div className="ui-grid-list-md">
                 {directory.item_list.map((item) => {
                   const itemStatusKey = normalizeStatusKey(item.status);
                   const roleLabel =
@@ -584,27 +584,27 @@ export function MemberConfigurationClient({
                         item.id === selectedMember?.id && isDeletePending ? "true" : undefined
                       }
                     >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-semibold text-[var(--color-text)]">
+                      <div className="ui-row-between">
+                        <div className="ui-min-w-0">
+                          <p className="ui-directory-title">
                             {resolveMemberLabel(item)}
                           </p>
-                          <p className="mt-1 truncate text-xs text-[var(--color-text-subtle)]">
+                          <p className="ui-directory-caption">
                             {item.email}
                           </p>
                         </div>
                         <span
-                          className={`ui-pill shrink-0 px-2.5 py-1 text-[11px] font-semibold ${getStatusToneClass(itemStatusKey)}`}
+                          className={`ui-pill ui-shrink-0 ${getStatusToneClass(itemStatusKey)}`}
                         >
                           {copy.statusLabels[itemStatusKey]}
                         </span>
                       </div>
 
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        <span className="ui-badge ui-badge-neutral px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
+                      <div className="ui-directory-meta">
+                        <span className="ui-badge ui-badge-neutral">
                           {roleLabel}
                         </span>
-                        <span className="ui-badge ui-badge-neutral px-2.5 py-1 text-[11px] font-semibold">
+                        <span className="ui-badge ui-badge-neutral">
                           #{item.id}
                         </span>
                       </div>
@@ -615,28 +615,28 @@ export function MemberConfigurationClient({
             </aside>
 
             <div
-              className="ui-panel ui-panel-editor px-6 py-6"
+              className="ui-panel ui-panel-editor"
               data-delete-pending={isDeletePending ? "true" : undefined}
             >
               {successMessage ? (
-                <div className="ui-status-panel ui-tone-positive text-sm">
+                <div className="ui-status-panel ui-tone-positive ui-status-copy">
                   {successMessage}
                 </div>
               ) : null}
 
               {formError ? (
-                <div className="ui-notice-danger px-4 py-3 text-sm">{formError}</div>
+                <div className="ui-notice-danger ui-notice-block">{formError}</div>
               ) : null}
 
               {selectedMember ? (
                 <>
                   {directory.can_edit ? (
                     !selectedMember.can_edit ? (
-                      <div className="ui-notice-attention px-4 py-3 text-sm">
+                      <div className="ui-notice-attention ui-notice-block">
                         {copy.protectedRecordNotice}
                       </div>
                     ) : !selectedMember.can_edit_access ? (
-                      <div className="ui-status-panel ui-tone-neutral text-sm">
+                      <div className="ui-status-panel ui-tone-neutral ui-status-copy">
                         {copy.accessManagedNotice}
                       </div>
                     ) : null
@@ -645,7 +645,7 @@ export function MemberConfigurationClient({
                   <section className="ui-card ui-form-section ui-border-accent">
                     <div className="ui-section-header">
                       <span className="ui-icon-badge">
-                        <PreviewIcon className="h-[1.05rem] w-[1.05rem]" />
+                        <PreviewIcon className="ui-icon-sm" />
                       </span>
                       <div className="ui-section-copy">
                         <h2 className="ui-header-title ui-title-section">
@@ -657,14 +657,14 @@ export function MemberConfigurationClient({
                       </div>
                     </div>
 
-                    <div className="ui-form-fields md:grid-cols-2">
+                    <div className="ui-form-fields ui-form-fields-2">
                       <div className="ui-field">
                         <label className="ui-field-label" htmlFor="member-display-name">
                           {copy.displayNameLabel}
                         </label>
                         <input
                           id="member-display-name"
-                          className="ui-input w-full"
+                          className="ui-input"
                           value={displayName}
                           onChange={(event) => {
                             setDisplayName(event.target.value);
@@ -692,7 +692,7 @@ export function MemberConfigurationClient({
                         </label>
                         <input
                           id="member-name"
-                          className="ui-input w-full"
+                          className="ui-input"
                           value={name}
                           onChange={(event) => {
                             setName(event.target.value);
@@ -719,7 +719,7 @@ export function MemberConfigurationClient({
                   <section className="ui-card ui-form-section ui-border-accent">
                     <div className="ui-section-header">
                       <span className="ui-icon-badge">
-                        <UsersIcon className="h-[1.05rem] w-[1.05rem]" />
+                        <UsersIcon className="ui-icon-sm" />
                       </span>
                       <div className="ui-section-copy">
                         <h2 className="ui-header-title ui-title-section">
@@ -731,14 +731,14 @@ export function MemberConfigurationClient({
                       </div>
                     </div>
 
-                    <div className="ui-form-fields md:grid-cols-3">
-                      <div className="ui-field md:col-span-3">
+                    <div className="ui-form-fields ui-form-fields-3">
+                      <div className="ui-field ui-field-span-full">
                         <label className="ui-field-label" htmlFor="member-email">
                           {copy.emailLabel}
                         </label>
                         <input
                           id="member-email"
-                          className="ui-input w-full"
+                          className="ui-input"
                           value={selectedMember.email}
                           disabled
                           readOnly
@@ -754,7 +754,7 @@ export function MemberConfigurationClient({
                         </label>
                         <select
                           id="member-role"
-                          className="ui-input w-full appearance-none"
+                          className="ui-input ui-input-select"
                           value={roleValue}
                           onChange={(event) => {
                             setRoleValue(Number(event.target.value));
@@ -776,7 +776,7 @@ export function MemberConfigurationClient({
                         </label>
                         <select
                           id="member-status"
-                          className="ui-input w-full appearance-none"
+                          className="ui-input ui-input-select"
                           value={statusKey}
                           onChange={(event) => {
                             setStatusKey(normalizeStatusKey(event.target.value));
@@ -816,12 +816,12 @@ export function MemberConfigurationClient({
 
             <aside className="ui-panel-context">
               <div
-                className="ui-panel ui-panel-context p-5"
+                className="ui-panel ui-panel-context ui-panel-context-body"
                 data-delete-pending={isDeletePending ? "true" : undefined}
               >
                 <div className="ui-section-header">
                   <span className="ui-icon-badge">
-                    <PreviewIcon className="h-[1.05rem] w-[1.05rem]" />
+                    <PreviewIcon className="ui-icon-sm" />
                   </span>
                   <div className="ui-section-copy">
                     <h2 className="ui-header-title ui-title-section">
@@ -843,12 +843,12 @@ export function MemberConfigurationClient({
                         {previewDisplayName}
                       </p>
 
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        <span className="ui-badge ui-badge-neutral px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
+                      <div className="ui-directory-meta">
+                        <span className="ui-badge ui-badge-neutral">
                           {previewRoleLabel}
                         </span>
                         <span
-                          className={`ui-pill px-2.5 py-1 text-[11px] font-semibold ${getStatusToneClass(statusKey)}`}
+                          className={`ui-pill ${getStatusToneClass(statusKey)}`}
                         >
                           {copy.statusLabels[statusKey]}
                         </span>
@@ -862,7 +862,7 @@ export function MemberConfigurationClient({
                       <p className="ui-preview-value-strong">
                         {previewName}
                       </p>
-                      <p className="mt-3 ui-metadata-label">
+                      <p className="ui-metadata-label ui-space-top-md">
                         {copy.emailLabel}
                       </p>
                       <p className="ui-preview-value">
@@ -892,16 +892,16 @@ export function MemberConfigurationClient({
                     </div>
                   </div>
                 ) : (
-                  <p className="ui-copy-body mt-5">
+                  <p className="ui-copy-body ui-space-top-xl">
                     {copy.selectPrompt}
                   </p>
                 )}
               </div>
 
-              <div className="ui-card ui-card-coming-soon p-5">
+              <div className="ui-card ui-card-coming-soon ui-panel-body-compact">
                 <div className="ui-section-header">
                   <span className="ui-icon-badge ui-icon-badge-construction">
-                    <HistoryIcon className="h-[1.05rem] w-[1.05rem]" />
+                    <HistoryIcon className="ui-icon-sm" />
                   </span>
                   <div className="ui-section-copy">
                     <h2 className="ui-header-title ui-title-section">
@@ -921,38 +921,38 @@ export function MemberConfigurationClient({
           id="member-panel-history"
           role="tabpanel"
           aria-labelledby="member-tab-history"
-          className="ui-layout-record xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.82fr)]"
+          className="ui-layout-record ui-layout-record-history"
         >
-          <div className="ui-panel px-6 py-6">
+          <div className="ui-panel ui-panel-body">
             <div className="ui-section-header">
               <span className="ui-icon-badge ui-icon-badge-construction">
-                <HistoryIcon className="h-[1.05rem] w-[1.05rem]" />
+                <HistoryIcon className="ui-icon-sm" />
               </span>
               <div className="ui-section-copy">
                 <h2 className="ui-header-title ui-title-section">
                   {copy.historyTitle}
                 </h2>
-                <p className="ui-copy-body mt-2 max-w-2xl">
+                <p className="ui-copy-body ui-history-description">
                   {copy.historyDescription}
                 </p>
               </div>
             </div>
 
-            <div className="mt-6 grid gap-3">
+            <div className="ui-history-list">
               {Array.from({ length: 3 }).map((_, index) => (
                 <div
                   key={index}
-                  className="ui-card ui-card-coming-soon px-4 py-4"
+                  className="ui-card ui-card-coming-soon ui-history-card"
                 >
-                  <div className="ui-skeleton h-4 w-28 animate-pulse rounded" />
-                  <div className="ui-skeleton mt-3 h-4 w-full max-w-xl animate-pulse rounded" />
-                  <div className="ui-skeleton mt-2 h-4 w-5/6 animate-pulse rounded" />
+                  <div className="ui-skeleton ui-skeleton-label ui-pulse" />
+                  <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-medium ui-space-top-md ui-pulse" />
+                  <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-short ui-space-top-sm ui-pulse" />
                 </div>
               ))}
             </div>
           </div>
 
-          <aside className="flex flex-col gap-4">
+          <aside className="ui-history-card-side">
             <StatusPanel
               title={copy.statusTitle}
               description={copy.statusDescription}
@@ -960,21 +960,21 @@ export function MemberConfigurationClient({
             />
 
             {selectedMember ? (
-              <div className="ui-panel p-5">
+              <div className="ui-panel ui-panel-context-body">
                 <p className="ui-metadata-label">
                   {copy.displayNameLabel}
                 </p>
-                <p className="ui-header-title mt-2 text-xl tracking-[-0.03em]">
+                <p className="ui-header-title ui-history-card-title">
                   {resolveMemberLabel(selectedMember)}
                 </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="ui-badge ui-badge-neutral px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
+                <div className="ui-badge-row">
+                  <span className="ui-badge ui-badge-neutral">
                     {copy.roleLabels[
                       selectedMember.role_name as keyof typeof copy.roleLabels
                     ] ?? selectedMember.role_name}
                   </span>
                   <span
-                    className={`ui-pill px-2.5 py-1 text-[11px] font-semibold ${getStatusToneClass(
+                    className={`ui-pill ${getStatusToneClass(
                       normalizeStatusKey(selectedMember.status)
                     )}`}
                   >
@@ -990,17 +990,17 @@ export function MemberConfigurationClient({
       {tab === "general" && portalTarget
         ? createPortal(
             <div className="ui-action-footer">
-              <div className="flex shrink-0 items-center">
+              <div className="ui-action-footer-start">
                 <Link
                   href={configurationPath}
-                  className="ui-button-secondary inline-flex items-center justify-center"
+                  className="ui-button-secondary"
                   onClick={handleBack}
                 >
                   {copy.cancel}
                 </Link>
               </div>
 
-              <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+              <div className="ui-action-footer-end">
                 {selectedMember ? (
                   <button
                     type="button"

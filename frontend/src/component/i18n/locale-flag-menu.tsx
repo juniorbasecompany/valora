@@ -103,19 +103,19 @@ export function LocaleFlagMenu({
   }
 
   const optionClass = (isActive: boolean) =>
-    `ui-menu-item appearance-none self-stretch whitespace-nowrap rounded-none border-0 shadow-none inline-flex items-center justify-start px-4 py-2.5 text-left text-sm ${
+    `ui-menu-item ${
       isActive ? "ui-menu-item-active" : ""
     }`;
 
   const panelClassName =
     placement === "sidebar"
-      ? "ui-menu-panel absolute left-0 top-[calc(100%+0.625rem)] z-[70] inline-flex w-auto max-w-[min(calc(100vw-4rem),17rem)] flex-col gap-0 overflow-hidden rounded-none p-0"
-      : "ui-menu-panel absolute right-0 top-[calc(100%+0.375rem)] z-40 inline-flex w-auto max-w-[min(calc(100vw-2rem),22rem)] flex-col gap-0 overflow-hidden rounded-none p-0";
+      ? "ui-menu-panel ui-menu-panel-sidebar ui-menu-panel-compact ui-menu-panel-overlay"
+      : "ui-menu-panel ui-menu-panel-end ui-menu-panel-wide ui-menu-panel-floating";
 
   return (
     <div
       ref={containerRef}
-      className={`relative isolate inline-flex shrink-0 ${isSidebar ? "z-50" : ""}`}
+      className="ui-menu-root ui-shrink-0"
     >
       <button
         type="button"
@@ -124,11 +124,7 @@ export function LocaleFlagMenu({
         aria-label={copy.triggerAriaLabel}
         data-state={isOpen ? "open" : "closed"}
         onClick={() => setOpen(!isOpen)}
-        className={`inline-flex shrink-0 items-center justify-center ${
-          isSidebar
-            ? "h-auto w-auto rounded-none border-0 bg-transparent p-0 shadow-none"
-            : "ui-menu-trigger h-9 w-9 rounded-none"
-        }`}
+        className={isSidebar ? "ui-menu-trigger-ghost" : "ui-menu-trigger"}
       >
         <LocaleFlagSvg locale={currentLocale} size="trigger" />
       </button>
@@ -147,7 +143,7 @@ export function LocaleFlagMenu({
             </div>
           ) : null}
 
-          <div className="inline-flex flex-col items-stretch self-start gap-0">
+          <div className="ui-menu-list">
             {localeList.map((locale) => {
               const isActive = locale === currentLocale;
               const localeLabel = localeLabelMap[locale] || locale;
@@ -161,7 +157,7 @@ export function LocaleFlagMenu({
                   disabled={switchingLocale !== null}
                   className={optionClass(isActive)}
                 >
-                  <span className="min-w-0 truncate">{localeLabel}</span>
+                  <span className="ui-menu-label">{localeLabel}</span>
                 </button>
               );
             })}

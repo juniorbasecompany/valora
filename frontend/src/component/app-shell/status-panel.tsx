@@ -33,13 +33,13 @@ export function StatusPanel({
 
   return (
     <div className={`ui-status-panel ${toneMeta.className}`}>
-      <div className="flex items-start gap-3">
+      <div className="ui-status-layout">
         <span className={toneMeta.iconClassName}>
-          <toneMeta.Icon className="h-[1.05rem] w-[1.05rem]" />
+          <toneMeta.Icon className="ui-icon-sm" />
         </span>
         <div className="ui-section-copy">
-          <div className="font-semibold tracking-[-0.01em]">{title}</div>
-          <div className="leading-6 opacity-85">{description}</div>
+          <div className="ui-status-title">{title}</div>
+          <div className="ui-status-description ui-status-copy">{description}</div>
         </div>
       </div>
     </div>

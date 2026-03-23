@@ -21,13 +21,13 @@ export function PageHeader({
 
       <div className="ui-page-header-main">
         {eyebrow ? (
-          <span className="ui-context-label max-w-full">
-            <InfoIcon className="h-3 w-3" />
+          <span className="ui-context-label">
+            <InfoIcon className="ui-icon-xs" />
             <span>{eyebrow}</span>
           </span>
         ) : null}
 
-        <div className="space-y-3">
+        <div className="ui-page-header-copy">
           <h1 className="ui-header-title ui-title-page">
             {title}
           </h1>

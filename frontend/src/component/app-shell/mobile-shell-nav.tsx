@@ -72,36 +72,36 @@ export function MobileShellNav({
 
   return (
     <>
-      <div className="ui-mobile-shell-nav lg:hidden">
+      <div className="ui-mobile-shell-nav">
         <button
           type="button"
           aria-expanded={isOpen}
           aria-label={openLabel}
           aria-controls="mobile-shell-navigation"
           onClick={() => setIsOpen(true)}
-          className="ui-menu-trigger col-start-1 row-start-1 inline-flex h-10 w-10 shrink-0 items-center justify-center"
+          className="ui-menu-trigger ui-mobile-shell-trigger"
         >
           <MenuIcon />
         </button>
 
-        <div className="col-start-2 row-start-1 min-w-0 text-[var(--color-text)] max-[22rem]:col-start-2 max-[22rem]:row-start-2 max-[22rem]:col-span-2">
-          <p className="truncate text-[0.95rem] font-semibold text-[var(--color-text)] max-[22rem]:text-[0.88rem] max-[22rem]:font-medium max-[22rem]:text-[var(--color-text-muted)]">
+        <div className="ui-mobile-shell-workspace">
+          <p className="ui-mobile-shell-workspace-text">
             {workspaceLabel}
           </p>
         </div>
 
-        <div className="col-start-3 row-start-1 min-w-0 truncate text-sm font-semibold tracking-[-0.02em] text-[var(--color-text)] max-[22rem]:col-start-2 max-[22rem]:row-start-1 max-[22rem]:text-[0.9rem]">
+        <div className="ui-mobile-shell-product">
           {productName}
         </div>
 
-        <div className="ui-mobile-shell-brandmark col-start-4 row-start-1 justify-self-end max-[22rem]:col-start-3 max-[22rem]:row-start-1">
+        <div className="ui-mobile-shell-brandmark ui-justify-self-end">
           V
         </div>
       </div>
 
       {isOpen && portalTarget
         ? createPortal(
-            <div className="fixed inset-0 z-[120] lg:hidden">
+            <div className="ui-mobile-shell-portal">
               <button
                 type="button"
                 aria-label={closeLabel}

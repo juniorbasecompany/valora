@@ -9,7 +9,7 @@ import {
   useRef,
   useState
 } from "react";
-import type { DragEvent, MouseEvent } from "react";
+import type { CSSProperties, DragEvent, MouseEvent } from "react";
 import { createPortal } from "react-dom";
 
 import { PageHeader } from "@/component/app-shell/page-header";
@@ -94,7 +94,7 @@ type InlineIconProps = {
 };
 
 function iconClassName(className?: string) {
-  return ["h-[1.2rem] w-[1.2rem]", className].filter(Boolean).join(" ");
+  return ["ui-icon-md", className].filter(Boolean).join(" ");
 }
 
 function GripDotsIcon({ className }: InlineIconProps) {
@@ -653,7 +653,7 @@ export function LocationConfigurationClient({
     : selectedLocation?.name ?? copy.title;
 
   return (
-    <section className="flex flex-col gap-6 pb-56 lg:pb-0">
+    <section className="ui-page-stack ui-page-stack-footer">
       <PageHeader
         eyebrow={copy.eyebrow}
         title={pageTitle}
@@ -667,17 +667,17 @@ export function LocationConfigurationClient({
         }
       />
 
-      <div className="ui-layout-directory 2xl:grid-cols-[minmax(18rem,0.84fr)_minmax(0,1.16fr)_minmax(18rem,0.84fr)]">
-        <aside className="ui-panel flex flex-col gap-4 px-5 py-5">
+      <div className="ui-layout-directory ui-layout-directory-editor">
+        <aside className="ui-panel ui-stack-lg ui-panel-context-card">
           {!directory ? (
             <div className="ui-panel ui-empty-panel">
               {hasAnyScope ? copy.missingCurrentScope : copy.emptyScope}
             </div>
           ) : null}
 
-          {directory && !directory.can_edit ? <div className="ui-notice-attention px-4 py-3 text-sm">{copy.readOnlyNotice}</div> : null}
+          {directory && !directory.can_edit ? <div className="ui-notice-attention ui-notice-block">{copy.readOnlyNotice}</div> : null}
 
-          <div className="grid gap-1">
+          <div className="ui-directory-list">
               {visibleItemList.map((item) => {
                 const siblings = childrenByParent.get(item.parent_location_id ?? null) ?? [];
                 const siblingIndex = siblings.findIndex((sibling) => sibling.id === item.id);
@@ -687,7 +687,7 @@ export function LocationConfigurationClient({
                 const isSelected = item.id === selectedLocation?.id && !isCreateMode;
 
                 return (
-                  <div key={item.id} className="grid gap-1">
+                  <div key={item.id} className="ui-directory-entry">
                     <div
                       className="ui-directory-drop-slot"
                       data-active={dropKey === topKey ? "true" : undefined}
@@ -710,10 +710,10 @@ export function LocationConfigurationClient({
                         );
                       }}
                     />
-                    <div className="flex items-stretch gap-2">
+                    <div className="ui-directory-row">
                       <button
                         type="button"
-                        className="ui-directory-handle disabled:cursor-not-allowed disabled:opacity-45"
+                        className="ui-directory-handle"
                         draggable={item.can_move && !isSaving && !isMoving}
                         onDragStart={(event: DragEvent<HTMLButtonElement>) => {
                           setDraggedLocationId(item.id);
@@ -730,7 +730,7 @@ export function LocationConfigurationClient({
                         <GripDotsIcon />
                       </button>
                       <div
-                        className="ui-directory-item flex flex-1 items-stretch gap-3"
+                        className="ui-directory-item ui-directory-item-frame"
                         data-selected={isSelected ? "true" : undefined}
                         data-drop-active={dropKey === insideKey ? "true" : undefined}
                         onDragOver={(event) => {
@@ -757,22 +757,22 @@ export function LocationConfigurationClient({
                             {expandedIdSet.has(item.id) ? "-" : "+"}
                           </button>
                         ) : <span className="ui-directory-dot">&middot;</span>}
-                        <button type="button" className="flex-1 text-left" onClick={() => handleSelectLocation(item)} style={{ paddingLeft: `${item.depth * 1.1}rem` }}>
+                        <button type="button" className="ui-directory-content" onClick={() => handleSelectLocation(item)} style={{ "--ui-directory-depth": String(item.depth) } as CSSProperties}>
                           <p className="ui-directory-label">{resolveLocationLabel(item)}</p>
                           <p className="ui-directory-description">{item.display_name}</p>
                         </button>
                       </div>
                       <div className="ui-directory-action-grid">
-                        <button type="button" className="ui-directory-action disabled:cursor-not-allowed disabled:opacity-45" onClick={() => siblingIndex > 0 ? void moveLocation(item.id, item.parent_location_id ?? null, siblingIndex - 1) : undefined} disabled={!item.can_move || siblingIndex < 1 || isSaving || isMoving} aria-label={copy.moveUp} title={copy.moveUp}>
+                        <button type="button" className="ui-directory-action" onClick={() => siblingIndex > 0 ? void moveLocation(item.id, item.parent_location_id ?? null, siblingIndex - 1) : undefined} disabled={!item.can_move || siblingIndex < 1 || isSaving || isMoving} aria-label={copy.moveUp} title={copy.moveUp}>
                           <MoveUpIcon />
                         </button>
-                        <button type="button" className="ui-directory-action disabled:cursor-not-allowed disabled:opacity-45" onClick={() => handleStartCreate(item.id, true)} disabled={!directory?.can_create || isSaving || isMoving} aria-label={copy.newChild} title={copy.newChild}>
+                        <button type="button" className="ui-directory-action" onClick={() => handleStartCreate(item.id, true)} disabled={!directory?.can_create || isSaving || isMoving} aria-label={copy.newChild} title={copy.newChild}>
                           <NewChildIcon />
                         </button>
-                        <button type="button" className="ui-directory-action disabled:cursor-not-allowed disabled:opacity-45" onClick={() => siblingIndex >= 0 ? void moveLocation(item.id, item.parent_location_id ?? null, siblingIndex + 1) : undefined} disabled={!item.can_move || siblingIndex < 0 || siblingIndex >= siblings.length - 1 || isSaving || isMoving} aria-label={copy.moveDown} title={copy.moveDown}>
+                        <button type="button" className="ui-directory-action" onClick={() => siblingIndex >= 0 ? void moveLocation(item.id, item.parent_location_id ?? null, siblingIndex + 1) : undefined} disabled={!item.can_move || siblingIndex < 0 || siblingIndex >= siblings.length - 1 || isSaving || isMoving} aria-label={copy.moveDown} title={copy.moveDown}>
                           <MoveDownIcon />
                         </button>
-                        <button type="button" className="ui-directory-action disabled:cursor-not-allowed disabled:opacity-45" onClick={() => handleStartCreate(item.parent_location_id ?? null, true)} disabled={!directory?.can_create || isSaving || isMoving} aria-label={copy.newSibling} title={copy.newSibling}>
+                        <button type="button" className="ui-directory-action" onClick={() => handleStartCreate(item.parent_location_id ?? null, true)} disabled={!directory?.can_create || isSaving || isMoving} aria-label={copy.newSibling} title={copy.newSibling}>
                           <NewSiblingIcon />
                         </button>
                       </div>
@@ -808,34 +808,34 @@ export function LocationConfigurationClient({
             ) : null}
           </div>
 
-          <button type="button" className="ui-button-secondary mt-2" onClick={() => handleStartCreate(null, true)} disabled={!directory?.can_create}>{copy.newLabel}</button>
+          <button type="button" className="ui-button-secondary ui-space-top-sm" onClick={() => handleStartCreate(null, true)} disabled={!directory?.can_create}>{copy.newLabel}</button>
         </aside>
           <div
             ref={editorPanelRef}
-            className="ui-panel ui-panel-editor ui-scroll-stable ui-editor-panel-sticky relative isolate px-6 py-6 scroll-mt-24 sm:scroll-mt-28 lg:scroll-mt-0"
+            className="ui-panel ui-panel-editor ui-scroll-stable ui-editor-panel-sticky ui-editor-panel"
             data-delete-pending={isDeletePending ? "true" : undefined}
           >
-            <div className="flex flex-col gap-6">
-              {successMessage ? <div className="ui-status-panel ui-tone-positive text-sm">{successMessage}</div> : null}
-              {formError ? <div className="ui-notice-danger px-4 py-3 text-sm">{formError}</div> : null}
+            <div className="ui-editor-panel-body">
+              {successMessage ? <div className="ui-status-panel ui-tone-positive ui-status-copy">{successMessage}</div> : null}
+              {formError ? <div className="ui-notice-danger ui-notice-block">{formError}</div> : null}
 
-              <section className="ui-card ui-form-section ui-border-accent relative isolate">
+              <section className="ui-card ui-form-section ui-border-accent">
                 {isEditorFlashActive ? (
                   <>
                     <span
                       aria-hidden
-                      className="ui-editor-flash-ring pointer-events-none absolute inset-0"
+                      className="ui-editor-flash-ring"
                     />
                     <span
                       aria-hidden
-                      className="ui-editor-flash-fill pointer-events-none absolute inset-x-0 top-0 h-28"
+                      className="ui-editor-flash-fill"
                     />
                   </>
                 ) : null}
 
-                <div className="relative z-10">
+                <div className="ui-editor-content">
                   <div className="ui-section-header">
-                    <span className="ui-icon-badge"><PreviewIcon className="h-[1.05rem] w-[1.05rem]" /></span>
+                    <span className="ui-icon-badge"><PreviewIcon className="ui-icon-sm" /></span>
                     <div className="ui-section-copy">
                       <h2 className="ui-header-title ui-title-section">{copy.sectionIdentityTitle}</h2>
                       <p className="ui-copy-body">{copy.sectionIdentityDescription}</p>
@@ -845,14 +845,14 @@ export function LocationConfigurationClient({
                   <div className="ui-form-fields">
                     <div className="ui-field">
                       <label className="ui-field-label" htmlFor="location-name">{copy.nameLabel}</label>
-                      <input id="location-name" className="ui-input w-full" value={name} onChange={(event) => { setName(event.target.value); setFieldError((previous) => ({ ...previous, name: undefined })); setSuccessMessage(null); }} disabled={isDeletePending || !canEditForm} aria-invalid={Boolean(fieldError.name)} />
+                      <input id="location-name" className="ui-input" value={name} onChange={(event) => { setName(event.target.value); setFieldError((previous) => ({ ...previous, name: undefined })); setSuccessMessage(null); }} disabled={isDeletePending || !canEditForm} aria-invalid={Boolean(fieldError.name)} />
                       <p className="ui-field-hint">{copy.nameHint}</p>
                       {fieldError.name ? <p className="ui-field-error">{fieldError.name}</p> : null}
                     </div>
 
                     <div className="ui-field">
                       <label className="ui-field-label" htmlFor="location-display-name">{copy.displayNameLabel}</label>
-                      <textarea id="location-display-name" className="ui-input min-h-28 w-full resize-y" value={displayName} onChange={(event) => { setDisplayName(event.target.value); setFieldError((previous) => ({ ...previous, displayName: undefined })); setSuccessMessage(null); }} disabled={isDeletePending || !canEditForm} aria-invalid={Boolean(fieldError.displayName)} />
+                      <textarea id="location-display-name" className="ui-input ui-input-textarea" value={displayName} onChange={(event) => { setDisplayName(event.target.value); setFieldError((previous) => ({ ...previous, displayName: undefined })); setSuccessMessage(null); }} disabled={isDeletePending || !canEditForm} aria-invalid={Boolean(fieldError.displayName)} />
                       <p className="ui-field-hint">{copy.displayNameHint}</p>
                       {fieldError.displayName ? <p className="ui-field-error">{fieldError.displayName}</p> : null}
                     </div>
@@ -865,7 +865,7 @@ export function LocationConfigurationClient({
 
           <aside className="ui-panel-context">
             {selectedLocation && !isCreateMode ? (
-              <div className="ui-panel ui-panel-context p-5">
+              <div className="ui-panel ui-panel-context ui-panel-context-body">
                 <div className="ui-metadata-grid">
                   <div className="ui-metadata-card">
                     <p className="ui-metadata-label">{copy.metadataIdLabel}</p>
@@ -889,9 +889,9 @@ export function LocationConfigurationClient({
               </div>
             ) : null}
 
-            <div className="ui-card ui-card-coming-soon p-5">
+            <div className="ui-card ui-card-coming-soon ui-panel-body-compact">
               <div className="ui-section-header">
-                <span className="ui-icon-badge ui-icon-badge-construction"><HistoryIcon className="h-[1.05rem] w-[1.05rem]" /></span>
+                <span className="ui-icon-badge ui-icon-badge-construction"><HistoryIcon className="ui-icon-sm" /></span>
                 <div className="ui-section-copy">
                   <h2 className="ui-header-title ui-title-section">{copy.historyTitle}</h2>
                   <p className="ui-copy-body">{copy.historyDescription}</p>
@@ -904,8 +904,8 @@ export function LocationConfigurationClient({
       {portalTarget
         ? createPortal(
             <div className="ui-action-footer">
-              <Link href={configurationPath} className="ui-button-secondary inline-flex items-center justify-center" onClick={(event: MouseEvent<HTMLAnchorElement>) => { if (isDirty && !window.confirm(copy.discardConfirm)) { event.preventDefault(); } }}>{copy.cancel}</Link>
-              <div className="flex gap-2">
+              <Link href={configurationPath} className="ui-button-secondary" onClick={(event: MouseEvent<HTMLAnchorElement>) => { if (isDirty && !window.confirm(copy.discardConfirm)) { event.preventDefault(); } }}>{copy.cancel}</Link>
+              <div className="ui-action-footer-end">
                 {!isCreateMode && selectedLocation ? (
                   <button type="button" className="ui-button-danger" onClick={() => setIsDeletePending((previous) => !previous)} disabled={!selectedLocation.can_delete || isSaving}>{isDeletePending ? copy.undoDelete : copy.delete}</button>
                 ) : null}

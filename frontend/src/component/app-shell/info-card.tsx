@@ -19,9 +19,9 @@ export function InfoCard({
   actionLabel
 }: InfoCardProps) {
   return (
-    <article className="ui-card flex h-full flex-col gap-4 p-5">
-      <div className="flex items-start gap-4">
-        {iconSlot ? <div className="ui-icon-badge shrink-0">{iconSlot}</div> : null}
+    <article className="ui-card ui-card-stack">
+      <div className="ui-card-main">
+        {iconSlot ? <div className="ui-icon-badge ui-shrink-0">{iconSlot}</div> : null}
         <div className="ui-section-copy">
           <h2 className="ui-header-title ui-title-section">
             {title}
@@ -32,8 +32,8 @@ export function InfoCard({
         </div>
       </div>
       {actionHref && actionLabel ? (
-        <div className="mt-auto">
-          <Link className="ui-link text-sm font-semibold" href={actionHref}>
+        <div className="ui-card-action">
+          <Link className="ui-link" href={actionHref}>
             {actionLabel}
             <ArrowUpRightIcon />
           </Link>

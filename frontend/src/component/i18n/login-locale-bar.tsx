@@ -13,7 +13,7 @@ export function LoginLocaleBar({ currentLocale }: LoginLocaleBarProps) {
   const t = useTranslations("AppShell.menu");
 
   return (
-    <div className="pointer-events-auto fixed right-6 top-6 z-50">
+    <div className="ui-login-locale-bar">
       <LocaleFlagMenu
         key={currentLocale}
         currentLocale={currentLocale}

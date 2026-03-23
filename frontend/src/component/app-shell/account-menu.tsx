@@ -125,14 +125,14 @@ export function AccountMenu({
 
   const panelClassName =
     placement === "sidebar"
-      ? "ui-menu-panel absolute left-0 top-[calc(100%+0.375rem)] z-40 inline-flex w-auto max-w-[min(calc(100vw-3rem),18rem)] flex-col gap-0 overflow-hidden rounded-none p-0"
-      : "ui-menu-panel absolute left-0 top-[calc(100%+0.375rem)] inline-flex w-auto max-w-[min(calc(100vw-3rem),18rem)] flex-col gap-0 overflow-hidden rounded-none p-0";
+      ? "ui-menu-panel ui-menu-panel-start ui-menu-panel-narrow ui-menu-panel-floating"
+      : "ui-menu-panel ui-menu-panel-start ui-menu-panel-narrow";
 
   return (
-    <div ref={containerRef} className="relative isolate w-full max-w-full">
-      <div className="flex w-full max-w-full items-center gap-2">
+    <div ref={containerRef} className="ui-menu-root-fill">
+      <div className="ui-menu-row">
         <div
-          className={`${isSidebar ? "order-2 relative max-w-full shrink-0" : "order-1 relative min-w-0 flex-1"}`}
+          className={isSidebar ? "ui-menu-account-anchor-sidebar" : "ui-menu-account-anchor-default"}
         >
           <button
             type="button"
@@ -146,16 +146,16 @@ export function AccountMenu({
             }
             className={`ui-account-trigger ${
               isSidebar
-                ? "ui-account-trigger-sidebar w-auto max-w-full"
-                : "w-full ui-menu-trigger gap-3 rounded-none pl-2 pr-2.5 sm:pl-2.5 sm:pr-3"
+                ? "ui-account-trigger-sidebar"
+                : "ui-menu-trigger ui-account-trigger-default"
             }`}
           >
             {!isSidebar ? (
-              <span className="ui-avatar shrink-0">
+              <span className="ui-avatar ui-shrink-0">
                 {getInitials(accountName)}
               </span>
             ) : null}
-            <span className={`${isSidebar ? "text-left" : "min-w-0 flex-1 text-left"}`}>
+            <span className={isSidebar ? "ui-account-summary-sidebar" : "ui-account-summary"}>
               <span
                 className={`ui-account-name ${
                   isSidebar
@@ -167,18 +167,18 @@ export function AccountMenu({
               </span>
             </span>
             <ChevronDownIcon
-              className={`ui-account-chevron ${isSidebar ? "text-[var(--color-text)]" : "text-[var(--color-text-subtle)]"}`}
+              className={`ui-account-chevron ${isSidebar ? "ui-account-chevron-sidebar" : "ui-account-chevron-default"}`}
             />
           </button>
 
           {isAccountMenuOpen ? (
             <div role="menu" aria-label={accountName} className={panelClassName}>
-              <div className="inline-flex flex-col items-stretch self-start gap-0">
+              <div className="ui-menu-list">
                 <Link
                   href={configurationHref}
                   role="menuitem"
                   onClick={() => setActiveMenu(null)}
-                  className="ui-menu-item self-stretch whitespace-nowrap rounded-none border-0 shadow-none inline-flex items-center px-4 py-2.5 text-sm font-medium text-[var(--color-text)]"
+                  className="ui-menu-item"
                 >
                   {copy.configurationLabel}
                 </Link>
@@ -188,7 +188,7 @@ export function AccountMenu({
                   role="menuitem"
                   onClick={() => void handleSignOut()}
                   disabled={isSigningOut}
-                  className="ui-menu-item ui-menu-sign-out appearance-none self-stretch whitespace-nowrap rounded-none border-0 shadow-none inline-flex items-center px-4 py-2.5 text-left text-sm font-medium disabled:opacity-60"
+                  className="ui-menu-item ui-menu-sign-out"
                 >
                   {isSigningOut
                     ? copy.signOutPendingLabel
@@ -200,7 +200,7 @@ export function AccountMenu({
         </div>
 
         <div
-          className={`${isSidebar ? "order-1 shrink-0 self-end" : "order-2 shrink-0"}`}
+          className={isSidebar ? "ui-menu-flag-anchor-sidebar" : "ui-menu-flag-anchor-default"}
         >
           <LocaleFlagMenu
             key={currentLocale}

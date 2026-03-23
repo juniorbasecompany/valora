@@ -23,7 +23,7 @@ export default async function AppHomePage({ params }: AppHomePageProps) {
   const t = await getTranslations("HomePage");
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="ui-page-stack">
       <PageHeader
         eyebrow={t("eyebrow")}
         title={t("title")}
@@ -37,84 +37,84 @@ export default async function AppHomePage({ params }: AppHomePageProps) {
         }
       />
 
-      <section className="grid gap-4 xl:grid-cols-3">
+      <section className="ui-grid-cards-3">
         <InfoCard
           title={t("context.workspace.title")}
           description={t("context.workspace.description")}
-          iconSlot={<BuildingIcon className="h-[1.05rem] w-[1.05rem]" />}
+          iconSlot={<BuildingIcon className="ui-icon-sm" />}
         />
         <InfoCard
           title={t("context.locale.title")}
           description={t("context.locale.description")}
-          iconSlot={<GlobeIcon className="h-[1.05rem] w-[1.05rem]" />}
+          iconSlot={<GlobeIcon className="ui-icon-sm" />}
         />
         <InfoCard
           title={t("context.entryFlow.title")}
           description={t("context.entryFlow.description")}
-          iconSlot={<WorkflowIcon className="h-[1.05rem] w-[1.05rem]" />}
+          iconSlot={<WorkflowIcon className="ui-icon-sm" />}
         />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <div className="ui-panel flex flex-col gap-5 p-6">
-          <div className="space-y-2">
-            <h2 className="ui-header-title text-xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">
+      <section className="ui-grid-split-home">
+        <div className="ui-panel ui-panel-stack">
+          <div className="ui-heading-stack">
+            <h2 className="ui-header-title ui-title-section-lg">
               {t("setup.title")}
             </h2>
-            <p className="text-sm leading-6 text-[var(--color-text-subtle)]">
+            <p className="ui-text-note">
               {t("setup.description")}
             </p>
           </div>
 
-          <div className="grid gap-4">
+          <div className="ui-grid-list">
             <SetupStepCard
               title={t("setup.steps.organization.title")}
               description={t("setup.steps.organization.description")}
               statusLabel={t("setup.steps.organization.status")}
               tone="attention"
-              iconSlot={<BuildingIcon className="h-[1.05rem] w-[1.05rem]" />}
+              iconSlot={<BuildingIcon className="ui-icon-sm" />}
             />
             <SetupStepCard
               title={t("setup.steps.member.title")}
               description={t("setup.steps.member.description")}
               statusLabel={t("setup.steps.member.status")}
               tone="neutral"
-              iconSlot={<UsersIcon className="h-[1.05rem] w-[1.05rem]" />}
+              iconSlot={<UsersIcon className="ui-icon-sm" />}
             />
             <SetupStepCard
               title={t("setup.steps.scope.title")}
               description={t("setup.steps.scope.description")}
               statusLabel={t("setup.steps.scope.status")}
               tone="neutral"
-              iconSlot={<ScopeIcon className="h-[1.05rem] w-[1.05rem]" />}
+              iconSlot={<ScopeIcon className="ui-icon-sm" />}
             />
           </div>
         </div>
 
-        <div className="ui-panel flex flex-col gap-5 p-6">
-          <div className="space-y-2">
-            <h2 className="ui-header-title text-xl font-semibold tracking-[-0.03em] text-[var(--color-text)]">
+        <div className="ui-panel ui-panel-stack">
+          <div className="ui-heading-stack">
+            <h2 className="ui-header-title ui-title-section-lg">
               {t("quickAction.title")}
             </h2>
-            <p className="text-sm leading-6 text-[var(--color-text-subtle)]">
+            <p className="ui-text-note">
               {t("quickAction.description")}
             </p>
           </div>
 
-          <div className="grid gap-4">
+          <div className="ui-grid-list">
             <QuickActionCard
               title={t("quickAction.configuration.title")}
               description={t("quickAction.configuration.description")}
               href={`/${locale}/app/configuration`}
               actionLabel={t("quickAction.configuration.action")}
-              iconSlot={<SparkIcon className="h-[1.05rem] w-[1.05rem]" />}
+              iconSlot={<SparkIcon className="ui-icon-sm" />}
             />
             <QuickActionCard
               title={t("quickAction.plan.title")}
               description={t("quickAction.plan.description")}
               href={`/${locale}/app/configuration`}
               actionLabel={t("quickAction.plan.action")}
-              iconSlot={<WorkflowIcon className="h-[1.05rem] w-[1.05rem]" />}
+              iconSlot={<WorkflowIcon className="ui-icon-sm" />}
             />
           </div>
         </div>

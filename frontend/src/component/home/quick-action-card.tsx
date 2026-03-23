@@ -19,10 +19,10 @@ export function QuickActionCard({
   iconSlot
 }: QuickActionCardProps) {
   return (
-    <article className="ui-card ui-preview-card-accent flex h-full flex-col gap-4 p-5">
+    <article className="ui-card ui-preview-card-accent ui-card-stack">
       <div className="ui-preview-card-glow" />
-      <div className="relative flex items-start gap-4">
-        {iconSlot ? <div className="ui-icon-badge shrink-0">{iconSlot}</div> : null}
+      <div className="ui-card-main">
+        {iconSlot ? <div className="ui-icon-badge ui-shrink-0">{iconSlot}</div> : null}
         <div className="ui-section-copy">
           <h3 className="ui-header-title ui-title-section">
             {title}
@@ -32,10 +32,10 @@ export function QuickActionCard({
           </p>
         </div>
       </div>
-      <div className="relative mt-auto">
+      <div className="ui-card-action ui-relative">
         <Link
           href={href}
-          className="ui-button-secondary inline-flex items-center text-sm font-medium transition"
+          className="ui-button-secondary"
         >
           {actionLabel}
           <ArrowUpRightIcon />

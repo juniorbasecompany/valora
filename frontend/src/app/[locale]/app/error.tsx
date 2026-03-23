@@ -12,15 +12,15 @@ export default function AppErrorPage({ error, reset }: AppErrorPageProps) {
 
   return (
     <section className="ui-notice-danger ui-notice-panel">
-      <div className="flex flex-col gap-3">
-        <h2 className="ui-header-title text-xl font-semibold tracking-[-0.03em]">
+      <div className="ui-panel-stack-compact">
+        <h2 className="ui-header-title ui-title-section-xl">
           {t("errorTitle")}
         </h2>
-        <p className="max-w-2xl text-sm leading-6 opacity-90">
+        <p className="ui-text-note-muted ui-copy-limit">
           {t("errorDescription")}
         </p>
         {error.message ? (
-          <p className="ui-card ui-tone-danger px-4 py-3 text-sm leading-6">
+          <p className="ui-card ui-tone-danger ui-notice-block ui-text-note-muted">
             {error.message}
           </p>
         ) : null}
@@ -28,7 +28,7 @@ export default function AppErrorPage({ error, reset }: AppErrorPageProps) {
           <button
             type="button"
             onClick={reset}
-            className="ui-button-danger text-sm font-medium transition"
+            className="ui-button-danger"
           >
             {t("retry")}
           </button>

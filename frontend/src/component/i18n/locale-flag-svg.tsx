@@ -6,9 +6,9 @@ type LocaleFlagSvgProps = {
 };
 
 const sizeClassMap = {
-  menu: "h-[1.125rem] w-6",
+  menu: "ui-flag-menu",
   /** Sem altura fixa (`h-5`): proporção 22×15 evita caixa mais alta que o texto na topbar/sidebar */
-  trigger: "aspect-[22/15] w-[1.35rem] h-auto"
+  trigger: "ui-flag-trigger"
 } as const;
 
 function BrazilFlagSvg({ className }: { className?: string }) {
@@ -93,7 +93,7 @@ export function LocaleFlagSvg({
 }: LocaleFlagSvgProps) {
   const merged = [
     sizeClassMap[size],
-    "shrink-0 overflow-hidden rounded-none",
+    "ui-flag-frame",
     className
   ]
     .filter(Boolean)

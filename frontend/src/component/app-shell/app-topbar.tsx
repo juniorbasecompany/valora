@@ -16,7 +16,7 @@ export function AppTopbar({
   actionSlot
 }: AppTopbarProps) {
   return (
-    <header className="ui-topbar ui-panel-body ui-z-30">
+    <header className="ui-topbar ui-panel-body">
       <div className="ui-topbar-layout">
         <div className="ui-topbar-context">
           {leadingSlot ? <div className="ui-topbar-leading">{leadingSlot}</div> : null}

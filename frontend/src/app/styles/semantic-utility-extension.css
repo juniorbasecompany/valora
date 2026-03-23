@@ -41,6 +41,33 @@
     gap: 0.75rem;
 }
 
+.ui-shell-page {
+    min-height: 100dvh;
+}
+
+.ui-centered-page {
+    margin-inline: auto;
+    display: grid;
+    min-height: 100dvh;
+    width: 100%;
+    max-width: var(--measure-auth-layout);
+    align-items: center;
+    padding: 4.5rem 1rem 2rem;
+}
+
+.ui-centered-page-main {
+    width: 100%;
+    max-width: 64rem;
+    justify-self: center;
+}
+
+.ui-login-locale-bar {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    z-index: var(--z-menu-floating);
+}
+
 .ui-page-stack-footer {
     padding-bottom: 14rem;
 }
@@ -513,6 +540,15 @@
 }
 
 @media (min-width: 640px) {
+    .ui-centered-page {
+        padding-inline: 1.25rem;
+    }
+
+    .ui-login-locale-bar {
+        right: 1.25rem;
+        top: 1.25rem;
+    }
+
     .ui-account-trigger-default {
         padding-left: 0.625rem;
         padding-right: 0.75rem;

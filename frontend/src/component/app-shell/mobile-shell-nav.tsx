@@ -94,7 +94,7 @@ export function MobileShellNav({
           {productName}
         </div>
 
-        <div className="ui-mobile-shell-brandmark ui-justify-self-end">
+        <div className="ui-mobile-shell-brandmark">
           V
         </div>
       </div>

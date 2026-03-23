@@ -32,7 +32,7 @@ export function QuickActionCard({
           </p>
         </div>
       </div>
-      <div className="ui-card-action ui-relative">
+      <div className="ui-card-action">
         <Link
           href={href}
           className="ui-button-secondary"

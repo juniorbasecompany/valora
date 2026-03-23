@@ -4,7 +4,9 @@ import { fileURLToPath } from "node:url";
 
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 const sourceRoot = path.resolve(scriptDirectory, "../src");
-const allowedExtensionSet = new Set([".js", ".jsx", ".ts", ".tsx"]);
+const styleRoot = path.resolve(scriptDirectory, "../src/app/styles");
+const sourceExtensionSet = new Set([".js", ".jsx", ".ts", ".tsx"]);
+const styleExtensionSet = new Set([".css"]);
 const classPatternList = [
   {
     label: "className string",
@@ -33,7 +35,7 @@ const classPatternList = [
   }
 ];
 
-async function walk(directoryPath) {
+async function walk(directoryPath, allowedExtensionSet) {
   const entryList = await readdir(directoryPath, { withFileTypes: true });
   const resultList = [];
 
@@ -41,7 +43,7 @@ async function walk(directoryPath) {
     const entryPath = path.join(directoryPath, entry.name);
 
     if (entry.isDirectory()) {
-      resultList.push(...(await walk(entryPath)));
+      resultList.push(...(await walk(entryPath, allowedExtensionSet)));
       continue;
     }
 
@@ -61,16 +63,38 @@ function getLineText(source, lineNumber) {
   return source.split(/\r?\n/)[lineNumber - 1]?.trim() ?? "";
 }
 
-function getUnexpectedTokenList(raw) {
+function getClassTokenList(raw) {
   return raw
     .replace(/\$\{[^}]*\}/g, " ")
     .split(/\s+/)
     .map((token) => token.trim())
-    .filter(Boolean)
-    .filter((token) => !token.startsWith("ui-"));
+    .filter(Boolean);
 }
 
-function collectFindingList(filePath, source) {
+function isSemanticToken(token) {
+  return token.startsWith("ui-") || token.startsWith("is-");
+}
+
+function getUnexpectedTokenList(raw) {
+  return getClassTokenList(raw).filter((token) => !isSemanticToken(token));
+}
+
+async function collectDefinedTokenSet() {
+  const stylePathList = await walk(styleRoot, styleExtensionSet);
+  const definedTokenSet = new Set();
+
+  for (const stylePath of stylePathList) {
+    const source = await readFile(stylePath, "utf8");
+
+    for (const match of source.matchAll(/\.((?:ui|is)-[A-Za-z0-9-]+)/g)) {
+      definedTokenSet.add(match[1]);
+    }
+  }
+
+  return definedTokenSet;
+}
+
+function collectFindingList(filePath, source, definedTokenSet) {
   const findingList = [];
 
   for (const pattern of classPatternList) {
@@ -82,23 +106,38 @@ function collectFindingList(filePath, source) {
         continue;
       }
 
-      if (pattern.requiresUiToken && !raw.includes("ui-")) {
+      if (pattern.requiresUiToken && !/(?:^|\s)(?:ui-|is-)/.test(raw)) {
         continue;
       }
 
       const unexpectedTokenList = getUnexpectedTokenList(raw);
-      if (unexpectedTokenList.length === 0) {
-        continue;
+      if (unexpectedTokenList.length > 0) {
+        const lineNumber = getLineNumber(source, match.index);
+        findingList.push({
+          filePath,
+          lineNumber,
+          label: pattern.label,
+          kind: "non-semantic tokens",
+          tokenList: unexpectedTokenList,
+          line: getLineText(source, lineNumber)
+        });
       }
 
-      const lineNumber = getLineNumber(source, match.index);
-      findingList.push({
-        filePath,
-        lineNumber,
-        label: pattern.label,
-        tokenList: unexpectedTokenList,
-        line: getLineText(source, lineNumber)
-      });
+      const undefinedSemanticTokenList = getClassTokenList(raw)
+        .filter(isSemanticToken)
+        .filter((token) => !definedTokenSet.has(token));
+
+      if (undefinedSemanticTokenList.length > 0) {
+        const lineNumber = getLineNumber(source, match.index);
+        findingList.push({
+          filePath,
+          lineNumber,
+          label: pattern.label,
+          kind: "undefined semantic tokens",
+          tokenList: undefinedSemanticTokenList,
+          line: getLineText(source, lineNumber)
+        });
+      }
     }
 
     pattern.regex.lastIndex = 0;
@@ -127,12 +166,13 @@ function collectFindingList(filePath, source) {
 }
 
 async function main() {
-  const filePathList = await walk(sourceRoot);
+  const filePathList = await walk(sourceRoot, sourceExtensionSet);
+  const definedTokenSet = await collectDefinedTokenSet();
   const findingList = [];
 
   for (const filePath of filePathList) {
     const source = await readFile(filePath, "utf8");
-    findingList.push(...collectFindingList(filePath, source));
+    findingList.push(...collectFindingList(filePath, source, definedTokenSet));
   }
 
   if (findingList.length === 0) {
@@ -146,7 +186,7 @@ async function main() {
 
   for (const finding of findingList) {
     const relativePath = path.relative(path.resolve(scriptDirectory, ".."), finding.filePath);
-    console.error(`- ${relativePath}:${finding.lineNumber} uses non-semantic tokens: ${finding.tokenList.join(", ")}`);
+    console.error(`- ${relativePath}:${finding.lineNumber} uses ${finding.kind}: ${finding.tokenList.join(", ")}`);
     console.error(`  ${finding.line}`);
   }
 

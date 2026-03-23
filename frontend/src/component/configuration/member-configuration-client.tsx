@@ -17,7 +17,6 @@ import type {
 type MemberStatusKey = "ACTIVE" | "PENDING" | "DISABLED";
 
 export type MemberConfigurationCopy = {
-  eyebrow: string;
   title: string;
   description: string;
   statusTitle: string;
@@ -476,7 +475,6 @@ export function MemberConfigurationClient({
   return (
     <section className={`ui-page-stack ${tab === "general" ? "ui-page-stack-footer" : ""}`}>
       <PageHeader
-        eyebrow={copy.eyebrow}
         title={pageTitle}
         description={copy.description}
         actionSlot={

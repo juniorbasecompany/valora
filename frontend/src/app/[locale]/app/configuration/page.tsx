@@ -26,7 +26,6 @@ export default async function ConfigurationPage({ params }: ConfigurationPagePro
   return (
     <section className="ui-page-stack">
       <PageHeader
-        eyebrow={t("eyebrow")}
         title={t("title")}
         description={t("description")}
         actionSlot={

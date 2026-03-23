@@ -45,7 +45,6 @@
     }
   },
   "HomePage": {
-    "eyebrow": "Página principal",
     "title": "La base del sistema ya está lista para iniciar la configuración estructural de Valora.",
     "description": "Esta página principal funciona como punto de entrada de la aplicación después de la autenticación. Muestra el contexto actual, el estado de la configuración inicial y el camino más corto hacia la configuración administrativa.",
     "status": {
@@ -103,7 +102,6 @@
     }
   },
   "ConfigurationPage": {
-    "eyebrow": "Configuración administrativa",
     "title": "Esta área será la primera base útil de datos del sistema.",
     "description": "Aquí estarán los registros manuales iniciales antes de que existan asistentes guiados, automatizaciones o módulos operativos completos.",
     "openTenantEditor": "Editar licenciatario",
@@ -156,7 +154,6 @@
     }
   },
   "ModulePlaceholderPage": {
-    "eyebrow": "Módulo",
     "description": "{module} ya está conectado a la navegación principal y usa esta pantalla provisional hasta la primera entrega funcional del flujo.",
     "status": {
       "title": "Destino navegable disponible",
@@ -190,7 +187,6 @@
     }
   },
   "MemberConfigurationPage": {
-    "eyebrow": "Configuración",
     "title": "Miembros",
     "description": "Edita el registro de los miembros vinculados al licenciatario activo. Nombre, rol y estado quedan centralizados en este directorio.",
     "status": {
@@ -261,7 +257,6 @@
     "discardConfirm": "¿Descartar los cambios no guardados?"
   },
   "ScopeConfigurationPage": {
-    "eyebrow": "Configuración",
     "title": "Alcances",
     "description": "Edita la base estructural mínima del licenciatario activo. Cada alcance define un recorte inicial que sostendrá los registros y módulos posteriores.",
     "status": {
@@ -312,7 +307,6 @@
     "discardConfirm": "¿Descartar los cambios no guardados?"
   },
   "LocationConfigurationPage": {
-    "eyebrow": "Configuración",
     "title": "Ubicaciones",
     "description": "Edita el directorio jerárquico de ubicaciones del licenciatario activo. Cada ubicación pertenece a un alcance y puede quedar debajo de otra ubicación dentro del mismo alcance.",
     "status": {
@@ -374,7 +368,6 @@
     "discardConfirm": "¿Descartar los cambios no guardados?"
   },
   "TenantConfigurationPage": {
-    "eyebrow": "Configuración",
     "title": "Licenciatario",
     "description": "Estos campos identifican a la organización contratante en el espacio de trabajo, la barra superior y las listas. Los cambios aplican al licenciatario activo de tu sesión.",
     "status": {

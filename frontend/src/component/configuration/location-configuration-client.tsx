@@ -655,7 +655,6 @@ export function LocationConfigurationClient({
   return (
     <section className="ui-page-stack ui-page-stack-footer">
       <PageHeader
-        eyebrow={copy.eyebrow}
         title={pageTitle}
         description={copy.description}
         actionSlot={

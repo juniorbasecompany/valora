@@ -51,7 +51,6 @@ export default async function LocationConfigurationPage({
         hasAnyScope={scopeDirectory.item_list.length > 0}
         initialLocationDirectory={locationDirectory}
         copy={{
-          eyebrow: t("eyebrow"),
           title: t("title"),
           description: t("description"),
           statusTitle: t("status.title"),

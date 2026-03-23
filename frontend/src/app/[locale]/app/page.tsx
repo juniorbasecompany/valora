@@ -25,7 +25,6 @@ export default async function AppHomePage({ params }: AppHomePageProps) {
   return (
     <section className="ui-page-stack">
       <PageHeader
-        eyebrow={t("eyebrow")}
         title={t("title")}
         description={t("description")}
         actionSlot={

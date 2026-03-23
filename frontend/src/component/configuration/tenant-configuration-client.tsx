@@ -12,7 +12,6 @@ import { BuildingIcon, HistoryIcon, PreviewIcon } from "@/component/ui/ui-icons"
 import type { TenantCurrentResponse } from "@/lib/auth/types";
 
 export type TenantConfigurationCopy = {
-  eyebrow: string;
   title: string;
   description: string;
   statusTitle: string;
@@ -237,7 +236,6 @@ export function TenantConfigurationClient({
   return (
     <section className={`ui-page-stack ${tab === "general" ? "ui-page-stack-footer" : ""}`}>
       <PageHeader
-        eyebrow={copy.eyebrow}
         title={pageTitle}
         description={copy.description}
         actionSlot={

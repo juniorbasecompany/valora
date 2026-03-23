@@ -45,7 +45,6 @@
     }
   },
   "HomePage": {
-    "eyebrow": "Página principal",
     "title": "A base do sistema já está pronta para iniciar o cadastro estrutural do Valora.",
     "description": "Esta página inicial funciona como ponto de entrada da aplicação após a autenticação. Ela mostra o contexto atual, o estado da configuração inicial e o caminho mais curto até a configuração administrativa.",
     "status": {
@@ -103,7 +102,6 @@
     }
   },
   "ConfigurationPage": {
-    "eyebrow": "Configuração administrativa",
     "title": "Esta área será a primeira base útil de cadastro do sistema.",
     "description": "Aqui ficarão os cadastros iniciais feitos manualmente antes de existirem assistentes guiados, automações ou módulos operacionais completos.",
     "openTenantEditor": "Editar licenciado",
@@ -156,7 +154,6 @@
     }
   },
   "ModulePlaceholderPage": {
-    "eyebrow": "Módulo",
     "description": "{module} já está ligado à navegação principal e usa esta tela provisória até a primeira entrega funcional do fluxo.",
     "status": {
       "title": "Destino navegável disponível",
@@ -190,7 +187,6 @@
     }
   },
   "MemberConfigurationPage": {
-    "eyebrow": "Configuração",
     "title": "Membros",
     "description": "Edite o cadastro dos membros vinculados ao licenciado ativo. Nome, papel e situação ficam centralizados neste diretório.",
     "status": {
@@ -266,7 +262,6 @@
     "discardConfirm": "Descartar alterações não salvas?"
   },
   "ScopeConfigurationPage": {
-    "eyebrow": "Configuração",
     "title": "Escopos",
     "description": "Edite a base estrutural mínima do licenciado ativo. Cada escopo define um recorte inicial que sustentará os cadastros e módulos posteriores.",
     "status": {
@@ -322,7 +317,6 @@
     "discardConfirm": "Descartar alterações não salvas?"
   },
   "LocationConfigurationPage": {
-    "eyebrow": "Configuração",
     "title": "Locais",
     "description": "Edite o diretório hierárquico de locais do licenciado ativo. Cada local pertence a um escopo e pode ficar abaixo de outro local no mesmo escopo.",
     "status": {
@@ -384,7 +378,6 @@
     "discardConfirm": "Descartar alterações não salvas?"
   },
   "TenantConfigurationPage": {
-    "eyebrow": "Configuração",
     "title": "Licenciado",
     "description": "Estes campos identificam a organização contratante no ambiente, na barra superior e nas listas. As alterações valem para o licenciado ativo da sua sessão.",
     "status": {

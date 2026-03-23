@@ -39,7 +39,6 @@ export default async function ModulePlaceholderPage({
   return (
     <section className="ui-page-stack">
       <PageHeader
-        eyebrow={t("eyebrow")}
         title={moduleLabel}
         description={t("description", { module: moduleLabel })}
         actionSlot={

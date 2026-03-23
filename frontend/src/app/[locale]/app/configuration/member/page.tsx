@@ -23,7 +23,6 @@ export default async function MemberConfigurationPage({
   const tState = await getTranslations("State");
 
   const copy = {
-    eyebrow: t("eyebrow"),
     title: t("title"),
     description: t("description"),
     statusTitle: t("status.title"),

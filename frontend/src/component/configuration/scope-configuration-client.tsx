@@ -15,7 +15,6 @@ import type {
 } from "@/lib/auth/types";
 
 export type ScopeConfigurationCopy = {
-  eyebrow: string;
   title: string;
   description: string;
   statusTitle: string;
@@ -487,7 +486,6 @@ export function ScopeConfigurationClient({
   return (
     <section className={`ui-page-stack ${tab === "general" ? "ui-page-stack-footer" : ""}`}>
       <PageHeader
-        eyebrow={copy.eyebrow}
         title={pageTitle}
         description={copy.description}
         actionSlot={

@@ -472,31 +472,18 @@ export function ScopeConfigurationClient({
 
             <div className="ui-layout-directory ui-layout-directory-editor">
                 <aside className="ui-panel ui-stack-lg ui-panel-context-card">
-                    <div className="ui-row-between">
-                        <div className="ui-section-header">
-                            <span className="ui-icon-badge">
-                                <ScopeIcon className="ui-icon" />
-                            </span>
-                            <div className="ui-section-copy">
-                                <h2 className="ui-header-title ui-title-section">
-                                    {copy.listTitle}
-                                </h2>
-                                <p className="ui-copy-body">
-                                    {copy.listDescription}
-                                </p>
-                            </div>
+                    <div className="ui-section-header">
+                        <span className="ui-icon-badge">
+                            <ScopeIcon className="ui-icon" />
+                        </span>
+                        <div className="ui-section-copy">
+                            <h2 className="ui-header-title ui-title-section">
+                                {copy.listTitle}
+                            </h2>
+                            <p className="ui-copy-body">
+                                {copy.listDescription}
+                            </p>
                         </div>
-
-                        {directory.can_create ? (
-                            <button
-                                type="button"
-                                className="ui-button-secondary"
-                                onClick={handleStartCreate}
-                                disabled={isSaving}
-                            >
-                                {copy.newScope}
-                            </button>
-                        ) : null}
                     </div>
 
                     {!directory.can_edit ? (
@@ -552,6 +539,17 @@ export function ScopeConfigurationClient({
                             </div>
                         ) : null}
                     </div>
+
+                    {directory.can_create ? (
+                        <button
+                            type="button"
+                            className="ui-button-secondary ui-space-top-sm"
+                            onClick={handleStartCreate}
+                            disabled={isSaving}
+                        >
+                            {copy.newScope}
+                        </button>
+                    ) : null}
                 </aside>
 
                 <div

@@ -317,7 +317,7 @@
 .ui-flag-frame {
     flex-shrink: 0;
     overflow: hidden;
-    border-radius: var(--flag-radius);
+    border-radius: var(--radius-flag);
 }
 
 .ui-sr-only {

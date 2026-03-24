@@ -89,6 +89,43 @@ function buildExpandedIdSet(directory: TenantLocationDirectoryResponse | null) {
     );
 }
 
+function resolveSiblingDropIndex(
+    siblings: TenantLocationRecord[],
+    draggedLocationId: number,
+    targetLocationId: number,
+    position: "before" | "after"
+) {
+    const draggedIndex = siblings.findIndex((item) => item.id === draggedLocationId);
+    const targetIndex = siblings.findIndex((item) => item.id === targetLocationId);
+    if (targetIndex < 0) {
+        return null;
+    }
+
+    if (draggedIndex >= 0 && draggedIndex < targetIndex) {
+        return position === "before" ? targetIndex - 1 : targetIndex;
+    }
+
+    return position === "before" ? targetIndex : targetIndex + 1;
+}
+
+function resolveChildDropIndex(
+    itemList: TenantLocationRecord[],
+    draggedLocationId: number,
+    targetParentId: number,
+    childrenCount: number
+) {
+    const draggedItem = itemList.find((item) => item.id === draggedLocationId);
+    if (!draggedItem) {
+        return childrenCount;
+    }
+
+    if (draggedItem.parent_location_id === targetParentId) {
+        return Math.max(childrenCount - 1, 0);
+    }
+
+    return childrenCount;
+}
+
 type InlineIconProps = {
     className?: string;
 };
@@ -678,7 +715,6 @@ export function LocationConfigurationClient({
                             const siblingIndex = siblings.findIndex((sibling) => sibling.id === item.id);
                             const topKey = `before-${item.id}`;
                             const insideKey = `inside-${item.id}`;
-                            const bottomKey = `after-${item.id}`;
                             const isSelected = item.id === selectedLocation?.id && !isCreateMode;
 
                             return (
@@ -698,10 +734,19 @@ export function LocationConfigurationClient({
                                             if (!draggedLocationId || draggedLocationId === item.id) {
                                                 return;
                                             }
+                                            const targetIndex = resolveSiblingDropIndex(
+                                                siblings,
+                                                draggedLocationId,
+                                                item.id,
+                                                "before"
+                                            );
+                                            if (targetIndex == null) {
+                                                return;
+                                            }
                                             void moveLocation(
                                                 draggedLocationId,
                                                 item.parent_location_id ?? null,
-                                                siblingIndex
+                                                targetIndex
                                             );
                                         }}
                                     />
@@ -740,10 +785,16 @@ export function LocationConfigurationClient({
                                                 if (!draggedLocationId || draggedLocationId === item.id) {
                                                     return;
                                                 }
-                                                void moveLocation(
+                                                const targetIndex = resolveChildDropIndex(
+                                                    itemList,
                                                     draggedLocationId,
                                                     item.id,
                                                     item.children_count
+                                                );
+                                                void moveLocation(
+                                                    draggedLocationId,
+                                                    item.id,
+                                                    targetIndex
                                                 );
                                             }}
                                         >
@@ -772,31 +823,47 @@ export function LocationConfigurationClient({
                                             </button>
                                         </div>
                                     </div>
-                                    <div
-                                        className="ui-directory-drop-slot"
-                                        data-active={dropKey === bottomKey ? "true" : undefined}
-                                        onDragOver={(event) => {
-                                            if (!draggedLocationId || draggedLocationId === item.id) {
-                                                return;
-                                            }
-                                            event.preventDefault();
-                                            setDropKey(bottomKey);
-                                        }}
-                                        onDrop={(event) => {
-                                            event.preventDefault();
-                                            if (!draggedLocationId || draggedLocationId === item.id) {
-                                                return;
-                                            }
-                                            void moveLocation(
-                                                draggedLocationId,
-                                                item.parent_location_id ?? null,
-                                                siblingIndex + 1
-                                            );
-                                        }}
-                                    />
                                 </div>
                             );
                         })}
+
+                        {visibleItemList.length > 0 ? (
+                            <div
+                                className="ui-directory-drop-slot"
+                                data-active={dropKey === "after-list" ? "true" : undefined}
+                                onDragOver={(event) => {
+                                    const lastItem = visibleItemList[visibleItemList.length - 1];
+                                    if (!draggedLocationId || !lastItem || draggedLocationId === lastItem.id) {
+                                        return;
+                                    }
+                                    event.preventDefault();
+                                    setDropKey("after-list");
+                                }}
+                                onDrop={(event) => {
+                                    const lastItem = visibleItemList[visibleItemList.length - 1];
+                                    event.preventDefault();
+                                    if (!draggedLocationId || !lastItem || draggedLocationId === lastItem.id) {
+                                        return;
+                                    }
+                                    const siblings =
+                                        childrenByParent.get(lastItem.parent_location_id ?? null) ?? [];
+                                    const targetIndex = resolveSiblingDropIndex(
+                                        siblings,
+                                        draggedLocationId,
+                                        lastItem.id,
+                                        "after"
+                                    );
+                                    if (targetIndex == null) {
+                                        return;
+                                    }
+                                    void moveLocation(
+                                        draggedLocationId,
+                                        lastItem.parent_location_id ?? null,
+                                        targetIndex
+                                    );
+                                }}
+                            />
+                        ) : null}
 
                         {directory && itemList.length === 0 ? (
                             <div className="ui-panel ui-empty-panel">{copy.empty}</div>

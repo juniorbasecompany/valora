@@ -311,7 +311,7 @@
     "description": "Edita el directorio jerárquico de ubicaciones del licenciatario activo. Cada ubicación pertenece a un alcance y puede quedar debajo de otra ubicación dentro del mismo alcance.",
     "status": {
       "title": "Edición de ubicaciones",
-      "description": "Los cambios solo afectan al licenciatario activo de tu sesión. Usa arrastrar y soltar para reordenar hermanos o mover una ubicación a otro padre."
+      "description": "Los cambios solo afectan al licenciatario activo de tu sesión. Haz clic en una caja para editar la ubicación o usa el botón Nuevo dentro de ella para crear un hijo en ese nivel."
     },
     "list": {
       "empty": "No se encontraron ubicaciones para el alcance seleccionado.",

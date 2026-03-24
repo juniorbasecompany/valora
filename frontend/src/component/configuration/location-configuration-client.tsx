@@ -9,7 +9,7 @@ import {
     useRef,
     useState
 } from "react";
-import type { CSSProperties, DragEvent, MouseEvent } from "react";
+import type { CSSProperties, MouseEvent } from "react";
 import { createPortal } from "react-dom";
 
 import { PageHeader } from "@/component/app-shell/page-header";
@@ -33,6 +33,18 @@ type Props = {
 };
 
 type SelectedLocationKey = number | "new" | null;
+
+type LocationNestNodeProps = {
+    item: TenantLocationRecord;
+    childrenByParent: Map<number | null, TenantLocationRecord[]>;
+    selectedLocationId: number | null;
+    createParentId: number | null;
+    isCreateMode: boolean;
+    isBusy: boolean;
+    newLabel: string;
+    onSelect: (location: TenantLocationRecord) => void;
+    onCreate: (parentId: number | null) => void;
+};
 
 function parseLocationKey(raw: string | null): SelectedLocationKey {
     if (raw === "new") {
@@ -81,142 +93,89 @@ function resolveLocationLabel(item: TenantLocationRecord) {
     return item.name.trim() || item.display_name.trim() || `#${item.id}`;
 }
 
-function buildExpandedIdSet(directory: TenantLocationDirectoryResponse | null) {
-    return new Set(
-        (directory?.item_list ?? [])
-            .filter((item) => item.children_count > 0)
-            .map((item) => item.id)
-    );
-}
+function LocationNestNode({
+    item,
+    childrenByParent,
+    selectedLocationId,
+    createParentId,
+    isCreateMode,
+    isBusy,
+    newLabel,
+    onSelect,
+    onCreate
+}: LocationNestNodeProps) {
+    const childList = childrenByParent.get(item.id) ?? [];
+    const label = resolveLocationLabel(item);
+    const description = item.display_name.trim();
+    const isSelected = !isCreateMode && item.id === selectedLocationId;
+    const isCreateContext = isCreateMode && createParentId === item.id;
 
-function resolveSiblingDropIndex(
-    siblings: TenantLocationRecord[],
-    draggedLocationId: number,
-    targetLocationId: number,
-    position: "before" | "after"
-) {
-    const draggedIndex = siblings.findIndex((item) => item.id === draggedLocationId);
-    const targetIndex = siblings.findIndex((item) => item.id === targetLocationId);
-    if (targetIndex < 0) {
-        return null;
-    }
-
-    if (draggedIndex >= 0 && draggedIndex < targetIndex) {
-        return position === "before" ? targetIndex - 1 : targetIndex;
-    }
-
-    return position === "before" ? targetIndex : targetIndex + 1;
-}
-
-function resolveChildDropIndex(
-    itemList: TenantLocationRecord[],
-    draggedLocationId: number,
-    targetParentId: number,
-    childrenCount: number
-) {
-    const draggedItem = itemList.find((item) => item.id === draggedLocationId);
-    if (!draggedItem) {
-        return childrenCount;
-    }
-
-    if (draggedItem.parent_location_id === targetParentId) {
-        return Math.max(childrenCount - 1, 0);
-    }
-
-    return childrenCount;
-}
-
-type InlineIconProps = {
-    className?: string;
-};
-
-function iconClassName(className?: string) {
-    return ["ui-icon", className].filter(Boolean).join(" ");
-}
-
-function GripDotsIcon({ className }: InlineIconProps) {
     return (
-        <svg className={iconClassName(className)} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-            <circle cx="9" cy="6.5" r="1" />
-            <circle cx="15" cy="6.5" r="1" />
-            <circle cx="9" cy="12" r="1" />
-            <circle cx="15" cy="12" r="1" />
-            <circle cx="9" cy="17.5" r="1" />
-            <circle cx="15" cy="17.5" r="1" />
-        </svg>
-    );
-}
-
-function MoveUpIcon({ className }: InlineIconProps) {
-    return (
-        <svg
-            className={iconClassName(className)}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden
+        <section
+            className="ui-location-nest-box"
+            data-selected={isSelected ? "true" : undefined}
+            data-create-context={isCreateContext ? "true" : undefined}
+            style={{ "--ui-location-depth": String(item.depth) } as CSSProperties}
+            onClick={(event) => {
+                event.stopPropagation();
+                if (isBusy) {
+                    return;
+                }
+                onSelect(item);
+            }}
         >
-            <path d="M12 18V6.5" />
-            <path d="m7.5 11 4.5-4.5 4.5 4.5" />
-        </svg>
-    );
-}
+            <button
+                type="button"
+                className="ui-location-nest-body"
+                onClick={(event) => {
+                    event.stopPropagation();
+                    onSelect(item);
+                }}
+                disabled={isBusy}
+            >
+                <div className="ui-location-nest-copy">
+                    <p className="ui-location-nest-label">{label}</p>
+                    {description && description !== label ? (
+                        <p className="ui-location-nest-description">{description}</p>
+                    ) : null}
+                </div>
+            </button>
 
-function MoveDownIcon({ className }: InlineIconProps) {
-    return (
-        <svg
-            className={iconClassName(className)}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden
-        >
-            <path d="M12 6v11.5" />
-            <path d="m7.5 13 4.5 4.5 4.5-4.5" />
-        </svg>
-    );
-}
+            {childList.length > 0 ? (
+                <div className="ui-location-nest-children">
+                    {childList.map((child) => (
+                        <LocationNestNode
+                            key={child.id}
+                            item={child}
+                            childrenByParent={childrenByParent}
+                            selectedLocationId={selectedLocationId}
+                            createParentId={createParentId}
+                            isCreateMode={isCreateMode}
+                            isBusy={isBusy}
+                            newLabel={newLabel}
+                            onSelect={onSelect}
+                            onCreate={onCreate}
+                        />
+                    ))}
+                </div>
+            ) : null}
 
-function NewChildIcon({ className }: InlineIconProps) {
-    return (
-        <svg
-            className={iconClassName(className)}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden
-        >
-            <path d="M15.5 5h4" />
-            <path d="M17.5 3v4" />
-            <path d="M8 7.5v7.5" strokeDasharray="1.8 2.4" />
-            <path d="M8 15h10.5" />
-            <path d="m14.5 11 4 4-4 4" />
-        </svg>
-    );
-}
-
-function NewSiblingIcon({ className }: InlineIconProps) {
-    return (
-        <svg
-            className={iconClassName(className)}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden
-        >
-            <path d="M15.5 5h4" />
-            <path d="M17.5 3v4" />
-            <path d="M12 8.5v9.5" strokeDasharray="1.8 2.4" />
-            <path d="m7.5 13.5 4.5 4.5 4.5-4.5" />
-        </svg>
+            {item.can_create_child ? (
+                <div className="ui-location-nest-footer">
+                    <button
+                        type="button"
+                        className="ui-location-nest-create"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            onCreate(item.id);
+                        }}
+                        disabled={isBusy}
+                    >
+                        {newLabel}
+                    </button>
+                </div>
+            ) : null}
+        </section>
     );
 }
 
@@ -291,13 +250,7 @@ export function LocationConfigurationClient({
     const [formError, setFormError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
-    const [isMoving, setIsMoving] = useState(false);
     const [isDeletePending, setIsDeletePending] = useState(false);
-    const [expandedIdSet, setExpandedIdSet] = useState<Set<number>>(
-        () => buildExpandedIdSet(initialLocationDirectory)
-    );
-    const [draggedLocationId, setDraggedLocationId] = useState<number | null>(null);
-    const [dropKey, setDropKey] = useState<string | null>(null);
     const [editorScrollToken, setEditorScrollToken] = useState(0);
     const [isEditorFlashActive, setIsEditorFlashActive] = useState(false);
     const editorPanelRef = useRef<HTMLDivElement | null>(null);
@@ -318,6 +271,10 @@ export function LocationConfigurationClient({
         }
         return next;
     }, [itemList]);
+    const rootLocationList = useMemo(
+        () => childrenByParent.get(null) ?? [],
+        [childrenByParent]
+    );
 
     const selectedLocation = useMemo(() => {
         if (isCreateMode) {
@@ -367,22 +324,6 @@ export function LocationConfigurationClient({
         []
     );
 
-    const visibleItemList = useMemo(() => {
-        const result: TenantLocationRecord[] = [];
-
-        const visit = (parentId: number | null) => {
-            for (const item of childrenByParent.get(parentId) ?? []) {
-                result.push(item);
-                if (expandedIdSet.has(item.id) && item.children_count > 0) {
-                    visit(item.id);
-                }
-            }
-        };
-
-        visit(null);
-        return result;
-    }, [childrenByParent, expandedIdSet]);
-
     const isDirty =
         name.trim() !== baseline.name.trim() ||
         displayName.trim() !== baseline.displayName.trim() ||
@@ -409,44 +350,6 @@ export function LocationConfigurationClient({
         setFieldError(nextError);
         return Object.keys(nextError).length === 0;
     }, [copy.validationError, displayName, name]);
-
-    const moveLocation = useCallback(
-        async (locationId: number, nextParentId: number | null, targetIndex: number) => {
-            if (scopeId == null) {
-                return;
-            }
-            setFormError(null);
-            setSuccessMessage(null);
-            setIsMoving(true);
-            const response = await fetch(
-                `/api/auth/tenant/current/scopes/${scopeId}/locations/${locationId}/move`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        parent_location_id: nextParentId,
-                        target_index: targetIndex
-                    })
-                }
-            );
-            const data: unknown = await response.json().catch(() => ({}));
-            setIsMoving(false);
-            setDraggedLocationId(null);
-            setDropKey(null);
-            if (!response.ok) {
-                setFormError(parseErrorDetail(data, copy.moveError));
-                return;
-            }
-            const nextDirectory = data as TenantLocationDirectoryResponse;
-            setDirectory(nextDirectory);
-            setExpandedIdSet(buildExpandedIdSet(nextDirectory));
-            const nextSelected =
-                nextDirectory.item_list.find((item) => item.id === locationId) ?? null;
-            syncEditor(nextSelected, false, null);
-            setSuccessMessage(copy.movedNotice);
-        },
-        [copy.moveError, copy.movedNotice, scopeId, syncEditor]
-    );
 
     const scrollEditorIntoView = useCallback(() => {
         setEditorScrollToken((previous) => previous + 1);
@@ -551,7 +454,13 @@ export function LocationConfigurationClient({
 
     const handleStartCreate = useCallback(
         (draftParentId: number | null, shouldScroll = false) => {
-            if (!(directory?.can_create ?? false)) {
+            const canCreateTarget =
+                draftParentId == null
+                    ? (directory?.can_create ?? false)
+                    : (itemList.find((item) => item.id === draftParentId)?.can_create_child ??
+                    false);
+
+            if (!canCreateTarget) {
                 return;
             }
             if (isDirty && !window.confirm(copy.discardConfirm)) {
@@ -566,6 +475,7 @@ export function LocationConfigurationClient({
             copy.discardConfirm,
             directory?.can_create,
             isDirty,
+            itemList,
             scrollEditorIntoView,
             syncEditor
         ]
@@ -636,7 +546,6 @@ export function LocationConfigurationClient({
 
         const nextDirectory = data as TenantLocationDirectoryResponse;
         setDirectory(nextDirectory);
-        setExpandedIdSet(buildExpandedIdSet(nextDirectory));
 
         if (isDeletePending) {
             syncEditor(
@@ -707,179 +616,62 @@ export function LocationConfigurationClient({
                         </div>
                     ) : null}
 
-                    {directory && !directory.can_edit ? <div className="ui-notice-attention ui-notice-block">{copy.readOnlyNotice}</div> : null}
+                    {directory && !directory.can_edit ? (
+                        <div className="ui-notice-attention ui-notice-block">
+                            {copy.readOnlyNotice}
+                        </div>
+                    ) : null}
 
-                    <div className="ui-directory-list">
-                        {visibleItemList.map((item) => {
-                            const siblings = childrenByParent.get(item.parent_location_id ?? null) ?? [];
-                            const siblingIndex = siblings.findIndex((sibling) => sibling.id === item.id);
-                            const topKey = `before-${item.id}`;
-                            const insideKey = `inside-${item.id}`;
-                            const isSelected = item.id === selectedLocation?.id && !isCreateMode;
-
-                            return (
-                                <div key={item.id} className="ui-directory-entry">
-                                    <div
-                                        className="ui-directory-drop-slot"
-                                        data-active={dropKey === topKey ? "true" : undefined}
-                                        onDragOver={(event) => {
-                                            if (!draggedLocationId || draggedLocationId === item.id) {
-                                                return;
-                                            }
-                                            event.preventDefault();
-                                            setDropKey(topKey);
-                                        }}
-                                        onDrop={(event) => {
-                                            event.preventDefault();
-                                            if (!draggedLocationId || draggedLocationId === item.id) {
-                                                return;
-                                            }
-                                            const targetIndex = resolveSiblingDropIndex(
-                                                siblings,
-                                                draggedLocationId,
-                                                item.id,
-                                                "before"
-                                            );
-                                            if (targetIndex == null) {
-                                                return;
-                                            }
-                                            void moveLocation(
-                                                draggedLocationId,
-                                                item.parent_location_id ?? null,
-                                                targetIndex
-                                            );
-                                        }}
-                                    />
-                                    <div className="ui-directory-row">
-                                        <button
-                                            type="button"
-                                            className="ui-directory-handle"
-                                            draggable={item.can_move && !isSaving && !isMoving}
-                                            onDragStart={(event: DragEvent<HTMLButtonElement>) => {
-                                                setDraggedLocationId(item.id);
-                                                event.dataTransfer.effectAllowed = "move";
-                                            }}
-                                            onDragEnd={() => {
-                                                setDraggedLocationId(null);
-                                                setDropKey(null);
-                                            }}
-                                            disabled={!item.can_move || isSaving || isMoving}
-                                            aria-label={copy.dragDropHint}
-                                            title={copy.dragDropHint}
-                                        >
-                                            <GripDotsIcon />
-                                        </button>
-                                        <div
-                                            className="ui-directory-item ui-directory-item-frame"
-                                            data-selected={isSelected ? "true" : undefined}
-                                            data-drop-active={dropKey === insideKey ? "true" : undefined}
-                                            onDragOver={(event) => {
-                                                if (!draggedLocationId || draggedLocationId === item.id) {
-                                                    return;
-                                                }
-                                                event.preventDefault();
-                                                setDropKey(insideKey);
-                                            }}
-                                            onDrop={(event) => {
-                                                event.preventDefault();
-                                                if (!draggedLocationId || draggedLocationId === item.id) {
-                                                    return;
-                                                }
-                                                const targetIndex = resolveChildDropIndex(
-                                                    itemList,
-                                                    draggedLocationId,
-                                                    item.id,
-                                                    item.children_count
-                                                );
-                                                void moveLocation(
-                                                    draggedLocationId,
-                                                    item.id,
-                                                    targetIndex
-                                                );
-                                            }}
-                                        >
-                                            {item.children_count > 0 ? (
-                                                <button type="button" className="ui-directory-toggle" onClick={() => setExpandedIdSet((previous) => { const next = new Set(previous); if (next.has(item.id)) { next.delete(item.id); } else { next.add(item.id); } return next; })}>
-                                                    {expandedIdSet.has(item.id) ? "-" : "+"}
-                                                </button>
-                                            ) : <span className="ui-directory-dot">&middot;</span>}
-                                            <button type="button" className="ui-directory-content" onClick={() => handleSelectLocation(item)} style={{ "--ui-directory-depth": String(item.depth) } as CSSProperties}>
-                                                <p className="ui-directory-label">{resolveLocationLabel(item)}</p>
-                                                <p className="ui-directory-description">{item.display_name}</p>
-                                            </button>
-                                        </div>
-                                        <div className="ui-directory-action-grid">
-                                            <button type="button" className="ui-directory-action" onClick={() => siblingIndex > 0 ? void moveLocation(item.id, item.parent_location_id ?? null, siblingIndex - 1) : undefined} disabled={!item.can_move || siblingIndex < 1 || isSaving || isMoving} aria-label={copy.moveUp} title={copy.moveUp}>
-                                                <MoveUpIcon />
-                                            </button>
-                                            <button type="button" className="ui-directory-action" onClick={() => handleStartCreate(item.id, true)} disabled={!directory?.can_create || isSaving || isMoving} aria-label={copy.newChild} title={copy.newChild}>
-                                                <NewChildIcon />
-                                            </button>
-                                            <button type="button" className="ui-directory-action" onClick={() => siblingIndex >= 0 ? void moveLocation(item.id, item.parent_location_id ?? null, siblingIndex + 1) : undefined} disabled={!item.can_move || siblingIndex < 0 || siblingIndex >= siblings.length - 1 || isSaving || isMoving} aria-label={copy.moveDown} title={copy.moveDown}>
-                                                <MoveDownIcon />
-                                            </button>
-                                            <button type="button" className="ui-directory-action" onClick={() => handleStartCreate(item.parent_location_id ?? null, true)} disabled={!directory?.can_create || isSaving || isMoving} aria-label={copy.newSibling} title={copy.newSibling}>
-                                                <NewSiblingIcon />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-
-                        {visibleItemList.length > 0 ? (
-                            <div
-                                className="ui-directory-drop-slot"
-                                data-active={dropKey === "after-list" ? "true" : undefined}
-                                onDragOver={(event) => {
-                                    const lastItem = visibleItemList[visibleItemList.length - 1];
-                                    if (!draggedLocationId || !lastItem || draggedLocationId === lastItem.id) {
-                                        return;
-                                    }
-                                    event.preventDefault();
-                                    setDropKey("after-list");
-                                }}
-                                onDrop={(event) => {
-                                    const lastItem = visibleItemList[visibleItemList.length - 1];
-                                    event.preventDefault();
-                                    if (!draggedLocationId || !lastItem || draggedLocationId === lastItem.id) {
-                                        return;
-                                    }
-                                    const siblings =
-                                        childrenByParent.get(lastItem.parent_location_id ?? null) ?? [];
-                                    const targetIndex = resolveSiblingDropIndex(
-                                        siblings,
-                                        draggedLocationId,
-                                        lastItem.id,
-                                        "after"
-                                    );
-                                    if (targetIndex == null) {
-                                        return;
-                                    }
-                                    void moveLocation(
-                                        draggedLocationId,
-                                        lastItem.parent_location_id ?? null,
-                                        targetIndex
-                                    );
-                                }}
+                    <div className="ui-directory-list ui-location-nest-list">
+                        {rootLocationList.map((item) => (
+                            <LocationNestNode
+                                key={item.id}
+                                item={item}
+                                childrenByParent={childrenByParent}
+                                selectedLocationId={selectedLocation?.id ?? null}
+                                createParentId={isCreateMode ? parentLocationId : null}
+                                isCreateMode={isCreateMode}
+                                isBusy={isSaving}
+                                newLabel={copy.newLabel}
+                                onSelect={handleSelectLocation}
+                                onCreate={(draftParentId) => handleStartCreate(draftParentId, true)}
                             />
-                        ) : null}
+                        ))}
 
                         {directory && itemList.length === 0 ? (
                             <div className="ui-panel ui-empty-panel">{copy.empty}</div>
                         ) : null}
-                    </div>
 
-                    <button type="button" className="ui-button-secondary ui-space-top-sm" onClick={() => handleStartCreate(null, true)} disabled={!directory?.can_create}>{copy.newLabel}</button>
+                        {directory?.can_create ? (
+                            <button
+                                type="button"
+                                className="ui-location-nest-create ui-location-nest-create-root"
+                                data-active={
+                                    isCreateMode && parentLocationId == null ? "true" : undefined
+                                }
+                                onClick={() => handleStartCreate(null, true)}
+                                disabled={isSaving}
+                            >
+                                {copy.newLabel}
+                            </button>
+                        ) : null}
+                    </div>
                 </aside>
+
                 <div
                     ref={editorPanelRef}
                     className="ui-panel ui-panel-editor ui-scroll-stable ui-editor-panel-sticky ui-editor-panel"
                     data-delete-pending={isDeletePending ? "true" : undefined}
                 >
                     <div className="ui-editor-panel-body">
-                        {successMessage ? <div className="ui-status-panel ui-tone-positive ui-status-copy">{successMessage}</div> : null}
-                        {formError ? <div className="ui-notice-danger ui-notice-block">{formError}</div> : null}
+                        {successMessage ? (
+                            <div className="ui-status-panel ui-tone-positive ui-status-copy">
+                                {successMessage}
+                            </div>
+                        ) : null}
+                        {formError ? (
+                            <div className="ui-notice-danger ui-notice-block">{formError}</div>
+                        ) : null}
 
                         <section className="ui-card ui-form-section ui-border-accent">
                             {isEditorFlashActive ? (
@@ -897,32 +689,78 @@ export function LocationConfigurationClient({
 
                             <div className="ui-editor-content">
                                 <div className="ui-section-header">
-                                    <span className="ui-icon-badge"><PreviewIcon className="ui-icon" /></span>
+                                    <span className="ui-icon-badge">
+                                        <PreviewIcon className="ui-icon" />
+                                    </span>
                                     <div className="ui-section-copy">
-                                        <h2 className="ui-header-title ui-title-section">{copy.sectionIdentityTitle}</h2>
-                                        <p className="ui-copy-body">{copy.sectionIdentityDescription}</p>
+                                        <h2 className="ui-header-title ui-title-section">
+                                            {copy.sectionIdentityTitle}
+                                        </h2>
+                                        <p className="ui-copy-body">
+                                            {copy.sectionIdentityDescription}
+                                        </p>
                                     </div>
                                 </div>
 
                                 <div className="ui-form-fields">
                                     <div className="ui-field">
-                                        <label className="ui-field-label" htmlFor="location-name">{copy.nameLabel}</label>
-                                        <input id="location-name" className="ui-input" value={name} onChange={(event) => { setName(event.target.value); setFieldError((previous) => ({ ...previous, name: undefined })); setSuccessMessage(null); }} disabled={isDeletePending || !canEditForm} aria-invalid={Boolean(fieldError.name)} />
+                                        <label className="ui-field-label" htmlFor="location-name">
+                                            {copy.nameLabel}
+                                        </label>
+                                        <input
+                                            id="location-name"
+                                            className="ui-input"
+                                            value={name}
+                                            onChange={(event) => {
+                                                setName(event.target.value);
+                                                setFieldError((previous) => ({
+                                                    ...previous,
+                                                    name: undefined
+                                                }));
+                                                setSuccessMessage(null);
+                                            }}
+                                            disabled={isDeletePending || !canEditForm}
+                                            aria-invalid={Boolean(fieldError.name)}
+                                        />
                                         <p className="ui-field-hint">{copy.nameHint}</p>
-                                        {fieldError.name ? <p className="ui-field-error">{fieldError.name}</p> : null}
+                                        {fieldError.name ? (
+                                            <p className="ui-field-error">{fieldError.name}</p>
+                                        ) : null}
                                     </div>
 
                                     <div className="ui-field">
-                                        <label className="ui-field-label" htmlFor="location-display-name">{copy.displayNameLabel}</label>
-                                        <textarea id="location-display-name" className="ui-input ui-input-textarea" value={displayName} onChange={(event) => { setDisplayName(event.target.value); setFieldError((previous) => ({ ...previous, displayName: undefined })); setSuccessMessage(null); }} disabled={isDeletePending || !canEditForm} aria-invalid={Boolean(fieldError.displayName)} />
+                                        <label
+                                            className="ui-field-label"
+                                            htmlFor="location-display-name"
+                                        >
+                                            {copy.displayNameLabel}
+                                        </label>
+                                        <textarea
+                                            id="location-display-name"
+                                            className="ui-input ui-input-textarea"
+                                            value={displayName}
+                                            onChange={(event) => {
+                                                setDisplayName(event.target.value);
+                                                setFieldError((previous) => ({
+                                                    ...previous,
+                                                    displayName: undefined
+                                                }));
+                                                setSuccessMessage(null);
+                                            }}
+                                            disabled={isDeletePending || !canEditForm}
+                                            aria-invalid={Boolean(fieldError.displayName)}
+                                        />
                                         <p className="ui-field-hint">{copy.displayNameHint}</p>
-                                        {fieldError.displayName ? <p className="ui-field-error">{fieldError.displayName}</p> : null}
+                                        {fieldError.displayName ? (
+                                            <p className="ui-field-error">
+                                                {fieldError.displayName}
+                                            </p>
+                                        ) : null}
                                     </div>
                                 </div>
                             </div>
                         </section>
                     </div>
-
                 </div>
 
                 <aside className="ui-panel-context">
@@ -931,20 +769,32 @@ export function LocationConfigurationClient({
                             <div className="ui-metadata-grid">
                                 <div className="ui-metadata-card">
                                     <p className="ui-metadata-label">{copy.metadataIdLabel}</p>
-                                    <p className="ui-metadata-value-strong">{selectedLocation.id}</p>
+                                    <p className="ui-metadata-value-strong">
+                                        {selectedLocation.id}
+                                    </p>
                                 </div>
                                 <div className="ui-metadata-card">
                                     <p className="ui-metadata-label">{copy.metadataPathLabel}</p>
-                                    <p className="ui-metadata-value">{selectedLocation.path_labels.join(" / ")}</p>
+                                    <p className="ui-metadata-value">
+                                        {selectedLocation.path_labels.join(" / ")}
+                                    </p>
                                 </div>
                                 <div className="ui-metadata-grid ui-metadata-grid-2">
                                     <div className="ui-metadata-card">
-                                        <p className="ui-metadata-label">{copy.metadataChildrenLabel}</p>
-                                        <p className="ui-metadata-value-strong">{selectedLocation.children_count}</p>
+                                        <p className="ui-metadata-label">
+                                            {copy.metadataChildrenLabel}
+                                        </p>
+                                        <p className="ui-metadata-value-strong">
+                                            {selectedLocation.children_count}
+                                        </p>
                                     </div>
                                     <div className="ui-metadata-card">
-                                        <p className="ui-metadata-label">{copy.metadataDescendantsLabel}</p>
-                                        <p className="ui-metadata-value-strong">{selectedLocation.descendants_count}</p>
+                                        <p className="ui-metadata-label">
+                                            {copy.metadataDescendantsLabel}
+                                        </p>
+                                        <p className="ui-metadata-value-strong">
+                                            {selectedLocation.descendants_count}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -953,9 +803,13 @@ export function LocationConfigurationClient({
 
                     <div className="ui-card ui-card-coming-soon ui-panel-body-compact">
                         <div className="ui-section-header">
-                            <span className="ui-icon-badge ui-icon-badge-construction"><HistoryIcon className="ui-icon" /></span>
+                            <span className="ui-icon-badge ui-icon-badge-construction">
+                                <HistoryIcon className="ui-icon" />
+                            </span>
                             <div className="ui-section-copy">
-                                <h2 className="ui-header-title ui-title-section">{copy.historyTitle}</h2>
+                                <h2 className="ui-header-title ui-title-section">
+                                    {copy.historyTitle}
+                                </h2>
                                 <p className="ui-copy-body">{copy.historyDescription}</p>
                             </div>
                         </div>
@@ -966,12 +820,36 @@ export function LocationConfigurationClient({
             {portalTarget
                 ? createPortal(
                     <div className="ui-action-footer">
-                        <Link href={configurationPath} className="ui-button-secondary" onClick={(event: MouseEvent<HTMLAnchorElement>) => { if (isDirty && !window.confirm(copy.discardConfirm)) { event.preventDefault(); } }}>{copy.cancel}</Link>
+                        <Link
+                            href={configurationPath}
+                            className="ui-button-secondary"
+                            onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+                                if (isDirty && !window.confirm(copy.discardConfirm)) {
+                                    event.preventDefault();
+                                }
+                            }}
+                        >
+                            {copy.cancel}
+                        </Link>
                         <div className="ui-action-footer-end">
                             {!isCreateMode && selectedLocation ? (
-                                <button type="button" className="ui-button-danger" onClick={() => setIsDeletePending((previous) => !previous)} disabled={!selectedLocation.can_delete || isSaving}>{isDeletePending ? copy.undoDelete : copy.delete}</button>
+                                <button
+                                    type="button"
+                                    className="ui-button-danger"
+                                    onClick={() => setIsDeletePending((previous) => !previous)}
+                                    disabled={!selectedLocation.can_delete || isSaving}
+                                >
+                                    {isDeletePending ? copy.undoDelete : copy.delete}
+                                </button>
                             ) : null}
-                            <button type="button" className="ui-button-primary" onClick={() => void handleSave()} disabled={!directory || !canSubmit || isSaving || !isDirty}>{isSaving ? copy.saving : copy.save}</button>
+                            <button
+                                type="button"
+                                className="ui-button-primary"
+                                onClick={() => void handleSave()}
+                                disabled={!directory || !canSubmit || isSaving || !isDirty}
+                            >
+                                {isSaving ? copy.saving : copy.save}
+                            </button>
                         </div>
                     </div>,
                     portalTarget

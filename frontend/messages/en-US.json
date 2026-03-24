@@ -311,7 +311,7 @@
     "description": "Edit the hierarchical location directory of the active tenant. Each location belongs to a scope and can be nested under another location in the same scope.",
     "status": {
       "title": "Editing locations",
-      "description": "Changes only affect the active tenant in your session. Use drag and drop to reorder siblings or move a location under a different parent."
+      "description": "Changes only affect the active tenant in your session. Click a box to edit that location, or use the New button inside a box to create a child at that level."
     },
     "list": {
       "empty": "No locations were found for the selected scope.",

@@ -940,6 +940,10 @@
 }
 
 .ui-editor-flash-ring {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: var(--z-base);
     border: var(--border-width-emphasis) solid var(--color-accent-border-flash);
     border-radius: inherit;
     box-shadow: var(--shadow-editor-flash);
@@ -947,6 +951,10 @@
 }
 
 .ui-editor-flash-fill {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: var(--z-base);
     background: var(--gradient-editor-flash-fill);
     border-top-left-radius: inherit;
     border-top-right-radius: inherit;

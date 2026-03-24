@@ -352,7 +352,6 @@
       "moveDown": "Mover abajo"
     },
     "readOnlyNotice": "Puedes revisar el directorio de ubicaciones, pero solo los miembros master o administrador pueden crear o editar registros jerárquicos.",
-    "savedNotice": "Ubicación actualizada correctamente.",
     "createdNotice": "Ubicación creada correctamente.",
     "deletedNotice": "Ubicación eliminada correctamente.",
     "movedNotice": "Ubicación movida correctamente.",

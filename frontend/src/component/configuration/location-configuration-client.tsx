@@ -275,11 +275,10 @@ export function LocationConfigurationClient({
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isDeletePending, setIsDeletePending] = useState(false);
-    const [editorScrollToken, setEditorScrollToken] = useState(0);
     const [isEditorFlashActive, setIsEditorFlashActive] = useState(false);
-    const editorPanelRef = useRef<HTMLDivElement | null>(null);
     const editorFlashStartTimeoutRef = useRef<number | null>(null);
     const editorFlashHideTimeoutRef = useRef<number | null>(null);
+    const previousEditorFlashKeyRef = useRef<string | null>(null);
     const portalTarget =
         typeof document === "undefined"
             ? null
@@ -379,10 +378,6 @@ export function LocationConfigurationClient({
         return Object.keys(nextError).length === 0;
     }, [copy.validationError, displayName, name]);
 
-    const scrollEditorIntoView = useCallback(() => {
-        setEditorScrollToken((previous) => previous + 1);
-    }, []);
-
     const triggerEditorFlash = useCallback(() => {
         if (editorFlashStartTimeoutRef.current != null) {
             window.clearTimeout(editorFlashStartTimeoutRef.current);
@@ -404,70 +399,35 @@ export function LocationConfigurationClient({
         }, 24);
     }, []);
 
-    const scheduleEditorFlashAfterScroll = useCallback(
-        (startTop: number, targetTop: number) => {
-            if (editorFlashStartTimeoutRef.current != null) {
-                window.clearTimeout(editorFlashStartTimeoutRef.current);
-                editorFlashStartTimeoutRef.current = null;
-            }
+    const editorFlashKey = useMemo(() => {
+        if (!directory) {
+            return null;
+        }
 
-            const distance = Math.abs(targetTop - startTop);
-            const delay = Math.max(260, Math.min(720, 180 + distance * 0.42));
-            editorFlashStartTimeoutRef.current = window.setTimeout(() => {
-                editorFlashStartTimeoutRef.current = null;
-                triggerEditorFlash();
-            }, delay);
-        },
-        [triggerEditorFlash]
-    );
+        if (isCreateMode) {
+            return `new:${String(parentLocationId ?? "root")}`;
+        }
+
+        if (!selectedLocation) {
+            return null;
+        }
+
+        return `id:${String(selectedLocation.id)}:name:${selectedLocation.name}:display:${selectedLocation.display_name}:parent:${String(selectedLocation.parent_location_id ?? "root")}`;
+    }, [directory, isCreateMode, parentLocationId, selectedLocation]);
 
     useEffect(() => {
-        if (editorScrollToken === 0) {
+        if (!editorFlashKey) {
+            previousEditorFlashKeyRef.current = null;
             return;
         }
 
-        const timeoutId = window.setTimeout(() => {
-            const editorPanel = editorPanelRef.current;
-            if (!editorPanel) {
-                return;
-            }
+        if (previousEditorFlashKeyRef.current === editorFlashKey) {
+            return;
+        }
 
-            const scrollContainer = editorPanel.closest(".ui-scroll-stable");
-            const isMobileViewport = window.matchMedia("(max-width: 1024px)").matches;
-            const mobileOffset = isMobileViewport
-                ? window.matchMedia("(min-width: 640px)").matches
-                    ? 112
-                    : 96
-                : 0;
-
-            if (scrollContainer instanceof HTMLElement) {
-                const containerRect = scrollContainer.getBoundingClientRect();
-                const panelRect = editorPanel.getBoundingClientRect();
-                const startTop = scrollContainer.scrollTop;
-                const targetTop =
-                    startTop + (panelRect.top - containerRect.top - mobileOffset);
-
-                editorPanel.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                    inline: "nearest"
-                });
-                scheduleEditorFlashAfterScroll(startTop, Math.max(0, targetTop));
-                return;
-            }
-
-            const startTop = window.scrollY;
-            const targetTop = startTop + editorPanel.getBoundingClientRect().top - mobileOffset;
-            editorPanel.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-                inline: "nearest"
-            });
-            scheduleEditorFlashAfterScroll(startTop, Math.max(0, targetTop));
-        }, 80);
-
-        return () => window.clearTimeout(timeoutId);
-    }, [editorScrollToken, scheduleEditorFlashAfterScroll]);
+        previousEditorFlashKeyRef.current = editorFlashKey;
+        triggerEditorFlash();
+    }, [editorFlashKey, triggerEditorFlash]);
 
     useEffect(() => {
         return () => {
@@ -481,12 +441,12 @@ export function LocationConfigurationClient({
     }, []);
 
     const handleStartCreate = useCallback(
-        (draftParentId: number | null, shouldScroll = false) => {
+        (draftParentId: number | null) => {
             const canCreateTarget =
                 draftParentId == null
                     ? (directory?.can_create ?? false)
                     : (itemList.find((item) => item.id === draftParentId)?.can_create_child ??
-                    false);
+                        false);
 
             if (!canCreateTarget) {
                 return;
@@ -495,18 +455,8 @@ export function LocationConfigurationClient({
                 return;
             }
             syncEditor(null, true, draftParentId);
-            if (shouldScroll) {
-                scrollEditorIntoView();
-            }
         },
-        [
-            copy.discardConfirm,
-            directory?.can_create,
-            isDirty,
-            itemList,
-            scrollEditorIntoView,
-            syncEditor
-        ]
+        [copy.discardConfirm, directory?.can_create, isDirty, itemList, syncEditor]
     );
 
     const handleSelectLocation = useCallback(
@@ -518,16 +468,8 @@ export function LocationConfigurationClient({
                 return;
             }
             syncEditor(location, false, null);
-            scrollEditorIntoView();
         },
-        [
-            copy.discardConfirm,
-            isCreateMode,
-            isDirty,
-            scrollEditorIntoView,
-            selectedLocation?.id,
-            syncEditor
-        ]
+        [copy.discardConfirm, isCreateMode, isDirty, selectedLocation?.id, syncEditor]
     );
 
     const handleSave = useCallback(async () => {
@@ -605,7 +547,6 @@ export function LocationConfigurationClient({
         copy.deleteError,
         copy.deletedNotice,
         copy.saveError,
-        copy.savedNotice,
         directory,
         displayName,
         isCreateMode,
@@ -663,7 +604,7 @@ export function LocationConfigurationClient({
                                 maxDepth={maxLocationDepth}
                                 newLabel={copy.newLabel}
                                 onSelect={handleSelectLocation}
-                                onCreate={(draftParentId) => handleStartCreate(draftParentId, true)}
+                                onCreate={(draftParentId) => handleStartCreate(draftParentId)}
                             />
                         ))}
 
@@ -679,7 +620,7 @@ export function LocationConfigurationClient({
                                 data-active={
                                     isCreateMode && parentLocationId == null ? "true" : undefined
                                 }
-                                onClick={() => handleStartCreate(null, true)}
+                                onClick={() => handleStartCreate(null)}
                                 disabled={isSaving}
                             >
                                 {copy.newLabel}
@@ -689,8 +630,7 @@ export function LocationConfigurationClient({
                 </aside>
 
                 <div
-                    ref={editorPanelRef}
-                    className="ui-panel ui-panel-editor ui-scroll-stable ui-editor-panel-sticky ui-editor-panel"
+                    className="ui-panel ui-panel-editor ui-editor-panel-sticky ui-editor-panel"
                     data-delete-pending={isDeletePending ? "true" : undefined}
                 >
                     <div className="ui-editor-panel-body">

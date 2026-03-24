@@ -352,7 +352,6 @@
       "moveDown": "Move down"
     },
     "readOnlyNotice": "You can review the location directory, but only master or admin members can create or edit hierarchical records.",
-    "savedNotice": "Location updated successfully.",
     "createdNotice": "Location created successfully.",
     "deletedNotice": "Location deleted successfully.",
     "movedNotice": "Location moved successfully.",

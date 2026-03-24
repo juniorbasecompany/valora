@@ -352,7 +352,6 @@
       "moveDown": "Mover para baixo"
     },
     "readOnlyNotice": "Você pode consultar o diretório de locais, mas só membros master ou administrador podem criar ou editar cadastros hierárquicos.",
-    "savedNotice": "Local atualizado com sucesso.",
     "createdNotice": "Local criado com sucesso.",
     "deletedNotice": "Local apagado com sucesso.",
     "movedNotice": "Local movido com sucesso.",

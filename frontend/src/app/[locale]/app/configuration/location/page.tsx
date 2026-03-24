@@ -82,7 +82,6 @@ export default async function LocationConfigurationPage({
           moveUp: t("action.moveUp"),
           moveDown: t("action.moveDown"),
           readOnlyNotice: t("readOnlyNotice"),
-          savedNotice: t("savedNotice"),
           createdNotice: t("createdNotice"),
           deletedNotice: t("deletedNotice"),
           movedNotice: t("movedNotice"),

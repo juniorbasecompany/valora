@@ -370,6 +370,7 @@
 }
 
 .ui-location-nest-box {
+    --ui-location-nest-child-offset: 1.5rem;
     position: relative;
     display: grid;
     gap: 1rem;
@@ -454,18 +455,18 @@
 .ui-location-nest-children {
     display: grid;
     gap: 1rem;
-    padding-left: 1.5rem;
+    padding-left: var(--ui-location-nest-child-offset);
 }
 
 .ui-location-nest-footer {
     display: flex;
-    justify-content: center;
+    padding-left: var(--ui-location-nest-child-offset);
 }
 
 .ui-location-nest-create {
     display: inline-flex;
     min-height: 2.75rem;
-    width: min(100%, 22rem);
+    width: 100%;
     align-items: center;
     justify-content: center;
     border: var(--border-width-default) solid var(--color-accent-border-emphasis);
@@ -485,10 +486,6 @@
     border-color: var(--color-accent-border-focus);
     background: var(--color-accent-surface-default);
     color: var(--color-accent-text);
-}
-
-.ui-location-nest-create-root {
-    width: 100%;
 }
 
 .ui-location-nest-create[data-active="true"] {

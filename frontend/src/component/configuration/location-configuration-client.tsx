@@ -645,7 +645,7 @@ export function LocationConfigurationClient({
                         {directory?.can_create ? (
                             <button
                                 type="button"
-                                className="ui-location-nest-create ui-location-nest-create-root"
+                                className="ui-location-nest-create"
                                 data-active={
                                     isCreateMode && parentLocationId == null ? "true" : undefined
                                 }

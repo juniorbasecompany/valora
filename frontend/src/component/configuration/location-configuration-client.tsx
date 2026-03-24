@@ -70,6 +70,26 @@ function buildPath(
     return query ? `${basePath}?${query}` : basePath;
 }
 
+function parseErrorDetail(payload: unknown) {
+    if (!payload || typeof payload !== "object") {
+        return null;
+    }
+
+    const detail = (payload as { detail?: unknown }).detail;
+    if (typeof detail === "string" && detail.trim()) {
+        return detail;
+    }
+
+    if (Array.isArray(detail) && detail.length > 0) {
+        const first = detail[0] as { msg?: string };
+        if (typeof first?.msg === "string" && first.msg.trim()) {
+            return first.msg;
+        }
+    }
+
+    return null;
+}
+
 function resolveLocationLabel(item: TenantLocationRecord) {
     return item.name.trim() || item.display_name.trim() || `#${item.id}`;
 }
@@ -242,6 +262,7 @@ export function LocationConfigurationClient({
         name?: string;
         displayName?: string;
     }>({});
+    const [requestErrorMessage, setRequestErrorMessage] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isDeletePending, setIsDeletePending] = useState(false);
     const [isEditorFlashActive, setIsEditorFlashActive] = useState(false);
@@ -313,6 +334,7 @@ export function LocationConfigurationClient({
                     : (location?.parent_location_id ?? null)
             });
             setFieldError({});
+            setRequestErrorMessage(null);
             setIsDeletePending(false);
         },
         []
@@ -332,6 +354,8 @@ export function LocationConfigurationClient({
         : isDeletePending
             ? true
             : (selectedLocation?.can_edit ?? false);
+    const footerErrorMessage =
+        requestErrorMessage ?? fieldError.name ?? fieldError.displayName ?? null;
 
     const validate = useCallback(() => {
         const nextError: { name?: string; displayName?: string } = {};
@@ -443,6 +467,7 @@ export function LocationConfigurationClient({
         if (!directory || scopeId == null) {
             return;
         }
+        setRequestErrorMessage(null);
         if (!isDeletePending && !validate()) {
             return;
         }
@@ -465,13 +490,14 @@ export function LocationConfigurationClient({
                     })
                 }
         );
+        const data: unknown = await response.json().catch(() => ({}));
         setIsSaving(false);
 
         if (!response.ok) {
+            setRequestErrorMessage(parseErrorDetail(data));
             return;
         }
 
-        const data: unknown = await response.json().catch(() => ({}));
         const nextDirectory = data as TenantLocationDirectoryResponse;
         setDirectory(nextDirectory);
         syncEditor(null, true, null);
@@ -607,6 +633,7 @@ export function LocationConfigurationClient({
                                                     ...previous,
                                                     name: undefined
                                                 }));
+                                                setRequestErrorMessage(null);
                                             }}
                                             disabled={isDeletePending || !canEditForm}
                                             aria-invalid={Boolean(fieldError.name)}
@@ -634,6 +661,7 @@ export function LocationConfigurationClient({
                                                     ...previous,
                                                     displayName: undefined
                                                 }));
+                                                setRequestErrorMessage(null);
                                             }}
                                             disabled={isDeletePending || !canEditForm}
                                             aria-invalid={Boolean(fieldError.displayName)}
@@ -719,6 +747,13 @@ export function LocationConfigurationClient({
                         >
                             {copy.cancel}
                         </Link>
+                        <div className="ui-action-footer-feedback">
+                            {footerErrorMessage ? (
+                                <div className="ui-notice-danger ui-notice-block ui-status-copy">
+                                    {footerErrorMessage}
+                                </div>
+                            ) : null}
+                        </div>
                         <div className="ui-action-footer-end">
                             {!isCreateMode && selectedLocation ? (
                                 <button

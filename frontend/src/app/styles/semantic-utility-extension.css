@@ -451,6 +451,11 @@
     gap: 0.5rem;
 }
 
+.ui-action-footer-feedback {
+    flex: 1 1 18rem;
+    min-width: 12rem;
+}
+
 .ui-history-list {
     margin-top: 1.5rem;
     display: grid;

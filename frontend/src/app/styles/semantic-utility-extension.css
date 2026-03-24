@@ -171,6 +171,7 @@
 
 .ui-menu-root-fill {
     position: relative;
+    z-index: var(--z-content);
     isolation: isolate;
     width: 100%;
     max-width: 100%;
@@ -300,6 +301,8 @@
 }
 
 .ui-shell-workspace-slot {
+    position: relative;
+    z-index: var(--z-shell-header);
     max-width: 100%;
 }
 

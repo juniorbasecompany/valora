@@ -1195,25 +1195,42 @@
 }
 
 .ui-menu-item {
-    display: inline-flex;
+    position: relative;
+    display: flex;
     width: 100%;
     align-items: center;
     justify-content: flex-start;
-    border: 0;
-    padding: 0.625rem 1rem;
+    border: none;
+    padding-block: 0.625rem;
+    padding-left: 1.25rem;
+    padding-right: 1rem;
     text-align: left;
     font-size: 0.875rem;
     font-weight: 500;
-    border: none;
-    border-radius: var(--radius-control);
     background: transparent;
     color: var(--color-text-muted);
     transition:
-        color 0.12s ease,
+        border-color 0.16s ease,
+        background-color 0.16s ease,
+        color 0.16s ease,
+        box-shadow 0.16s ease,
         opacity 0.12s ease;
 }
 
-.ui-menu-item:hover:not(:disabled) {
+.ui-menu-item::before {
+    content: "";
+    position: absolute;
+    left: 0.9rem;
+    top: 0.7rem;
+    bottom: 0.7rem;
+    width: 3px;
+    border-radius: var(--radius-control);
+    background: transparent;
+    transition: background-color 0.16s ease;
+}
+
+.ui-menu-item:hover:not(:disabled):not(.ui-menu-item-active) {
+    background: var(--color-accent-surface-soft);
     color: var(--color-text);
 }
 
@@ -1228,8 +1245,12 @@
 }
 
 .ui-menu-item-active {
-    color: var(--color-text);
-    font-weight: 500;
+    background: var(--color-accent-surface-strong);
+    color: var(--color-primary);
+}
+
+.ui-menu-item-active::before {
+    background: var(--color-accent);
 }
 
 .ui-menu-badge {
@@ -1249,15 +1270,6 @@
     border-top: var(--border-width-default) solid var(--color-border);
     padding-top: 0.75rem;
     margin-top: 0.25rem;
-}
-
-.ui-menu-sign-out {
-    color: var(--color-danger-text);
-}
-
-.ui-menu-sign-out:hover:not(:disabled) {
-    background: var(--color-danger-surface);
-    color: var(--color-danger-text);
 }
 
 .ui-nav-item {
@@ -1296,7 +1308,6 @@
 .ui-nav-item-active {
     background: var(--color-accent-surface-strong);
     color: var(--color-primary);
-    box-shadow: var(--shadow-xs);
 }
 
 .ui-nav-item-active::before {

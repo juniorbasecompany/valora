@@ -717,22 +717,22 @@ export function LocationConfigurationClient({
                             </div>
                         </div>
                     ) : null}
-
-                    <div className="ui-card ui-card-coming-soon ui-panel-body-compact">
-                        <div className="ui-section-header">
-                            <span className="ui-icon-badge ui-icon-badge-construction">
-                                <HistoryIcon className="ui-icon" />
-                            </span>
-                            <div className="ui-section-copy">
-                                <h2 className="ui-header-title ui-title-section">
-                                    {copy.historyTitle}
-                                </h2>
-                                <p className="ui-copy-body">{copy.historyDescription}</p>
-                            </div>
-                        </div>
-                    </div>
                 </aside>
             </div>
+
+            <section className="ui-card ui-card-coming-soon ui-panel-body-compact">
+                <div className="ui-section-header">
+                    <span className="ui-icon-badge ui-icon-badge-construction">
+                        <HistoryIcon className="ui-icon" />
+                    </span>
+                    <div className="ui-section-copy">
+                        <h2 className="ui-header-title ui-title-section">
+                            {copy.historyTitle}
+                        </h2>
+                        <p className="ui-copy-body">{copy.historyDescription}</p>
+                    </div>
+                </div>
+            </section>
 
             {portalTarget
                 ? createPortal(

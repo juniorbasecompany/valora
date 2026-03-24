@@ -527,7 +527,7 @@ export function MemberConfigurationClient({
                                                 </p>
                                             </div>
                                             <span
-                                                className={`ui-pill ui-shrink-0 ${getStatusToneClass(itemStatusKey)}`}
+                                                className={`ui-badge ui-badge-neutral ${getStatusToneClass(itemStatusKey)}`}
                                             >
                                                 {copy.statusLabels[itemStatusKey]}
                                             </span>
@@ -781,7 +781,7 @@ export function MemberConfigurationClient({
                                                 {previewRoleLabel}
                                             </span>
                                             <span
-                                                className={`ui-pill ${getStatusToneClass(statusKey)}`}
+                                                className={`ui-badge ui-badge-neutral ${getStatusToneClass(statusKey)}`}
                                             >
                                                 {copy.statusLabels[statusKey]}
                                             </span>
@@ -892,7 +892,7 @@ export function MemberConfigurationClient({
                                     ] ?? selectedMember.role_name}
                                 </span>
                                 <span
-                                    className={`ui-pill ${getStatusToneClass(
+                                    className={`ui-badge ui-badge-neutral ${getStatusToneClass(
                                         normalizeStatusKey(selectedMember.status)
                                     )}`}
                                 >

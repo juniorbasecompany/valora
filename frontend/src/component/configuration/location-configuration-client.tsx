@@ -70,26 +70,6 @@ function buildPath(
     return query ? `${basePath}?${query}` : basePath;
 }
 
-function parseErrorDetail(payload: unknown, fallback: string) {
-    if (!payload || typeof payload !== "object") {
-        return fallback;
-    }
-
-    const detail = (payload as { detail?: unknown }).detail;
-    if (typeof detail === "string" && detail.trim()) {
-        return detail;
-    }
-
-    if (Array.isArray(detail) && detail.length > 0) {
-        const first = detail[0] as { msg?: string };
-        if (typeof first?.msg === "string" && first.msg.trim()) {
-            return first.msg;
-        }
-    }
-
-    return fallback;
-}
-
 function resolveLocationLabel(item: TenantLocationRecord) {
     return item.name.trim() || item.display_name.trim() || `#${item.id}`;
 }
@@ -262,7 +242,6 @@ export function LocationConfigurationClient({
         name?: string;
         displayName?: string;
     }>({});
-    const [formError, setFormError] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isDeletePending, setIsDeletePending] = useState(false);
     const [isEditorFlashActive, setIsEditorFlashActive] = useState(false);
@@ -334,7 +313,6 @@ export function LocationConfigurationClient({
                     : (location?.parent_location_id ?? null)
             });
             setFieldError({});
-            setFormError(null);
             setIsDeletePending(false);
         },
         []
@@ -465,7 +443,6 @@ export function LocationConfigurationClient({
         if (!directory || scopeId == null) {
             return;
         }
-        setFormError(null);
         if (!isDeletePending && !validate()) {
             return;
         }
@@ -488,26 +465,17 @@ export function LocationConfigurationClient({
                     })
                 }
         );
-        const data: unknown = await response.json().catch(() => ({}));
         setIsSaving(false);
 
         if (!response.ok) {
-            setFormError(
-                parseErrorDetail(
-                    data,
-                    isDeletePending ? copy.deleteError : isCreateMode ? copy.createError : copy.saveError
-                )
-            );
             return;
         }
 
+        const data: unknown = await response.json().catch(() => ({}));
         const nextDirectory = data as TenantLocationDirectoryResponse;
         setDirectory(nextDirectory);
         syncEditor(null, true, null);
     }, [
-        copy.createError,
-        copy.deleteError,
-        copy.saveError,
         directory,
         displayName,
         isCreateMode,
@@ -595,10 +563,6 @@ export function LocationConfigurationClient({
                     data-delete-pending={isDeletePending ? "true" : undefined}
                 >
                     <div className="ui-editor-panel-body">
-                        {formError ? (
-                            <div className="ui-notice-danger ui-notice-block">{formError}</div>
-                        ) : null}
-
                         <section className="ui-card ui-form-section ui-border-accent">
                             {isEditorFlashActive ? (
                                 <>

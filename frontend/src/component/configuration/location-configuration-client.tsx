@@ -598,7 +598,7 @@ export function LocationConfigurationClient({
         const updated =
             nextDirectory.item_list.find((item) => item.id === selectedLocation?.id) ?? null;
         syncEditor(updated, false, null);
-        setSuccessMessage(copy.savedNotice);
+        setSuccessMessage(null);
     }, [
         copy.createError,
         copy.createdNotice,

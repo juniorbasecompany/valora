@@ -41,6 +41,7 @@ type LocationNestNodeProps = {
     createParentId: number | null;
     isCreateMode: boolean;
     isBusy: boolean;
+    maxDepth: number;
     newLabel: string;
     onSelect: (location: TenantLocationRecord) => void;
     onCreate: (parentId: number | null) => void;
@@ -93,6 +94,23 @@ function resolveLocationLabel(item: TenantLocationRecord) {
     return item.name.trim() || item.display_name.trim() || `#${item.id}`;
 }
 
+function resolveLocationToneRatio(depth: number, maxDepth: number) {
+    if (maxDepth <= 0) {
+        return 0;
+    }
+
+    return Math.max(0, Math.min(depth / maxDepth, 1));
+}
+
+function buildLocationToneStyle(depth: number, maxDepth: number): CSSProperties {
+    const toneRatio = resolveLocationToneRatio(depth, maxDepth);
+    return {
+        "--ui-location-depth": String(depth),
+        "--ui-location-tone-light-share": `${((1 - toneRatio) * 100).toFixed(3)}%`,
+        "--ui-location-tone-dark-share": `${(toneRatio * 100).toFixed(3)}%`
+    } as CSSProperties;
+}
+
 function LocationNestNode({
     item,
     childrenByParent,
@@ -100,6 +118,7 @@ function LocationNestNode({
     createParentId,
     isCreateMode,
     isBusy,
+    maxDepth,
     newLabel,
     onSelect,
     onCreate
@@ -115,7 +134,7 @@ function LocationNestNode({
             className="ui-location-nest-box"
             data-selected={isSelected ? "true" : undefined}
             data-create-context={isCreateContext ? "true" : undefined}
-            style={{ "--ui-location-depth": String(item.depth) } as CSSProperties}
+            style={buildLocationToneStyle(item.depth, maxDepth)}
             onClick={(event) => {
                 event.stopPropagation();
                 if (isBusy) {
@@ -152,6 +171,7 @@ function LocationNestNode({
                             createParentId={createParentId}
                             isCreateMode={isCreateMode}
                             isBusy={isBusy}
+                            maxDepth={maxDepth}
                             newLabel={newLabel}
                             onSelect={onSelect}
                             onCreate={onCreate}
@@ -165,6 +185,10 @@ function LocationNestNode({
                     <button
                         type="button"
                         className="ui-location-nest-create"
+                        style={buildLocationToneStyle(
+                            Math.min(item.depth + 1, maxDepth),
+                            maxDepth
+                        )}
                         onClick={(event) => {
                             event.stopPropagation();
                             onCreate(item.id);
@@ -274,6 +298,10 @@ export function LocationConfigurationClient({
     const rootLocationList = useMemo(
         () => childrenByParent.get(null) ?? [],
         [childrenByParent]
+    );
+    const maxLocationDepth = useMemo(
+        () => itemList.reduce((maxDepth, item) => Math.max(maxDepth, item.depth), 0),
+        [itemList]
     );
 
     const selectedLocation = useMemo(() => {
@@ -632,6 +660,7 @@ export function LocationConfigurationClient({
                                 createParentId={isCreateMode ? parentLocationId : null}
                                 isCreateMode={isCreateMode}
                                 isBusy={isSaving}
+                                maxDepth={maxLocationDepth}
                                 newLabel={copy.newLabel}
                                 onSelect={handleSelectLocation}
                                 onCreate={(draftParentId) => handleStartCreate(draftParentId, true)}
@@ -646,6 +675,7 @@ export function LocationConfigurationClient({
                             <button
                                 type="button"
                                 className="ui-location-nest-create"
+                                style={buildLocationToneStyle(0, maxLocationDepth)}
                                 data-active={
                                     isCreateMode && parentLocationId == null ? "true" : undefined
                                 }

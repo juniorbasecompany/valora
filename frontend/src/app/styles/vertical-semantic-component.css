@@ -374,18 +374,18 @@
     position: relative;
     display: grid;
     gap: 1rem;
-    border: var(--border-width-default) solid var(--color-accent-border-subtle);
-    border-radius: calc(var(--radius-card) + 0.125rem);
-    background:
-        linear-gradient(
-            180deg,
-            color-mix(in srgb, var(--color-accent-surface-soft) 82%, white),
-            color-mix(
-                in srgb,
-                var(--color-accent-surface-soft) calc(96% - (var(--ui-location-depth) * 7%)),
-                var(--color-accent-surface-strong)
-            )
+    border: var(--border-width-default) solid
+        color-mix(
+            in srgb,
+            var(--color-location-nest-border-start) var(--ui-location-tone-light-share),
+            var(--color-location-nest-border-end) var(--ui-location-tone-dark-share)
         );
+    border-radius: calc(var(--radius-card) + 0.125rem);
+    background: color-mix(
+        in srgb,
+        var(--color-location-nest-start) var(--ui-location-tone-light-share),
+        var(--color-location-nest-end) var(--ui-location-tone-dark-share)
+    );
     padding: 1.25rem;
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.42), var(--shadow-xs);
     transition:
@@ -469,9 +469,18 @@
     width: 100%;
     align-items: center;
     justify-content: center;
-    border: var(--border-width-default) solid var(--color-accent-border-emphasis);
+    border: var(--border-width-default) solid
+        color-mix(
+            in srgb,
+            var(--color-location-nest-border-start) var(--ui-location-tone-light-share),
+            var(--color-location-nest-border-end) var(--ui-location-tone-dark-share)
+        );
     border-radius: var(--radius-control);
-    background: color-mix(in srgb, var(--color-accent-surface-strong) 86%, white);
+    background: color-mix(
+        in srgb,
+        var(--color-location-nest-start) var(--ui-location-tone-light-share),
+        var(--color-location-nest-end) var(--ui-location-tone-dark-share)
+    );
     padding: 0.625rem 1rem;
     font-weight: 600;
     color: var(--color-text);

@@ -29,6 +29,10 @@
     --color-accent: #2575d8;
     --color-accent-strong: #0f549f;
     --color-accent-soft: #e8f1ff;
+    --color-location-nest-start: #eeeeff;
+    --color-location-nest-end: #aaaaff;
+    --color-location-nest-border-start: rgba(92, 142, 216, 0.18);
+    --color-location-nest-border-end: rgba(56, 95, 180, 0.34);
     --color-focus-ring: #2575d8;
     --shadow-focus-ring: 0 0 0 4px rgba(37, 117, 216, 0.14);
 

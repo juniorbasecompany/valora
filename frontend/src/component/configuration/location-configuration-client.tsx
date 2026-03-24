@@ -15,6 +15,7 @@ import { createPortal } from "react-dom";
 import { PageHeader } from "@/component/app-shell/page-header";
 import { StatusPanel } from "@/component/app-shell/status-panel";
 import {
+    BuildingIcon,
     HistoryIcon,
     PreviewIcon
 } from "@/component/ui/ui-icons";
@@ -297,6 +298,27 @@ export function LocationConfigurationClient({
         return itemList.find((item) => item.id === selectedLocationId) ?? null;
     }, [isCreateMode, itemList, selectedLocationId]);
 
+    const structureParentLabel = useMemo(() => {
+        if (parentLocationId == null) {
+            return copy.sectionStructureParentRoot;
+        }
+        const parentItem = itemList.find((item) => item.id === parentLocationId);
+        return parentItem ? resolveLocationLabel(parentItem) : copy.sectionStructureParentRoot;
+    }, [copy.sectionStructureParentRoot, itemList, parentLocationId]);
+
+    const structureLevelDisplay = useMemo(() => {
+        let depth = 0;
+        if (isCreateMode) {
+            if (parentLocationId != null) {
+                const parentItem = itemList.find((item) => item.id === parentLocationId);
+                depth = parentItem ? parentItem.depth + 1 : 0;
+            }
+        } else if (selectedLocation) {
+            depth = selectedLocation.depth;
+        }
+        return String(depth + 1);
+    }, [isCreateMode, itemList, parentLocationId, selectedLocation]);
+
     const selectedLocationKey: SelectedLocationKey = isCreateMode
         ? "new"
         : (selectedLocation?.id ?? null);
@@ -534,7 +556,7 @@ export function LocationConfigurationClient({
             />
 
             <div className="ui-layout-directory ui-layout-directory-editor">
-                <aside className="ui-panel ui-stack-lg ui-panel-context-card ui-layout-sticky">
+                <aside className="ui-panel ui-stack-lg ui-panel-context-card">
                     {!directory ? (
                         <div className="ui-panel ui-empty-panel">
                             {hasAnyScope ? copy.missingCurrentScope : copy.emptyScope}
@@ -586,7 +608,7 @@ export function LocationConfigurationClient({
                 </aside>
 
                 <div
-                    className="ui-panel ui-panel-editor ui-editor-panel ui-layout-sticky"
+                    className="ui-panel ui-panel-editor ui-editor-panel"
                     data-delete-pending={isDeletePending ? "true" : undefined}
                 >
                     <div className="ui-editor-panel-body">
@@ -677,47 +699,90 @@ export function LocationConfigurationClient({
                                 </div>
                             </div>
                         </section>
+
+                        {directory ? (
+                            <section className="ui-card ui-form-section ui-border-accent">
+                                <div className="ui-editor-content">
+                                    <div className="ui-section-header">
+                                        <span className="ui-icon-badge">
+                                            <BuildingIcon className="ui-icon" />
+                                        </span>
+                                        <div className="ui-section-copy">
+                                            <h2 className="ui-header-title ui-title-section">
+                                                {copy.sectionStructureTitle}
+                                            </h2>
+                                            <p className="ui-copy-body">
+                                                {copy.sectionStructureDescription}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="ui-form-fields ui-form-fields-2">
+                                        <div className="ui-field">
+                                            <label
+                                                className="ui-field-label"
+                                                htmlFor="location-structure-level"
+                                            >
+                                                {copy.sectionStructureLevelLabel}
+                                            </label>
+                                            <input
+                                                id="location-structure-level"
+                                                className="ui-input"
+                                                value={structureLevelDisplay}
+                                                disabled
+                                                readOnly
+                                            />
+                                            <p className="ui-field-hint">
+                                                {copy.sectionStructureLevelHint}
+                                            </p>
+                                        </div>
+
+                                        <div className="ui-field">
+                                            <label
+                                                className="ui-field-label"
+                                                htmlFor="location-structure-order"
+                                            >
+                                                {copy.sectionStructureOrderLabel}
+                                            </label>
+                                            <input
+                                                id="location-structure-order"
+                                                className="ui-input"
+                                                value={
+                                                    isCreateMode || !selectedLocation
+                                                        ? copy.sectionStructureOrderPending
+                                                        : String(selectedLocation.sort_order)
+                                                }
+                                                disabled
+                                                readOnly
+                                            />
+                                            <p className="ui-field-hint">
+                                                {isCreateMode || !selectedLocation
+                                                    ? copy.sectionStructureOrderHintCreate
+                                                    : copy.sectionStructureOrderHintEdit}
+                                            </p>
+                                        </div>
+
+                                        <div className="ui-field ui-field-span-full">
+                                            <label
+                                                className="ui-field-label"
+                                                htmlFor="location-structure-parent"
+                                            >
+                                                {copy.sectionStructureParentLabel}
+                                            </label>
+                                            <input
+                                                id="location-structure-parent"
+                                                className="ui-input"
+                                                value={structureParentLabel}
+                                                disabled
+                                                readOnly
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        ) : null}
                     </div>
                 </div>
-
-                <aside className="ui-panel-context ui-layout-sticky">
-                    {selectedLocation && !isCreateMode ? (
-                        <div className="ui-panel ui-panel-context ui-panel-context-body">
-                            <div className="ui-metadata-grid">
-                                <div className="ui-metadata-card">
-                                    <p className="ui-metadata-label">{copy.metadataIdLabel}</p>
-                                    <p className="ui-metadata-value-strong">
-                                        {selectedLocation.id}
-                                    </p>
-                                </div>
-                                <div className="ui-metadata-card">
-                                    <p className="ui-metadata-label">{copy.metadataPathLabel}</p>
-                                    <p className="ui-metadata-value">
-                                        {selectedLocation.path_labels.join(" / ")}
-                                    </p>
-                                </div>
-                                <div className="ui-metadata-grid ui-metadata-grid-2">
-                                    <div className="ui-metadata-card">
-                                        <p className="ui-metadata-label">
-                                            {copy.metadataChildrenLabel}
-                                        </p>
-                                        <p className="ui-metadata-value-strong">
-                                            {selectedLocation.children_count}
-                                        </p>
-                                    </div>
-                                    <div className="ui-metadata-card">
-                                        <p className="ui-metadata-label">
-                                            {copy.metadataDescendantsLabel}
-                                        </p>
-                                        <p className="ui-metadata-value-strong">
-                                            {selectedLocation.descendants_count}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ) : null}
-                </aside>
             </div>
 
             <section className="ui-card ui-card-coming-soon ui-panel-body-compact">

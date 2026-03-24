@@ -648,15 +648,6 @@
     max-width: 100%;
 }
 
-@container (min-width: 60rem) {
-    .ui-layout-directory.ui-layout-directory-editor > .ui-layout-sticky,
-    .ui-layout-directory.ui-layout-directory-editor > .ui-panel.ui-layout-sticky {
-        position: sticky;
-        top: 2rem;
-        align-self: flex-start;
-    }
-}
-
 @media (max-width: 1024px) {
     .ui-shell-content {
         padding-top: 7rem;

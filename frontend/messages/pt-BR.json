@@ -330,13 +330,19 @@
         "nameHint": "Use um rótulo curto, como Fazenda Norte, Aviário B ou Talhão 12.",
         "displayNameLabel": "Descrição do local",
         "displayNameHint": "Adicione contexto para o usuário reconhecer o local com rapidez."
+      },
+      "structure": {
+        "title": "Posição na hierarquia",
+        "description": "Nível, pai e ordem entre irmãos indicam onde o local aparece no escopo. A ordem pode mudar com as ações de mover, quando disponíveis.",
+        "levelLabel": "Nível hierárquico",
+        "levelHint": "Contado a partir da raiz do escopo (1 = raiz).",
+        "parentLabel": "Local pai",
+        "parentRoot": "Raiz do escopo (sem pai acima)",
+        "orderLabel": "Ordem entre irmãos",
+        "orderHintEdit": "Usada ao listar locais no mesmo nível.",
+        "orderHintCreate": "Será definida ao salvar o novo local.",
+        "orderPending": "—"
       }
-    },
-    "metadata": {
-      "idLabel": "Identificador do local",
-      "pathLabel": "Caminho hierárquico",
-      "childrenLabel": "Filhos diretos",
-      "descendantsLabel": "Descendentes totais"
     },
     "dragDropHint": "Arraste a alça para reordenar antes ou depois de um irmão, ou solte sobre uma linha para mover para baixo desse local.",
     "action": {

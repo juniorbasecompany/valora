@@ -330,13 +330,19 @@
         "nameHint": "Use a short label such as North Farm, Shed B, or Plot 12.",
         "displayNameLabel": "Location description",
         "displayNameHint": "Add context that helps users recognize the location quickly."
+      },
+      "structure": {
+        "title": "Position in hierarchy",
+        "description": "Level, parent, and sibling order show where the location sits in the scope. Order can change with move actions when available.",
+        "levelLabel": "Hierarchy level",
+        "levelHint": "Counted from the scope root (1 = root).",
+        "parentLabel": "Parent location",
+        "parentRoot": "Scope root (no parent above)",
+        "orderLabel": "Order among siblings",
+        "orderHintEdit": "Used when listing locations at the same level.",
+        "orderHintCreate": "Assigned when you save the new location.",
+        "orderPending": "—"
       }
-    },
-    "metadata": {
-      "idLabel": "Location identifier",
-      "pathLabel": "Hierarchy path",
-      "childrenLabel": "Direct children",
-      "descendantsLabel": "Total descendants"
     },
     "dragDropHint": "Drag a handle to reorder before or after a sibling, or drop on a row to move under that location.",
     "action": {

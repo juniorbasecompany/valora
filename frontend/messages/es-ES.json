@@ -330,13 +330,19 @@
         "nameHint": "Usa una etiqueta corta, como Granja Norte, Galpón B o Lote 12.",
         "displayNameLabel": "Descripción de la ubicación",
         "displayNameHint": "Añade contexto para que el usuario reconozca la ubicación rápidamente."
+      },
+      "structure": {
+        "title": "Posición en la jerarquía",
+        "description": "Nivel, padre y orden entre hermanos indican dónde queda la ubicación en el alcance. El orden puede cambiar con acciones de mover, cuando existan.",
+        "levelLabel": "Nivel jerárquico",
+        "levelHint": "Contado desde la raíz del alcance (1 = raíz).",
+        "parentLabel": "Ubicación padre",
+        "parentRoot": "Raíz del alcance (sin padre superior)",
+        "orderLabel": "Orden entre hermanos",
+        "orderHintEdit": "Se usa al listar ubicaciones en el mismo nivel.",
+        "orderHintCreate": "Se definirá al guardar la nueva ubicación.",
+        "orderPending": "—"
       }
-    },
-    "metadata": {
-      "idLabel": "Identificador de la ubicación",
-      "pathLabel": "Ruta jerárquica",
-      "childrenLabel": "Hijos directos",
-      "descendantsLabel": "Descendientes totales"
     },
     "dragDropHint": "Arrastra el asa para reordenar antes o después de un hermano, o suéltala sobre una fila para moverla debajo de esa ubicación.",
     "action": {

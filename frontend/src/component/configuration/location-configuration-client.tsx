@@ -222,10 +222,9 @@ export function LocationConfigurationClient({
         initialLocationKey === "new"
             ? null
             : typeof initialLocationKey === "number"
-                ? initialItemList.find((item) => item.id === initialLocationKey) ??
-                initialItemList[0] ??
-                null
-                : initialItemList[0] ?? null;
+                ? initialItemList.find((item) => item.id === initialLocationKey) ?? null
+                : null;
+    const shouldStartCreateMode = initialLocationKey === "new" || initialLocationKey == null;
 
     const locationPath = `/${locale}/app/configuration/location`;
     const configurationPath = `/${locale}/app/configuration`;
@@ -242,37 +241,28 @@ export function LocationConfigurationClient({
     );
     const scopeId = directory?.scope_id ?? initialScopeId;
     const [selectedLocationId, setSelectedLocationId] = useState<number | null>(
-        initialLocationKey === "new" ? null : (initialSelectedLocation?.id ?? null)
+        shouldStartCreateMode ? null : (initialSelectedLocation?.id ?? null)
     );
-    const [isCreateMode, setIsCreateMode] = useState(initialLocationKey === "new");
+    const [isCreateMode, setIsCreateMode] = useState(shouldStartCreateMode);
     const [name, setName] = useState(
-        initialLocationKey === "new" ? "" : (initialSelectedLocation?.name ?? "")
+        shouldStartCreateMode ? "" : (initialSelectedLocation?.name ?? "")
     );
     const [displayName, setDisplayName] = useState(
-        initialLocationKey === "new" ? "" : (initialSelectedLocation?.display_name ?? "")
+        shouldStartCreateMode ? "" : (initialSelectedLocation?.display_name ?? "")
     );
     const [parentLocationId, setParentLocationId] = useState<number | null>(
-        initialLocationKey === "new"
-            ? null
-            : (initialSelectedLocation?.parent_location_id ?? null)
+        shouldStartCreateMode ? null : (initialSelectedLocation?.parent_location_id ?? null)
     );
     const [baseline, setBaseline] = useState({
-        name: initialLocationKey === "new" ? "" : (initialSelectedLocation?.name ?? ""),
-        displayName:
-            initialLocationKey === "new"
-                ? ""
-                : (initialSelectedLocation?.display_name ?? ""),
-        parentLocationId:
-            initialLocationKey === "new"
-                ? null
-                : (initialSelectedLocation?.parent_location_id ?? null)
+        name: shouldStartCreateMode ? "" : (initialSelectedLocation?.name ?? ""),
+        displayName: shouldStartCreateMode ? "" : (initialSelectedLocation?.display_name ?? ""),
+        parentLocationId: shouldStartCreateMode ? null : (initialSelectedLocation?.parent_location_id ?? null)
     });
     const [fieldError, setFieldError] = useState<{
         name?: string;
         displayName?: string;
     }>({});
     const [formError, setFormError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isDeletePending, setIsDeletePending] = useState(false);
     const [isEditorFlashActive, setIsEditorFlashActive] = useState(false);
@@ -307,7 +297,7 @@ export function LocationConfigurationClient({
         if (isCreateMode) {
             return null;
         }
-        return itemList.find((item) => item.id === selectedLocationId) ?? itemList[0] ?? null;
+        return itemList.find((item) => item.id === selectedLocationId) ?? null;
     }, [isCreateMode, itemList, selectedLocationId]);
 
     const selectedLocationKey: SelectedLocationKey = isCreateMode
@@ -345,7 +335,6 @@ export function LocationConfigurationClient({
             });
             setFieldError({});
             setFormError(null);
-            setSuccessMessage(null);
             setIsDeletePending(false);
         },
         []
@@ -477,7 +466,6 @@ export function LocationConfigurationClient({
             return;
         }
         setFormError(null);
-        setSuccessMessage(null);
         if (!isDeletePending && !validate()) {
             return;
         }
@@ -486,7 +474,6 @@ export function LocationConfigurationClient({
         const endpoint = isCreateMode
             ? `/api/auth/tenant/current/scopes/${scopeId}/locations`
             : `/api/auth/tenant/current/scopes/${scopeId}/locations/${selectedLocation?.id}`;
-        const previousLocationIdSet = new Set(directory.item_list.map((item) => item.id));
         const response = await fetch(
             endpoint,
             isDeletePending
@@ -516,36 +503,10 @@ export function LocationConfigurationClient({
 
         const nextDirectory = data as TenantLocationDirectoryResponse;
         setDirectory(nextDirectory);
-
-        if (isDeletePending) {
-            syncEditor(
-                nextDirectory.item_list[0] ?? null,
-                nextDirectory.item_list.length === 0 && nextDirectory.can_create,
-                null
-            );
-            setSuccessMessage(copy.deletedNotice);
-            return;
-        }
-
-        if (isCreateMode) {
-            const created =
-                nextDirectory.item_list.find((item) => !previousLocationIdSet.has(item.id)) ??
-                nextDirectory.item_list[0] ??
-                null;
-            syncEditor(created, false, null);
-            setSuccessMessage(copy.createdNotice);
-            return;
-        }
-
-        const updated =
-            nextDirectory.item_list.find((item) => item.id === selectedLocation?.id) ?? null;
-        syncEditor(updated, false, null);
-        setSuccessMessage(null);
+        syncEditor(null, true, null);
     }, [
         copy.createError,
-        copy.createdNotice,
         copy.deleteError,
-        copy.deletedNotice,
         copy.saveError,
         directory,
         displayName,
@@ -634,11 +595,6 @@ export function LocationConfigurationClient({
                     data-delete-pending={isDeletePending ? "true" : undefined}
                 >
                     <div className="ui-editor-panel-body">
-                        {successMessage ? (
-                            <div className="ui-status-panel ui-tone-positive ui-status-copy">
-                                {successMessage}
-                            </div>
-                        ) : null}
                         {formError ? (
                             <div className="ui-notice-danger ui-notice-block">{formError}</div>
                         ) : null}
@@ -687,7 +643,6 @@ export function LocationConfigurationClient({
                                                     ...previous,
                                                     name: undefined
                                                 }));
-                                                setSuccessMessage(null);
                                             }}
                                             disabled={isDeletePending || !canEditForm}
                                             aria-invalid={Boolean(fieldError.name)}
@@ -715,7 +670,6 @@ export function LocationConfigurationClient({
                                                     ...previous,
                                                     displayName: undefined
                                                 }));
-                                                setSuccessMessage(null);
                                             }}
                                             disabled={isDeletePending || !canEditForm}
                                             aria-invalid={Boolean(fieldError.displayName)}

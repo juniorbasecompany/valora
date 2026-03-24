@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { MouseEvent } from "react";
 import { createPortal } from "react-dom";
@@ -16,9 +16,6 @@ export type TenantConfigurationCopy = {
   description: string;
   statusTitle: string;
   statusDescription: string;
-  tabGeneral: string;
-  tabHistory: string;
-  tabListAriaLabel: string;
   historyTitle: string;
   historyDescription: string;
   sectionDisplayTitle: string;
@@ -50,10 +47,6 @@ type TenantConfigurationClientProps = {
   copy: TenantConfigurationCopy;
 };
 
-function normalizeTab(raw: string | null): "general" | "history" {
-  return raw === "history" ? "history" : "general";
-}
-
 function parseErrorDetail(payload: unknown, fallback: string): string {
   if (!payload || typeof payload !== "object") {
     return fallback;
@@ -77,11 +70,8 @@ export function TenantConfigurationClient({
   copy
 }: TenantConfigurationClientProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const tab = normalizeTab(searchParams.get("tab"));
 
   const configurationPath = `/${locale}/app/configuration`;
-  const tenantPath = `/${locale}/app/configuration/tenant`;
 
   const [tenant, setTenant] = useState(initialTenant);
   const [displayName, setDisplayName] = useState(initialTenant.display_name);
@@ -123,17 +113,6 @@ export function TenantConfigurationClient({
       isDeletePending
     );
   }, [baseline.display, baseline.legal, displayName, isDeletePending, legalName]);
-
-  const setTab = useCallback(
-    (next: "general" | "history") => {
-      const url =
-        next === "history"
-          ? `${tenantPath}?tab=history`
-          : tenantPath;
-      router.replace(url);
-    },
-    [router, tenantPath]
-  );
 
   const validate = useCallback(() => {
     const nextError: { displayName?: string; legalName?: string } = {};
@@ -234,7 +213,7 @@ export function TenantConfigurationClient({
   const previewLegalName = legalName.trim() || tenant.name;
 
   return (
-    <section className={`ui-page-stack ${tab === "general" ? "ui-page-stack-footer" : ""}`}>
+    <section className="ui-page-stack ui-page-stack-footer">
       <PageHeader
         title={pageTitle}
         description={copy.description}
@@ -247,272 +226,213 @@ export function TenantConfigurationClient({
         }
       />
 
-      <div
-        className="ui-panel ui-tab-list"
-        role="tablist"
-        aria-label={copy.tabListAriaLabel}
-      >
-        <button
-          type="button"
-          role="tab"
-          id="tenant-tab-general"
-          aria-selected={tab === "general"}
-          aria-controls="tenant-panel-general"
-          className={`ui-tab ${
-            tab === "general"
-              ? "ui-tab-active"
-              : ""
-          }`}
-          onClick={() => setTab("general")}
-        >
-          {copy.tabGeneral}
-        </button>
-        <button
-          type="button"
-          role="tab"
-          id="tenant-tab-history"
-          aria-selected={tab === "history"}
-          aria-controls="tenant-panel-history"
-          className={`ui-tab ${
-            tab === "history"
-              ? "ui-tab-active"
-              : ""
-          }`}
-          onClick={() => setTab("history")}
-        >
-          {copy.tabHistory}
-        </button>
-      </div>
-
-      {tab === "general" ? (
+      <div className="ui-layout-record ui-layout-record-editor">
         <div
-          id="tenant-panel-general"
-          role="tabpanel"
-          aria-labelledby="tenant-tab-general"
-          className="ui-layout-record ui-layout-record-editor"
+          className="ui-panel ui-panel-editor"
+          data-delete-pending={isDeletePending ? "true" : undefined}
         >
-          <div
-            className="ui-panel ui-panel-editor"
-            data-delete-pending={isDeletePending ? "true" : undefined}
-          >
-            {!tenant.can_edit ? (
-              <div className="ui-notice-attention ui-notice-block">
-                {copy.readOnlyNotice}
-              </div>
-            ) : null}
-
-            {saveSuccess ? (
-              <div className="ui-status-panel ui-tone-positive ui-status-copy">
-                {copy.savedNotice}
-              </div>
-            ) : null}
-
-            {formError ? (
-              <div className="ui-notice-danger ui-notice-block">{formError}</div>
-            ) : null}
-
-            <section className="ui-card ui-form-section ui-border-accent">
-              <div className="ui-section-header">
-                <span className="ui-icon-badge">
-                  <PreviewIcon className="ui-icon-sm" />
-                </span>
-                <div className="ui-section-copy">
-                  <h2 className="ui-header-title ui-title-section">
-                    {copy.sectionDisplayTitle}
-                  </h2>
-                  <p className="ui-copy-body">
-                    {copy.sectionDisplayDescription}
-                  </p>
-                </div>
-              </div>
-              <div className="ui-field">
-                <label className="ui-field-label" htmlFor="tenant-display-name">
-                  {copy.displayNameLabel}
-                </label>
-                <input
-                  id="tenant-display-name"
-                  className="ui-input"
-                  value={displayName}
-                  onChange={(event) => {
-                    setDisplayName(event.target.value);
-                    setFieldError((previous) => ({
-                      ...previous,
-                      displayName: undefined
-                    }));
-                    setSaveSuccess(false);
-                  }}
-                  disabled={isDeletePending || !tenant.can_edit}
-                  autoComplete="organization"
-                  aria-invalid={Boolean(fieldError.displayName)}
-                  aria-describedby="tenant-display-name-hint"
-                />
-                <p id="tenant-display-name-hint" className="ui-field-hint">
-                  {copy.displayNameHint}
-                </p>
-                {fieldError.displayName ? (
-                  <p className="ui-field-error">{fieldError.displayName}</p>
-                ) : null}
-              </div>
-            </section>
-
-            <section className="ui-card ui-form-section ui-border-accent">
-              <div className="ui-section-header">
-                <span className="ui-icon-badge">
-                  <BuildingIcon className="ui-icon-sm" />
-                </span>
-                <div className="ui-section-copy">
-                  <h2 className="ui-header-title ui-title-section">
-                    {copy.sectionLegalTitle}
-                  </h2>
-                  <p className="ui-copy-body">
-                    {copy.sectionLegalDescription}
-                  </p>
-                </div>
-              </div>
-              <div className="ui-field">
-                <label className="ui-field-label" htmlFor="tenant-legal-name">
-                  {copy.legalNameLabel}
-                </label>
-                <input
-                  id="tenant-legal-name"
-                  className="ui-input"
-                  value={legalName}
-                  onChange={(event) => {
-                    setLegalName(event.target.value);
-                    setFieldError((previous) => ({
-                      ...previous,
-                      legalName: undefined
-                    }));
-                    setSaveSuccess(false);
-                  }}
-                  disabled={isDeletePending || !tenant.can_edit}
-                  autoComplete="organization-title"
-                  aria-invalid={Boolean(fieldError.legalName)}
-                  aria-describedby="tenant-legal-name-hint"
-                />
-                <p id="tenant-legal-name-hint" className="ui-field-hint">
-                  {copy.legalNameHint}
-                </p>
-                {fieldError.legalName ? (
-                  <p className="ui-field-error">{fieldError.legalName}</p>
-                ) : null}
-              </div>
-            </section>
-
-            <section className="ui-metadata-card">
-              <p className="ui-metadata-label">
-                {copy.metadataIdLabel}
-              </p>
-              <p className="ui-metadata-value-strong">
-                {tenant.id}
-              </p>
-            </section>
-
-            <div className="ui-divider-top" />
-          </div>
-
-          <aside className="ui-panel-context">
-            <div
-              className="ui-panel ui-panel-context ui-panel-context-body"
-              data-delete-pending={isDeletePending ? "true" : undefined}
-            >
-              <div className="ui-section-header">
-                <span className="ui-icon-badge">
-                  <PreviewIcon className="ui-icon-sm" />
-                </span>
-                <div className="ui-section-copy">
-                  <h2 className="ui-header-title ui-title-section">
-                    {copy.displayNameLabel}
-                  </h2>
-                  <p className="ui-copy-body">
-                    {copy.displayNameHint}
-                  </p>
-                </div>
-              </div>
-
-              <div className="ui-preview-stack">
-                <div className="ui-preview-card ui-preview-card-accent">
-                  <p className="ui-metadata-label">
-                    {copy.displayNameLabel}
-                  </p>
-                  <p className="ui-preview-headline">
-                    {previewDisplayName}
-                  </p>
-                </div>
-
-                <div className="ui-preview-card">
-                  <p className="ui-metadata-label">
-                    {copy.legalNameLabel}
-                  </p>
-                  <p className="ui-preview-value-strong">
-                    {previewLegalName}
-                  </p>
-                </div>
-              </div>
+          {!tenant.can_edit ? (
+            <div className="ui-notice-attention ui-notice-block">
+              {copy.readOnlyNotice}
             </div>
+          ) : null}
 
-            <div className="ui-card ui-card-coming-soon ui-panel-body-compact">
-              <div className="ui-section-header">
-                <span className="ui-icon-badge ui-icon-badge-construction">
-                  <HistoryIcon className="ui-icon-sm" />
-                </span>
-                <div className="ui-section-copy">
-                  <h2 className="ui-header-title ui-title-section">
-                    {copy.historyTitle}
-                  </h2>
-                  <p className="ui-copy-body">
-                    {copy.historyDescription}
-                  </p>
-                </div>
-              </div>
+          {saveSuccess ? (
+            <div className="ui-status-panel ui-tone-positive ui-status-copy">
+              {copy.savedNotice}
             </div>
-          </aside>
-        </div>
-      ) : (
-        <div
-          id="tenant-panel-history"
-          role="tabpanel"
-          aria-labelledby="tenant-tab-history"
-          className="ui-layout-record ui-layout-record-history"
-        >
-          <div className="ui-panel ui-panel-body">
+          ) : null}
+
+          {formError ? (
+            <div className="ui-notice-danger ui-notice-block">{formError}</div>
+          ) : null}
+
+          <section className="ui-card ui-form-section ui-border-accent">
             <div className="ui-section-header">
-              <span className="ui-icon-badge ui-icon-badge-construction">
-                <HistoryIcon className="ui-icon-sm" />
+              <span className="ui-icon-badge">
+                <PreviewIcon className="ui-icon-sm" />
               </span>
               <div className="ui-section-copy">
                 <h2 className="ui-header-title ui-title-section">
-                  {copy.historyTitle}
+                  {copy.sectionDisplayTitle}
                 </h2>
-                <p className="ui-copy-body ui-history-description">
-                  {copy.historyDescription}
+                <p className="ui-copy-body">
+                  {copy.sectionDisplayDescription}
+                </p>
+              </div>
+            </div>
+            <div className="ui-field">
+              <label className="ui-field-label" htmlFor="tenant-display-name">
+                {copy.displayNameLabel}
+              </label>
+              <input
+                id="tenant-display-name"
+                className="ui-input"
+                value={displayName}
+                onChange={(event) => {
+                  setDisplayName(event.target.value);
+                  setFieldError((previous) => ({
+                    ...previous,
+                    displayName: undefined
+                  }));
+                  setSaveSuccess(false);
+                }}
+                disabled={isDeletePending || !tenant.can_edit}
+                autoComplete="organization"
+                aria-invalid={Boolean(fieldError.displayName)}
+                aria-describedby="tenant-display-name-hint"
+              />
+              <p id="tenant-display-name-hint" className="ui-field-hint">
+                {copy.displayNameHint}
+              </p>
+              {fieldError.displayName ? (
+                <p className="ui-field-error">{fieldError.displayName}</p>
+              ) : null}
+            </div>
+          </section>
+
+          <section className="ui-card ui-form-section ui-border-accent">
+            <div className="ui-section-header">
+              <span className="ui-icon-badge">
+                <BuildingIcon className="ui-icon-sm" />
+              </span>
+              <div className="ui-section-copy">
+                <h2 className="ui-header-title ui-title-section">
+                  {copy.sectionLegalTitle}
+                </h2>
+                <p className="ui-copy-body">
+                  {copy.sectionLegalDescription}
+                </p>
+              </div>
+            </div>
+            <div className="ui-field">
+              <label className="ui-field-label" htmlFor="tenant-legal-name">
+                {copy.legalNameLabel}
+              </label>
+              <input
+                id="tenant-legal-name"
+                className="ui-input"
+                value={legalName}
+                onChange={(event) => {
+                  setLegalName(event.target.value);
+                  setFieldError((previous) => ({
+                    ...previous,
+                    legalName: undefined
+                  }));
+                  setSaveSuccess(false);
+                }}
+                disabled={isDeletePending || !tenant.can_edit}
+                autoComplete="organization-title"
+                aria-invalid={Boolean(fieldError.legalName)}
+                aria-describedby="tenant-legal-name-hint"
+              />
+              <p id="tenant-legal-name-hint" className="ui-field-hint">
+                {copy.legalNameHint}
+              </p>
+              {fieldError.legalName ? (
+                <p className="ui-field-error">{fieldError.legalName}</p>
+              ) : null}
+            </div>
+          </section>
+
+          <section className="ui-metadata-card">
+            <p className="ui-metadata-label">
+              {copy.metadataIdLabel}
+            </p>
+            <p className="ui-metadata-value-strong">
+              {tenant.id}
+            </p>
+          </section>
+
+          <div className="ui-divider-top" />
+        </div>
+
+        <aside className="ui-panel-context">
+          <div
+            className="ui-panel ui-panel-context ui-panel-context-body"
+            data-delete-pending={isDeletePending ? "true" : undefined}
+          >
+            <div className="ui-section-header">
+              <span className="ui-icon-badge">
+                <PreviewIcon className="ui-icon-sm" />
+              </span>
+              <div className="ui-section-copy">
+                <h2 className="ui-header-title ui-title-section">
+                  {copy.displayNameLabel}
+                </h2>
+                <p className="ui-copy-body">
+                  {copy.displayNameHint}
                 </p>
               </div>
             </div>
 
-            <div className="ui-history-list">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="ui-card ui-card-coming-soon ui-history-card"
-                >
-                  <div className="ui-skeleton ui-skeleton-label ui-pulse" />
-                  <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-medium ui-space-top-md ui-pulse" />
-                  <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-short ui-space-top-sm ui-pulse" />
-                </div>
-              ))}
+            <div className="ui-preview-stack">
+              <div className="ui-preview-card ui-preview-card-accent">
+                <p className="ui-metadata-label">
+                  {copy.displayNameLabel}
+                </p>
+                <p className="ui-preview-headline">
+                  {previewDisplayName}
+                </p>
+              </div>
+
+              <div className="ui-preview-card">
+                <p className="ui-metadata-label">
+                  {copy.legalNameLabel}
+                </p>
+                <p className="ui-preview-value-strong">
+                  {previewLegalName}
+                </p>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <section
+        className="ui-layout-record ui-layout-record-history"
+        aria-labelledby="tenant-history-heading"
+      >
+        <div className="ui-panel ui-panel-body">
+          <div className="ui-section-header">
+            <span className="ui-icon-badge ui-icon-badge-construction">
+              <HistoryIcon className="ui-icon-sm" />
+            </span>
+            <div className="ui-section-copy">
+              <h2
+                id="tenant-history-heading"
+                className="ui-header-title ui-title-section"
+              >
+                {copy.historyTitle}
+              </h2>
+              <p className="ui-copy-body ui-history-description">
+                {copy.historyDescription}
+              </p>
             </div>
           </div>
 
-          <StatusPanel
-            title={copy.statusTitle}
-            description={copy.statusDescription}
-            tone="neutral"
-          />
+          <div className="ui-history-list">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div
+                key={index}
+                className="ui-card ui-card-coming-soon ui-history-card"
+              >
+                <div className="ui-skeleton ui-skeleton-label ui-pulse" />
+                <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-medium ui-space-top-md ui-pulse" />
+                <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-short ui-space-top-sm ui-pulse" />
+              </div>
+            ))}
+          </div>
         </div>
-      )}
 
-      {tab === "general" && portalTarget
+        <StatusPanel
+          title={copy.statusTitle}
+          description={copy.statusDescription}
+          tone="neutral"
+        />
+      </section>
+
+      {portalTarget
         ? createPortal(
             <div className="ui-action-footer">
               <div className="ui-action-footer-start">

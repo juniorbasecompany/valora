@@ -195,13 +195,6 @@
     color: var(--color-accent-strong);
 }
 
-.ui-tab-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem;
-    padding: 0.375rem;
-}
-
 .ui-form-section {
     display: flex;
     flex-direction: column;
@@ -1597,35 +1590,6 @@
 .ui-link:hover {
     color: var(--color-primary);
     transform: translateX(2px);
-}
-
-.ui-tab {
-    min-height: 2.9rem;
-    padding-block: 0.625rem;
-    padding-inline: 1rem;
-    border: var(--border-width-default) solid transparent;
-    border-radius: var(--radius-control);
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--color-text-muted);
-    transition:
-        background-color 0.16s ease,
-        color 0.16s ease,
-        border-color 0.16s ease,
-        transform 0.16s ease,
-        box-shadow 0.16s ease;
-}
-
-.ui-tab:hover {
-    background: var(--color-surface-glass);
-    color: var(--color-text);
-}
-
-.ui-tab-active {
-    border-color: var(--color-accent-border-default);
-    background: var(--gradient-surface-accent);
-    color: var(--color-primary);
-    box-shadow: var(--shadow-xs);
 }
 
 .ui-header-title {

@@ -19,9 +19,6 @@ export type ScopeConfigurationCopy = {
   description: string;
   statusTitle: string;
   statusDescription: string;
-  tabGeneral: string;
-  tabHistory: string;
-  tabListAriaLabel: string;
   listTitle: string;
   listDescription: string;
   empty: string;
@@ -59,10 +56,6 @@ type ScopeConfigurationClientProps = {
 };
 
 type ScopeSelectionKey = number | "new" | null;
-
-function normalizeTab(raw: string | null): "general" | "history" {
-  return raw === "history" ? "history" : "general";
-}
 
 function parseErrorDetail(payload: unknown, fallback: string): string {
   if (!payload || typeof payload !== "object") {
@@ -121,16 +114,8 @@ function resolveSelectedScopeKey(
   return itemList[0]?.id ?? (canCreate ? "new" : null);
 }
 
-function buildScopePath(
-  basePath: string,
-  tab: "general" | "history",
-  scopeKey: ScopeSelectionKey
-) {
+function buildScopePath(basePath: string, scopeKey: ScopeSelectionKey) {
   const params = new URLSearchParams();
-
-  if (tab === "history") {
-    params.set("tab", "history");
-  }
 
   if (scopeKey === "new") {
     params.set("scope", "new");
@@ -149,7 +134,6 @@ export function ScopeConfigurationClient({
 }: ScopeConfigurationClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const tab = normalizeTab(searchParams.get("tab"));
   const initialSearchScopeKey =
     parseSelectedScopeKey(searchParams.get("scope")) ??
     initialDirectory.current_scope_id ??
@@ -260,19 +244,17 @@ export function ScopeConfigurationClient({
   useEffect(() => {
     const currentPath = buildScopePath(
       scopePath,
-      tab,
       parseSelectedScopeKey(searchParams.get("scope"))
     );
     const nextPath = buildScopePath(
       scopePath,
-      tab,
       isCreateMode ? "new" : selectedScope?.id ?? null
     );
 
     if (currentPath !== nextPath) {
       router.replace(nextPath);
     }
-  }, [isCreateMode, router, scopePath, searchParams, selectedScope, tab]);
+  }, [isCreateMode, router, scopePath, searchParams, selectedScope]);
 
   const isDirty = useMemo(() => {
     return (
@@ -281,15 +263,6 @@ export function ScopeConfigurationClient({
       isDeletePending
     );
   }, [baseline.displayName, baseline.name, displayName, isDeletePending, name]);
-
-  const setTab = useCallback(
-    (next: "general" | "history") => {
-      router.replace(
-        buildScopePath(scopePath, next, isCreateMode ? "new" : selectedScope?.id ?? null)
-      );
-    },
-    [isCreateMode, router, scopePath, selectedScope]
-  );
 
   const validate = useCallback(() => {
     const nextError: { name?: string; displayName?: string } = {};
@@ -484,7 +457,7 @@ export function ScopeConfigurationClient({
       : selectedScope?.can_edit ?? false;
 
   return (
-    <section className={`ui-page-stack ${tab === "general" ? "ui-page-stack-footer" : ""}`}>
+    <section className="ui-page-stack ui-page-stack-footer">
       <PageHeader
         title={pageTitle}
         description={copy.description}
@@ -497,46 +470,7 @@ export function ScopeConfigurationClient({
         }
       />
 
-      <div
-        className="ui-panel ui-tab-list"
-        role="tablist"
-        aria-label={copy.tabListAriaLabel}
-      >
-        <button
-          type="button"
-          role="tab"
-          id="scope-tab-general"
-          aria-selected={tab === "general"}
-          aria-controls="scope-panel-general"
-          className={`ui-tab ${
-            tab === "general" ? "ui-tab-active" : ""
-          }`}
-          onClick={() => setTab("general")}
-        >
-          {copy.tabGeneral}
-        </button>
-        <button
-          type="button"
-          role="tab"
-          id="scope-tab-history"
-          aria-selected={tab === "history"}
-          aria-controls="scope-panel-history"
-          className={`ui-tab ${
-            tab === "history" ? "ui-tab-active" : ""
-          }`}
-          onClick={() => setTab("history")}
-        >
-          {copy.tabHistory}
-        </button>
-      </div>
-
-      {tab === "general" ? (
-        <div
-          id="scope-panel-general"
-          role="tabpanel"
-          aria-labelledby="scope-tab-general"
-          className="ui-layout-directory ui-layout-directory-editor"
-        >
+      <div className="ui-layout-directory ui-layout-directory-editor">
           <aside className="ui-panel ui-stack-lg ui-panel-context-card">
             <div className="ui-row-between">
               <div className="ui-section-header">
@@ -771,79 +705,63 @@ export function ScopeConfigurationClient({
                 </p>
               )}
             </div>
-
-            <div className="ui-card ui-card-coming-soon ui-panel-body-compact">
-              <div className="ui-section-header">
-                <span className="ui-icon-badge ui-icon-badge-construction">
-                  <HistoryIcon className="ui-icon-sm" />
-                </span>
-                <div className="ui-section-copy">
-                  <h2 className="ui-header-title ui-title-section">
-                    {copy.historyTitle}
-                  </h2>
-                  <p className="ui-copy-body">
-                    {copy.historyDescription}
-                  </p>
-                </div>
-              </div>
-            </div>
           </aside>
-        </div>
-      ) : (
-        <div
-          id="scope-panel-history"
-          role="tabpanel"
-          aria-labelledby="scope-tab-history"
-          className="ui-layout-record ui-layout-record-history"
-        >
-          <div className="ui-panel ui-panel-body">
-            <div className="ui-section-header">
-              <span className="ui-icon-badge ui-icon-badge-construction">
-                <HistoryIcon className="ui-icon-sm" />
-              </span>
-              <div className="ui-section-copy">
-                <h2 className="ui-header-title ui-title-section">
-                  {copy.historyTitle}
-                </h2>
-                <p className="ui-copy-body ui-history-description">
-                  {copy.historyDescription}
-                </p>
-              </div>
-            </div>
+      </div>
 
-            <div className="ui-history-list">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="ui-card ui-card-coming-soon ui-history-card">
-                  <div className="ui-skeleton ui-skeleton-label ui-pulse" />
-                  <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-medium ui-space-top-md ui-pulse" />
-                  <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-short ui-space-top-sm ui-pulse" />
-                </div>
-              ))}
+      <section
+        className="ui-layout-record ui-layout-record-history"
+        aria-labelledby="scope-history-heading"
+      >
+        <div className="ui-panel ui-panel-body">
+          <div className="ui-section-header">
+            <span className="ui-icon-badge ui-icon-badge-construction">
+              <HistoryIcon className="ui-icon-sm" />
+            </span>
+            <div className="ui-section-copy">
+              <h2
+                id="scope-history-heading"
+                className="ui-header-title ui-title-section"
+              >
+                {copy.historyTitle}
+              </h2>
+              <p className="ui-copy-body ui-history-description">
+                {copy.historyDescription}
+              </p>
             </div>
           </div>
 
-          <aside className="ui-history-card-side">
-            <StatusPanel
-              title={copy.statusTitle}
-              description={copy.statusDescription}
-              tone="neutral"
-            />
-
-            {selectedScopeKey ? (
-              <div className="ui-panel ui-panel-context-body">
-                <p className="ui-metadata-label">
-                  {copy.nameLabel}
-                </p>
-                <p className="ui-header-title ui-history-card-title">
-                  {previewLabel}
-                </p>
+          <div className="ui-history-list">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="ui-card ui-card-coming-soon ui-history-card">
+                <div className="ui-skeleton ui-skeleton-label ui-pulse" />
+                <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-medium ui-space-top-md ui-pulse" />
+                <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-short ui-space-top-sm ui-pulse" />
               </div>
-            ) : null}
-          </aside>
+            ))}
+          </div>
         </div>
-      )}
 
-      {tab === "general" && portalTarget
+        <aside className="ui-history-card-side">
+          <StatusPanel
+            title={copy.statusTitle}
+            description={copy.statusDescription}
+            tone="neutral"
+          />
+
+          {selectedScopeKey ? (
+            <div className="ui-panel ui-panel-context-body">
+              <p className="ui-metadata-label">
+                {copy.nameLabel}
+              </p>
+              <p className="ui-header-title ui-history-card-title">
+                {previewLabel}
+              </p>
+            </div>
+          ) : null}
+        </aside>
+      </section>
+
+      {portalTarget
         ? createPortal(
             <div className="ui-action-footer">
               <div className="ui-action-footer-start">

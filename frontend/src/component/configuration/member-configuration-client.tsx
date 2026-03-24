@@ -21,9 +21,6 @@ export type MemberConfigurationCopy = {
   description: string;
   statusTitle: string;
   statusDescription: string;
-  tabGeneral: string;
-  tabHistory: string;
-  tabListAriaLabel: string;
   listTitle: string;
   listDescription: string;
   empty: string;
@@ -75,10 +72,6 @@ const memberStatusValueByKey: Record<MemberStatusKey, number> = {
   PENDING: 2,
   DISABLED: 3
 };
-
-function normalizeTab(raw: string | null): "general" | "history" {
-  return raw === "history" ? "history" : "general";
-}
 
 function parseErrorDetail(payload: unknown, fallback: string): string {
   if (!payload || typeof payload !== "object") {
@@ -148,16 +141,8 @@ function resolveSelectedMemberId(
   );
 }
 
-function buildMemberPath(
-  basePath: string,
-  tab: "general" | "history",
-  memberId: number | null
-) {
+function buildMemberPath(basePath: string, memberId: number | null) {
   const params = new URLSearchParams();
-
-  if (tab === "history") {
-    params.set("tab", "history");
-  }
 
   if (memberId != null) {
     params.set("member", String(memberId));
@@ -174,7 +159,6 @@ export function MemberConfigurationClient({
 }: MemberConfigurationClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const tab = normalizeTab(searchParams.get("tab"));
   const initialSearchMemberId = parseSelectedMemberId(searchParams.get("member"));
   const initialSelectedMemberId = resolveSelectedMemberId(
     initialDirectory.item_list,
@@ -280,15 +264,14 @@ export function MemberConfigurationClient({
   useEffect(() => {
     const currentPath = buildMemberPath(
       memberPath,
-      tab,
       parseSelectedMemberId(searchParams.get("member"))
     );
-    const nextPath = buildMemberPath(memberPath, tab, selectedMemberId);
+    const nextPath = buildMemberPath(memberPath, selectedMemberId);
 
     if (currentPath !== nextPath) {
       router.replace(nextPath);
     }
-  }, [memberPath, router, searchParams, selectedMemberId, tab]);
+  }, [memberPath, router, searchParams, selectedMemberId]);
 
   const isDirty = useMemo(() => {
     return (
@@ -309,13 +292,6 @@ export function MemberConfigurationClient({
     roleValue,
     statusKey
   ]);
-
-  const setTab = useCallback(
-    (next: "general" | "history") => {
-      router.replace(buildMemberPath(memberPath, next, selectedMemberId));
-    },
-    [memberPath, router, selectedMemberId]
-  );
 
   const validate = useCallback(() => {
     const nextError: { displayName?: string; name?: string } = {};
@@ -473,7 +449,7 @@ export function MemberConfigurationClient({
     : false;
 
   return (
-    <section className={`ui-page-stack ${tab === "general" ? "ui-page-stack-footer" : ""}`}>
+    <section className="ui-page-stack ui-page-stack-footer">
       <PageHeader
         title={pageTitle}
         description={copy.description}
@@ -486,43 +462,8 @@ export function MemberConfigurationClient({
         }
       />
 
-      <div
-        className="ui-panel ui-tab-list"
-        role="tablist"
-        aria-label={copy.tabListAriaLabel}
-      >
-        <button
-          type="button"
-          role="tab"
-          id="member-tab-general"
-          aria-selected={tab === "general"}
-          aria-controls="member-panel-general"
-          className={`ui-tab ${
-            tab === "general" ? "ui-tab-active" : ""
-          }`}
-          onClick={() => setTab("general")}
-        >
-          {copy.tabGeneral}
-        </button>
-        <button
-          type="button"
-          role="tab"
-          id="member-tab-history"
-          aria-selected={tab === "history"}
-          aria-controls="member-panel-history"
-          className={`ui-tab ${
-            tab === "history" ? "ui-tab-active" : ""
-          }`}
-          onClick={() => setTab("history")}
-        >
-          {copy.tabHistory}
-        </button>
-      </div>
-
-      {tab === "general" ? (
-        directory.item_list.length === 0 ? (
-          <div id="member-panel-general" role="tabpanel" aria-labelledby="member-tab-general">
-            <div className="ui-stack-lg">
+      {directory.item_list.length === 0 ? (
+        <div className="ui-stack-lg">
               {successMessage ? (
                 <div className="ui-status-panel ui-tone-positive ui-status-copy">
                   {successMessage}
@@ -535,14 +476,8 @@ export function MemberConfigurationClient({
                 {copy.empty}
               </div>
             </div>
-          </div>
-        ) : (
-          <div
-            id="member-panel-general"
-            role="tabpanel"
-            aria-labelledby="member-tab-general"
-            className="ui-layout-directory ui-layout-directory-editor"
-          >
+      ) : (
+          <div className="ui-layout-directory ui-layout-directory-editor">
             <aside className="ui-panel ui-stack-lg ui-panel-context-card">
               <div className="ui-section-header">
                 <span className="ui-icon-badge">
@@ -895,97 +830,81 @@ export function MemberConfigurationClient({
                   </p>
                 )}
               </div>
-
-              <div className="ui-card ui-card-coming-soon ui-panel-body-compact">
-                <div className="ui-section-header">
-                  <span className="ui-icon-badge ui-icon-badge-construction">
-                    <HistoryIcon className="ui-icon-sm" />
-                  </span>
-                  <div className="ui-section-copy">
-                    <h2 className="ui-header-title ui-title-section">
-                      {copy.historyTitle}
-                    </h2>
-                    <p className="ui-copy-body">
-                      {copy.historyDescription}
-                    </p>
-                  </div>
-                </div>
-              </div>
             </aside>
           </div>
-        )
-      ) : (
-        <div
-          id="member-panel-history"
-          role="tabpanel"
-          aria-labelledby="member-tab-history"
-          className="ui-layout-record ui-layout-record-history"
-        >
-          <div className="ui-panel ui-panel-body">
-            <div className="ui-section-header">
-              <span className="ui-icon-badge ui-icon-badge-construction">
-                <HistoryIcon className="ui-icon-sm" />
-              </span>
-              <div className="ui-section-copy">
-                <h2 className="ui-header-title ui-title-section">
-                  {copy.historyTitle}
-                </h2>
-                <p className="ui-copy-body ui-history-description">
-                  {copy.historyDescription}
-                </p>
-              </div>
-            </div>
+      )}
 
-            <div className="ui-history-list">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="ui-card ui-card-coming-soon ui-history-card"
-                >
-                  <div className="ui-skeleton ui-skeleton-label ui-pulse" />
-                  <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-medium ui-space-top-md ui-pulse" />
-                  <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-short ui-space-top-sm ui-pulse" />
-                </div>
-              ))}
+      <section
+        className="ui-layout-record ui-layout-record-history"
+        aria-labelledby="member-history-heading"
+      >
+        <div className="ui-panel ui-panel-body">
+          <div className="ui-section-header">
+            <span className="ui-icon-badge ui-icon-badge-construction">
+              <HistoryIcon className="ui-icon-sm" />
+            </span>
+            <div className="ui-section-copy">
+              <h2
+                id="member-history-heading"
+                className="ui-header-title ui-title-section"
+              >
+                {copy.historyTitle}
+              </h2>
+              <p className="ui-copy-body ui-history-description">
+                {copy.historyDescription}
+              </p>
             </div>
           </div>
 
-          <aside className="ui-history-card-side">
-            <StatusPanel
-              title={copy.statusTitle}
-              description={copy.statusDescription}
-              tone="neutral"
-            />
-
-            {selectedMember ? (
-              <div className="ui-panel ui-panel-context-body">
-                <p className="ui-metadata-label">
-                  {copy.displayNameLabel}
-                </p>
-                <p className="ui-header-title ui-history-card-title">
-                  {resolveMemberLabel(selectedMember)}
-                </p>
-                <div className="ui-badge-row">
-                  <span className="ui-badge ui-badge-neutral">
-                    {copy.roleLabels[
-                      selectedMember.role_name as keyof typeof copy.roleLabels
-                    ] ?? selectedMember.role_name}
-                  </span>
-                  <span
-                    className={`ui-pill ${getStatusToneClass(
-                      normalizeStatusKey(selectedMember.status)
-                    )}`}
-                  >
-                    {copy.statusLabels[normalizeStatusKey(selectedMember.status)]}
-                  </span>
-                </div>
+          <div className="ui-history-list">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div
+                key={index}
+                className="ui-card ui-card-coming-soon ui-history-card"
+              >
+                <div className="ui-skeleton ui-skeleton-label ui-pulse" />
+                <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-medium ui-space-top-md ui-pulse" />
+                <div className="ui-skeleton ui-skeleton-line ui-skeleton-line-short ui-space-top-sm ui-pulse" />
               </div>
-            ) : null}
-          </aside>
+            ))}
+          </div>
         </div>
-      )}
 
-      {tab === "general" && portalTarget
+        <aside className="ui-history-card-side">
+          <StatusPanel
+            title={copy.statusTitle}
+            description={copy.statusDescription}
+            tone="neutral"
+          />
+
+          {selectedMember ? (
+            <div className="ui-panel ui-panel-context-body">
+              <p className="ui-metadata-label">
+                {copy.displayNameLabel}
+              </p>
+              <p className="ui-header-title ui-history-card-title">
+                {resolveMemberLabel(selectedMember)}
+              </p>
+              <div className="ui-badge-row">
+                <span className="ui-badge ui-badge-neutral">
+                  {copy.roleLabels[
+                    selectedMember.role_name as keyof typeof copy.roleLabels
+                  ] ?? selectedMember.role_name}
+                </span>
+                <span
+                  className={`ui-pill ${getStatusToneClass(
+                    normalizeStatusKey(selectedMember.status)
+                  )}`}
+                >
+                  {copy.statusLabels[normalizeStatusKey(selectedMember.status)]}
+                </span>
+              </div>
+            </div>
+          ) : null}
+        </aside>
+      </section>
+
+      {portalTarget
         ? createPortal(
             <div className="ui-action-footer">
               <div className="ui-action-footer-start">

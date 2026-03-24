@@ -269,10 +269,7 @@ export function LocationConfigurationClient({
     const editorFlashStartTimeoutRef = useRef<number | null>(null);
     const editorFlashHideTimeoutRef = useRef<number | null>(null);
     const previousEditorFlashKeyRef = useRef<string | null>(null);
-    const portalTarget =
-        typeof document === "undefined"
-            ? null
-            : document.getElementById("app-shell-footer-slot");
+    const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
     const itemList = useMemo(() => directory?.item_list ?? [], [directory]);
     const childrenByParent = useMemo(() => {
         const next = new Map<number | null, TenantLocationRecord[]>();
@@ -303,6 +300,10 @@ export function LocationConfigurationClient({
     const selectedLocationKey: SelectedLocationKey = isCreateMode
         ? "new"
         : (selectedLocation?.id ?? null);
+
+    useEffect(() => {
+        setPortalTarget(document.getElementById("app-shell-footer-slot"));
+    }, []);
 
     useEffect(() => {
         const currentQuery = searchParams.toString();

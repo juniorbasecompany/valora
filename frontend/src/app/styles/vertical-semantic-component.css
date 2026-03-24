@@ -384,7 +384,7 @@
     background: color-mix(in srgb,
             var(--color-location-nest-start) var(--ui-location-tone-light-share),
             var(--color-location-nest-end) var(--ui-location-tone-dark-share));
-    padding: 1.25rem;
+    padding: 1rem;
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.42), var(--shadow-xs);
     transition:
         border-color 0.16s ease,

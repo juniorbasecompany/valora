@@ -30,7 +30,7 @@
     --color-accent-strong: #0f549f;
     --color-accent-soft: #e8f1ff;
     --color-accent-vertical-border: hsla(240, 50%, 50%, 50%);
-    --color-editor-vertical-border: hsla(60, 100%, 50%, 50%);
+    --color-editor-vertical-border: hsla(32, 100%, 50%, 75%);
     --color-location-nest-start: lch(94.55% 8.75 290.86);
     --color-location-nest-end: #bbbbff;
     --color-location-nest-border-start: rgba(92, 142, 216, 0.18);

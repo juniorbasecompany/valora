@@ -481,7 +481,18 @@
 }
 
 .ui-editor-card-flow>.ui-form-section:not(.ui-configuration-info-section) {
-    border-inline-start: var(--border-width-emphasis) solid var(--color-editor-vertical-border);
+    position: relative;
+}
+
+.ui-editor-card-flow>.ui-form-section:not(.ui-configuration-info-section)::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 6px;
+    background: var(--color-editor-vertical-border);
 }
 
 .ui-editor-card-flow>.ui-form-section .ui-field {

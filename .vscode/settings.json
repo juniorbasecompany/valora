@@ -1,8 +1,8 @@
 {
-  // Indentação do workspace: 4 espaços; não inferir a partir do conteúdo do arquivo.
-  "editor.tabSize": 4,
-  "editor.insertSpaces": true,
-  "editor.detectIndentation": false,
-  // Formatar ao salvar (formatador padrão por linguagem).
-  "editor.formatOnSave": true
+    // Indentação do workspace: 4 espaços; não inferir a partir do conteúdo do arquivo.
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    // Formatar ao salvar (formatador padrão por linguagem).
+    "editor.formatOnSave": true
 }

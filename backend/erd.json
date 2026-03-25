@@ -367,7 +367,7 @@
         }
       ],
       "x": -680.9582181240327,
-      "y": 248.69744719887257
+      "y": 290.60076147272224
     },
     {
       "id": "location",
@@ -413,20 +413,6 @@
           "increment": false
         },
         {
-          "id": "scope_id",
-          "name": "scope_id",
-          "comment": "Ligação do local ao escopo.",
-          "type": "BIGINT",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "size": "",
-          "values": []
-        },
-        {
           "id": "parent_location_id",
           "name": "parent_location_id",
           "comment": "Ligação do local ao local pai, por exemplo, Unidade Sul fica dentro da Granja A.",
@@ -436,6 +422,20 @@
           "primary": false,
           "unique": false,
           "notNull": false,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "scope_id",
+          "name": "scope_id",
+          "comment": "Ligação do local ao escopo.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
           "increment": false,
           "size": "",
           "values": []
@@ -455,8 +455,103 @@
           "values": []
         }
       ],
-      "x": -152.50526813127374,
-      "y": 205.52576865959884
+      "x": -83.23652412756303,
+      "y": 131.98117626059718
+    },
+    {
+      "id": "unity",
+      "name": "unity",
+      "comment": "Use para cadastrar a unidade produtiva. Pode ser, por exemplo: galinha, fêmea, branca, vermelha.",
+      "color": "#ff0000",
+      "indices": [],
+      "fields": [
+        {
+          "id": "id",
+          "name": "id",
+          "comment": "Identificação da unidade produtiva.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": true,
+          "increment": true,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "name",
+          "name": "name",
+          "comment": "Nome curto da unidade produtiva.",
+          "type": "TEXT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "display_name",
+          "name": "display_name",
+          "comment": "Descrição da unidade produtiva.",
+          "type": "TEXT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "parent_unity_id",
+          "name": "parent_unity_id",
+          "comment": "Em caso de hierarquia, esta á a unidade produtiva a qual esta pertence.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "scope_id",
+          "name": "scope_id",
+          "comment": "Escopo desta unidade produtiva.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "sort_order",
+          "name": "sort_order",
+          "comment": "Ordem da unidade produtiva em relação às demais de mesmo nível.",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        }
+      ],
+      "x": -85.23192874460136,
+      "y": 510.82134408336117
     }
   ],
   "relationships": [
@@ -513,7 +608,7 @@
       "endFieldId": "parent_location_id",
       "cardinality": "one_to_many",
       "updateConstraint": "Cascade",
-      "deleteConstraint": "Restrict"
+      "deleteConstraint": "Cascade"
     },
     {
       "id": "member.current_scope_id",
@@ -525,6 +620,28 @@
       "cardinality": "one_to_many",
       "updateConstraint": "Cascade",
       "deleteConstraint": "Set null"
+    },
+    {
+      "id": "unity.scope_id",
+      "name": "unity.scope_id",
+      "startTableId": "scope",
+      "startFieldId": "id",
+      "endTableId": "unity",
+      "endFieldId": "scope_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action"
+    },
+    {
+      "id": "unity.parent_unity_id",
+      "name": "unity.parent_unity_id",
+      "startTableId": "unity",
+      "startFieldId": "id",
+      "endTableId": "unity",
+      "endFieldId": "parent_unity_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Cascade"
     }
   ],
   "notes": [],

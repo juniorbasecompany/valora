@@ -1,4 +1,4 @@
-# Modelos estruturais iniciais: tenant, account, member, scope e location.
+# Modelos estruturais iniciais: tenant, account, member, scope, location e unity.
 
 from __future__ import annotations
 
@@ -291,4 +291,82 @@ class Location(Base):
         default=0,
         server_default=text("0"),
         comment="Ordem técnica de exibição entre irmãos na hierarquia.",
+    )
+
+
+class Unity(Base):
+    """Unidade produtiva hierárquica configurada dentro de um escopo."""
+
+    __tablename__ = "unity"
+    __table_args__ = (
+        CheckConstraint(
+            "parent_unity_id IS NULL OR parent_unity_id <> id",
+            name="unity_parent_self_chk",
+        ),
+        UniqueConstraint(
+            "scope_id",
+            "id",
+            name="unity_scope_id_unique",
+        ),
+        ForeignKeyConstraint(
+            ["scope_id", "parent_unity_id"],
+            ["unity.scope_id", "unity.id"],
+            name="unity_parent_same_scope_fk",
+            onupdate="CASCADE",
+            ondelete="CASCADE",
+        ),
+        Index(
+            "unity_scope_parent_sort_idx",
+            "scope_id",
+            "parent_unity_id",
+            "sort_order",
+            "id",
+        ),
+        Index(
+            "unity_scope_parent_name_idx",
+            "scope_id",
+            "parent_unity_id",
+            "name",
+        ),
+        {
+            "comment": (
+                "Unidade produtiva no escopo (ex.: galinha, fêmea, linhagem); "
+                "permite hierarquia opcional."
+            )
+        },
+    )
+
+    id: Mapped[int] = mapped_column(
+        BigInteger,
+        primary_key=True,
+        autoincrement=True,
+        comment="Identificador da unidade produtiva.",
+    )
+    name: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+        comment="Nome curto da unidade produtiva.",
+    )
+    display_name: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+        comment="Descrição da unidade produtiva.",
+    )
+    scope_id: Mapped[int] = mapped_column(
+        BigInteger,
+        ForeignKey("scope.id", onupdate="CASCADE", ondelete="RESTRICT"),
+        nullable=False,
+        comment="Escopo desta unidade produtiva.",
+    )
+    parent_unity_id: Mapped[int | None] = mapped_column(
+        BigInteger,
+        nullable=True,
+        comment="Unidade produtiva pai na mesma hierarquia e escopo.",
+    )
+    sort_order: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default=text("0"),
+        comment="Ordem de exibição entre irmãos na hierarquia.",
     )

@@ -6,6 +6,7 @@
         "navigation": {
             "home": "Inicio",
             "location": "Ubicaciones",
+            "unity": "Unidades productivas",
             "operation": "Operaciones",
             "record": "Registros",
             "import": "Importaciones",
@@ -303,6 +304,65 @@
             "create": "No se pudo crear la ubicación. Inténtalo de nuevo.",
             "delete": "No se pudo eliminar la ubicación. Inténtalo de nuevo.",
             "move": "No se pudo mover la ubicación. Inténtalo de nuevo.",
+            "validation": "Este campo no puede quedar vacío."
+        },
+        "discardConfirm": "¿Descartar los cambios no guardados?"
+    },
+    "UnityConfigurationPage": {
+        "title": "Unidades productivas",
+        "description": "En este panel ves el árbol de unidades productivas del alcance. A la izquierda está la jerarquía; al lado, el formulario para editar nombre y descripción, además del panel de historial. Selecciona un ítem en el árbol para editarlo o usa Nuevo para crear otro nivel bajo el ítem elegido.",
+        "list": {
+            "empty": "No se encontraron unidades productivas para el alcance seleccionado.",
+            "emptyScope": "Crea un alcance antes de editar unidades productivas.",
+            "missingCurrentScope": "Define un alcance activo en el selector del encabezado antes de editar unidades productivas."
+        },
+        "history": {
+            "title": "Historial de cambios",
+            "description": "Una línea de tiempo de los cambios aparecerá aquí cuando la auditoría estructural esté disponible. Hasta entonces, esta pestaña queda como referencia de diseño y trazabilidad."
+        },
+        "section": {
+            "identity": {
+                "nameLabel": "Nombre corto",
+                "nameHint": "Usa un nombre corto para identificar la unidad productiva en el día a día (por ejemplo: Blanca, Hembra, Núcleo).",
+                "displayNameLabel": "Descripción",
+                "displayNameHint": "Describe con más contexto qué representa esta unidad productiva en la operación."
+            },
+            "structure": {
+                "title": "Información",
+                "description": "Resumen del ítem en foco: nivel en la jerarquía, orden entre hermanos y vínculo con el padre.",
+                "levelLabel": "Nivel jerárquico",
+                "levelHint": "Contado desde la raíz del alcance (1 = raíz).",
+                "parentLabel": "Unidad padre",
+                "parentRoot": "Raíz del alcance (sin padre superior)",
+                "orderLabel": "Orden entre hermanos",
+                "orderHintEdit": "Se usa al listar ítems en el mismo nivel.",
+                "orderHintCreate": "Se definirá al guardar el nuevo registro.",
+                "orderPending": "-"
+            }
+        },
+        "dragDropHint": "Arrastra el asa para reordenar antes o después de un hermano, o suéltala sobre una fila para moverla debajo de ese ítem.",
+        "action": {
+            "cancel": "Cancelar",
+            "newLabel": "Nuevo",
+            "newChild": "Nuevo hijo",
+            "newSibling": "Nuevo hermano",
+            "delete": "Eliminar",
+            "undoDelete": "Desmarcar eliminación",
+            "save": "Guardar",
+            "saving": "Guardando...",
+            "moveUp": "Mover arriba",
+            "moveDown": "Mover abajo"
+        },
+        "readOnlyNotice": "Puedes consultar las unidades productivas, pero solo los miembros master o administrador pueden crear o editar registros jerárquicos.",
+        "createdNotice": "Unidad productiva creada correctamente.",
+        "deletedNotice": "Unidad productiva eliminada correctamente.",
+        "movedNotice": "Unidad productiva movida correctamente.",
+        "error": {
+            "load": "No se pudo cargar el directorio. Inténtalo de nuevo.",
+            "save": "No se pudo guardar. Inténtalo de nuevo.",
+            "create": "No se pudo crear. Inténtalo de nuevo.",
+            "delete": "No se pudo eliminar. Inténtalo de nuevo.",
+            "move": "No se pudo mover. Inténtalo de nuevo.",
             "validation": "Este campo no puede quedar vacío."
         },
         "discardConfirm": "¿Descartar los cambios no guardados?"

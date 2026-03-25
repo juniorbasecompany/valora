@@ -6,6 +6,7 @@
         "navigation": {
             "home": "Início",
             "location": "Locais",
+            "unity": "Unidades produtivas",
             "operation": "Operações",
             "record": "Registros",
             "import": "Importações",
@@ -303,6 +304,65 @@
             "create": "Não foi possível criar o local. Tente novamente.",
             "delete": "Não foi possível apagar o local. Tente novamente.",
             "move": "Não foi possível mover o local. Tente novamente.",
+            "validation": "Este campo não pode ficar vazio."
+        },
+        "discardConfirm": "Descartar alterações não salvas?"
+    },
+    "UnityConfigurationPage": {
+        "title": "Unidades produtivas",
+        "description": "Neste painel você vê a árvore de unidades produtivas do escopo. À esquerda está a hierarquia; ao lado, o formulário para editar nome e descrição, além do painel de histórico. Selecione um item na árvore para editá-lo ou use Novo para criar outro nível abaixo do item escolhido.",
+        "list": {
+            "empty": "Nenhuma unidade produtiva foi encontrada para o escopo selecionado.",
+            "emptyScope": "Crie um escopo antes de editar unidades produtivas.",
+            "missingCurrentScope": "Defina um escopo ativo no seletor do cabeçalho antes de editar unidades produtivas."
+        },
+        "history": {
+            "title": "Histórico de alterações",
+            "description": "Uma linha do tempo das alterações aparecerá aqui quando a auditoria estrutural estiver disponível. Até lá, esta aba permanece como referência de layout e rastreabilidade."
+        },
+        "section": {
+            "identity": {
+                "nameLabel": "Nome curto",
+                "nameHint": "Use um nome curto para identificar a unidade produtiva no dia a dia (ex.: Branca, Fêmea, Matriz).",
+                "displayNameLabel": "Descrição",
+                "displayNameHint": "Descreva com mais contexto o que essa unidade produtiva representa na operação."
+            },
+            "structure": {
+                "title": "Informações",
+                "description": "Resumo do item em foco: nível na hierarquia, ordem entre irmãos e vínculo com o pai.",
+                "levelLabel": "Nível hierárquico",
+                "levelHint": "Contado a partir da raiz do escopo (1 = raiz).",
+                "parentLabel": "Unidade pai",
+                "parentRoot": "Raiz do escopo (sem pai acima)",
+                "orderLabel": "Ordem entre irmãos",
+                "orderHintEdit": "Usada ao listar itens no mesmo nível.",
+                "orderHintCreate": "Será definida ao salvar o novo cadastro.",
+                "orderPending": "-"
+            }
+        },
+        "dragDropHint": "Arraste a alça para reordenar antes ou depois de um irmão, ou solte sobre uma linha para mover para baixo desse item.",
+        "action": {
+            "cancel": "Cancelar",
+            "newLabel": "Novo",
+            "newChild": "Novo filho",
+            "newSibling": "Novo irmão",
+            "delete": "Apagar",
+            "undoDelete": "Desmarcar exclusão",
+            "save": "Salvar",
+            "saving": "Salvando...",
+            "moveUp": "Mover para cima",
+            "moveDown": "Mover para baixo"
+        },
+        "readOnlyNotice": "Você pode consultar as unidades produtivas, mas só membros master ou administrador podem criar ou editar cadastros hierárquicos.",
+        "createdNotice": "Unidade produtiva criada com sucesso.",
+        "deletedNotice": "Unidade produtiva apagada com sucesso.",
+        "movedNotice": "Unidade produtiva movida com sucesso.",
+        "error": {
+            "load": "Não foi possível carregar o diretório. Tente novamente.",
+            "save": "Não foi possível salvar. Tente novamente.",
+            "create": "Não foi possível criar. Tente novamente.",
+            "delete": "Não foi possível apagar. Tente novamente.",
+            "move": "Não foi possível mover. Tente novamente.",
             "validation": "Este campo não pode ficar vazio."
         },
         "discardConfirm": "Descartar alterações não salvas?"

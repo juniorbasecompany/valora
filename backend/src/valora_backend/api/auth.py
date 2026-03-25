@@ -26,8 +26,15 @@ from valora_backend.auth.service import (
     member_status_name,
     tenant_display_name,
 )
+from valora_backend.api.scope_hierarchy_directory_support import (
+    hierarchy_item_label,
+    hierarchy_sort_key,
+    move_hierarchy_node_in_scope,
+    normalize_scope_hierarchy_order,
+    validate_scope_hierarchy_parent_change,
+)
 from valora_backend.db import get_session
-from valora_backend.model.identity import Account, Location, Member, Scope, Tenant
+from valora_backend.model.identity import Account, Location, Member, Scope, Tenant, Unity
 from valora_backend.model.null_if_empty import commit_session_with_null_if_empty
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -293,6 +300,71 @@ class TenantLocationMoveRequest(BaseModel):
     @field_validator("target_index")
     @classmethod
     def validate_target_index(cls, value: int) -> int:
+        if value < 0:
+            raise ValueError("target index must be non-negative")
+        return value
+
+
+class TenantUnityRecord(BaseModel):
+    id: int
+    parent_unity_id: int | None
+    name: str
+    display_name: str
+    sort_order: int
+    depth: int
+    path_labels: list[str] = Field(default_factory=list)
+    children_count: int
+    descendants_count: int
+    can_edit: bool
+    can_delete: bool
+    can_create_child: bool
+    can_move: bool
+
+
+class TenantUnityDirectoryResponse(BaseModel):
+    scope_id: int
+    scope_name: str
+    scope_display_name: str
+    can_edit: bool
+    can_create: bool
+    item_list: list[TenantUnityRecord] = Field(default_factory=list)
+
+
+class TenantUnityUpsertRequest(BaseModel):
+    name: str
+    display_name: str
+    parent_unity_id: int | None = None
+
+    @field_validator("name", "display_name")
+    @classmethod
+    def strip_non_empty_unity_value(cls, value: str) -> str:
+        cleaned = value.strip()
+        if not cleaned:
+            raise ValueError("must not be empty")
+        return cleaned
+
+    @field_validator("parent_unity_id")
+    @classmethod
+    def validate_parent_unity_id(cls, value: int | None) -> int | None:
+        if value is not None and value < 1:
+            raise ValueError("invalid parent unity id")
+        return value
+
+
+class TenantUnityMoveRequest(BaseModel):
+    parent_unity_id: int | None = None
+    target_index: int = 0
+
+    @field_validator("parent_unity_id")
+    @classmethod
+    def validate_move_parent_unity_id(cls, value: int | None) -> int | None:
+        if value is not None and value < 1:
+            raise ValueError("invalid parent unity id")
+        return value
+
+    @field_validator("target_index")
+    @classmethod
+    def validate_unity_target_index(cls, value: int) -> int:
         if value < 0:
             raise ValueError("target index must be non-negative")
         return value
@@ -835,22 +907,6 @@ def _build_tenant_scope_directory(
     )
 
 
-def _location_sort_key(item: Location) -> tuple[int, str, int]:
-    return (item.sort_order, item.name.lower(), item.id)
-
-
-def _location_label(item: Location) -> str:
-    name = item.name.strip()
-    if name:
-        return name
-
-    display_name = item.display_name.strip()
-    if display_name:
-        return display_name
-
-    return f"#{item.id}"
-
-
 def _get_tenant_scope_for_location(
     session: Session, *, actor: Member, scope_id: int
 ) -> Scope:
@@ -893,40 +949,32 @@ def _validate_location_parent_change(
     parent_location_id: int | None,
     moving_location_id: int | None,
 ) -> None:
-    if parent_location_id is None:
-        return
-
-    parent_location = location_map.get(parent_location_id)
-    if parent_location is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Parent location not found for current scope",
-        )
-
-    if moving_location_id is None:
-        return
-
-    if parent_location.id == moving_location_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Location cannot be its own parent",
-        )
-
-    current_parent = parent_location
-    while current_parent.parent_location_id is not None:
-        if current_parent.parent_location_id == moving_location_id:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Location cannot move under one of its descendants",
-            )
-        current_parent = location_map.get(current_parent.parent_location_id)
-        if current_parent is None:
-            break
+    validate_scope_hierarchy_parent_change(
+        location_map,
+        get_parent_id=lambda item: item.parent_location_id,
+        parent_id=parent_location_id,
+        moving_id=moving_location_id,
+        not_found_detail="Parent location not found for current scope",
+        self_parent_detail="Location cannot be its own parent",
+        cycle_detail="Location cannot move under one of its descendants",
+    )
 
 
-def _resequence_location_siblings(sibling_list: list[Location]) -> None:
-    for index, sibling in enumerate(sibling_list):
-        sibling.sort_order = index
+def _validate_unity_parent_change(
+    unity_map: dict[int, Unity],
+    *,
+    parent_unity_id: int | None,
+    moving_unity_id: int | None,
+) -> None:
+    validate_scope_hierarchy_parent_change(
+        unity_map,
+        get_parent_id=lambda item: item.parent_unity_id,
+        parent_id=parent_unity_id,
+        moving_id=moving_unity_id,
+        not_found_detail="Parent productive unit not found for current scope",
+        self_parent_detail="Productive unit cannot be its own parent",
+        cycle_detail="Productive unit cannot move under one of its descendants",
+    )
 
 
 def _move_location_in_scope(
@@ -937,64 +985,27 @@ def _move_location_in_scope(
     target_index: int | None,
 ) -> None:
     location_list = _get_scope_location_list(session, scope_id=target_location.scope_id)
-    location_map = {item.id: item for item in location_list}
-    location_map[target_location.id] = target_location
-
-    _validate_location_parent_change(
-        location_map,
-        parent_location_id=parent_location_id,
-        moving_location_id=target_location.id,
+    move_hierarchy_node_in_scope(
+        session,
+        item_list=location_list,
+        target_item=target_location,
+        get_parent_id=lambda item: item.parent_location_id,
+        set_parent_id=lambda item, value: setattr(item, "parent_location_id", value),
+        new_parent_id=parent_location_id,
+        target_index=target_index,
+        not_found_detail="Parent location not found for current scope",
+        self_parent_detail="Location cannot be its own parent",
+        cycle_detail="Location cannot move under one of its descendants",
     )
-
-    current_parent_id = target_location.parent_location_id
-    origin_sibling_list = sorted(
-        [
-            item
-            for item in location_list
-            if item.parent_location_id == current_parent_id and item.id != target_location.id
-        ],
-        key=_location_sort_key,
-    )
-    destination_sibling_list = sorted(
-        [
-            item
-            for item in location_list
-            if item.parent_location_id == parent_location_id and item.id != target_location.id
-        ],
-        key=_location_sort_key,
-    )
-
-    resolved_target_index = len(destination_sibling_list)
-    if target_index is not None:
-        if target_index > len(destination_sibling_list):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Target index is outside the valid sibling range",
-            )
-        resolved_target_index = target_index
-
-    target_location.parent_location_id = parent_location_id
-    destination_sibling_list.insert(resolved_target_index, target_location)
-    _resequence_location_siblings(destination_sibling_list)
-    for sibling in destination_sibling_list:
-        session.add(sibling)
-
-    if current_parent_id != parent_location_id:
-        _resequence_location_siblings(origin_sibling_list)
-        for sibling in origin_sibling_list:
-            session.add(sibling)
 
 
 def _normalize_scope_location_order(session: Session, *, scope_id: int) -> None:
     location_list = _get_scope_location_list(session, scope_id=scope_id)
-    child_list_by_parent_id: defaultdict[int | None, list[Location]] = defaultdict(list)
-    for item in sorted(location_list, key=_location_sort_key):
-        child_list_by_parent_id[item.parent_location_id].append(item)
-
-    for sibling_list in child_list_by_parent_id.values():
-        _resequence_location_siblings(sibling_list)
-        for sibling in sibling_list:
-            session.add(sibling)
+    normalize_scope_hierarchy_order(
+        session,
+        item_list=location_list,
+        get_parent_id=lambda item: item.parent_location_id,
+    )
 
 
 def _build_tenant_location_directory(
@@ -1002,7 +1013,7 @@ def _build_tenant_location_directory(
 ) -> TenantLocationDirectoryResponse:
     location_list = _get_scope_location_list(session, scope_id=scope.id)
     child_list_by_parent_id: defaultdict[int | None, list[Location]] = defaultdict(list)
-    for item in sorted(location_list, key=_location_sort_key):
+    for item in sorted(location_list, key=hierarchy_sort_key):
         child_list_by_parent_id[item.parent_location_id].append(item)
 
     item_list: list[TenantLocationRecord] = []
@@ -1013,7 +1024,7 @@ def _build_tenant_location_directory(
         location: Location, *, depth: int, path_prefix: list[str]
     ) -> int:
         visited_location_id_set.add(location.id)
-        path_labels = [*path_prefix, _location_label(location)]
+        path_labels = [*path_prefix, hierarchy_item_label(location)]
         child_list = child_list_by_parent_id.get(location.id, [])
         record = TenantLocationRecord(
             id=location.id,
@@ -1046,7 +1057,7 @@ def _build_tenant_location_directory(
     for root_location in child_list_by_parent_id.get(None, []):
         append_branch(root_location, depth=0, path_prefix=[])
 
-    for dangling_location in sorted(location_list, key=_location_sort_key):
+    for dangling_location in sorted(location_list, key=hierarchy_sort_key):
         if dangling_location.id not in visited_location_id_set:
             append_branch(dangling_location, depth=0, path_prefix=[])
 
@@ -1056,6 +1067,123 @@ def _build_tenant_location_directory(
         scope_display_name=scope.display_name,
         can_edit=can_edit_location,
         can_create=can_edit_location,
+        item_list=item_list,
+    )
+
+
+def _get_scope_unity_list(session: Session, *, scope_id: int) -> list[Unity]:
+    return list(
+        session.scalars(
+            select(Unity)
+            .where(Unity.scope_id == scope_id)
+            .order_by(Unity.sort_order, Unity.name, Unity.id)
+        )
+    )
+
+
+def _get_scope_unity_or_404(
+    session: Session, *, scope_id: int, unity_id: int
+) -> Unity:
+    target_unity = session.get(Unity, unity_id)
+    if not target_unity or target_unity.scope_id != scope_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Productive unit not found for current scope",
+        )
+
+    return target_unity
+
+
+def _move_unity_in_scope(
+    session: Session,
+    *,
+    target_unity: Unity,
+    parent_unity_id: int | None,
+    target_index: int | None,
+) -> None:
+    unity_list = _get_scope_unity_list(session, scope_id=target_unity.scope_id)
+    move_hierarchy_node_in_scope(
+        session,
+        item_list=unity_list,
+        target_item=target_unity,
+        get_parent_id=lambda item: item.parent_unity_id,
+        set_parent_id=lambda item, value: setattr(item, "parent_unity_id", value),
+        new_parent_id=parent_unity_id,
+        target_index=target_index,
+        not_found_detail="Parent productive unit not found for current scope",
+        self_parent_detail="Productive unit cannot be its own parent",
+        cycle_detail="Productive unit cannot move under one of its descendants",
+    )
+
+
+def _normalize_scope_unity_order(session: Session, *, scope_id: int) -> None:
+    unity_list = _get_scope_unity_list(session, scope_id=scope_id)
+    normalize_scope_hierarchy_order(
+        session,
+        item_list=unity_list,
+        get_parent_id=lambda item: item.parent_unity_id,
+    )
+
+
+def _build_tenant_unity_directory(
+    session: Session, *, actor: Member, scope: Scope
+) -> TenantUnityDirectoryResponse:
+    unity_list = _get_scope_unity_list(session, scope_id=scope.id)
+    child_list_by_parent_id: defaultdict[int | None, list[Unity]] = defaultdict(list)
+    for item in sorted(unity_list, key=hierarchy_sort_key):
+        child_list_by_parent_id[item.parent_unity_id].append(item)
+
+    item_list: list[TenantUnityRecord] = []
+    visited_unity_id_set: set[int] = set()
+    can_edit_unity = _member_can_edit_location(actor)
+
+    def append_branch(
+        unity_row: Unity, *, depth: int, path_prefix: list[str]
+    ) -> int:
+        visited_unity_id_set.add(unity_row.id)
+        path_labels = [*path_prefix, hierarchy_item_label(unity_row)]
+        child_list = child_list_by_parent_id.get(unity_row.id, [])
+        record = TenantUnityRecord(
+            id=unity_row.id,
+            parent_unity_id=unity_row.parent_unity_id,
+            name=unity_row.name,
+            display_name=unity_row.display_name,
+            sort_order=unity_row.sort_order,
+            depth=depth,
+            path_labels=path_labels,
+            children_count=len(child_list),
+            descendants_count=0,
+            can_edit=can_edit_unity,
+            can_delete=_member_can_delete_location(actor),
+            can_create_child=can_edit_unity,
+            can_move=can_edit_unity,
+        )
+        item_list.append(record)
+
+        descendant_count = 0
+        for child in child_list:
+            descendant_count += 1 + append_branch(
+                child,
+                depth=depth + 1,
+                path_prefix=path_labels,
+            )
+
+        record.descendants_count = descendant_count
+        return descendant_count
+
+    for root_unity in child_list_by_parent_id.get(None, []):
+        append_branch(root_unity, depth=0, path_prefix=[])
+
+    for dangling_unity in sorted(unity_list, key=hierarchy_sort_key):
+        if dangling_unity.id not in visited_unity_id_set:
+            append_branch(dangling_unity, depth=0, path_prefix=[])
+
+    return TenantUnityDirectoryResponse(
+        scope_id=scope.id,
+        scope_name=scope.name,
+        scope_display_name=scope.display_name,
+        can_edit=can_edit_unity,
+        can_create=can_edit_unity,
         item_list=item_list,
     )
 
@@ -1337,6 +1465,15 @@ def delete_current_tenant_scope(
             detail="Cannot delete scope while it still has locations",
         )
 
+    has_unity = session.scalar(
+        select(Unity.id).where(Unity.scope_id == target_scope.id).limit(1)
+    )
+    if has_unity is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete scope while it still has productive units",
+        )
+
     session.delete(target_scope)
     session.commit()
 
@@ -1533,6 +1670,202 @@ def delete_current_scope_location(
     commit_session_with_null_if_empty(session)
 
     return _build_tenant_location_directory(
+        session,
+        actor=current_member,
+        scope=target_scope,
+    )
+
+
+@router.get(
+    "/tenant/current/scopes/{scope_id}/unities",
+    response_model=TenantUnityDirectoryResponse,
+)
+def get_current_scope_unity_directory(
+    scope_id: int,
+    current_member: Member = Depends(get_current_member),
+    session: Session = Depends(get_session),
+):
+    target_scope = _get_tenant_scope_for_location(
+        session,
+        actor=current_member,
+        scope_id=scope_id,
+    )
+    return _build_tenant_unity_directory(
+        session,
+        actor=current_member,
+        scope=target_scope,
+    )
+
+
+@router.post(
+    "/tenant/current/scopes/{scope_id}/unities",
+    response_model=TenantUnityDirectoryResponse,
+)
+def create_current_scope_unity(
+    scope_id: int,
+    body: TenantUnityUpsertRequest,
+    current_member: Member = Depends(get_current_member),
+    session: Session = Depends(get_session),
+):
+    target_scope = _get_tenant_scope_for_location(
+        session,
+        actor=current_member,
+        scope_id=scope_id,
+    )
+    if not _member_can_edit_location(current_member):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions to create productive unit",
+        )
+
+    unity_list = _get_scope_unity_list(session, scope_id=target_scope.id)
+    _validate_unity_parent_change(
+        {item.id: item for item in unity_list},
+        parent_unity_id=body.parent_unity_id,
+        moving_unity_id=None,
+    )
+    unity = Unity(
+        name=body.name,
+        display_name=body.display_name,
+        scope_id=target_scope.id,
+        parent_unity_id=body.parent_unity_id,
+        sort_order=sum(
+            1
+            for item in unity_list
+            if item.parent_unity_id == body.parent_unity_id
+        ),
+    )
+    session.add(unity)
+    commit_session_with_null_if_empty(session)
+
+    return _build_tenant_unity_directory(
+        session,
+        actor=current_member,
+        scope=target_scope,
+    )
+
+
+@router.patch(
+    "/tenant/current/scopes/{scope_id}/unities/{unity_id}",
+    response_model=TenantUnityDirectoryResponse,
+)
+def patch_current_scope_unity(
+    scope_id: int,
+    unity_id: int,
+    body: TenantUnityUpsertRequest,
+    current_member: Member = Depends(get_current_member),
+    session: Session = Depends(get_session),
+):
+    target_scope = _get_tenant_scope_for_location(
+        session,
+        actor=current_member,
+        scope_id=scope_id,
+    )
+    target_unity = _get_scope_unity_or_404(
+        session,
+        scope_id=target_scope.id,
+        unity_id=unity_id,
+    )
+    if not _member_can_edit_location(current_member):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions to update productive unit",
+        )
+
+    if target_unity.parent_unity_id != body.parent_unity_id:
+        _move_unity_in_scope(
+            session,
+            target_unity=target_unity,
+            parent_unity_id=body.parent_unity_id,
+            target_index=None,
+        )
+
+    target_unity.name = body.name
+    target_unity.display_name = body.display_name
+    session.add(target_unity)
+    commit_session_with_null_if_empty(session)
+
+    return _build_tenant_unity_directory(
+        session,
+        actor=current_member,
+        scope=target_scope,
+    )
+
+
+@router.post(
+    "/tenant/current/scopes/{scope_id}/unities/{unity_id}/move",
+    response_model=TenantUnityDirectoryResponse,
+)
+def move_current_scope_unity(
+    scope_id: int,
+    unity_id: int,
+    body: TenantUnityMoveRequest,
+    current_member: Member = Depends(get_current_member),
+    session: Session = Depends(get_session),
+):
+    target_scope = _get_tenant_scope_for_location(
+        session,
+        actor=current_member,
+        scope_id=scope_id,
+    )
+    target_unity = _get_scope_unity_or_404(
+        session,
+        scope_id=target_scope.id,
+        unity_id=unity_id,
+    )
+    if not _member_can_edit_location(current_member):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions to move productive unit",
+        )
+
+    _move_unity_in_scope(
+        session,
+        target_unity=target_unity,
+        parent_unity_id=body.parent_unity_id,
+        target_index=body.target_index,
+    )
+    commit_session_with_null_if_empty(session)
+
+    return _build_tenant_unity_directory(
+        session,
+        actor=current_member,
+        scope=target_scope,
+    )
+
+
+@router.delete(
+    "/tenant/current/scopes/{scope_id}/unities/{unity_id}",
+    response_model=TenantUnityDirectoryResponse,
+)
+def delete_current_scope_unity(
+    scope_id: int,
+    unity_id: int,
+    current_member: Member = Depends(get_current_member),
+    session: Session = Depends(get_session),
+):
+    target_scope = _get_tenant_scope_for_location(
+        session,
+        actor=current_member,
+        scope_id=scope_id,
+    )
+    target_unity = _get_scope_unity_or_404(
+        session,
+        scope_id=target_scope.id,
+        unity_id=unity_id,
+    )
+    if not _member_can_delete_location(current_member):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions to delete productive unit",
+        )
+
+    session.delete(target_unity)
+    session.flush()
+    _normalize_scope_unity_order(session, scope_id=target_scope.id)
+    commit_session_with_null_if_empty(session)
+
+    return _build_tenant_unity_directory(
         session,
         actor=current_member,
         scope=target_scope,

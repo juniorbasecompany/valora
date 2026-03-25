@@ -60,6 +60,11 @@ export default async function AppLayout({
       label: t("navigation.location"),
       href: `/${locale}/app/configuration/location`
     },
+    {
+      key: "unity",
+      label: t("navigation.unity"),
+      href: `/${locale}/app/configuration/unity`
+    },
     ...appModuleKeyList.map((key) => ({
       key,
       label: t(`navigation.${key}`),

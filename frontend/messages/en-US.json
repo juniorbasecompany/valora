@@ -6,6 +6,7 @@
         "navigation": {
             "home": "Home",
             "location": "Locations",
+            "unity": "Productive units",
             "operation": "Operations",
             "record": "Records",
             "import": "Imports",
@@ -303,6 +304,65 @@
             "create": "Could not create the location. Try again.",
             "delete": "Could not delete the location. Try again.",
             "move": "Could not move the location. Try again.",
+            "validation": "This field cannot be empty."
+        },
+        "discardConfirm": "Discard unsaved changes?"
+    },
+    "UnityConfigurationPage": {
+        "title": "Productive units",
+        "description": "This panel shows the productive-unit tree for the scope. The hierarchy is on the left; beside it is the form to edit the name and description, plus the history panel. Select an item in the tree to edit it, or use New to add a child under the chosen item.",
+        "list": {
+            "empty": "No productive units were found for the selected scope.",
+            "emptyScope": "Create a scope before editing productive units.",
+            "missingCurrentScope": "Set an active scope from the header selector before editing productive units."
+        },
+        "history": {
+            "title": "Change history",
+            "description": "A timeline of hierarchy changes will appear here when structural auditing is available. Until then, this tab stays as a layout and traceability placeholder."
+        },
+        "section": {
+            "identity": {
+                "nameLabel": "Short name",
+                "nameHint": "Use a short label you will recognize in daily work (for example: White, Female, Core).",
+                "displayNameLabel": "Description",
+                "displayNameHint": "Describe what this productive unit represents in the operation with a bit more context."
+            },
+            "structure": {
+                "title": "Information",
+                "description": "Summary of the item in focus: level in the hierarchy, order among siblings, and parent link.",
+                "levelLabel": "Hierarchy level",
+                "levelHint": "Counted from the scope root (1 = root).",
+                "parentLabel": "Parent unit",
+                "parentRoot": "Scope root (no parent above)",
+                "orderLabel": "Order among siblings",
+                "orderHintEdit": "Used when listing items at the same level.",
+                "orderHintCreate": "Assigned when you save the new record.",
+                "orderPending": "-"
+            }
+        },
+        "dragDropHint": "Drag a handle to reorder before or after a sibling, or drop on a row to move under that item.",
+        "action": {
+            "cancel": "Cancel",
+            "newLabel": "New",
+            "newChild": "New child",
+            "newSibling": "New sibling",
+            "delete": "Delete",
+            "undoDelete": "Undo delete",
+            "save": "Save",
+            "saving": "Saving...",
+            "moveUp": "Move up",
+            "moveDown": "Move down"
+        },
+        "readOnlyNotice": "You can review productive units, but only master or admin members can create or edit hierarchical records.",
+        "createdNotice": "Productive unit created successfully.",
+        "deletedNotice": "Productive unit deleted successfully.",
+        "movedNotice": "Productive unit moved successfully.",
+        "error": {
+            "load": "Could not load the directory. Try again.",
+            "save": "Could not save. Try again.",
+            "create": "Could not create. Try again.",
+            "delete": "Could not delete. Try again.",
+            "move": "Could not move. Try again.",
             "validation": "This field cannot be empty."
         },
         "discardConfirm": "Discard unsaved changes?"

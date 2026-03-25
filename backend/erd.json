@@ -629,8 +629,8 @@
       "endTableId": "unity",
       "endFieldId": "scope_id",
       "cardinality": "one_to_many",
-      "updateConstraint": "No action",
-      "deleteConstraint": "No action"
+      "updateConstraint": "Update",
+      "deleteConstraint": "Restrict"
     },
     {
       "id": "unity.parent_unity_id",

@@ -15,6 +15,7 @@ type NavigationItem = {
 type NavigationIconKind =
     | "home"
     | "location"
+    | "unity"
     | "operation"
     | "record"
     | "import"

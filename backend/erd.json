@@ -595,7 +595,7 @@
           "check": "",
           "primary": false,
           "unique": false,
-          "notNull": true,
+          "notNull": false,
           "increment": false,
           "size": "",
           "values": []
@@ -609,7 +609,7 @@
           "check": "",
           "primary": false,
           "unique": false,
-          "notNull": true,
+          "notNull": false,
           "increment": false,
           "size": "",
           "values": []
@@ -773,7 +773,7 @@
       "endFieldId": "tenant_id",
       "cardinality": "one_to_many",
       "updateConstraint": "Cascade",
-      "deleteConstraint": "Cascade"
+      "deleteConstraint": "Set null"
     },
     {
       "id": "log.account_id",
@@ -784,7 +784,7 @@
       "endFieldId": "account_id",
       "cardinality": "one_to_many",
       "updateConstraint": "Cascade",
-      "deleteConstraint": "Cascade"
+      "deleteConstraint": "Set null"
     }
   ],
   "notes": [],

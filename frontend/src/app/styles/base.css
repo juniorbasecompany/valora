@@ -29,6 +29,7 @@
     --color-accent: #2575d8;
     --color-accent-strong: #0f549f;
     --color-accent-soft: #e8f1ff;
+    --color-accent-vertical-border: hsl(240deg 50% 50% / 75%);
     --color-location-nest-start: #eeeeff;
     --color-location-nest-end: #bbbbff;
     --color-location-nest-border-start: rgba(92, 142, 216, 0.18);

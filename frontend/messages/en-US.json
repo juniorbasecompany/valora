@@ -350,10 +350,6 @@
   "TenantConfigurationPage": {
     "title": "Tenant",
     "description": "These fields identify the contracting organization in the workspace, top bar, and lists. Changes apply to the active tenant of your session.",
-    "status": {
-      "title": "Editing tenant",
-      "description": "Updates are saved for the active tenant. Switch tenant from the header selector if you need another context."
-    },
     "history": {
       "title": "Change history",
       "description": "A timeline of who changed what will appear here when the audit API is available. Until then, this block remains the reserved space for layout and traceability next to the form."
@@ -373,18 +369,18 @@
       }
     },
     "metadata": {
-      "idLabel": "Internal identifier"
+      "idLabel": "Internal identifier",
+      "sectionTitle": "System reference",
+      "sectionDescription": "Stable identifier for this tenant in the database."
     },
     "action": {
       "cancel": "Cancel",
       "delete": "Delete",
       "undoDelete": "Undo delete",
       "save": "Save",
-      "saving": "Saving...",
-      "back": "Back to Configuration"
+      "saving": "Saving..."
     },
     "readOnlyNotice": "You can view tenant data, but only master or admin members can edit it.",
-    "savedNotice": "Tenant updated successfully.",
     "error": {
       "save": "Could not save changes. Try again.",
       "delete": "Could not delete the tenant. Try again.",

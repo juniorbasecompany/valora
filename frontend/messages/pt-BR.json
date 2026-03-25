@@ -350,10 +350,6 @@
   "TenantConfigurationPage": {
     "title": "Licenciado",
     "description": "Estes campos identificam a organização contratante no ambiente, na barra superior e nas listas. As alterações valem para o licenciado ativo da sua sessão.",
-    "status": {
-      "title": "Edição do licenciado",
-      "description": "As atualizações são salvas para o licenciado ativo. Troque de licenciado pelo seletor do cabeçalho se precisar de outro contexto."
-    },
     "history": {
       "title": "Histórico de alterações",
       "description": "Uma linha do tempo de quem alterou o quê aparecerá aqui quando a API de auditoria estiver disponível. Até lá, este bloco permanece como referência de layout e rastreabilidade ao lado do formulário."
@@ -373,18 +369,18 @@
       }
     },
     "metadata": {
-      "idLabel": "Identificador interno"
+      "idLabel": "Identificador interno",
+      "sectionTitle": "Referência no sistema",
+      "sectionDescription": "Identificador estável do licenciado na base de dados."
     },
     "action": {
       "cancel": "Cancelar",
       "delete": "Apagar",
       "undoDelete": "Desmarcar exclusão",
       "save": "Salvar",
-      "saving": "Salvando...",
-      "back": "Voltar para Configuração"
+      "saving": "Salvando..."
     },
     "readOnlyNotice": "Você pode ver os dados do licenciado, mas só membros master ou administrador podem editar.",
-    "savedNotice": "Licenciado atualizado com sucesso.",
     "error": {
       "save": "Não foi possível salvar. Tente novamente.",
       "delete": "Não foi possível apagar o licenciado. Tente novamente.",

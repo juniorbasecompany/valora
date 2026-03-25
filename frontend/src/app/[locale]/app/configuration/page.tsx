@@ -42,6 +42,8 @@ export default async function ConfigurationPage({ params }: ConfigurationPagePro
                     title={t("cards.organization.title")}
                     description={t("cards.organization.description")}
                     iconSlot={<BuildingIcon className="ui-icon" />}
+                    actionHref={tenantEditorHref}
+                    actionLabel={t("openTenantEditor")}
                 />
                 <InfoCard
                     title={t("cards.member.title")}

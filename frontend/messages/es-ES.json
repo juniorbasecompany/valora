@@ -350,10 +350,6 @@
   "TenantConfigurationPage": {
     "title": "Licenciatario",
     "description": "Estos campos identifican a la organización contratante en el espacio de trabajo, la barra superior y las listas. Los cambios aplican al licenciatario activo de tu sesión.",
-    "status": {
-      "title": "Edición del licenciatario",
-      "description": "Las actualizaciones se guardan para el licenciatario activo. Cambia de licenciatario desde el selector del encabezado si necesitas otro contexto."
-    },
     "history": {
       "title": "Historial de cambios",
       "description": "Una línea de tiempo de quién cambió qué aparecerá aquí cuando exista la API de auditoría. Hasta entonces, este bloque permanece como espacio reservado de diseño y trazabilidad junto al formulario."
@@ -373,18 +369,18 @@
       }
     },
     "metadata": {
-      "idLabel": "Identificador interno"
+      "idLabel": "Identificador interno",
+      "sectionTitle": "Referencia en el sistema",
+      "sectionDescription": "Identificador estable del licenciatario en la base de datos."
     },
     "action": {
       "cancel": "Cancelar",
       "delete": "Eliminar",
       "undoDelete": "Desmarcar eliminación",
       "save": "Guardar",
-      "saving": "Guardando...",
-      "back": "Volver a Configuración"
+      "saving": "Guardando..."
     },
     "readOnlyNotice": "Puedes ver los datos del licenciatario, pero solo los miembros master o administrador pueden editarlos.",
-    "savedNotice": "Licenciatario actualizado correctamente.",
     "error": {
       "save": "No se pudieron guardar los cambios. Inténtalo de nuevo.",
       "delete": "No se pudo eliminar el licenciatario. Inténtalo de nuevo.",

@@ -30,6 +30,11 @@
     gap: 1.5rem;
 }
 
+/* Espaço entre o parágrafo introdutório e o conteúdo (ex.: lista de tópicos). */
+.ui-configuration-info-section-body {
+    margin-top: 2rem;
+}
+
 .ui-info-topic-list {
     margin: 0;
     padding-left: 1.35rem;

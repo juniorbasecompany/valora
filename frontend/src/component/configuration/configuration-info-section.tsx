@@ -25,7 +25,7 @@ export function ConfigurationInfoSection({
                         <p className="ui-copy-body">{description}</p>
                     </div>
                 </div>
-                {children}
+                <div className="ui-configuration-info-section-body">{children}</div>
             </div>
         </section>
     );

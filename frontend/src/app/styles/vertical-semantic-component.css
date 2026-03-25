@@ -383,6 +383,10 @@
     gap: 1rem;
 }
 
+.ui-location-nest-list > .ui-directory-item {
+    padding-left: 1.5rem;
+}
+
 .ui-location-nest-list-toolbar {
     display: flex;
     justify-content: flex-end;

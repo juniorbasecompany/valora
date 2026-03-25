@@ -707,7 +707,7 @@ export function LocationConfigurationClient({
                     data-delete-pending={isDeletePending ? "true" : undefined}
                 >
                     <div className="ui-editor-panel-body">
-                        <div className="ui-editor-primary-field-row">
+                        <div className="ui-editor-card-flow">
                             <section className="ui-card ui-form-section ui-border-accent">
                                 {isEditorFlashActive ? (
                                     <>
@@ -783,73 +783,73 @@ export function LocationConfigurationClient({
                                     </div>
                                 </div>
                             </section>
-                        </div>
 
-                        {directory ? (
-                            <section className="ui-card ui-form-section ui-border-accent">
-                                <div className="ui-editor-content">
-                                    <div className="ui-section-header">
-                                        <span className="ui-icon-badge">
-                                            <InfoIcon className="ui-icon" />
-                                        </span>
-                                        <div className="ui-section-copy">
-                                            <h2 className="ui-header-title ui-title-section">
-                                                {copy.sectionStructureTitle}
-                                            </h2>
-                                            <p className="ui-copy-body">
-                                                {copy.sectionStructureDescription}
-                                            </p>
+                            {directory ? (
+                                <section className="ui-card ui-form-section ui-border-accent">
+                                    <div className="ui-editor-content">
+                                        <div className="ui-section-header">
+                                            <span className="ui-icon-badge">
+                                                <InfoIcon className="ui-icon" />
+                                            </span>
+                                            <div className="ui-section-copy">
+                                                <h2 className="ui-header-title ui-title-section">
+                                                    {copy.sectionStructureTitle}
+                                                </h2>
+                                                <p className="ui-copy-body">
+                                                    {copy.sectionStructureDescription}
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <ul className="ui-info-topic-list">
-                                        <li>
-                                            <p className="ui-info-topic-lead">
-                                                <span className="ui-info-topic-label">
-                                                    {copy.sectionStructureLevelLabel}
-                                                </span>
-                                                {": "}
-                                                <span className="ui-info-topic-value">
-                                                    {structureLevelDisplay}
-                                                </span>
-                                            </p>
-                                            <p className="ui-field-hint ui-info-topic-hint">
-                                                {copy.sectionStructureLevelHint}
-                                            </p>
-                                        </li>
-                                        <li>
-                                            <p className="ui-info-topic-lead">
-                                                <span className="ui-info-topic-label">
-                                                    {copy.sectionStructureOrderLabel}
-                                                </span>
-                                                {": "}
-                                                <span className="ui-info-topic-value">
+                                        <ul className="ui-info-topic-list">
+                                            <li>
+                                                <p className="ui-info-topic-lead">
+                                                    <span className="ui-info-topic-label">
+                                                        {copy.sectionStructureLevelLabel}
+                                                    </span>
+                                                    {": "}
+                                                    <span className="ui-info-topic-value">
+                                                        {structureLevelDisplay}
+                                                    </span>
+                                                </p>
+                                                <p className="ui-field-hint ui-info-topic-hint">
+                                                    {copy.sectionStructureLevelHint}
+                                                </p>
+                                            </li>
+                                            <li>
+                                                <p className="ui-info-topic-lead">
+                                                    <span className="ui-info-topic-label">
+                                                        {copy.sectionStructureOrderLabel}
+                                                    </span>
+                                                    {": "}
+                                                    <span className="ui-info-topic-value">
+                                                        {isCreateMode || !selectedLocation
+                                                            ? copy.sectionStructureOrderPending
+                                                            : String(selectedLocation.sort_order)}
+                                                    </span>
+                                                </p>
+                                                <p className="ui-field-hint ui-info-topic-hint">
                                                     {isCreateMode || !selectedLocation
-                                                        ? copy.sectionStructureOrderPending
-                                                        : String(selectedLocation.sort_order)}
-                                                </span>
-                                            </p>
-                                            <p className="ui-field-hint ui-info-topic-hint">
-                                                {isCreateMode || !selectedLocation
-                                                    ? copy.sectionStructureOrderHintCreate
-                                                    : copy.sectionStructureOrderHintEdit}
-                                            </p>
-                                        </li>
-                                        <li>
-                                            <p className="ui-info-topic-lead">
-                                                <span className="ui-info-topic-label">
-                                                    {copy.sectionStructureParentLabel}
-                                                </span>
-                                                {": "}
-                                                <span className="ui-info-topic-value">
-                                                    {structureParentLabel}
-                                                </span>
-                                            </p>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </section>
-                        ) : null}
+                                                        ? copy.sectionStructureOrderHintCreate
+                                                        : copy.sectionStructureOrderHintEdit}
+                                                </p>
+                                            </li>
+                                            <li>
+                                                <p className="ui-info-topic-lead">
+                                                    <span className="ui-info-topic-label">
+                                                        {copy.sectionStructureParentLabel}
+                                                    </span>
+                                                    {": "}
+                                                    <span className="ui-info-topic-value">
+                                                        {structureParentLabel}
+                                                    </span>
+                                                </p>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </section>
+                            ) : null}
+                        </div>
                     </div>
                 </div>
             </div>

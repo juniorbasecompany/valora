@@ -459,21 +459,23 @@
     gap: 1.5rem;
 }
 
-/* Linha nome + descrição: reage ao container do painel (não ao viewport). Cada card usa no máximo metade da linha; com menos de ~400px + gap não cabem dois trilhos de 200px e o segundo desce. */
-.ui-editor-primary-field-row {
-    --ui-editor-primary-field-row-gap: 1.5rem;
+/* Cards do editor: mín. 200px por card; até 100% da largura do fluxo; quebra de linha pelo container (não pelo viewport). */
+.ui-editor-card-flow {
+    --ui-editor-card-flow-gap: 1.5rem;
     display: flex;
     flex-wrap: wrap;
-    gap: var(--ui-editor-primary-field-row-gap);
+    align-items: flex-start;
+    gap: var(--ui-editor-card-flow-gap);
 }
 
-.ui-editor-primary-field-row>.ui-form-section {
-    flex: 1 1 calc(50% - var(--ui-editor-primary-field-row-gap) / 2);
-    min-width: min(400px, 100%);
+.ui-editor-card-flow > .ui-form-section {
+    box-sizing: border-box;
+    flex: 1 1 200px;
+    min-width: min(200px, 100%);
     max-width: 100%;
 }
 
-.ui-editor-primary-field-row>.ui-form-section .ui-field {
+.ui-editor-card-flow > .ui-form-section .ui-field {
     min-width: 0;
 }
 

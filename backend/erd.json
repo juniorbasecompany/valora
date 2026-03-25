@@ -587,9 +587,9 @@
           "values": []
         },
         {
-          "id": "member_id",
-          "name": "member_id",
-          "comment": "Ligação com a pessoa que fez a modificação",
+          "id": "account_id",
+          "name": "account_id",
+          "comment": "Ligação com a conta do usuário que fez a modificação",
           "type": "BIGINT",
           "default": "",
           "check": "",
@@ -776,12 +776,12 @@
       "deleteConstraint": "Cascade"
     },
     {
-      "id": "log.member_id",
-      "name": "log.member_id",
-      "startTableId": "member",
+      "id": "log.account_id",
+      "name": "log.account_id",
+      "startTableId": "account",
       "startFieldId": "id",
       "endTableId": "log",
-      "endFieldId": "member_id",
+      "endFieldId": "account_id",
       "cardinality": "one_to_many",
       "updateConstraint": "Cascade",
       "deleteConstraint": "Cascade"

@@ -35,11 +35,11 @@ class Log(Base):
         autoincrement=True,
         comment="Identificador do log.",
     )
-    member_id: Mapped[int] = mapped_column(
+    account_id: Mapped[int] = mapped_column(
         BigInteger,
-        ForeignKey("member.id", onupdate="CASCADE", ondelete="CASCADE"),
+        ForeignKey("account.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
-        comment="Ligação com a pessoa que fez a modificação.",
+        comment="Ligação com a conta do usuário que fez a modificação.",
     )
     tenant_id: Mapped[int] = mapped_column(
         BigInteger,

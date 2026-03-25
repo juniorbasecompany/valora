@@ -320,8 +320,6 @@
     },
     "section": {
       "identity": {
-        "title": "Identidad",
-        "description": "Nombre corto y descripción operativa mostrados a lo largo de la jerarquía.",
         "nameLabel": "Nombre de la ubicación",
         "nameHint": "Usa una etiqueta corta, como Granja Norte, Galpón B o Lote 12.",
         "displayNameLabel": "Descripción de la ubicación",

@@ -320,8 +320,6 @@
     },
     "section": {
       "identity": {
-        "title": "Identificação",
-        "description": "Nome curto e descrição operacional exibidos ao longo da hierarquia.",
         "nameLabel": "Nome do local",
         "nameHint": "Use um rótulo curto, como Fazenda Norte, Aviário B ou Talhão 12.",
         "displayNameLabel": "Descrição do local",

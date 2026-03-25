@@ -320,8 +320,6 @@
     },
     "section": {
       "identity": {
-        "title": "Identity",
-        "description": "Short name and operational description shown throughout the hierarchy.",
         "nameLabel": "Location name",
         "nameHint": "Use a short label such as North Farm, Shed B, or Plot 12.",
         "displayNameLabel": "Location description",

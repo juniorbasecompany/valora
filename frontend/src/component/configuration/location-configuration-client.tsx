@@ -13,7 +13,7 @@ import type { CSSProperties, MouseEvent } from "react";
 import { createPortal } from "react-dom";
 
 import { PageHeader } from "@/component/app-shell/page-header";
-import { BuildingIcon, HistoryIcon, PreviewIcon } from "@/component/ui/ui-icons";
+import { BuildingIcon, HistoryIcon } from "@/component/ui/ui-icons";
 import type {
     TenantLocationDirectoryResponse,
     TenantLocationRecord,
@@ -722,20 +722,6 @@ export function LocationConfigurationClient({
                             ) : null}
 
                             <div className="ui-editor-content">
-                                <div className="ui-section-header">
-                                    <span className="ui-icon-badge">
-                                        <PreviewIcon className="ui-icon" />
-                                    </span>
-                                    <div className="ui-section-copy">
-                                        <h2 className="ui-header-title ui-title-section">
-                                            {copy.sectionIdentityTitle}
-                                        </h2>
-                                        <p className="ui-copy-body">
-                                            {copy.sectionIdentityDescription}
-                                        </p>
-                                    </div>
-                                </div>
-
                                 <div className="ui-form-fields">
                                     <div className="ui-field">
                                         <label className="ui-field-label" htmlFor="location-name">

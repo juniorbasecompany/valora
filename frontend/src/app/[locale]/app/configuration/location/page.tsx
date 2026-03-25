@@ -58,8 +58,6 @@ export default async function LocationConfigurationPage({
           missingCurrentScope: t("list.missingCurrentScope"),
           historyTitle: t("history.title"),
           historyDescription: t("history.description"),
-          sectionIdentityTitle: t("section.identity.title"),
-          sectionIdentityDescription: t("section.identity.description"),
           sectionStructureTitle: t("section.structure.title"),
           sectionStructureDescription: t("section.structure.description"),
           sectionStructureLevelLabel: t("section.structure.levelLabel"),

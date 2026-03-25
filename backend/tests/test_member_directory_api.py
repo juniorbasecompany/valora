@@ -4,7 +4,7 @@ from collections.abc import Generator
 from contextlib import contextmanager
 
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, event, select
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -28,14 +28,6 @@ def build_test_client(
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
-
-    @event.listens_for(engine, "connect")
-    def _sqlite_enable_foreign_keys(dbapi_connection, _connection_record) -> None:
-        if engine.dialect.name == "sqlite":
-            cursor = dbapi_connection.cursor()
-            cursor.execute("PRAGMA foreign_keys=ON")
-            cursor.close()
-
     testing_session_local = sessionmaker(
         bind=engine,
         autoflush=False,
@@ -469,15 +461,13 @@ def test_location_delete_cascades_to_descendant_list() -> None:
         session.expire_all()
         child_location = session.scalar(select(Location).where(Location.name == "Núcleo 1"))
         assert child_location is not None
-        parent_id = parent_location.id
-        child_id = child_location.id
 
         response = client.delete(
-            f"/auth/tenant/current/scopes/{scope_id}/locations/{parent_id}"
+            f"/auth/tenant/current/scopes/{scope_id}/locations/{parent_location.id}"
         )
         session.expire_all()
-        deleted_parent = session.get(Location, parent_id)
-        deleted_child = session.get(Location, child_id)
+        deleted_parent = session.get(Location, parent_location.id)
+        deleted_child = session.get(Location, child_location.id)
 
     assert response.status_code == 200
     assert deleted_parent is None
@@ -729,15 +719,13 @@ def test_unity_delete_cascades_to_descendant_list() -> None:
         session.expire_all()
         child_unity = session.scalar(select(Unity).where(Unity.name == "Filial"))
         assert child_unity is not None
-        parent_id = parent_unity.id
-        child_id = child_unity.id
 
         response = client.delete(
-            f"/auth/tenant/current/scopes/{scope_id}/unities/{parent_id}"
+            f"/auth/tenant/current/scopes/{scope_id}/unities/{parent_unity.id}"
         )
         session.expire_all()
-        deleted_parent = session.get(Unity, parent_id)
-        deleted_child = session.get(Unity, child_id)
+        deleted_parent = session.get(Unity, parent_unity.id)
+        deleted_child = session.get(Unity, child_unity.id)
 
     assert response.status_code == 200
     assert deleted_parent is None

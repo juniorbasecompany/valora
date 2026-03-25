@@ -5,17 +5,11 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, JSON, Text, text
+from sqlalchemy import BigInteger, CheckConstraint, DateTime, ForeignKey, Text, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
-from valora_backend.model.base import BIGINT, Base
-
-# JSON em SQLite (testes); JSONB em PostgreSQL (produção), alinhado ao DDL.
-_ROW_JSON_TYPE = JSON().with_variant(JSONB(astext_type=Text()), "postgresql")
-# Default portável para create_all (testes em SQLite). Em BD já migrada, o DEFAULT do Postgres
-# pode permanecer (now() AT TIME ZONE 'UTC') via Alembic; omissão da coluna no INSERT aplica o da BD.
-_MOMENT_UTC_SERVER_DEFAULT = text("CURRENT_TIMESTAMP")
+from valora_backend.model.base import Base
 
 
 class Log(Base):
@@ -41,19 +35,19 @@ class Log(Base):
     )
 
     id: Mapped[int] = mapped_column(
-        BIGINT,
+        BigInteger,
         primary_key=True,
         autoincrement=True,
         comment="Identificador do log.",
     )
     account_id: Mapped[int] = mapped_column(
-        BIGINT,
+        BigInteger,
         ForeignKey("account.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
         comment="Ligação com a conta do usuário que fez a modificação.",
     )
     tenant_id: Mapped[int] = mapped_column(
-        BIGINT,
+        BigInteger,
         ForeignKey("tenant.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
         comment="Ligação com o licenciado.",
@@ -70,13 +64,13 @@ class Log(Base):
     )
     row_payload: Mapped[Any | None] = mapped_column(
         "row",
-        _ROW_JSON_TYPE,
+        JSONB,
         nullable=True,
         comment="Conteúdo da linha. NULL em caso de delete.",
     )
     moment_utc: Mapped[datetime] = mapped_column(
         DateTime(timezone=False),
         nullable=False,
-        server_default=_MOMENT_UTC_SERVER_DEFAULT,
+        server_default=text("(now() AT TIME ZONE 'UTC')"),
         comment="Momento em que ocorreu a ação.",
     )

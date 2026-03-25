@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from sqlalchemy import (
+    BigInteger,
     CheckConstraint,
     ForeignKey,
     ForeignKeyConstraint,
@@ -14,7 +15,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
-from valora_backend.model.base import BIGINT, Base
+from valora_backend.model.base import Base
 
 
 class Tenant(Base):
@@ -24,7 +25,7 @@ class Tenant(Base):
     __table_args__ = {"comment": "Este é o licenciado que está contratando o sistema."}
 
     id: Mapped[int] = mapped_column(
-        BIGINT,
+        BigInteger,
         primary_key=True,
         autoincrement=True,
         comment="Identificador do licenciado.",
@@ -48,7 +49,7 @@ class Scope(Base):
     __table_args__ = {"comment": "Escopo do projeto: Aves, Soja, Leite..."}
 
     id: Mapped[int] = mapped_column(
-        BIGINT,
+        BigInteger,
         primary_key=True,
         autoincrement=True,
         comment="Identificador do escopo.",
@@ -67,7 +68,7 @@ class Scope(Base):
         ),
     )
     tenant_id: Mapped[int] = mapped_column(
-        BIGINT,
+        BigInteger,
         ForeignKey("tenant.id", onupdate="CASCADE", ondelete="RESTRICT"),
         nullable=False,
         comment="Ligação do escopo ao licenciado.",
@@ -89,7 +90,7 @@ class Account(Base):
     )
 
     id: Mapped[int] = mapped_column(
-        BIGINT,
+        BigInteger,
         primary_key=True,
         autoincrement=True,
         comment="Identificador da conta do usuário.",
@@ -152,7 +153,7 @@ class Member(Base):
     )
 
     id: Mapped[int] = mapped_column(
-        BIGINT,
+        BigInteger,
         primary_key=True,
         autoincrement=True,
         comment="Identificador do usuário.",
@@ -175,19 +176,19 @@ class Member(Base):
         comment="Email do usuário.",
     )
     tenant_id: Mapped[int] = mapped_column(
-        BIGINT,
+        BigInteger,
         ForeignKey("tenant.id", onupdate="CASCADE", ondelete="RESTRICT"),
         nullable=False,
         comment="Ligação do usuário ao licenciado.",
     )
     account_id: Mapped[int | None] = mapped_column(
-        BIGINT,
+        BigInteger,
         ForeignKey("account.id", onupdate="CASCADE", ondelete="SET NULL"),
         nullable=True,
         comment="Ligação do usuário à conta do usuário.",
     )
     current_scope_id: Mapped[int | None] = mapped_column(
-        BIGINT,
+        BigInteger,
         ForeignKey("scope.id", onupdate="CASCADE", ondelete="SET NULL"),
         nullable=True,
         comment="Escopo atualmente selecionado pelo usuário dentro do licenciado.",
@@ -250,7 +251,7 @@ class Location(Base):
     )
 
     id: Mapped[int] = mapped_column(
-        BIGINT,
+        BigInteger,
         primary_key=True,
         autoincrement=True,
         comment="Identificador do local.",
@@ -269,13 +270,13 @@ class Location(Base):
         comment="Descrição do local com mais contexto para a operação.",
     )
     scope_id: Mapped[int] = mapped_column(
-        BIGINT,
+        BigInteger,
         ForeignKey("scope.id", onupdate="CASCADE", ondelete="RESTRICT"),
         nullable=False,
         comment="Ligação do local ao escopo.",
     )
     parent_location_id: Mapped[int | None] = mapped_column(
-        BIGINT,
+        BigInteger,
         nullable=True,
         comment="Ligação do local ao local pai na mesma hierarquia e escopo.",
     )
@@ -331,7 +332,7 @@ class Unity(Base):
     )
 
     id: Mapped[int] = mapped_column(
-        BIGINT,
+        BigInteger,
         primary_key=True,
         autoincrement=True,
         comment="Identificador da unidade produtiva.",
@@ -347,13 +348,13 @@ class Unity(Base):
         comment="Descrição da unidade produtiva.",
     )
     scope_id: Mapped[int] = mapped_column(
-        BIGINT,
+        BigInteger,
         ForeignKey("scope.id", onupdate="CASCADE", ondelete="RESTRICT"),
         nullable=False,
         comment="Escopo desta unidade produtiva.",
     )
     parent_unity_id: Mapped[int | None] = mapped_column(
-        BIGINT,
+        BigInteger,
         nullable=True,
         comment="Unidade produtiva pai na mesma hierarquia e escopo.",
     )

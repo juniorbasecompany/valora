@@ -5,16 +5,11 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from valora_backend.api.auth import router as auth_router
-from valora_backend.audit.middleware import AuditContextMiddleware
 from valora_backend.db import engine, get_session
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Import tardio: evita carregar o modelo Log no metadata antes de testes SQLite com create_all.
-    from valora_backend.audit.session_listener import register_audit_listener
-
-    register_audit_listener()
     yield
     engine.dispose()
 
@@ -25,7 +20,6 @@ def create_app() -> FastAPI:
         version="0.1.0",
         lifespan=lifespan,
     )
-    app.add_middleware(AuditContextMiddleware)
 
     @app.get("/health")
     def health_check() -> dict[str, str]:

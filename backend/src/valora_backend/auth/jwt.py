@@ -48,20 +48,3 @@ def verify_token(token: str) -> dict[str, Any]:
         ) from exc
 
     return payload
-
-
-def decode_token_payload_optional(token: str) -> dict[str, Any] | None:
-    """
-    Decodifica JWT com as mesmas regras que verify_token, mas sem HTTPException —
-    útil no middleware de auditoria quando o token está ausente ou inválido.
-    """
-    settings = Settings()
-    try:
-        return jwt.decode(
-            token,
-            settings.jwt_secret.get_secret_value(),
-            algorithms=["HS256"],
-            issuer=settings.jwt_issuer,
-        )
-    except jwt.PyJWTError:
-        return None

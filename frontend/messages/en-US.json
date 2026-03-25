@@ -108,7 +108,6 @@
     "openTenantEditor": "Edit tenant",
     "openMemberEditor": "Edit members",
     "openScopeEditor": "Edit scopes",
-    "openLocationEditor": "Edit locations",
     "status": {
       "title": "Next phase",
       "description": "Tenant, member, and scope records can already be maintained in this initial area."
@@ -125,10 +124,6 @@
       "scope": {
         "title": "Scope",
         "description": "Concentrates the minimum structure that will support later modules and records."
-      },
-      "location": {
-        "title": "Locations",
-        "description": "Organizes the hierarchical location tree inside each scope for later operational records."
       }
     },
     "queue": {
@@ -145,11 +140,6 @@
       "scope": {
         "title": "Scope registration",
         "description": "Closes the minimum structural foundation before advancing to operational modules.",
-        "status": "available"
-      },
-      "location": {
-        "title": "Location registration",
-        "description": "Prepares the editable location hierarchy that will support future hierarchical records.",
         "status": "available"
       }
     }

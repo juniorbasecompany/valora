@@ -108,7 +108,6 @@
     "openTenantEditor": "Editar licenciatario",
     "openMemberEditor": "Editar miembros",
     "openScopeEditor": "Editar alcances",
-    "openLocationEditor": "Editar ubicaciones",
     "status": {
       "title": "Siguiente fase",
       "description": "Licenciatario, miembros y alcances ya pueden mantenerse en esta área inicial."
@@ -125,10 +124,6 @@
       "scope": {
         "title": "Alcance",
         "description": "Concentra la estructura mínima que servirá de base para los módulos y registros posteriores."
-      },
-      "location": {
-        "title": "Ubicaciones",
-        "description": "Organiza el árbol jerárquico de ubicaciones dentro de cada alcance para los registros operativos futuros."
       }
     },
     "queue": {
@@ -145,11 +140,6 @@
       "scope": {
         "title": "Registro de alcance",
         "description": "Cierra la base estructural mínima antes de avanzar hacia los módulos operativos.",
-        "status": "disponible"
-      },
-      "location": {
-        "title": "Registro de ubicaciones",
-        "description": "Prepara la jerarquía editable de ubicaciones que servirá de base para otros registros jerárquicos.",
         "status": "disponible"
       }
     }

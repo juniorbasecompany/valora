@@ -108,7 +108,6 @@
     "openTenantEditor": "Editar licenciado",
     "openMemberEditor": "Editar membros",
     "openScopeEditor": "Editar escopos",
-    "openLocationEditor": "Editar locais",
     "status": {
       "title": "Fase seguinte",
       "description": "Licenciado, membros e escopos já podem ser mantidos nesta área inicial."
@@ -125,10 +124,6 @@
       "scope": {
         "title": "Escopo",
         "description": "Concentra a estrutura mínima que servirá de base para os módulos e cadastros posteriores."
-      },
-      "location": {
-        "title": "Locais",
-        "description": "Organiza a árvore hierárquica de locais dentro de cada escopo para os cadastros operacionais futuros."
       }
     },
     "queue": {
@@ -145,11 +140,6 @@
       "scope": {
         "title": "Cadastro de escopo",
         "description": "Fecha a base estrutural mínima antes do avanço para módulos operacionais.",
-        "status": "disponível"
-      },
-      "location": {
-        "title": "Cadastro de locais",
-        "description": "Prepara a hierarquia editável de locais que servirá de base para outros cadastros hierárquicos.",
         "status": "disponível"
       }
     }

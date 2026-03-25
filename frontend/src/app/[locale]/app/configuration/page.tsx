@@ -4,12 +4,7 @@ import { InfoCard } from "@/component/app-shell/info-card";
 import { PageHeader } from "@/component/app-shell/page-header";
 import { StatusPanel } from "@/component/app-shell/status-panel";
 import { SetupStepCard } from "@/component/home/setup-step-card";
-import {
-    BuildingIcon,
-    ScopeIcon,
-    UsersIcon,
-    WorkflowIcon
-} from "@/component/ui/ui-icons";
+import { BuildingIcon, ScopeIcon, UsersIcon } from "@/component/ui/ui-icons";
 
 type ConfigurationPageProps = {
     params: Promise<{ locale: string }>;
@@ -21,7 +16,6 @@ export default async function ConfigurationPage({ params }: ConfigurationPagePro
     const tenantEditorHref = `/${locale}/app/configuration/tenant`;
     const memberEditorHref = `/${locale}/app/configuration/member`;
     const scopeEditorHref = `/${locale}/app/configuration/scope`;
-    const locationEditorHref = `/${locale}/app/configuration/location`;
 
     return (
         <section className="ui-page-stack">
@@ -37,7 +31,7 @@ export default async function ConfigurationPage({ params }: ConfigurationPagePro
                 }
             />
 
-            <section className="ui-grid-cards-4">
+            <section className="ui-grid-cards-3">
                 <InfoCard
                     title={t("cards.organization.title")}
                     description={t("cards.organization.description")}
@@ -58,13 +52,6 @@ export default async function ConfigurationPage({ params }: ConfigurationPagePro
                     iconSlot={<ScopeIcon className="ui-icon" />}
                     actionHref={scopeEditorHref}
                     actionLabel={t("openScopeEditor")}
-                />
-                <InfoCard
-                    title={t("cards.location.title")}
-                    description={t("cards.location.description")}
-                    iconSlot={<WorkflowIcon className="ui-icon" />}
-                    actionHref={locationEditorHref}
-                    actionLabel={t("openLocationEditor")}
                 />
             </section>
 
@@ -95,15 +82,6 @@ export default async function ConfigurationPage({ params }: ConfigurationPagePro
                     actionHref={scopeEditorHref}
                     actionLabel={t("openScopeEditor")}
                     iconSlot={<ScopeIcon className="ui-icon" />}
-                />
-                <SetupStepCard
-                    title={t("queue.location.title")}
-                    description={t("queue.location.description")}
-                    statusLabel={t("queue.location.status")}
-                    tone="attention"
-                    actionHref={locationEditorHref}
-                    actionLabel={t("openLocationEditor")}
-                    iconSlot={<WorkflowIcon className="ui-icon" />}
                 />
             </section>
         </section>

@@ -46,59 +46,50 @@
         }
     },
     "HomePage": {
-        "title": "A base do sistema já está pronta para iniciar o cadastro estrutural do Valora.",
-        "description": "Esta página inicial funciona como ponto de entrada da aplicação após a autenticação. Ela mostra o contexto atual, o estado da configuração inicial e o caminho mais curto até a configuração administrativa.",
+        "title": "Bem-vindo ao Valora",
+        "description": "Aqui você encontra uma visão simples do sistema para entender o que ele já faz hoje e como ele apoia sua rotina.",
         "status": {
-            "title": "Configuração inicial pendente",
-            "description": "O próximo passo recomendado é abrir Configuração e cadastrar licenciado, membros e escopo."
+            "title": "Sistema pronto para uso",
+            "description": "Você já pode navegar pelo ambiente, organizar a estrutura e evoluir seus cadastros com segurança."
         },
         "context": {
             "workspace": {
                 "title": "Ambiente atual",
-                "description": "Você já está dentro da área autenticada da aplicação, com licenciado ativo e interface pronta para crescer em módulos."
+                "description": "Você está na área protegida do produto, com sessão ativa e tudo preparado para trabalhar com tranquilidade."
             },
             "locale": {
                 "title": "Idioma e região",
-                "description": "A base já usa `pt-BR` com mensagens por chave e estrutura pronta para expansão da internacionalização."
+                "description": "A plataforma já está preparada para funcionar em mais de um idioma sem perder consistência de navegação."
             },
             "entryFlow": {
                 "title": "Fluxo atual",
-                "description": "A entrada com Google já define a conta, o licenciado ativo e o próximo fluxo útil da aplicação."
+                "description": "Ao entrar, o sistema já identifica seu contexto para você continuar do ponto certo, sem ajustes manuais."
             }
         },
-        "setup": {
-            "title": "Estado da configuração inicial",
-            "description": "Estas são as primeiras etapas para tirar a aplicação do estado base e prepará-la para operação real.",
-            "steps": {
-                "organization": {
-                    "title": "Cadastrar o licenciado",
-                    "description": "Criar o licenciado base que vai representar o contratante do sistema.",
-                    "status": "prioritário"
-                },
-                "member": {
-                    "title": "Cadastrar os membros",
-                    "description": "Definir quem vai operar o sistema dentro do contexto do licenciado.",
-                    "status": "pendente"
-                },
-                "scope": {
-                    "title": "Configurar o escopo inicial",
-                    "description": "Preparar a estrutura mínima que servirá de base para os cadastros e módulos futuros do licenciado.",
-                    "status": "pendente"
-                }
-            }
-        },
-        "quickAction": {
-            "title": "O que fazer agora",
-            "description": "Use estes atalhos para seguir o fluxo mais curto da primeira entrega útil.",
-            "configuration": {
-                "title": "Abrir configuração",
-                "description": "Entre na área que concentrará os cadastros iniciais de licenciado, membros e escopo.",
-                "action": "Ir para Configuração"
+        "card": {
+            "tenant": {
+                "title": "Organização e equipe",
+                "description": "Você define quem participa da operação e qual papel cada pessoa terá no dia a dia."
             },
-            "plan": {
-                "title": "Ver fila da configuração inicial",
-                "description": "Reveja a ordem recomendada de cadastros antes de começar a implementação das telas de administração.",
-                "action": "Ver próximos passos"
+            "location": {
+                "title": "Estrutura de locais",
+                "description": "Permite organizar sua operação por unidades e hierarquias, facilitando a visão do todo."
+            },
+            "record": {
+                "title": "Registros organizados",
+                "description": "Centraliza informações importantes do negócio para manter histórico e acompanhamento."
+            },
+            "import": {
+                "title": "Importação de dados",
+                "description": "Ajuda a trazer dados externos para dentro do sistema de forma mais prática e confiável."
+            },
+            "process": {
+                "title": "Processamentos",
+                "description": "Executa rotinas sobre os dados cadastrados para apoiar análises e decisões."
+            },
+            "audit": {
+                "title": "Auditoria e histórico",
+                "description": "Mostra mudanças e evolução dos dados para dar transparência e segurança operacional."
             }
         }
     },

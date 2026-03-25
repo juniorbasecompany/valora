@@ -46,59 +46,50 @@
         }
     },
     "HomePage": {
-        "title": "La base del sistema ya está lista para iniciar la configuración estructural de Valora.",
-        "description": "Esta página principal funciona como punto de entrada de la aplicación después de la autenticación. Muestra el contexto actual, el estado de la configuración inicial y el camino más corto hacia la configuración administrativa.",
+        "title": "Bienvenido a Valora",
+        "description": "Aquí tienes una vista simple de lo que el sistema ya hace y de cómo puede ayudarte en la operación diaria.",
         "status": {
-            "title": "Configuración inicial pendiente",
-            "description": "El siguiente paso recomendado es abrir Configuración y registrar el licenciatario, los miembros y el alcance."
+            "title": "Sistema listo para usar",
+            "description": "Ya puedes navegar por el entorno, organizar tu estructura y evolucionar tus registros con seguridad."
         },
         "context": {
             "workspace": {
                 "title": "Espacio actual",
-                "description": "Ya estás dentro del área autenticada de la aplicación, con un licenciatario activo y una interfaz lista para crecer en módulos."
+                "description": "Ya estás en el área protegida, con sesión activa y todo preparado para trabajar con fluidez."
             },
             "locale": {
                 "title": "Idioma y región",
-                "description": "La base ya usa mensajes por clave y una estructura lista para ampliar la internacionalización a varios locales."
+                "description": "La plataforma ya está preparada para soportar varios idiomas sin perder consistencia de navegación."
             },
             "entryFlow": {
                 "title": "Flujo actual",
-                "description": "El acceso con Google ya define la cuenta, el licenciatario activo y el siguiente flujo útil de la aplicación."
+                "description": "Al entrar, el sistema ya identifica tu contexto para que continúes desde el punto correcto sin ajustes manuales."
             }
         },
-        "setup": {
-            "title": "Estado de la configuración inicial",
-            "description": "Estos son los primeros pasos para sacar la aplicación de su estado base y prepararla para la operación real.",
-            "steps": {
-                "organization": {
-                    "title": "Registrar el licenciatario",
-                    "description": "Crear el licenciatario base que representará al contratante del sistema.",
-                    "status": "prioritario"
-                },
-                "member": {
-                    "title": "Registrar los miembros",
-                    "description": "Definir quién operará el sistema dentro del contexto del licenciatario.",
-                    "status": "pendiente"
-                },
-                "scope": {
-                    "title": "Configurar el alcance inicial",
-                    "description": "Preparar la estructura mínima que servirá de base para los futuros registros y módulos del licenciatario.",
-                    "status": "pendiente"
-                }
-            }
-        },
-        "quickAction": {
-            "title": "Qué hacer ahora",
-            "description": "Usa estos accesos directos para seguir el camino más corto hacia la primera entrega útil.",
-            "configuration": {
-                "title": "Abrir configuración",
-                "description": "Entra al área que concentrará los registros iniciales de licenciatario, miembros y alcance.",
-                "action": "Ir a Configuración"
+        "card": {
+            "tenant": {
+                "title": "Organización y equipo",
+                "description": "Define quién participa en la operación y qué rol tendrá cada persona en el día a día."
             },
-            "plan": {
-                "title": "Ver la cola de configuración inicial",
-                "description": "Revisa el orden recomendado de registros antes de comenzar la implementación de las pantallas de administración.",
-                "action": "Ver próximos pasos"
+            "location": {
+                "title": "Estructura de ubicaciones",
+                "description": "Organiza la operación por unidades y niveles de jerarquía para tener una visión clara del conjunto."
+            },
+            "record": {
+                "title": "Registros organizados",
+                "description": "Reúne información clave del negocio en un solo lugar para dar continuidad al trabajo."
+            },
+            "import": {
+                "title": "Importación de datos",
+                "description": "Facilita traer datos externos al sistema de forma más práctica y confiable."
+            },
+            "process": {
+                "title": "Procesamiento",
+                "description": "Ejecuta rutinas sobre los datos estructurados para apoyar análisis y decisiones."
+            },
+            "audit": {
+                "title": "Auditoría e historial",
+                "description": "Permite seguir cambios en el tiempo para mejorar transparencia y confianza operativa."
             }
         }
     },

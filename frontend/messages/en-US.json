@@ -46,59 +46,50 @@
         }
     },
     "HomePage": {
-        "title": "The system foundation is already ready to start Valora's structural setup.",
-        "description": "This home page acts as the application entry point after authentication. It shows the current context, the initial setup status, and the shortest path to administrative configuration.",
+        "title": "Welcome to Valora",
+        "description": "This page gives you a simple overview of what the system already does and how it supports your daily work.",
         "status": {
-            "title": "Initial setup pending",
-            "description": "The recommended next step is to open Configuration and register the tenant, members, and scope."
+            "title": "System ready to use",
+            "description": "You can already navigate the workspace, organize your structure, and evolve your records safely."
         },
         "context": {
             "workspace": {
                 "title": "Current workspace",
-                "description": "You are already inside the authenticated area of the application, with an active tenant and an interface ready to grow into modules."
+                "description": "You are in the protected area with an active session and everything prepared for a smooth workflow."
             },
             "locale": {
                 "title": "Language and region",
-                "description": "The foundation already uses keyed messages and a structure ready to expand internationalization across multiple locales."
+                "description": "The platform is already prepared to support multiple languages without losing navigation consistency."
             },
             "entryFlow": {
                 "title": "Current flow",
-                "description": "Google sign-in already defines the account, the active tenant, and the next useful application flow."
+                "description": "At sign-in, the system already identifies your context so you can continue from the right place without manual setup."
             }
         },
-        "setup": {
-            "title": "Initial setup status",
-            "description": "These are the first steps to move the application out of its base state and prepare it for real operation.",
-            "steps": {
-                "organization": {
-                    "title": "Register the tenant",
-                    "description": "Create the base tenant that will represent the system contractor.",
-                    "status": "priority"
-                },
-                "member": {
-                    "title": "Register the members",
-                    "description": "Define who will operate the system within the tenant context.",
-                    "status": "pending"
-                },
-                "scope": {
-                    "title": "Configure the initial scope",
-                    "description": "Prepare the minimum structure that will serve as the foundation for the tenant's future records and modules.",
-                    "status": "pending"
-                }
-            }
-        },
-        "quickAction": {
-            "title": "What to do now",
-            "description": "Use these shortcuts to follow the shortest path toward the first useful delivery.",
-            "configuration": {
-                "title": "Open configuration",
-                "description": "Go to the area that will concentrate the initial tenant, member, and scope records.",
-                "action": "Go to Configuration"
+        "card": {
+            "tenant": {
+                "title": "Organization and team",
+                "description": "Define who is part of the operation and which role each person has in daily work."
             },
-            "plan": {
-                "title": "View the initial setup queue",
-                "description": "Review the recommended order of records before starting the implementation of the administration screens.",
-                "action": "View next steps"
+            "location": {
+                "title": "Location structure",
+                "description": "Organize your operation by units and hierarchy levels to keep a clear view of the whole."
+            },
+            "record": {
+                "title": "Organized records",
+                "description": "Keep key business information in one place with better follow-up and continuity."
+            },
+            "import": {
+                "title": "Data import",
+                "description": "Bring external data into the system in a more practical and reliable way."
+            },
+            "process": {
+                "title": "Processing",
+                "description": "Run routines over your structured data to support analysis and decision-making."
+            },
+            "audit": {
+                "title": "Audit and history",
+                "description": "Track changes over time to improve transparency and operational confidence."
             }
         }
     },

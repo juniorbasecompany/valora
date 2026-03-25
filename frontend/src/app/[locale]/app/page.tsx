@@ -3,23 +3,19 @@ import { getTranslations } from "next-intl/server";
 import { InfoCard } from "@/component/app-shell/info-card";
 import { PageHeader } from "@/component/app-shell/page-header";
 import { StatusPanel } from "@/component/app-shell/status-panel";
-import { QuickActionCard } from "@/component/home/quick-action-card";
-import { SetupStepCard } from "@/component/home/setup-step-card";
 import {
+    AuditIcon,
     BuildingIcon,
     GlobeIcon,
-    ScopeIcon,
-    SparkIcon,
+    ImportIcon,
+    LocationIcon,
+    ProcessIcon,
+    RecordsIcon,
     UsersIcon,
     WorkflowIcon
 } from "@/component/ui/ui-icons";
 
-type AppHomePageProps = {
-    params: Promise<{ locale: string }>;
-};
-
-export default async function AppHomePage({ params }: AppHomePageProps) {
-    const { locale } = await params;
+export default async function AppHomePage() {
     const t = await getTranslations("HomePage");
 
     return (
@@ -31,7 +27,7 @@ export default async function AppHomePage({ params }: AppHomePageProps) {
                     <StatusPanel
                         title={t("status.title")}
                         description={t("status.description")}
-                        tone="attention"
+                        tone="positive"
                     />
                 }
             />
@@ -52,71 +48,36 @@ export default async function AppHomePage({ params }: AppHomePageProps) {
                     description={t("context.entryFlow.description")}
                     iconSlot={<WorkflowIcon className="ui-icon" />}
                 />
-            </section>
-
-            <section className="ui-grid-split-home">
-                <div className="ui-panel ui-panel-stack">
-                    <div className="ui-heading-stack">
-                        <h2 className="ui-header-title ui-title-section-lg">
-                            {t("setup.title")}
-                        </h2>
-                        <p className="ui-text-note">
-                            {t("setup.description")}
-                        </p>
-                    </div>
-
-                    <div className="ui-grid-list">
-                        <SetupStepCard
-                            title={t("setup.steps.organization.title")}
-                            description={t("setup.steps.organization.description")}
-                            statusLabel={t("setup.steps.organization.status")}
-                            tone="attention"
-                            iconSlot={<BuildingIcon className="ui-icon" />}
-                        />
-                        <SetupStepCard
-                            title={t("setup.steps.member.title")}
-                            description={t("setup.steps.member.description")}
-                            statusLabel={t("setup.steps.member.status")}
-                            tone="neutral"
-                            iconSlot={<UsersIcon className="ui-icon" />}
-                        />
-                        <SetupStepCard
-                            title={t("setup.steps.scope.title")}
-                            description={t("setup.steps.scope.description")}
-                            statusLabel={t("setup.steps.scope.status")}
-                            tone="neutral"
-                            iconSlot={<ScopeIcon className="ui-icon" />}
-                        />
-                    </div>
-                </div>
-
-                <div className="ui-panel ui-panel-stack">
-                    <div className="ui-heading-stack">
-                        <h2 className="ui-header-title ui-title-section-lg">
-                            {t("quickAction.title")}
-                        </h2>
-                        <p className="ui-text-note">
-                            {t("quickAction.description")}
-                        </p>
-                    </div>
-
-                    <div className="ui-grid-list">
-                        <QuickActionCard
-                            title={t("quickAction.configuration.title")}
-                            description={t("quickAction.configuration.description")}
-                            href={`/${locale}/app/configuration`}
-                            actionLabel={t("quickAction.configuration.action")}
-                            iconSlot={<SparkIcon className="ui-icon" />}
-                        />
-                        <QuickActionCard
-                            title={t("quickAction.plan.title")}
-                            description={t("quickAction.plan.description")}
-                            href={`/${locale}/app/configuration`}
-                            actionLabel={t("quickAction.plan.action")}
-                            iconSlot={<WorkflowIcon className="ui-icon" />}
-                        />
-                    </div>
-                </div>
+                <InfoCard
+                    title={t("card.tenant.title")}
+                    description={t("card.tenant.description")}
+                    iconSlot={<UsersIcon className="ui-icon" />}
+                />
+                <InfoCard
+                    title={t("card.location.title")}
+                    description={t("card.location.description")}
+                    iconSlot={<LocationIcon className="ui-icon" />}
+                />
+                <InfoCard
+                    title={t("card.record.title")}
+                    description={t("card.record.description")}
+                    iconSlot={<RecordsIcon className="ui-icon" />}
+                />
+                <InfoCard
+                    title={t("card.import.title")}
+                    description={t("card.import.description")}
+                    iconSlot={<ImportIcon className="ui-icon" />}
+                />
+                <InfoCard
+                    title={t("card.process.title")}
+                    description={t("card.process.description")}
+                    iconSlot={<ProcessIcon className="ui-icon" />}
+                />
+                <InfoCard
+                    title={t("card.audit.title")}
+                    description={t("card.audit.description")}
+                    iconSlot={<AuditIcon className="ui-icon" />}
+                />
             </section>
         </section>
     );

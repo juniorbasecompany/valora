@@ -14,7 +14,7 @@ export function ConfigurationInfoSection({
     children
 }: ConfigurationInfoSectionProps) {
     return (
-        <section className="ui-card ui-form-section ui-border-accent">
+        <section className="ui-card ui-form-section ui-border-accent ui-configuration-info-section">
             <div className="ui-editor-content">
                 <div className="ui-section-header">
                     <span className="ui-icon-badge">

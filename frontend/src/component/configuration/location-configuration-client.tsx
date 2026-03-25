@@ -92,9 +92,12 @@ function LocationNestNode({
     const isSelected = !isCreateMode && item.id === selectedLocationId;
     const isCreateContext = isCreateMode && createParentId === item.id;
 
+    const containerClassName =
+        item.depth === 0 ? "ui-directory-item" : "ui-location-nest-box";
+
     return (
         <section
-            className="ui-location-nest-box"
+            className={containerClassName}
             data-selected={isSelected ? "true" : undefined}
             data-create-context={isCreateContext ? "true" : undefined}
             style={buildLocationToneStyle(item.depth, maxDepth)}

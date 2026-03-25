@@ -212,12 +212,8 @@
         "statusLabel": "Situação",
         "accountLinked": "Conta vinculada",
         "accountPending": "Aguardando vínculo da conta",
-        "accessManagedNotice": "Papel e situação deste registro são protegidos pelas permissões atuais. Atualize somente os campos liberados."
+        "accountTopicLabel": "Conta"
       }
-    },
-    "metadata": {
-      "memberIdLabel": "Identificador do membro",
-      "accountIdLabel": "Identificador da conta"
     },
     "action": {
       "cancel": "Cancelar",

@@ -38,9 +38,7 @@ export type MemberConfigurationCopy = {
     statusLabel: string;
     accountLinked: string;
     accountPending: string;
-    accessManagedNotice: string;
-    memberIdLabel: string;
-    accountIdLabel: string;
+    accountTopicLabel: string;
     cancel: string;
     delete: string;
     undoDelete: string;
@@ -149,15 +147,9 @@ export function MemberConfigurationClient({
         initialSelectedMember?.display_name ?? ""
     );
     const [name, setName] = useState(initialSelectedMember?.name ?? "");
-    const [roleValue, setRoleValue] = useState(initialSelectedMember?.role ?? 3);
-    const [statusKey, setStatusKey] = useState<MemberStatusKey>(
-        normalizeStatusKey(initialSelectedMember?.status ?? "DISABLED")
-    );
     const [baseline, setBaseline] = useState({
         displayName: initialSelectedMember?.display_name ?? "",
-        name: initialSelectedMember?.name ?? "",
-        role: initialSelectedMember?.role ?? 3,
-        status: normalizeStatusKey(initialSelectedMember?.status ?? "DISABLED")
+        name: initialSelectedMember?.name ?? ""
     });
     const [fieldError, setFieldError] = useState<{
         displayName?: string;
@@ -217,13 +209,9 @@ export function MemberConfigurationClient({
             setSelectedMemberId(nextSelectedMemberId);
             setDisplayName(nextSelectedMember?.display_name ?? "");
             setName(nextSelectedMember?.name ?? "");
-            setRoleValue(nextSelectedMember?.role ?? 3);
-            setStatusKey(normalizeStatusKey(nextSelectedMember?.status ?? "DISABLED"));
             setBaseline({
                 displayName: nextSelectedMember?.display_name ?? "",
-                name: nextSelectedMember?.name ?? "",
-                role: nextSelectedMember?.role ?? 3,
-                status: normalizeStatusKey(nextSelectedMember?.status ?? "DISABLED")
+                name: nextSelectedMember?.name ?? ""
             });
             setFieldError({});
             setRequestErrorMessage(null);
@@ -247,21 +235,9 @@ export function MemberConfigurationClient({
         return (
             displayName.trim() !== baseline.displayName.trim() ||
             name.trim() !== baseline.name.trim() ||
-            roleValue !== baseline.role ||
-            statusKey !== baseline.status ||
             isDeletePending
         );
-    }, [
-        baseline.displayName,
-        baseline.name,
-        baseline.role,
-        baseline.status,
-        displayName,
-        isDeletePending,
-        name,
-        roleValue,
-        statusKey
-    ]);
+    }, [baseline.displayName, baseline.name, displayName, isDeletePending, name]);
 
     const validate = useCallback(() => {
         const nextError: { displayName?: string; name?: string } = {};
@@ -327,8 +303,10 @@ export function MemberConfigurationClient({
                         body: JSON.stringify({
                             display_name: displayName.trim(),
                             name: name.trim(),
-                            role: roleValue,
-                            status: memberStatusValueByKey[statusKey]
+                            role: selectedMember.role,
+                            status: memberStatusValueByKey[
+                                normalizeStatusKey(selectedMember.status)
+                            ]
                         })
                     }
             );
@@ -355,40 +333,30 @@ export function MemberConfigurationClient({
         displayName,
         isDeletePending,
         name,
-        roleValue,
         selectedMember,
-        statusKey,
         syncFromDirectory,
         validate
     ]);
 
-    const roleOptions = useMemo(
-        () => [
-            { value: 1, label: copy.roleLabels.master },
-            { value: 2, label: copy.roleLabels.admin },
-            { value: 3, label: copy.roleLabels.member }
-        ],
-        [copy.roleLabels.admin, copy.roleLabels.master, copy.roleLabels.member]
-    );
+    const accessRoleText = useMemo(() => {
+        if (!selectedMember) {
+            return "";
+        }
 
-    const statusOptions = useMemo(
-        () =>
-            selectedMember?.account_id == null
-                ? [
-                    { value: "PENDING" as const, label: copy.statusLabels.PENDING },
-                    { value: "DISABLED" as const, label: copy.statusLabels.DISABLED }
-                ]
-                : [
-                    { value: "ACTIVE" as const, label: copy.statusLabels.ACTIVE },
-                    { value: "DISABLED" as const, label: copy.statusLabels.DISABLED }
-                ],
-        [
-            copy.statusLabels.ACTIVE,
-            copy.statusLabels.DISABLED,
-            copy.statusLabels.PENDING,
-            selectedMember?.account_id
-        ]
-    );
+        return (
+            copy.roleLabels[selectedMember.role_name as keyof typeof copy.roleLabels] ??
+            selectedMember.role_name
+        );
+    }, [copy.roleLabels, selectedMember]);
+
+    const accessStatusText = useMemo(() => {
+        if (!selectedMember) {
+            return "";
+        }
+
+        const key = normalizeStatusKey(selectedMember.status);
+        return copy.statusLabels[key];
+    }, [copy.statusLabels, selectedMember]);
 
     const canSubmit = directoryEditorCanSubmitForDirectoryEditor({
         isCreateMode: false,
@@ -459,9 +427,6 @@ export function MemberConfigurationClient({
                                         <span className="ui-badge ui-badge-neutral">
                                             {roleLabel}
                                         </span>
-                                        <span className="ui-badge ui-badge-neutral">
-                                            #{item.id}
-                                        </span>
                                     </div>
                                 </button>
                             );
@@ -480,14 +445,6 @@ export function MemberConfigurationClient({
                     {directory.can_edit && selectedMember && !selectedMember.can_edit ? (
                         <div className="ui-notice-attention ui-notice-block">
                             {copy.protectedRecordNotice}
-                        </div>
-                    ) : null}
-
-                    {directory.can_edit &&
-                    selectedMember?.can_edit &&
-                    !selectedMember.can_edit_access ? (
-                        <div className="ui-status-panel ui-tone-neutral ui-status-copy">
-                            {copy.accessManagedNotice}
                         </div>
                     ) : null}
 
@@ -514,93 +471,49 @@ export function MemberConfigurationClient({
                             title={copy.sectionAccessTitle}
                             description={copy.sectionAccessDescription}
                         >
-                            <div className="ui-form-fields ui-form-fields-3">
-                                <div className="ui-field ui-field-span-full">
-                                    <label className="ui-field-label" htmlFor="member-email">
-                                        {copy.emailLabel}
-                                    </label>
-                                    <input
-                                        id="member-email"
-                                        className="ui-input"
-                                        value={selectedMember.email}
-                                        disabled
-                                        readOnly
-                                    />
-                                    <p className="ui-field-hint">{copy.emailHint}</p>
-                                </div>
-
-                                <div className="ui-field">
-                                    <label className="ui-field-label" htmlFor="member-role">
-                                        {copy.roleLabel}
-                                    </label>
-                                    <select
-                                        id="member-role"
-                                        className="ui-input ui-input-select"
-                                        value={roleValue}
-                                        onChange={(event) => {
-                                            setRoleValue(Number(event.target.value));
-                                            setRequestErrorMessage(null);
-                                        }}
-                                        disabled={isDeletePending || !selectedMember.can_edit_access}
-                                    >
-                                        {roleOptions.map((option) => (
-                                            <option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div className="ui-field">
-                                    <label className="ui-field-label" htmlFor="member-status">
-                                        {copy.statusLabel}
-                                    </label>
-                                    <select
-                                        id="member-status"
-                                        className="ui-input ui-input-select"
-                                        value={statusKey}
-                                        onChange={(event) => {
-                                            setStatusKey(normalizeStatusKey(event.target.value));
-                                            setRequestErrorMessage(null);
-                                        }}
-                                        disabled={isDeletePending || !selectedMember.can_edit_access}
-                                    >
-                                        {statusOptions.map((option) => (
-                                            <option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div className="ui-metadata-card">
-                                    <p className="ui-metadata-label">
-                                        {selectedMember.account_id
-                                            ? copy.accountLinked
-                                            : copy.accountPending}
+                            <ul className="ui-info-topic-list">
+                                <li>
+                                    <p className="ui-info-topic-lead">
+                                        <span className="ui-info-topic-label">{copy.emailLabel}</span>
+                                        {": "}
+                                        <span className="ui-info-topic-value">
+                                            {selectedMember.email}
+                                        </span>
                                     </p>
-                                    <p className="ui-metadata-value-strong">
-                                        {selectedMember.account_id
-                                            ? `#${selectedMember.account_id}`
-                                            : copy.accountPending}
+                                    <p className="ui-field-hint ui-info-topic-hint">{copy.emailHint}</p>
+                                </li>
+                                <li>
+                                    <p className="ui-info-topic-lead">
+                                        <span className="ui-info-topic-label">
+                                            {copy.accountTopicLabel}
+                                        </span>
+                                        {": "}
+                                        <span className="ui-info-topic-value">
+                                            {selectedMember.account_id
+                                                ? copy.accountLinked
+                                                : copy.accountPending}
+                                        </span>
                                     </p>
-                                </div>
-                            </div>
-
-                            <div className="ui-metadata-card ui-space-top-md">
-                                <div className="ui-metadata-grid ui-metadata-grid-2">
-                                    <div>
-                                        <p className="ui-metadata-label">{copy.memberIdLabel}</p>
-                                        <p className="ui-metadata-value-strong">{selectedMember.id}</p>
-                                    </div>
-                                    <div>
-                                        <p className="ui-metadata-label">{copy.accountIdLabel}</p>
-                                        <p className="ui-metadata-value-strong">
-                                            {selectedMember.account_id ?? "—"}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+                                </li>
+                                <li>
+                                    <p className="ui-info-topic-lead">
+                                        <span className="ui-info-topic-label">{copy.roleLabel}</span>
+                                        {": "}
+                                        <span className="ui-info-topic-value">{accessRoleText}</span>
+                                    </p>
+                                </li>
+                                <li>
+                                    <p className="ui-info-topic-lead">
+                                        <span className="ui-info-topic-label">
+                                            {copy.statusLabel}
+                                        </span>
+                                        {": "}
+                                        <span className="ui-info-topic-value">
+                                            {accessStatusText}
+                                        </span>
+                                    </p>
+                                </li>
+                            </ul>
                         </ConfigurationInfoSection>
                     ) : null}
                 </>

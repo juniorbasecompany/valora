@@ -212,12 +212,8 @@
         "statusLabel": "Status",
         "accountLinked": "Linked account",
         "accountPending": "Waiting for account link",
-        "accessManagedNotice": "Role and status for this record are protected by the current permissions. Update only the fields that are enabled."
+        "accountTopicLabel": "Account"
       }
-    },
-    "metadata": {
-      "memberIdLabel": "Member identifier",
-      "accountIdLabel": "Account identifier"
     },
     "action": {
       "cancel": "Cancel",

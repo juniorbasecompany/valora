@@ -326,8 +326,8 @@
         "displayNameHint": "Adicione contexto para o usuário reconhecer o local com rapidez."
       },
       "structure": {
-        "title": "Posição na hierarquia",
-        "description": "Nível, pai e ordem entre irmãos indicam onde o local aparece no escopo. A ordem pode mudar com as ações de mover, quando disponíveis.",
+        "title": "Informações",
+        "description": "Resumo do local em foco no escopo: nível na árvore, ordem entre irmãos no mesmo pai e qual é o local pai. São dados apenas para consulta; a ordem pode mudar ao usar mover, quando essa ação estiver disponível.",
         "levelLabel": "Nível hierárquico",
         "levelHint": "Contado a partir da raiz do escopo (1 = raiz).",
         "parentLabel": "Local pai",

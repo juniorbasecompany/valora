@@ -326,8 +326,8 @@
         "displayNameHint": "Add context that helps users recognize the location quickly."
       },
       "structure": {
-        "title": "Position in hierarchy",
-        "description": "Level, parent, and sibling order show where the location sits in the scope. Order can change with move actions when available.",
+        "title": "Information",
+        "description": "Summary of the location in focus within the scope: tree level, order among siblings under the same parent, and which location is the parent. This is read-only context; order can change when using move, when that action is available.",
         "levelLabel": "Hierarchy level",
         "levelHint": "Counted from the scope root (1 = root).",
         "parentLabel": "Parent location",

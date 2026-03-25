@@ -30,6 +30,35 @@
     gap: 1.5rem;
 }
 
+.ui-info-topic-list {
+    margin: 0;
+    padding-left: 1.35rem;
+    display: grid;
+    gap: 0.75rem;
+    list-style: disc;
+    color: var(--color-text-default);
+}
+
+.ui-info-topic-lead {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.ui-info-topic-label {
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.ui-info-topic-value {
+    font-weight: 500;
+    color: var(--color-text-default);
+}
+
+.ui-info-topic-hint {
+    margin: 0.2rem 0 0;
+}
+
 .ui-grid-list-tight {
     display: grid;
     gap: 0.25rem;

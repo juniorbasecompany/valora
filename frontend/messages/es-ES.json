@@ -326,8 +326,8 @@
         "displayNameHint": "Añade contexto para que el usuario reconozca la ubicación rápidamente."
       },
       "structure": {
-        "title": "Posición en la jerarquía",
-        "description": "Nivel, padre y orden entre hermanos indican dónde queda la ubicación en el alcance. El orden puede cambiar con acciones de mover, cuando existan.",
+        "title": "Información",
+        "description": "Resumen de la ubicación en foco dentro del alcance: nivel en el árbol, orden entre hermanos bajo el mismo padre y cuál es la ubicación padre. Son datos solo de consulta; el orden puede cambiar al usar mover, cuando esa acción esté disponible.",
         "levelLabel": "Nivel jerárquico",
         "levelHint": "Contado desde la raíz del alcance (1 = raíz).",
         "parentLabel": "Ubicación padre",

@@ -13,7 +13,7 @@ import type { CSSProperties, MouseEvent } from "react";
 import { createPortal } from "react-dom";
 
 import { PageHeader } from "@/component/app-shell/page-header";
-import { BuildingIcon, HistoryIcon } from "@/component/ui/ui-icons";
+import { HistoryIcon, InfoIcon } from "@/component/ui/ui-icons";
 import type {
     TenantLocationDirectoryResponse,
     TenantLocationRecord,
@@ -788,7 +788,7 @@ export function LocationConfigurationClient({
                                 <div className="ui-editor-content">
                                     <div className="ui-section-header">
                                         <span className="ui-icon-badge">
-                                            <BuildingIcon className="ui-icon" />
+                                            <InfoIcon className="ui-icon" />
                                         </span>
                                         <div className="ui-section-copy">
                                             <h2 className="ui-header-title ui-title-section">
@@ -800,67 +800,51 @@ export function LocationConfigurationClient({
                                         </div>
                                     </div>
 
-                                    <div className="ui-form-fields ui-form-fields-2">
-                                        <div className="ui-field">
-                                            <label
-                                                className="ui-field-label"
-                                                htmlFor="location-structure-level"
-                                            >
-                                                {copy.sectionStructureLevelLabel}
-                                            </label>
-                                            <input
-                                                id="location-structure-level"
-                                                className="ui-input"
-                                                value={structureLevelDisplay}
-                                                disabled
-                                                readOnly
-                                            />
-                                            <p className="ui-field-hint">
+                                    <ul className="ui-info-topic-list">
+                                        <li>
+                                            <p className="ui-info-topic-lead">
+                                                <span className="ui-info-topic-label">
+                                                    {copy.sectionStructureLevelLabel}
+                                                </span>
+                                                {": "}
+                                                <span className="ui-info-topic-value">
+                                                    {structureLevelDisplay}
+                                                </span>
+                                            </p>
+                                            <p className="ui-field-hint ui-info-topic-hint">
                                                 {copy.sectionStructureLevelHint}
                                             </p>
-                                        </div>
-
-                                        <div className="ui-field">
-                                            <label
-                                                className="ui-field-label"
-                                                htmlFor="location-structure-order"
-                                            >
-                                                {copy.sectionStructureOrderLabel}
-                                            </label>
-                                            <input
-                                                id="location-structure-order"
-                                                className="ui-input"
-                                                value={
-                                                    isCreateMode || !selectedLocation
+                                        </li>
+                                        <li>
+                                            <p className="ui-info-topic-lead">
+                                                <span className="ui-info-topic-label">
+                                                    {copy.sectionStructureOrderLabel}
+                                                </span>
+                                                {": "}
+                                                <span className="ui-info-topic-value">
+                                                    {isCreateMode || !selectedLocation
                                                         ? copy.sectionStructureOrderPending
-                                                        : String(selectedLocation.sort_order)
-                                                }
-                                                disabled
-                                                readOnly
-                                            />
-                                            <p className="ui-field-hint">
+                                                        : String(selectedLocation.sort_order)}
+                                                </span>
+                                            </p>
+                                            <p className="ui-field-hint ui-info-topic-hint">
                                                 {isCreateMode || !selectedLocation
                                                     ? copy.sectionStructureOrderHintCreate
                                                     : copy.sectionStructureOrderHintEdit}
                                             </p>
-                                        </div>
-
-                                        <div className="ui-field ui-field-span-full">
-                                            <label
-                                                className="ui-field-label"
-                                                htmlFor="location-structure-parent"
-                                            >
-                                                {copy.sectionStructureParentLabel}
-                                            </label>
-                                            <input
-                                                id="location-structure-parent"
-                                                className="ui-input"
-                                                value={structureParentLabel}
-                                                disabled
-                                                readOnly
-                                            />
-                                        </div>
-                                    </div>
+                                        </li>
+                                        <li>
+                                            <p className="ui-info-topic-lead">
+                                                <span className="ui-info-topic-label">
+                                                    {copy.sectionStructureParentLabel}
+                                                </span>
+                                                {": "}
+                                                <span className="ui-info-topic-value">
+                                                    {structureParentLabel}
+                                                </span>
+                                            </p>
+                                        </li>
+                                    </ul>
                                 </div>
                             </section>
                         ) : null}

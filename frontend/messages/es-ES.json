@@ -321,9 +321,9 @@
     "section": {
       "identity": {
         "nameLabel": "Nombre de la ubicación",
-        "nameHint": "Usa un nombre corto para identificar esta ubicación.\n\nPor ejemplo: Mimosa en lugar de Granja Mimosa, Avesul en lugar de Aviario Avesul o Norte en lugar de Talhão Norte.",
+        "nameHint": "Usa un nombre corto para identificar esta ubicación. Por ejemplo: Rosal en lugar de Granja Rosal, Andevalo en lugar de Granja avícola Andevalo o Este en lugar de Parcela Este.",
         "displayNameLabel": "Descripción de la ubicación",
-        "displayNameHint": "Indica el nombre completo de la ubicación.\n\nPor ejemplo: Granja Mimosa en lugar de Mimosa, Granja Avesul en lugar de Avesul o Talhão Norte en lugar de solo Norte."
+        "displayNameHint": "Indica el nombre completo de la ubicación. Por ejemplo: Granja Rosal en lugar de Rosal, Granja avícola Andevalo en lugar de Andevalo o Parcela Este en lugar de solo Este."
       },
       "structure": {
         "title": "Información",

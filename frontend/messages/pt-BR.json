@@ -321,9 +321,9 @@
     "section": {
       "identity": {
         "nameLabel": "Nome do local",
-        "nameHint": "Use um nome curto para identificar esta localização.\n\nPor exemplo: Mimosa em vez de Granja Mimosa, Avesul em vez de Aviário Avesul ou Norte em vez de Talhão Norte.",
+        "nameHint": "Use um nome curto para identificar esta localização. Por exemplo: Rio Verde em vez de Fazenda Rio Verde, Piratini em vez de Aviário Piratini ou Oeste em vez de Talhão Oeste.",
         "displayNameLabel": "Descrição do local",
-        "displayNameHint": "Informe o nome completo do local.\n\nPor exemplo: Granja Mimosa em vez de Mimosa, Granja Avesul em vez de Avesul ou Talhão Norte em vez de apenas Norte."
+        "displayNameHint": "Informe o nome completo do local. Por exemplo: Fazenda Rio Verde em vez de Rio Verde, Aviário Piratini em vez de Piratini ou Talhão Oeste em vez de apenas Oeste."
       },
       "structure": {
         "title": "Informações",

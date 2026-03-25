@@ -321,9 +321,9 @@
     "section": {
       "identity": {
         "nameLabel": "Location name",
-        "nameHint": "Use a short name to identify this location.\n\nFor example: Mimosa instead of Granja Mimosa, Avesul instead of Aviário Avesul, or Norte instead of Talhão Norte.",
+        "nameHint": "Use a short name to identify this location. For example: Willow instead of Willow Farm, Brookside instead of Brookside Poultry, or East instead of East Field.",
         "displayNameLabel": "Location description",
-        "displayNameHint": "Enter the full name of the location.\n\nFor example: Granja Mimosa instead of Mimosa, Granja Avesul instead of Avesul, or Talhão Norte instead of just Norte."
+        "displayNameHint": "Enter the full name of the location. For example: Willow Farm instead of Willow, Brookside Poultry instead of Brookside, or East Field instead of just East."
       },
       "structure": {
         "title": "Information",

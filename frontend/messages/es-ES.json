@@ -294,9 +294,6 @@
       "saving": "Guardando..."
     },
     "readOnlyNotice": "Puedes revisar el directorio de alcances, pero solo los miembros master o administrador pueden crear o editar registros estructurales.",
-    "savedNotice": "Alcance actualizado correctamente.",
-    "createdNotice": "Alcance creado correctamente.",
-    "deletedNotice": "Alcance eliminado correctamente.",
     "selectPrompt": "Selecciona un alcance de la lista para editar el registro estructural.",
     "error": {
       "save": "No se pudo guardar el alcance. Inténtalo de nuevo.",

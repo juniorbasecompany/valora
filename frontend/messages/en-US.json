@@ -294,9 +294,6 @@
       "saving": "Saving..."
     },
     "readOnlyNotice": "You can review the scope directory, but only master or admin members can create or edit structural records.",
-    "savedNotice": "Scope updated successfully.",
-    "createdNotice": "Scope created successfully.",
-    "deletedNotice": "Scope deleted successfully.",
     "selectPrompt": "Select a scope from the list to edit the structural record.",
     "error": {
       "save": "Could not save the scope. Try again.",

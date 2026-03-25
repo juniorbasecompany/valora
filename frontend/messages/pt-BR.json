@@ -294,9 +294,6 @@
       "saving": "Salvando..."
     },
     "readOnlyNotice": "Você pode consultar o diretório de escopos, mas só membros master ou administrador podem criar ou editar cadastros estruturais.",
-    "savedNotice": "Escopo atualizado com sucesso.",
-    "createdNotice": "Escopo criado com sucesso.",
-    "deletedNotice": "Escopo apagado com sucesso.",
     "selectPrompt": "Selecione um escopo na lista para editar o cadastro estrutural.",
     "error": {
       "save": "Não foi possível salvar o escopo. Tente novamente.",

@@ -52,9 +52,6 @@ export type ScopeConfigurationCopy = {
     save: string;
     saving: string;
     readOnlyNotice: string;
-    savedNotice: string;
-    createdNotice: string;
-    deletedNotice: string;
     saveError: string;
     createError: string;
     deleteError: string;
@@ -157,7 +154,6 @@ export function ScopeConfigurationClient({
         displayName?: string;
     }>({});
     const [requestErrorMessage, setRequestErrorMessage] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isDeletePending, setIsDeletePending] = useState(false);
     const editorPanelElementRef = useRef<HTMLDivElement | null>(null);
@@ -211,11 +207,7 @@ export function ScopeConfigurationClient({
     }, [isCreateMode, selectedScope]);
 
     const syncFromDirectory = useCallback(
-        (
-            nextDirectory: TenantScopeDirectoryResponse,
-            preferredKey?: ScopeSelectionKey,
-            nextSuccessMessage: string | null = null
-        ) => {
+        (nextDirectory: TenantScopeDirectoryResponse, preferredKey?: ScopeSelectionKey) => {
             const nextKey = resolveSelectedScopeKey(
                 nextDirectory.item_list,
                 preferredKey ?? null,
@@ -238,7 +230,6 @@ export function ScopeConfigurationClient({
             setFieldError({});
             setRequestErrorMessage(null);
             setIsDeletePending(false);
-            setSuccessMessage(nextSuccessMessage);
 
             return nextKey;
         },
@@ -314,13 +305,11 @@ export function ScopeConfigurationClient({
         }
 
         setRequestErrorMessage(null);
-        setSuccessMessage(null);
         setIsDeletePending((previous) => !previous);
     }, [isSaving, selectedScope]);
 
     const handleSave = useCallback(async () => {
         setRequestErrorMessage(null);
-        setSuccessMessage(null);
 
         if (!isDeletePending && !validate()) {
             return;
@@ -357,7 +346,7 @@ export function ScopeConfigurationClient({
                     updatedDirectory.item_list[0]?.id ??
                     null;
 
-                syncFromDirectory(updatedDirectory, createdScopeId, copy.createdNotice);
+                syncFromDirectory(updatedDirectory, createdScopeId);
                 return;
             }
 
@@ -395,11 +384,7 @@ export function ScopeConfigurationClient({
                         ? "new"
                         : null
                     : selectedScope.id;
-            syncFromDirectory(
-                updatedDirectory,
-                nextSelection,
-                isDeletePending ? copy.deletedNotice : copy.savedNotice
-            );
+            syncFromDirectory(updatedDirectory, nextSelection);
         } catch {
             setRequestErrorMessage(
                 isCreateMode
@@ -413,11 +398,8 @@ export function ScopeConfigurationClient({
         }
     }, [
         copy.createError,
-        copy.createdNotice,
         copy.deleteError,
-        copy.deletedNotice,
         copy.saveError,
-        copy.savedNotice,
         directory.item_list,
         displayName,
         isCreateMode,
@@ -500,12 +482,6 @@ export function ScopeConfigurationClient({
                     data-delete-pending={isDeletePending ? "true" : undefined}
                 >
                     <div className="ui-editor-panel-body">
-                        {successMessage ? (
-                            <div className="ui-status-panel ui-tone-positive ui-status-copy">
-                                {successMessage}
-                            </div>
-                        ) : null}
-
                         {selectedScopeKey ? (
                             <div className="ui-editor-card-flow">
                                 <ConfigurationNameDisplayNameFields
@@ -523,7 +499,6 @@ export function ScopeConfigurationClient({
                                     displayNameLabel={copy.displayNameLabel}
                                     displayNameHint={copy.displayNameHint}
                                     flashActive={isEditorFlashActive}
-                                    onAfterFieldEdit={() => setSuccessMessage(null)}
                                 />
 
                                 {!isCreateMode && selectedScope ? (

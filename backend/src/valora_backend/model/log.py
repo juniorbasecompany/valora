@@ -40,17 +40,17 @@ class Log(Base):
         autoincrement=True,
         comment="Identificador do log.",
     )
-    account_id: Mapped[int] = mapped_column(
+    account_id: Mapped[int | None] = mapped_column(
         BigInteger,
-        ForeignKey("account.id", onupdate="CASCADE", ondelete="CASCADE"),
-        nullable=False,
-        comment="Ligação com a conta do usuário que fez a modificação.",
+        ForeignKey("account.id", onupdate="CASCADE", ondelete="SET NULL"),
+        nullable=True,
+        comment="Conta do usuário que originou o evento. NULL após exclusão da conta.",
     )
-    tenant_id: Mapped[int] = mapped_column(
+    tenant_id: Mapped[int | None] = mapped_column(
         BigInteger,
-        ForeignKey("tenant.id", onupdate="CASCADE", ondelete="CASCADE"),
-        nullable=False,
-        comment="Ligação com o licenciado.",
+        ForeignKey("tenant.id", onupdate="CASCADE", ondelete="SET NULL"),
+        nullable=True,
+        comment="Licenciado ao qual o evento se refere. NULL após exclusão do licenciado.",
     )
     table_name: Mapped[str] = mapped_column(
         Text,

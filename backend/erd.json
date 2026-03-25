@@ -589,7 +589,7 @@
         {
           "id": "account_id",
           "name": "account_id",
-          "comment": "Ligação com a conta do usuário que fez a modificação",
+          "comment": "Conta do usuário que originou o evento. NULL após exclusão da conta (ON DELETE SET NULL).",
           "type": "BIGINT",
           "default": "",
           "check": "",
@@ -603,7 +603,7 @@
         {
           "id": "tenant_id",
           "name": "tenant_id",
-          "comment": "Ligação com o licenciado que fez a ligação.",
+          "comment": "Licenciado ao qual o evento se refere. NULL após exclusão do licenciado (ON DELETE SET NULL).",
           "type": "BIGINT",
           "default": "",
           "check": "",

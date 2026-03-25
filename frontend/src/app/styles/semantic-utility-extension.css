@@ -387,7 +387,7 @@
 
 .ui-directory-list {
     display: grid;
-    gap: 0.25rem;
+    gap: 1rem;
 }
 
 .ui-directory-entry {

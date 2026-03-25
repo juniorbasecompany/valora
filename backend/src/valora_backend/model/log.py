@@ -26,6 +26,11 @@ class Log(Base):
             "action_type IN ('I', 'U', 'D')",
             name="log_action_type_chk",
         ),
+        CheckConstraint(
+            "(action_type = 'D' AND \"row\" IS NULL) "
+            "OR (action_type IN ('I', 'U') AND \"row\" IS NOT NULL)",
+            name="log_row_payload_by_action_chk",
+        ),
         {"comment": "Registra modificações feitas nas demais tabelas."},
     )
 
@@ -57,11 +62,11 @@ class Log(Base):
         nullable=False,
         comment="Tipo da modificação: I (insert), U (update), D (delete).",
     )
-    row_payload: Mapped[Any] = mapped_column(
+    row_payload: Mapped[Any | None] = mapped_column(
         "row",
         JSONB,
-        nullable=False,
-        comment="Conteúdo da linha; JSON vazio em caso de delete.",
+        nullable=True,
+        comment="Conteúdo da linha. NULL em caso de delete.",
     )
     moment_utc: Mapped[datetime] = mapped_column(
         DateTime(timezone=False),

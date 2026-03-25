@@ -125,23 +125,6 @@
         "title": "Scope",
         "description": "Concentrates the minimum structure that will support later modules and records."
       }
-    },
-    "queue": {
-      "organization": {
-        "title": "Tenant registration",
-        "description": "First real screen to be delivered inside the configuration area.",
-        "status": "available"
-      },
-      "member": {
-        "title": "Member registration",
-        "description": "Comes right after to connect users to the initial organizational context.",
-        "status": "available"
-      },
-      "scope": {
-        "title": "Scope registration",
-        "description": "Closes the minimum structural foundation before advancing to operational modules.",
-        "status": "available"
-      }
     }
   },
   "ModulePlaceholderPage": {

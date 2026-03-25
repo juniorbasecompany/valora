@@ -3,7 +3,6 @@ import { getTranslations } from "next-intl/server";
 import { InfoCard } from "@/component/app-shell/info-card";
 import { PageHeader } from "@/component/app-shell/page-header";
 import { StatusPanel } from "@/component/app-shell/status-panel";
-import { SetupStepCard } from "@/component/home/setup-step-card";
 import { BuildingIcon, ScopeIcon, UsersIcon } from "@/component/ui/ui-icons";
 
 type ConfigurationPageProps = {
@@ -52,36 +51,6 @@ export default async function ConfigurationPage({ params }: ConfigurationPagePro
                     iconSlot={<ScopeIcon className="ui-icon" />}
                     actionHref={scopeEditorHref}
                     actionLabel={t("openScopeEditor")}
-                />
-            </section>
-
-            <section className="ui-panel ui-panel-stack">
-                <SetupStepCard
-                    title={t("queue.organization.title")}
-                    description={t("queue.organization.description")}
-                    statusLabel={t("queue.organization.status")}
-                    tone="attention"
-                    actionHref={tenantEditorHref}
-                    actionLabel={t("openTenantEditor")}
-                    iconSlot={<BuildingIcon className="ui-icon" />}
-                />
-                <SetupStepCard
-                    title={t("queue.member.title")}
-                    description={t("queue.member.description")}
-                    statusLabel={t("queue.member.status")}
-                    tone="attention"
-                    actionHref={memberEditorHref}
-                    actionLabel={t("openMemberEditor")}
-                    iconSlot={<UsersIcon className="ui-icon" />}
-                />
-                <SetupStepCard
-                    title={t("queue.scope.title")}
-                    description={t("queue.scope.description")}
-                    statusLabel={t("queue.scope.status")}
-                    tone="attention"
-                    actionHref={scopeEditorHref}
-                    actionLabel={t("openScopeEditor")}
-                    iconSlot={<ScopeIcon className="ui-icon" />}
                 />
             </section>
         </section>

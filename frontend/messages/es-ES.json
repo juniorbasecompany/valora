@@ -125,23 +125,6 @@
         "title": "Alcance",
         "description": "Concentra la estructura mínima que servirá de base para los módulos y registros posteriores."
       }
-    },
-    "queue": {
-      "organization": {
-        "title": "Registro de licenciatario",
-        "description": "Primera pantalla real que se entregará dentro del área de configuración.",
-        "status": "disponible"
-      },
-      "member": {
-        "title": "Registro de miembros",
-        "description": "Viene justo después para conectar a los usuarios con el contexto organizativo inicial.",
-        "status": "disponible"
-      },
-      "scope": {
-        "title": "Registro de alcance",
-        "description": "Cierra la base estructural mínima antes de avanzar hacia los módulos operativos.",
-        "status": "disponible"
-      }
     }
   },
   "ModulePlaceholderPage": {

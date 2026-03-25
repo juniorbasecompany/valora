@@ -125,23 +125,6 @@
         "title": "Escopo",
         "description": "Concentra a estrutura mínima que servirá de base para os módulos e cadastros posteriores."
       }
-    },
-    "queue": {
-      "organization": {
-        "title": "Cadastro de licenciado",
-        "description": "Primeira tela real a ser entregue dentro da área de configuração.",
-        "status": "disponível"
-      },
-      "member": {
-        "title": "Cadastro de membros",
-        "description": "Entra logo depois para ligar usuários ao contexto organizacional inicial.",
-        "status": "disponível"
-      },
-      "scope": {
-        "title": "Cadastro de escopo",
-        "description": "Fecha a base estrutural mínima antes do avanço para módulos operacionais.",
-        "status": "disponível"
-      }
     }
   },
   "ModulePlaceholderPage": {

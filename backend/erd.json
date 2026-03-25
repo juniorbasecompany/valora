@@ -4,8 +4,8 @@
       "id": "tenant",
       "name": "tenant",
       "comment": "Este é o licenciado que está contratando o sistema.",
-      "x": -561.6680610101716,
-      "y": -368.13934918116547,
+      "x": -566.7990790845206,
+      "y": -203.09160112294114,
       "locked": false,
       "fields": [
         {
@@ -55,9 +55,9 @@
     {
       "id": "account",
       "name": "account",
-      "comment": "Esté a conta do usuário do sistema.",
-      "x": 425.5650603701099,
-      "y": -364.63344885426653,
+      "comment": "Esta é a conta do usuário do sistema.",
+      "x": 392.2134428868419,
+      "y": -167.9444226708904,
       "locked": false,
       "fields": [
         {
@@ -279,6 +279,7 @@
         {
           "id": "current_scope_id",
           "name": "current_scope_id",
+          "comment": "Escopo atualmente selecionado pelo usuário dentro do licenciado.",
           "type": "BIGINT",
           "default": "",
           "check": "",
@@ -286,7 +287,6 @@
           "unique": false,
           "notNull": false,
           "increment": false,
-          "comment": "",
           "size": "",
           "values": []
         }
@@ -354,7 +354,7 @@
         {
           "id": "tenant_id",
           "name": "tenant_id",
-          "comment": "",
+          "comment": "Ligação do escopo ao licenciado.",
           "type": "BIGINT",
           "default": "",
           "check": "",
@@ -372,7 +372,7 @@
     {
       "id": "location",
       "name": "location",
-      "comment": "Local onde ocorre a oparação: Granja, Unidade, Aviário, Subdivisão...",
+      "comment": "Local onde ocorre a operação: Granja, Unidade, Aviário, Subdivisão...",
       "indices": [],
       "color": "#ff0000",
       "fields": [
@@ -552,6 +552,115 @@
       ],
       "x": -85.23192874460136,
       "y": 510.82134408336117
+    },
+    {
+      "id": "log",
+      "name": "log",
+      "comment": "Esta tabela registra todas as modificações feitas nas demais tabelas.",
+      "color": "#00aa00",
+      "indices": [],
+      "fields": [
+        {
+          "id": "id",
+          "name": "id",
+          "comment": "Identificador do log",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": true,
+          "increment": true,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "member_id",
+          "name": "member_id",
+          "comment": "Ligação com a pessoa que fez a modificação",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "tenant_id",
+          "name": "tenant_id",
+          "comment": "Ligação com o licenciado que fez a ligação.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "table_name",
+          "name": "table_name",
+          "comment": "Nome da tabela que foi modificada",
+          "type": "TEXT",
+          "default": "",
+          "check": "table_name IN ( 'tenant', 'account', 'member', 'scope', 'location', 'unity' )",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "action_type",
+          "name": "action_type",
+          "comment": "Tipo da modificação feita: insert, update ou delete.",
+          "type": "TEXT",
+          "default": "",
+          "check": "action_type IN ( 'I', 'U', 'D' )",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "row",
+          "name": "row",
+          "comment": "Conteúdo da linha. JSONB vazio em caso de delete.",
+          "type": "JSONB",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "moment_utc",
+          "name": "moment_utc",
+          "comment": "Momento em que ocorreu a ação.",
+          "type": "TIMESTAMP",
+          "default": "now() at time zone 'UTC'",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        }
+      ],
+      "x": -560.1361397830926,
+      "y": -665.0369646216051
     }
   ],
   "relationships": [
@@ -639,6 +748,28 @@
       "startFieldId": "id",
       "endTableId": "unity",
       "endFieldId": "parent_unity_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Cascade"
+    },
+    {
+      "id": "log.tenant_id",
+      "name": "log.tenant_id",
+      "startTableId": "tenant",
+      "startFieldId": "id",
+      "endTableId": "log",
+      "endFieldId": "tenant_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Cascade"
+    },
+    {
+      "id": "log.member_id",
+      "name": "log.member_id",
+      "startTableId": "member",
+      "startFieldId": "id",
+      "endTableId": "log",
+      "endFieldId": "member_id",
       "cardinality": "one_to_many",
       "updateConstraint": "Cascade",
       "deleteConstraint": "Cascade"

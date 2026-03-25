@@ -5,11 +5,17 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import BigInteger, CheckConstraint, DateTime, ForeignKey, Text, text
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, JSON, Text, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
-from valora_backend.model.base import Base
+from valora_backend.model.base import BIGINT, Base
+
+# JSON em SQLite (testes); JSONB em PostgreSQL (produção), alinhado ao DDL.
+_ROW_JSON_TYPE = JSON().with_variant(JSONB(astext_type=Text()), "postgresql")
+# Default portável para create_all (testes em SQLite). Em BD já migrada, o DEFAULT do Postgres
+# pode permanecer (now() AT TIME ZONE 'UTC') via Alembic; omissão da coluna no INSERT aplica o da BD.
+_MOMENT_UTC_SERVER_DEFAULT = text("CURRENT_TIMESTAMP")
 
 
 class Log(Base):
@@ -35,19 +41,19 @@ class Log(Base):
     )
 
     id: Mapped[int] = mapped_column(
-        BigInteger,
+        BIGINT,
         primary_key=True,
         autoincrement=True,
         comment="Identificador do log.",
     )
     account_id: Mapped[int] = mapped_column(
-        BigInteger,
+        BIGINT,
         ForeignKey("account.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
         comment="Ligação com a conta do usuário que fez a modificação.",
     )
     tenant_id: Mapped[int] = mapped_column(
-        BigInteger,
+        BIGINT,
         ForeignKey("tenant.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
         comment="Ligação com o licenciado.",
@@ -64,13 +70,13 @@ class Log(Base):
     )
     row_payload: Mapped[Any | None] = mapped_column(
         "row",
-        JSONB,
+        _ROW_JSON_TYPE,
         nullable=True,
         comment="Conteúdo da linha. NULL em caso de delete.",
     )
     moment_utc: Mapped[datetime] = mapped_column(
         DateTime(timezone=False),
         nullable=False,
-        server_default=text("(now() AT TIME ZONE 'UTC')"),
+        server_default=_MOMENT_UTC_SERVER_DEFAULT,
         comment="Momento em que ocorreu a ação.",
     )

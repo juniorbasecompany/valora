@@ -107,6 +107,49 @@ function buildLocationToneStyle(depth: number, maxDepth: number): CSSProperties 
     } as CSSProperties;
 }
 
+const APP_SHELL_MAIN_SCROLL_SELECTOR = ".ui-shell-main-scroll";
+
+function isOverflowYScrollable(element: HTMLElement): boolean {
+    const style = window.getComputedStyle(element);
+    const overflowY = style.overflowY;
+    const canScroll =
+        overflowY === "auto" ||
+        overflowY === "scroll" ||
+        overflowY === "overlay";
+    return canScroll && element.scrollHeight > element.clientHeight;
+}
+
+function resolveEditorScrollport(panel: HTMLElement): HTMLElement | null {
+    const byShell = panel.closest(APP_SHELL_MAIN_SCROLL_SELECTOR);
+    if (byShell instanceof HTMLElement) {
+        return byShell;
+    }
+    let current: HTMLElement | null = panel.parentElement;
+    while (current) {
+        if (isOverflowYScrollable(current)) {
+            return current;
+        }
+        current = current.parentElement;
+    }
+    return null;
+}
+
+/** Topo do painel já está na zona útil do scrollport (mesma folga que scroll-margin-top do painel). */
+function isEditorPanelTopVisibleInScrollport(panel: HTMLElement): boolean {
+    const scrollport = resolveEditorScrollport(panel);
+    const panelRect = panel.getBoundingClientRect();
+    const marginTopPx =
+        Number.parseFloat(window.getComputedStyle(panel).scrollMarginTop) || 0;
+    const epsilonPx = 0.5;
+
+    if (scrollport) {
+        const scrollRect = scrollport.getBoundingClientRect();
+        return panelRect.top >= scrollRect.top + marginTopPx - epsilonPx;
+    }
+
+    return panelRect.top >= marginTopPx - epsilonPx;
+}
+
 function LocationNestNode({
     item,
     childrenByParent,
@@ -404,11 +447,9 @@ export function LocationConfigurationClient({
             editorFlashStartTimeoutRef.current = null;
 
             const panel = editorPanelElementRef.current;
-            panel?.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-                inline: "nearest"
-            });
+            if (!panel) {
+                return;
+            }
 
             let aborted = false;
             let flashStarted = false;
@@ -416,6 +457,8 @@ export function LocationConfigurationClient({
             const SCROLL_END_FALLBACK_MS = 900;
             const scrollEndSupported =
                 typeof Document !== "undefined" && "onscrollend" in Document.prototype;
+
+            let fallbackTimeoutId = 0;
 
             const cleanupWait = () => {
                 window.clearTimeout(fallbackTimeoutId);
@@ -440,11 +483,22 @@ export function LocationConfigurationClient({
                 startFlash();
             };
 
+            if (isEditorPanelTopVisibleInScrollport(panel)) {
+                startFlash();
+                return;
+            }
+
+            panel.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+                inline: "nearest"
+            });
+
             if (scrollEndSupported) {
                 document.addEventListener("scrollend", onScrollEnd, { passive: true });
             }
             const fallbackMs = scrollEndSupported ? SCROLL_END_FALLBACK_MS : 480;
-            const fallbackTimeoutId = window.setTimeout(startFlash, fallbackMs);
+            fallbackTimeoutId = window.setTimeout(startFlash, fallbackMs);
 
             editorFlashCancelAfterScrollRef.current = () => {
                 aborted = true;

@@ -1,18 +1,18 @@
 ---
 name: export-erd-drawdb
-description: ERD do projeto em formato drawDB. Fonte de verdade em backend/erd/erd.json. Use quando o usuário pedir o ERD para drawdb.app, consultar ou editar o diagrama, incluir ou alterar extensões JSON (ex. tables[].constraints) ou o formato compatível com https://www.drawdb.app/ e https://drawdb-io.github.io/docs/
+description: ERD do projeto em formato drawDB. Fonte de verdade em backend/erd.json. Use quando o usuário pedir o ERD para drawdb.app, consultar ou editar o diagrama, incluir ou alterar extensões JSON (ex. tables[].constraints) ou o formato compatível com https://www.drawdb.app/ e https://drawdb-io.github.io/docs/
 ---
 
 # Exportar ERD no formato JSON do drawDB
 
 ## Objetivo
 
-A fonte de verdade do ERD do projeto é `backend/erd/erd.json` (formato JSON do [drawDB](https://www.drawdb.app/)). O restante do sistema deve ser atualizado conforme o conteúdo de `erd.json`.
+A fonte de verdade do ERD do projeto é `backend/erd.json` (formato JSON do [drawDB](https://www.drawdb.app/)). O restante do sistema deve ser atualizado conforme o conteúdo de `erd.json`.
 
 ## Quando usar
 
 - Usuário pede para consultar ou editar o ERD no drawDB.
-- Usuário pede para **incluir ou alterar** entradas em `tables[].constraints` em `backend/erd/erd.json`.
+- Usuário pede para **incluir ou alterar** entradas em `tables[].constraints` em `backend/erd.json`.
 - Usuário pede para **incluir ou alterar** metadados por coluna em `tables[].fields[]` (ex.: `nullIfEmpty`).
 - Referência ao formato e à localização do diagrama (fonte de verdade).
 
@@ -39,8 +39,8 @@ A fonte de verdade do ERD do projeto é `backend/erd/erd.json` (formato JSON do 
 
 ## Fluxo
 
-1. **Fonte de verdade do diagrama**: `backend/erd/erd.json`. O restante do sistema é atualizado conforme esse arquivo.
-2. **Importar no drawDB**: em https://www.drawdb.app/editor usar **File > Import** e escolher `backend/erd/erd.json`. Edições no drawDB podem ser exportadas de volta para manter o arquivo em sincronia.
+1. **Fonte de verdade do diagrama**: `backend/erd.json`. O restante do sistema é atualizado conforme esse arquivo.
+2. **Importar no drawDB**: em https://www.drawdb.app/editor usar **File > Import** e escolher `backend/erd.json`. Edições no drawDB podem ser exportadas de volta para manter o arquivo em sincronia.
 
 ## Formato JSON (resumo)
 
@@ -69,4 +69,4 @@ Para o esquema JSON completo (tipos, enums, áreas, notas), ver [reference.md](r
 
 ## Manutenção
 
-- A fonte de verdade do diagrama é `backend/erd/erd.json`; edições no drawDB ou no repo devem refletir nesse arquivo.
+- A fonte de verdade do diagrama é `backend/erd.json`; edições no drawDB ou no repo devem refletir nesse arquivo.

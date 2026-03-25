@@ -5,7 +5,7 @@ from pathlib import Path
 
 from valora_backend.model import Base
 
-ERD_PATH = Path(__file__).resolve().parents[1] / "erd" / "erd.json"
+ERD_PATH = Path(__file__).resolve().parents[1] / "erd.json"
 
 
 def test_erd_null_if_empty_matches_orm_metadata_for_mapped_table() -> None:

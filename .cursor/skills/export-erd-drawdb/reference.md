@@ -32,7 +32,7 @@ Referência baseada no código-fonte do [drawdb-io/drawdb](https://github.com/dr
 
 ### Extensão do projeto: `constraints`
 
-Não faz parte do esquema oficial do drawDB; o editor costuma **aceitar e preservar** chaves extras ao importar o JSON. Ao reexportar pelo drawDB, esses atributos podem ser omitidos — tratar `backend/erd/erd.json` no repositório como fonte de verdade.
+Não faz parte do esquema oficial do drawDB; o editor costuma **aceitar e preservar** chaves extras ao importar o JSON. Ao reexportar pelo drawDB, esses atributos podem ser omitidos — tratar `backend/erd.json` no repositório como fonte de verdade.
 
 #### Onde no JSON
 
@@ -106,7 +106,7 @@ Regras de coerência (JSON / diagrama):
 
 ### Extensão do projeto: `fields[].nullIfEmpty`
 
-Não faz parte do esquema oficial do drawDB; tratar `backend/erd/erd.json` no repositório como fonte de verdade para essa convenção.
+Não faz parte do esquema oficial do drawDB; tratar `backend/erd.json` no repositório como fonte de verdade para essa convenção.
 
 #### Onde no JSON
 

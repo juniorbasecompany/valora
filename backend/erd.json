@@ -645,13 +645,13 @@
         {
           "id": "row",
           "name": "row",
-          "comment": "Conteúdo da linha. JSONB vazio em caso de delete.",
+          "comment": "Conteúdo da linha. NULL em caso de delete.",
           "type": "JSONB",
           "default": "",
           "check": "",
           "primary": false,
           "unique": false,
-          "notNull": true,
+          "notNull": false,
           "increment": false,
           "size": "",
           "values": []

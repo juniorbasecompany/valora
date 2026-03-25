@@ -459,6 +459,24 @@
     gap: 1.5rem;
 }
 
+/* Linha nome + descrição: reage ao container do painel (não ao viewport). Cada card usa no máximo metade da linha; com menos de ~400px + gap não cabem dois trilhos de 200px e o segundo desce. */
+.ui-editor-primary-field-row {
+    --ui-editor-primary-field-row-gap: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ui-editor-primary-field-row-gap);
+}
+
+.ui-editor-primary-field-row>.ui-form-section {
+    flex: 1 1 calc(50% - var(--ui-editor-primary-field-row-gap) / 2);
+    min-width: min(400px, 100%);
+    max-width: 100%;
+}
+
+.ui-editor-primary-field-row>.ui-form-section .ui-field {
+    min-width: 0;
+}
+
 .ui-editor-content {
     position: relative;
     z-index: var(--z-content);
@@ -659,19 +677,19 @@
     gap: 1.5rem;
 }
 
-.ui-layout-directory.ui-layout-directory-editor > aside:first-of-type {
+.ui-layout-directory.ui-layout-directory-editor>aside:first-of-type {
     flex: 2 1 18rem;
     min-width: 18rem;
     max-width: 100%;
 }
 
-.ui-layout-directory.ui-layout-directory-editor > .ui-panel-editor {
+.ui-layout-directory.ui-layout-directory-editor>.ui-panel-editor {
     flex: 1.5 1 min(100%, 20rem);
     min-width: min(100%, 20rem);
     max-width: 100%;
 }
 
-.ui-layout-directory.ui-layout-directory-editor > aside.ui-panel-context {
+.ui-layout-directory.ui-layout-directory-editor>aside.ui-panel-context {
     flex: 1 1 18rem;
     min-width: 18rem;
     max-width: 100%;

@@ -1,501 +1,501 @@
 {
-    "AppShell": {
-        "productName": "Valora",
-        "productStage": "Fase 1 em andamento",
-        "workspaceLabel": "Ambiente operacional e auditável",
-        "navigation": {
-            "home": "Início",
-            "location": "Locais",
-            "unity": "Unidades",
-            "operation": "Operações",
-            "record": "Registros",
-            "import": "Importações",
-            "process": "Processamento",
-            "audit": "Auditoria",
-            "configuration": "Configuração",
-            "comingSoon": "em breve"
-        },
-        "topbar": {
-            "tenantLabel": "Licenciado ativo",
-            "accountLabel": "Conta",
-            "localeLabel": "Idioma e região",
-            "openNavigation": "Abrir navegação",
-            "closeNavigation": "Fechar navegação",
-            "signOut": "Sair",
-            "signOutPending": "Saindo..."
-        },
-        "menu": {
-            "tenantSectionLabel": "Licenciado",
-            "tenantTriggerAriaLabel": "Escolher licenciado",
-            "tenantMenuAriaLabel": "Licenciados disponíveis",
-            "scopeTriggerAriaLabel": "Escolher escopo",
-            "scopeMenuAriaLabel": "Escopos disponíveis",
-            "localeFlagTriggerAriaLabel": "Escolher idioma e região",
-            "localeFlagMenuAriaLabel": "Idiomas disponíveis",
-            "configurationLabel": "Configuração",
-            "loadingTenantList": "Carregando...",
-            "tenantListError": "Não foi possível carregar a lista de licenciados.",
-            "emptyTenantList": "Nenhum licenciado disponível.",
-            "switchingTenant": "Trocando licenciado...",
-            "loadingScopeList": "Carregando escopos...",
-            "scopeListError": "Não foi possível carregar a lista de escopos.",
-            "emptyScopeList": "Nenhum escopo disponível.",
-            "switchingScope": "Salvando escopo...",
-            "switchingLocale": "Trocando idioma...",
-            "activeLabel": "ativo",
-            "noScopeLabel": "Sem escopo"
-        }
+  "AppShell": {
+    "productName": "Valora",
+    "productStage": "Fase 1 em andamento",
+    "workspaceLabel": "Ambiente operacional e auditável",
+    "navigation": {
+      "home": "Início",
+      "location": "Locais",
+      "unity": "Unidades",
+      "operation": "Operações",
+      "record": "Registros",
+      "import": "Importações",
+      "process": "Processamento",
+      "audit": "Auditoria",
+      "configuration": "Configuração",
+      "comingSoon": "em breve"
     },
-    "HomePage": {
-        "title": "Bem-vindo ao Valora",
-        "description": "Aqui você encontra uma visão simples do sistema para entender o que ele já faz hoje e como ele apoia sua rotina.",
-        "status": {
-            "title": "Sistema pronto para uso",
-            "description": "Você já pode navegar pelo ambiente, organizar a estrutura e evoluir seus cadastros com segurança."
-        },
-        "context": {
-            "workspace": {
-                "title": "Ambiente atual",
-                "description": "Você está na área protegida do produto, com sessão ativa e tudo preparado para trabalhar com tranquilidade."
-            },
-            "locale": {
-                "title": "Idioma e região",
-                "description": "A plataforma já está preparada para funcionar em mais de um idioma sem perder consistência de navegação."
-            },
-            "entryFlow": {
-                "title": "Fluxo atual",
-                "description": "Ao entrar, o sistema já identifica seu contexto para você continuar do ponto certo, sem ajustes manuais."
-            }
-        },
-        "card": {
-            "tenant": {
-                "title": "Organização e equipe",
-                "description": "Você define quem participa da operação e qual papel cada pessoa terá no dia a dia."
-            },
-            "location": {
-                "title": "Estrutura de locais",
-                "description": "Permite organizar sua operação por unidades e hierarquias, facilitando a visão do todo."
-            },
-            "record": {
-                "title": "Registros organizados",
-                "description": "Centraliza informações importantes do negócio para manter histórico e acompanhamento."
-            },
-            "import": {
-                "title": "Importação de dados",
-                "description": "Ajuda a trazer dados externos para dentro do sistema de forma mais prática e confiável."
-            },
-            "process": {
-                "title": "Processamentos",
-                "description": "Executa rotinas sobre os dados cadastrados para apoiar análises e decisões."
-            },
-            "audit": {
-                "title": "Auditoria e histórico",
-                "description": "Mostra mudanças e evolução dos dados para dar transparência e segurança operacional."
-            }
-        }
+    "topbar": {
+      "tenantLabel": "Licenciado ativo",
+      "accountLabel": "Conta",
+      "localeLabel": "Idioma e região",
+      "openNavigation": "Abrir navegação",
+      "closeNavigation": "Fechar navegação",
+      "signOut": "Sair",
+      "signOutPending": "Saindo..."
     },
-    "ConfigurationPage": {
-        "title": "Organização, quem acessa e em qual contexto",
-        "description": "O Valora separa três ideias antes de qualquer operação do dia a dia: qual é a organização contratante (o licenciado), quem pode agir dentro dela (membros e papéis) e em qual fatia de contexto os dados se organizam, escopos: filiais, projetos, unidades, o que fizer sentido para você. Esta página é o painel onde você mantém esse esqueleto; sem isso definido, cadastros e permissões ficam sem referência clara. A árvore de locais fica na entrada própria do menu lateral e sempre respeita o escopo ativo que você escolhe no cabeçalho.",
-        "openTenantEditor": "Editar licenciado",
-        "openMemberEditor": "Editar membros",
-        "openScopeEditor": "Editar escopos",
-        "cards": {
-            "organization": {
-                "title": "Licenciado",
-                "description": "É a organização contratante do ambiente: o nome que aparece na barra superior, no seletor de licenciado e em outras telas. Aqui você alinha nome de exibição (o que as pessoas veem no dia a dia) e nome completo ou razão social quando precisar de referência formal. As alterações valem para o licenciado ativo na sua sessão; se você administra mais de um, troque pelo menu antes de editar."
-            },
-            "member": {
-                "title": "Membros",
-                "description": "Membro é a pessoa vinculada a este licenciado no sistema: não é só a conta de login, é o vínculo com papel (master, administrador, membro) e situação. Quem consta aqui pode operar o ambiente nesta organização; papéis e status definem o que pode ser alterado, inclusive nesta área de configuração."
-            },
-            "scope": {
-                "title": "Escopo",
-                "description": "Escopo é uma unidade de contexto dentro do licenciado: onde os cadastros e, na sequência, a hierarquia de locais se separam sem se misturar. Pense em filial, obra, site ou projeto, o rótulo é seu, mas a função é sempre isolar dados que não devem aparecer juntos. O escopo selecionado no cabeçalho é o que vale ao trabalhar em locais e nos fluxos que dependem dele."
-            }
-        }
-    },
-    "ModulePlaceholderPage": {
-        "description": "{module} já está ligado à navegação principal e usa esta tela provisória até a primeira entrega funcional do fluxo.",
-        "status": {
-            "title": "Destino navegável disponível",
-            "description": "Esta página permite validar navegação, estado ativo do menu e evolução incremental do módulo."
-        },
-        "cards": {
-            "entry": {
-                "title": "Entrada já conectada",
-                "description": "{module} agora tem URL própria, item ativo na navegação lateral e placeholder clicável para revisão do fluxo."
-            },
-            "state": {
-                "title": "Comportamento visual alinhado",
-                "description": "Hover, seleção e barra lateral seguem o mesmo padrão visual dos demais menus da aplicação."
-            },
-            "next": {
-                "title": "Próxima evolução",
-                "description": "A próxima entrega deste módulo pode substituir este placeholder pela primeira rotina real sem refazer a navegação global."
-            }
-        },
-        "actions": {
-            "home": {
-                "title": "Voltar para o ponto de entrada",
-                "description": "Retorne ao início para revisar o contexto atual e os próximos passos da configuração inicial.",
-                "label": "Ir para Início"
-            },
-            "configuration": {
-                "title": "Abrir Configuração",
-                "description": "Continue pela área administrativa enquanto os fluxos funcionais deste módulo ainda estão em evolução.",
-                "label": "Ir para Configuração"
-            }
-        }
-    },
-    "MemberConfigurationPage": {
-        "title": "Membros",
-        "description": "Edite o cadastro dos membros vinculados ao licenciado ativo. Nome, papel e situação ficam centralizados neste diretório.",
-        "list": {
-            "empty": "Nenhum membro foi encontrado para o licenciado ativo."
-        },
-        "editor": {
-            "selectToEdit": "Selecione um membro na lista para ver e editar os dados."
-        },
-        "history": {
-            "title": "Histórico de alterações",
-            "description": "Veja as alterações mais recentes do cadastro de membros, com quem alterou, quando alterou e o payload gravado no log."
-        },
-        "section": {
-            "profile": {
-                "displayNameLabel": "Nome de exibição",
-                "displayNameHint": "Usado nas áreas internas do licenciado.",
-                "nameLabel": "Nome completo",
-                "nameHint": "Use o nome mais completo para referência administrativa."
-            },
-            "access": {
-                "title": "Acesso",
-                "description": "Papel e situação controlam o alcance do membro neste licenciado.",
-                "emailLabel": "Email",
-                "emailHint": "O email deste vínculo continua governado pela conta autenticada ou pelo convite original.",
-                "roleLabel": "Papel",
-                "statusLabel": "Situação",
-                "accountLinked": "Conta vinculada",
-                "accountPending": "Aguardando vínculo da conta",
-                "accountTopicLabel": "Conta"
-            }
-        },
-        "action": {
-            "cancel": "Cancelar",
-            "delete": "Apagar",
-            "undoDelete": "Desmarcar exclusão",
-            "save": "Salvar",
-            "saving": "Salvando..."
-        },
-        "readOnlyNotice": "Você pode consultar o diretório de membros, mas só membros master ou administrador podem editar cadastros.",
-        "protectedRecordNotice": "Este registro está protegido pelas permissões atuais. Selecione outro membro para editar.",
-        "role": {
-            "master": "Master",
-            "admin": "Administrador",
-            "member": "Membro"
-        },
-        "statusValue": {
-            "ACTIVE": "Ativo",
-            "PENDING": "Pendente",
-            "DISABLED": "Desativado"
-        },
-        "error": {
-            "save": "Não foi possível salvar o membro. Tente novamente.",
-            "delete": "Não foi possível apagar o membro. Tente novamente.",
-            "validation": "Este campo não pode ficar vazio."
-        },
-        "discardConfirm": "Descartar alterações não salvas?"
-    },
-    "ScopeConfigurationPage": {
-        "title": "Escopos",
-        "description": "Edite a base estrutural mínima do licenciado ativo. Cada escopo define um recorte inicial que sustentará os cadastros e módulos posteriores.",
-        "empty": "Nenhum escopo foi encontrado para o licenciado ativo.",
-        "history": {
-            "title": "Histórico de alterações",
-            "description": "Veja as alterações mais recentes dos escopos do licenciado, com data, usuário, tipo de ação e o JSON salvo no log."
-        },
-        "section": {
-            "identity": {
-                "nameLabel": "Nome do escopo",
-                "nameHint": "Use um rótulo curto para identificar o escopo, como Aves, Soja ou Leite.",
-                "displayNameLabel": "Descrição do escopo",
-                "displayNameHint": "Explique o recorte do escopo com mais contexto, como Aves para produção de ovos."
-            },
-            "info": {
-                "title": "Informações",
-                "description": "Resumo do escopo em foco: valores salvos no servidor e o que esta sessão pode alterar.",
-                "nameRegisteredLabel": "Nome salvo",
-                "displayRegisteredLabel": "Descrição salva",
-                "canEditLabel": "Pode editar",
-                "canDeleteLabel": "Pode apagar",
-                "yes": "Sim",
-                "no": "Não",
-                "createLead": "Novo escopo estrutural",
-                "createHint": "Você está definindo um novo recorte para o licenciado ativo. Salve para registrá-lo no diretório."
-            }
-        },
-        "action": {
-            "cancel": "Cancelar",
-            "new": "Novo escopo",
-            "delete": "Apagar",
-            "undoDelete": "Desmarcar exclusão",
-            "save": "Salvar",
-            "saving": "Salvando..."
-        },
-        "readOnlyNotice": "Você pode consultar o diretório de escopos, mas só membros master ou administrador podem criar ou editar cadastros estruturais.",
-        "selectPrompt": "Selecione um escopo na lista para editar o cadastro estrutural.",
-        "error": {
-            "save": "Não foi possível salvar o escopo. Tente novamente.",
-            "create": "Não foi possível criar o escopo. Tente novamente.",
-            "delete": "Não foi possível apagar o escopo. Tente novamente.",
-            "validation": "Este campo não pode ficar vazio."
-        },
-        "discardConfirm": "Descartar alterações não salvas?"
-    },
-    "LocationConfigurationPage": {
-        "title": "Locais",
-        "description": "Neste painel você vê sua árvore de locais. À esquerda aparece a hierarquia; ao lado, o formulário para editar o nome e outras informações sobre o local, além do painel de histórico. Selecione um local na árvore para editá-lo ou clique no botão Novo para criar uma nova divisão naquele local.",
-        "list": {
-            "empty": "Nenhum local foi encontrado para o escopo selecionado.",
-            "emptyScope": "Crie um escopo antes de editar a hierarquia de locais.",
-            "missingCurrentScope": "Defina um escopo ativo no seletor do cabeçalho antes de editar a hierarquia de locais."
-        },
-        "history": {
-            "title": "Histórico de alterações",
-            "description": "Veja as alterações mais recentes da tabela de locais, incluindo data, usuário, tipo de ação e o JSON gravado no log."
-        },
-        "section": {
-            "identity": {
-                "nameLabel": "Nome do local",
-                "nameHint": "Use um nome curto para identificar esta localização. Por exemplo: Rio Verde em vez de Fazenda Rio Verde, Piratini em vez de Aviário Piratini ou Oeste em vez de Talhão Oeste.",
-                "displayNameLabel": "Descrição do local",
-                "displayNameHint": "Informe o nome completo do local. Por exemplo: Fazenda Rio Verde em vez de Rio Verde, Aviário Piratini em vez de Piratini ou Talhão Oeste em vez de apenas Oeste."
-            },
-            "structure": {
-                "title": "Informações",
-                "description": "Resumo da localização em foco, com o nível na hierarquia, a ordem entre irmãos do mesmo local.",
-                "levelLabel": "Nível hierárquico",
-                "levelHint": "Contado a partir da raiz do escopo (1 = raiz).",
-                "parentLabel": "Local pai",
-                "parentRoot": "Raiz do escopo (sem pai acima)",
-                "orderLabel": "Ordem entre irmãos",
-                "orderHintEdit": "Usada ao listar locais no mesmo nível.",
-                "orderHintCreate": "Será definida ao salvar o novo local.",
-                "orderPending": "-"
-            }
-        },
-        "dragDropHint": "Arraste a alça para reordenar antes ou depois de um irmão, ou solte sobre uma linha para mover para baixo desse local.",
-        "action": {
-            "cancel": "Cancelar",
-            "newLabel": "Novo",
-            "newChild": "Novo filho",
-            "newSibling": "Novo irmão",
-            "delete": "Apagar",
-            "undoDelete": "Desmarcar exclusão",
-            "save": "Salvar",
-            "saving": "Salvando...",
-            "moveUp": "Mover para cima",
-            "moveDown": "Mover para baixo"
-        },
-        "readOnlyNotice": "Você pode consultar o diretório de locais, mas só membros master ou administrador podem criar ou editar cadastros hierárquicos.",
-        "createdNotice": "Local criado com sucesso.",
-        "deletedNotice": "Local apagado com sucesso.",
-        "movedNotice": "Local movido com sucesso.",
-        "error": {
-            "load": "Não foi possível carregar o diretório de locais. Tente novamente.",
-            "save": "Não foi possível salvar o local. Tente novamente.",
-            "create": "Não foi possível criar o local. Tente novamente.",
-            "delete": "Não foi possível apagar o local. Tente novamente.",
-            "move": "Não foi possível mover o local. Tente novamente.",
-            "validation": "Este campo não pode ficar vazio."
-        },
-        "discardConfirm": "Descartar alterações não salvas?"
-    },
-    "UnityConfigurationPage": {
-        "title": "Unidades produtivas",
-        "description": "Neste painel você vê a árvore de unidades produtivas do escopo. À esquerda está a hierarquia; ao lado, o formulário para editar nome e descrição, além do painel de histórico. Selecione um item na árvore para editá-lo ou use Novo para criar outro nível abaixo do item escolhido.",
-        "list": {
-            "empty": "Nenhuma unidade produtiva foi encontrada para o escopo selecionado.",
-            "emptyScope": "Crie um escopo antes de editar unidades produtivas.",
-            "missingCurrentScope": "Defina um escopo ativo no seletor do cabeçalho antes de editar unidades produtivas."
-        },
-        "history": {
-            "title": "Histórico de alterações",
-            "description": "Veja as alterações mais recentes da tabela de unidades produtivas, com data, usuário, tipo de ação e o JSON gravado no log."
-        },
-        "section": {
-            "identity": {
-                "nameLabel": "Nome curto",
-                "nameHint": "Use um nome curto para identificar a unidade produtiva no dia a dia (ex.: Branca, Fêmea, Matriz).",
-                "displayNameLabel": "Descrição",
-                "displayNameHint": "Descreva com mais contexto o que essa unidade produtiva representa na operação."
-            },
-            "structure": {
-                "title": "Informações",
-                "description": "Resumo do item em foco: nível na hierarquia, ordem entre irmãos e vínculo com o pai.",
-                "levelLabel": "Nível hierárquico",
-                "levelHint": "Contado a partir da raiz do escopo (1 = raiz).",
-                "parentLabel": "Unidade pai",
-                "parentRoot": "Raiz do escopo (sem pai acima)",
-                "orderLabel": "Ordem entre irmãos",
-                "orderHintEdit": "Usada ao listar itens no mesmo nível.",
-                "orderHintCreate": "Será definida ao salvar o novo cadastro.",
-                "orderPending": "-"
-            }
-        },
-        "dragDropHint": "Arraste a alça para reordenar antes ou depois de um irmão, ou solte sobre uma linha para mover para baixo desse item.",
-        "action": {
-            "cancel": "Cancelar",
-            "newLabel": "Novo",
-            "newChild": "Novo filho",
-            "newSibling": "Novo irmão",
-            "delete": "Apagar",
-            "undoDelete": "Desmarcar exclusão",
-            "save": "Salvar",
-            "saving": "Salvando...",
-            "moveUp": "Mover para cima",
-            "moveDown": "Mover para baixo"
-        },
-        "readOnlyNotice": "Você pode consultar as unidades produtivas, mas só membros master ou administrador podem criar ou editar cadastros hierárquicos.",
-        "createdNotice": "Unidade produtiva criada com sucesso.",
-        "deletedNotice": "Unidade produtiva apagada com sucesso.",
-        "movedNotice": "Unidade produtiva movida com sucesso.",
-        "error": {
-            "load": "Não foi possível carregar o diretório. Tente novamente.",
-            "save": "Não foi possível salvar. Tente novamente.",
-            "create": "Não foi possível criar. Tente novamente.",
-            "delete": "Não foi possível apagar. Tente novamente.",
-            "move": "Não foi possível mover. Tente novamente.",
-            "validation": "Este campo não pode ficar vazio."
-        },
-        "discardConfirm": "Descartar alterações não salvas?"
-    },
-    "TenantConfigurationPage": {
-        "title": "Licenciado",
-        "description": "Estes campos identificam a organização contratante no ambiente, na barra superior e nas listas. As alterações valem para o licenciado ativo da sua sessão.",
-        "editor": {
-            "selectToEdit": "Selecione o licenciado na lista para ver e editar os dados."
-        },
-        "history": {
-            "title": "Histórico de alterações",
-            "description": "Veja as alterações mais recentes do licenciado ativo, com data, usuário, tipo de ação e o JSON gravado no log."
-        },
-        "section": {
-            "display": {
-                "title": "Nome na interface",
-                "description": "Rótulo curto exibido na aplicação para o licenciado ativo.",
-                "nameLabel": "Nome de exibição",
-                "nameHint": "Usado na barra superior, na troca de licenciado e em outras áreas de navegação."
-            },
-            "legal": {
-                "title": "Nome completo oficial",
-                "description": "Nome oficial ou completo da organização contratante.",
-                "nameLabel": "Nome completo",
-                "nameHint": "Use a denominação formal; pode coincidir com o nome de exibição quando não houver um rótulo mais curto."
-            }
-        },
-        "metadata": {
-            "idLabel": "Identificador interno",
-            "sectionTitle": "Referência no sistema",
-            "sectionDescription": "Identificador estável do licenciado na base de dados."
-        },
-        "action": {
-            "cancel": "Cancelar",
-            "delete": "Apagar",
-            "undoDelete": "Desmarcar exclusão",
-            "save": "Salvar",
-            "saving": "Salvando..."
-        },
-        "readOnlyNotice": "Você pode ver os dados do licenciado, mas só membros master ou administrador podem editar.",
-        "error": {
-            "save": "Não foi possível salvar. Tente novamente.",
-            "delete": "Não foi possível apagar o licenciado. Tente novamente.",
-            "validation": "Este campo não pode ficar vazio."
-        },
-        "discardConfirm": "Descartar alterações não salvas?"
-    },
-    "AuditHistory": {
-        "loading": "Carregando histórico...",
-        "empty": "Nenhum registro de histórico encontrado.",
-        "unknownUser": "Usuário não encontrado",
-        "entryLabel": "Log #{id}",
-        "metaLine": "{actor} em {moment}",
-        "lineInsert": "Inclusão",
-        "lineDelete": "Exclusão",
-        "verbInsert": "incluiu",
-        "verbUpdate": "modificou",
-        "verbDelete": "apagou",
-        "srBeforeAfter": "Valor anterior: {before}. Valor atual: {after}.",
-        "diffUnavailable": "Não foi possível comparar este update com o registro anterior.",
-        "diffEmpty": "Nenhuma diferença foi detectada em relação ao registro anterior.",
-        "deletedNote": "Este registro representa uma exclusão. O log não possui payload da row para este caso.",
-        "action": {
-            "insert": "Inclusão",
-            "update": "Atualização",
-            "delete": "Exclusão",
-            "loadMore": "Ver mais",
-            "loadingMore": "Carregando..."
-        },
-        "error": {
-            "load": "Não foi possível carregar o histórico. Tente novamente."
-        }
-    },
-    "LoginPage": {
-        "eyebrow": "Entrada do sistema",
-        "title": "Autentique-se para entrar no ambiente operacional do Valora.",
-        "description": "Use sua conta Google para entrar no Valora. A autenticação já conecta a conta ao vínculo entre conta, licenciado e membro.",
-        "notice": {
-            "authRequired": "Entre na conta para acessar a área protegida da aplicação.",
-            "signedOut": "Sessão encerrada. Entre novamente para continuar."
-        },
-        "cards": {
-            "workspace": {
-                "title": "Ambiente sério desde o começo",
-                "description": "A navegação já está preparada para crescer em módulos sem parecer um modelo genérico de painel."
-            },
-            "traceability": {
-                "title": "Base orientada a rastreabilidade",
-                "description": "A interface nasce pronta para receber histórico, auditoria e explicação contextual nas próximas fases."
-            },
-            "nextStep": {
-                "title": "Próxima entrega útil",
-                "description": "Depois da autenticação, o usuário cairá na página principal e seguirá para a configuração administrativa inicial."
-            }
-        },
-        "form": {
-            "title": "Entrar",
-            "description": "Nesta fase, o acesso inicial do produto acontece por autenticação Google e contexto organizacional real.",
-            "submitIdle": "Carregando autenticação Google...",
-            "submitPending": "Entrando com Google...",
-            "helper": "Se houver apenas um vínculo ativo, a entrada acontece direto no aplicativo. Quando existirem múltiplos vínculos ou convites, o Valora pedirá a escolha do licenciado.",
-            "accessPolicy": "No primeiro acesso sem vínculo nem convite, o Valora cria automaticamente um contexto inicial para você concluir a configuração administrativa.",
-            "googleUnavailable": "A entrada com Google não está disponível porque o identificador público do cliente Google ainda não foi configurado no ambiente.",
-            "error": "Não foi possível concluir a entrada com Google. Tente novamente.",
-            "rememberMeLabel": "Permanecer autenticado neste dispositivo"
-        }
-    },
-    "SelectTenantPage": {
-        "loading": "Carregando opções de acesso...",
-        "title": "Escolha como deseja entrar no Valora.",
-        "description": "Sua conta Google foi validada. Agora falta definir o licenciado ativo que vai governar o contexto operacional da sessão.",
-        "activeListTitle": "Organizações ativas",
-        "inviteListTitle": "Convites pendentes",
-        "createTitle": "Preparando seu contexto inicial",
-        "createDescription": "Não encontramos licenciado ativo nem convite pendente. O Valora pode criar o primeiro contexto para você seguir direto para a configuração administrativa.",
-        "createAction": "Criar licenciado inicial",
-        "createPending": "Criando licenciado inicial...",
-        "acceptAction": "Aceitar convite",
-        "rejectAction": "Recusar convite",
-        "selectAction": "Entrar nesse licenciado",
-        "processing": "Processando...",
-        "empty": "Nenhuma opção de acesso foi encontrada para esta conta.",
-        "backToLogin": "Voltar para a entrada",
-        "genericError": "Não foi possível concluir esta ação agora. Tente novamente."
-    },
-    "State": {
-        "loadingDescription": "Carregando a base da aplicação.",
-        "errorTitle": "Não foi possível carregar esta área.",
-        "errorDescription": "Ocorreu um problema ao renderizar a interface. Você pode tentar novamente sem sair do fluxo atual.",
-        "retry": "Tentar novamente"
+    "menu": {
+      "tenantSectionLabel": "Licenciado",
+      "tenantTriggerAriaLabel": "Escolher licenciado",
+      "tenantMenuAriaLabel": "Licenciados disponíveis",
+      "scopeTriggerAriaLabel": "Escolher escopo",
+      "scopeMenuAriaLabel": "Escopos disponíveis",
+      "localeFlagTriggerAriaLabel": "Escolher idioma e região",
+      "localeFlagMenuAriaLabel": "Idiomas disponíveis",
+      "configurationLabel": "Configuração",
+      "loadingTenantList": "Carregando...",
+      "tenantListError": "Não foi possível carregar a lista de licenciados.",
+      "emptyTenantList": "Nenhum licenciado disponível.",
+      "switchingTenant": "Trocando licenciado...",
+      "loadingScopeList": "Carregando escopos...",
+      "scopeListError": "Não foi possível carregar a lista de escopos.",
+      "emptyScopeList": "Nenhum escopo disponível.",
+      "switchingScope": "Salvando escopo...",
+      "switchingLocale": "Trocando idioma...",
+      "activeLabel": "ativo",
+      "noScopeLabel": "Sem escopo"
     }
+  },
+  "HomePage": {
+    "title": "Bem-vindo ao Valora",
+    "description": "Aqui você encontra uma visão simples do sistema para entender o que ele já faz hoje e como ele apoia sua rotina.",
+    "status": {
+      "title": "Sistema pronto para uso",
+      "description": "Você já pode navegar pelo ambiente, organizar a estrutura e evoluir seus cadastros com segurança."
+    },
+    "context": {
+      "workspace": {
+        "title": "Ambiente atual",
+        "description": "Você está na área protegida do produto, com sessão ativa e tudo preparado para trabalhar com tranquilidade."
+      },
+      "locale": {
+        "title": "Idioma e região",
+        "description": "A plataforma já está preparada para funcionar em mais de um idioma sem perder consistência de navegação."
+      },
+      "entryFlow": {
+        "title": "Fluxo atual",
+        "description": "Ao entrar, o sistema já identifica seu contexto para você continuar do ponto certo, sem ajustes manuais."
+      }
+    },
+    "card": {
+      "tenant": {
+        "title": "Organização e equipe",
+        "description": "Você define quem participa da operação e qual papel cada pessoa terá no dia a dia."
+      },
+      "location": {
+        "title": "Estrutura de locais",
+        "description": "Permite organizar sua operação por unidades e hierarquias, facilitando a visão do todo."
+      },
+      "record": {
+        "title": "Registros organizados",
+        "description": "Centraliza informações importantes do negócio para manter histórico e acompanhamento."
+      },
+      "import": {
+        "title": "Importação de dados",
+        "description": "Ajuda a trazer dados externos para dentro do sistema de forma mais prática e confiável."
+      },
+      "process": {
+        "title": "Processamentos",
+        "description": "Executa rotinas sobre os dados cadastrados para apoiar análises e decisões."
+      },
+      "audit": {
+        "title": "Auditoria e histórico",
+        "description": "Mostra mudanças e evolução dos dados para dar transparência e segurança operacional."
+      }
+    }
+  },
+  "ConfigurationPage": {
+    "title": "Organização, quem acessa e em qual contexto",
+    "description": "O Valora separa três ideias antes de qualquer operação do dia a dia: qual é a organização contratante (o licenciado), quem pode agir dentro dela (membros e papéis) e em qual fatia de contexto os dados se organizam, escopos: filiais, projetos, unidades, o que fizer sentido para você. Esta página é o painel onde você mantém esse esqueleto; sem isso definido, cadastros e permissões ficam sem referência clara. A árvore de locais fica na entrada própria do menu lateral e sempre respeita o escopo ativo que você escolhe no cabeçalho.",
+    "openTenantEditor": "Editar licenciado",
+    "openMemberEditor": "Editar membros",
+    "openScopeEditor": "Editar escopos",
+    "cards": {
+      "organization": {
+        "title": "Licenciado",
+        "description": "É a organização contratante do ambiente: o nome que aparece na barra superior, no seletor de licenciado e em outras telas. Aqui você alinha nome de exibição (o que as pessoas veem no dia a dia) e nome completo ou razão social quando precisar de referência formal. As alterações valem para o licenciado ativo na sua sessão; se você administra mais de um, troque pelo menu antes de editar."
+      },
+      "member": {
+        "title": "Membros",
+        "description": "Membro é a pessoa vinculada a este licenciado no sistema: não é só a conta de login, é o vínculo com papel (master, administrador, membro) e situação. Quem consta aqui pode operar o ambiente nesta organização; papéis e status definem o que pode ser alterado, inclusive nesta área de configuração."
+      },
+      "scope": {
+        "title": "Escopo",
+        "description": "Escopo é uma unidade de contexto dentro do licenciado: onde os cadastros e, na sequência, a hierarquia de locais se separam sem se misturar. Pense em filial, obra, site ou projeto, o rótulo é seu, mas a função é sempre isolar dados que não devem aparecer juntos. O escopo selecionado no cabeçalho é o que vale ao trabalhar em locais e nos fluxos que dependem dele."
+      }
+    }
+  },
+  "ModulePlaceholderPage": {
+    "description": "{module} já está ligado à navegação principal e usa esta tela provisória até a primeira entrega funcional do fluxo.",
+    "status": {
+      "title": "Destino navegável disponível",
+      "description": "Esta página permite validar navegação, estado ativo do menu e evolução incremental do módulo."
+    },
+    "cards": {
+      "entry": {
+        "title": "Entrada já conectada",
+        "description": "{module} agora tem URL própria, item ativo na navegação lateral e placeholder clicável para revisão do fluxo."
+      },
+      "state": {
+        "title": "Comportamento visual alinhado",
+        "description": "Hover, seleção e barra lateral seguem o mesmo padrão visual dos demais menus da aplicação."
+      },
+      "next": {
+        "title": "Próxima evolução",
+        "description": "A próxima entrega deste módulo pode substituir este placeholder pela primeira rotina real sem refazer a navegação global."
+      }
+    },
+    "actions": {
+      "home": {
+        "title": "Voltar para o ponto de entrada",
+        "description": "Retorne ao início para revisar o contexto atual e os próximos passos da configuração inicial.",
+        "label": "Ir para Início"
+      },
+      "configuration": {
+        "title": "Abrir Configuração",
+        "description": "Continue pela área administrativa enquanto os fluxos funcionais deste módulo ainda estão em evolução.",
+        "label": "Ir para Configuração"
+      }
+    }
+  },
+  "MemberConfigurationPage": {
+    "title": "Membros",
+    "description": "Edite o cadastro dos membros vinculados ao licenciado ativo. Nome, papel e situação ficam centralizados neste diretório.",
+    "list": {
+      "empty": "Nenhum membro foi encontrado para o licenciado ativo."
+    },
+    "editor": {
+      "selectToEdit": "Selecione um membro na lista para ver e editar os dados."
+    },
+    "history": {
+      "title": "Histórico de alterações",
+      "description": "Consulte o histórico do cadastro de membros: quem alterou, quando e um resumo claro do que mudou."
+    },
+    "section": {
+      "profile": {
+        "displayNameLabel": "Nome de exibição",
+        "displayNameHint": "Usado nas áreas internas do licenciado.",
+        "nameLabel": "Nome completo",
+        "nameHint": "Use o nome mais completo para referência administrativa."
+      },
+      "access": {
+        "title": "Acesso",
+        "description": "Papel e situação controlam o alcance do membro neste licenciado.",
+        "emailLabel": "Email",
+        "emailHint": "O email deste vínculo continua governado pela conta autenticada ou pelo convite original.",
+        "roleLabel": "Papel",
+        "statusLabel": "Situação",
+        "accountLinked": "Conta vinculada",
+        "accountPending": "Aguardando vínculo da conta",
+        "accountTopicLabel": "Conta"
+      }
+    },
+    "action": {
+      "cancel": "Cancelar",
+      "delete": "Apagar",
+      "undoDelete": "Desmarcar exclusão",
+      "save": "Salvar",
+      "saving": "Salvando..."
+    },
+    "readOnlyNotice": "Você pode consultar o diretório de membros, mas só membros master ou administrador podem editar cadastros.",
+    "protectedRecordNotice": "Este registro está protegido pelas permissões atuais. Selecione outro membro para editar.",
+    "role": {
+      "master": "Master",
+      "admin": "Administrador",
+      "member": "Membro"
+    },
+    "statusValue": {
+      "ACTIVE": "Ativo",
+      "PENDING": "Pendente",
+      "DISABLED": "Desativado"
+    },
+    "error": {
+      "save": "Não foi possível salvar o membro. Tente novamente.",
+      "delete": "Não foi possível apagar o membro. Tente novamente.",
+      "validation": "Este campo não pode ficar vazio."
+    },
+    "discardConfirm": "Descartar alterações não salvas?"
+  },
+  "ScopeConfigurationPage": {
+    "title": "Escopos",
+    "description": "Edite a base estrutural mínima do licenciado ativo. Cada escopo define um recorte inicial que sustentará os cadastros e módulos posteriores.",
+    "empty": "Nenhum escopo foi encontrado para o licenciado ativo.",
+    "history": {
+      "title": "Histórico de alterações",
+      "description": "Consulte o histórico dos escopos deste licenciado: quem alterou, quando e um resumo do que mudou."
+    },
+    "section": {
+      "identity": {
+        "nameLabel": "Nome do escopo",
+        "nameHint": "Use um rótulo curto para identificar o escopo, como Aves, Soja ou Leite.",
+        "displayNameLabel": "Descrição do escopo",
+        "displayNameHint": "Explique o recorte do escopo com mais contexto, como Aves para produção de ovos."
+      },
+      "info": {
+        "title": "Informações",
+        "description": "Resumo do escopo em foco: valores salvos no servidor e o que esta sessão pode alterar.",
+        "nameRegisteredLabel": "Nome salvo",
+        "displayRegisteredLabel": "Descrição salva",
+        "canEditLabel": "Pode editar",
+        "canDeleteLabel": "Pode apagar",
+        "yes": "Sim",
+        "no": "Não",
+        "createLead": "Novo escopo estrutural",
+        "createHint": "Você está definindo um novo recorte para o licenciado ativo. Salve para registrá-lo no diretório."
+      }
+    },
+    "action": {
+      "cancel": "Cancelar",
+      "new": "Novo escopo",
+      "delete": "Apagar",
+      "undoDelete": "Desmarcar exclusão",
+      "save": "Salvar",
+      "saving": "Salvando..."
+    },
+    "readOnlyNotice": "Você pode consultar o diretório de escopos, mas só membros master ou administrador podem criar ou editar cadastros estruturais.",
+    "selectPrompt": "Selecione um escopo na lista para editar o cadastro estrutural.",
+    "error": {
+      "save": "Não foi possível salvar o escopo. Tente novamente.",
+      "create": "Não foi possível criar o escopo. Tente novamente.",
+      "delete": "Não foi possível apagar o escopo. Tente novamente.",
+      "validation": "Este campo não pode ficar vazio."
+    },
+    "discardConfirm": "Descartar alterações não salvas?"
+  },
+  "LocationConfigurationPage": {
+    "title": "Locais",
+    "description": "Neste painel você vê sua árvore de locais. À esquerda aparece a hierarquia; ao lado, o formulário para editar o nome e outras informações sobre o local, além do painel de histórico. Selecione um local na árvore para editá-lo ou clique no botão Novo para criar uma nova divisão naquele local.",
+    "list": {
+      "empty": "Nenhum local foi encontrado para o escopo selecionado.",
+      "emptyScope": "Crie um escopo antes de editar a hierarquia de locais.",
+      "missingCurrentScope": "Defina um escopo ativo no seletor do cabeçalho antes de editar a hierarquia de locais."
+    },
+    "history": {
+      "title": "Histórico de alterações",
+      "description": "Consulte o histórico da hierarquia de locais: quem alterou, quando e um resumo do que mudou."
+    },
+    "section": {
+      "identity": {
+        "nameLabel": "Nome do local",
+        "nameHint": "Use um nome curto para identificar esta localização. Por exemplo: Rio Verde em vez de Fazenda Rio Verde, Piratini em vez de Aviário Piratini ou Oeste em vez de Talhão Oeste.",
+        "displayNameLabel": "Descrição do local",
+        "displayNameHint": "Informe o nome completo do local. Por exemplo: Fazenda Rio Verde em vez de Rio Verde, Aviário Piratini em vez de Piratini ou Talhão Oeste em vez de apenas Oeste."
+      },
+      "structure": {
+        "title": "Informações",
+        "description": "Resumo da localização em foco, com o nível na hierarquia, a ordem entre irmãos do mesmo local.",
+        "levelLabel": "Nível hierárquico",
+        "levelHint": "Contado a partir da raiz do escopo (1 = raiz).",
+        "parentLabel": "Local pai",
+        "parentRoot": "Raiz do escopo (sem pai acima)",
+        "orderLabel": "Ordem entre irmãos",
+        "orderHintEdit": "Usada ao listar locais no mesmo nível.",
+        "orderHintCreate": "Será definida ao salvar o novo local.",
+        "orderPending": "-"
+      }
+    },
+    "dragDropHint": "Arraste a alça para reordenar antes ou depois de um irmão, ou solte sobre uma linha para mover para baixo desse local.",
+    "action": {
+      "cancel": "Cancelar",
+      "newLabel": "Novo",
+      "newChild": "Novo filho",
+      "newSibling": "Novo irmão",
+      "delete": "Apagar",
+      "undoDelete": "Desmarcar exclusão",
+      "save": "Salvar",
+      "saving": "Salvando...",
+      "moveUp": "Mover para cima",
+      "moveDown": "Mover para baixo"
+    },
+    "readOnlyNotice": "Você pode consultar o diretório de locais, mas só membros master ou administrador podem criar ou editar cadastros hierárquicos.",
+    "createdNotice": "Local criado com sucesso.",
+    "deletedNotice": "Local apagado com sucesso.",
+    "movedNotice": "Local movido com sucesso.",
+    "error": {
+      "load": "Não foi possível carregar o diretório de locais. Tente novamente.",
+      "save": "Não foi possível salvar o local. Tente novamente.",
+      "create": "Não foi possível criar o local. Tente novamente.",
+      "delete": "Não foi possível apagar o local. Tente novamente.",
+      "move": "Não foi possível mover o local. Tente novamente.",
+      "validation": "Este campo não pode ficar vazio."
+    },
+    "discardConfirm": "Descartar alterações não salvas?"
+  },
+  "UnityConfigurationPage": {
+    "title": "Unidades produtivas",
+    "description": "Neste painel você vê a árvore de unidades produtivas do escopo. À esquerda está a hierarquia; ao lado, o formulário para editar nome e descrição, além do painel de histórico. Selecione um item na árvore para editá-lo ou use Novo para criar outro nível abaixo do item escolhido.",
+    "list": {
+      "empty": "Nenhuma unidade produtiva foi encontrada para o escopo selecionado.",
+      "emptyScope": "Crie um escopo antes de editar unidades produtivas.",
+      "missingCurrentScope": "Defina um escopo ativo no seletor do cabeçalho antes de editar unidades produtivas."
+    },
+    "history": {
+      "title": "Histórico de alterações",
+      "description": "Consulte o histórico das unidades produtivas: quem alterou, quando e um resumo do que mudou."
+    },
+    "section": {
+      "identity": {
+        "nameLabel": "Nome curto",
+        "nameHint": "Use um nome curto para identificar a unidade produtiva no dia a dia (ex.: Branca, Fêmea, Matriz).",
+        "displayNameLabel": "Descrição",
+        "displayNameHint": "Descreva com mais contexto o que essa unidade produtiva representa na operação."
+      },
+      "structure": {
+        "title": "Informações",
+        "description": "Resumo do item em foco: nível na hierarquia, ordem entre irmãos e vínculo com o pai.",
+        "levelLabel": "Nível hierárquico",
+        "levelHint": "Contado a partir da raiz do escopo (1 = raiz).",
+        "parentLabel": "Unidade pai",
+        "parentRoot": "Raiz do escopo (sem pai acima)",
+        "orderLabel": "Ordem entre irmãos",
+        "orderHintEdit": "Usada ao listar itens no mesmo nível.",
+        "orderHintCreate": "Será definida ao salvar o novo cadastro.",
+        "orderPending": "-"
+      }
+    },
+    "dragDropHint": "Arraste a alça para reordenar antes ou depois de um irmão, ou solte sobre uma linha para mover para baixo desse item.",
+    "action": {
+      "cancel": "Cancelar",
+      "newLabel": "Novo",
+      "newChild": "Novo filho",
+      "newSibling": "Novo irmão",
+      "delete": "Apagar",
+      "undoDelete": "Desmarcar exclusão",
+      "save": "Salvar",
+      "saving": "Salvando...",
+      "moveUp": "Mover para cima",
+      "moveDown": "Mover para baixo"
+    },
+    "readOnlyNotice": "Você pode consultar as unidades produtivas, mas só membros master ou administrador podem criar ou editar cadastros hierárquicos.",
+    "createdNotice": "Unidade produtiva criada com sucesso.",
+    "deletedNotice": "Unidade produtiva apagada com sucesso.",
+    "movedNotice": "Unidade produtiva movida com sucesso.",
+    "error": {
+      "load": "Não foi possível carregar o diretório. Tente novamente.",
+      "save": "Não foi possível salvar. Tente novamente.",
+      "create": "Não foi possível criar. Tente novamente.",
+      "delete": "Não foi possível apagar. Tente novamente.",
+      "move": "Não foi possível mover. Tente novamente.",
+      "validation": "Este campo não pode ficar vazio."
+    },
+    "discardConfirm": "Descartar alterações não salvas?"
+  },
+  "TenantConfigurationPage": {
+    "title": "Licenciado",
+    "description": "Estes campos identificam a organização contratante no ambiente, na barra superior e nas listas. As alterações valem para o licenciado ativo da sua sessão.",
+    "editor": {
+      "selectToEdit": "Selecione o licenciado na lista para ver e editar os dados."
+    },
+    "history": {
+      "title": "Histórico de alterações",
+      "description": "Consulte o histórico dos dados do licenciado ativo: quem alterou, quando e um resumo do que mudou."
+    },
+    "section": {
+      "display": {
+        "title": "Nome na interface",
+        "description": "Rótulo curto exibido na aplicação para o licenciado ativo.",
+        "nameLabel": "Nome de exibição",
+        "nameHint": "Usado na barra superior, na troca de licenciado e em outras áreas de navegação."
+      },
+      "legal": {
+        "title": "Nome completo oficial",
+        "description": "Nome oficial ou completo da organização contratante.",
+        "nameLabel": "Nome completo",
+        "nameHint": "Use a denominação formal; pode coincidir com o nome de exibição quando não houver um rótulo mais curto."
+      }
+    },
+    "metadata": {
+      "idLabel": "Identificador interno",
+      "sectionTitle": "Referência no sistema",
+      "sectionDescription": "Identificador estável do licenciado na base de dados."
+    },
+    "action": {
+      "cancel": "Cancelar",
+      "delete": "Apagar",
+      "undoDelete": "Desmarcar exclusão",
+      "save": "Salvar",
+      "saving": "Salvando..."
+    },
+    "readOnlyNotice": "Você pode ver os dados do licenciado, mas só membros master ou administrador podem editar.",
+    "error": {
+      "save": "Não foi possível salvar. Tente novamente.",
+      "delete": "Não foi possível apagar o licenciado. Tente novamente.",
+      "validation": "Este campo não pode ficar vazio."
+    },
+    "discardConfirm": "Descartar alterações não salvas?"
+  },
+  "AuditHistory": {
+    "loading": "Carregando histórico...",
+    "empty": "Nenhum registro de histórico encontrado.",
+    "unknownUser": "Usuário não encontrado",
+    "entryLabel": "Log #{id}",
+    "metaLine": "{actor} em {moment}",
+    "lineInsert": "Inclusão",
+    "lineDelete": "Exclusão",
+    "verbInsert": "incluiu",
+    "verbUpdate": "modificou",
+    "verbDelete": "apagou",
+    "srBeforeAfter": "Valor anterior: {before}. Valor atual: {after}.",
+    "diffUnavailable": "Não foi possível comparar este update com o registro anterior.",
+    "diffEmpty": "Nenhuma diferença foi detectada em relação ao registro anterior.",
+    "deletedNote": "Este registro representa uma exclusão. O log não possui payload da row para este caso.",
+    "action": {
+      "insert": "Inclusão",
+      "update": "Atualização",
+      "delete": "Exclusão",
+      "loadMore": "Ver mais",
+      "loadingMore": "Carregando..."
+    },
+    "error": {
+      "load": "Não foi possível carregar o histórico. Tente novamente."
+    }
+  },
+  "LoginPage": {
+    "eyebrow": "Entrada do sistema",
+    "title": "Autentique-se para entrar no ambiente operacional do Valora.",
+    "description": "Use sua conta Google para entrar no Valora. A autenticação já conecta a conta ao vínculo entre conta, licenciado e membro.",
+    "notice": {
+      "authRequired": "Entre na conta para acessar a área protegida da aplicação.",
+      "signedOut": "Sessão encerrada. Entre novamente para continuar."
+    },
+    "cards": {
+      "workspace": {
+        "title": "Ambiente sério desde o começo",
+        "description": "A navegação já está preparada para crescer em módulos sem parecer um modelo genérico de painel."
+      },
+      "traceability": {
+        "title": "Base orientada a rastreabilidade",
+        "description": "A interface nasce pronta para receber histórico, auditoria e explicação contextual nas próximas fases."
+      },
+      "nextStep": {
+        "title": "Próxima entrega útil",
+        "description": "Depois da autenticação, o usuário cairá na página principal e seguirá para a configuração administrativa inicial."
+      }
+    },
+    "form": {
+      "title": "Entrar",
+      "description": "Nesta fase, o acesso inicial do produto acontece por autenticação Google e contexto organizacional real.",
+      "submitIdle": "Carregando autenticação Google...",
+      "submitPending": "Entrando com Google...",
+      "helper": "Se houver apenas um vínculo ativo, a entrada acontece direto no aplicativo. Quando existirem múltiplos vínculos ou convites, o Valora pedirá a escolha do licenciado.",
+      "accessPolicy": "No primeiro acesso sem vínculo nem convite, o Valora cria automaticamente um contexto inicial para você concluir a configuração administrativa.",
+      "googleUnavailable": "A entrada com Google não está disponível porque o identificador público do cliente Google ainda não foi configurado no ambiente.",
+      "error": "Não foi possível concluir a entrada com Google. Tente novamente.",
+      "rememberMeLabel": "Permanecer autenticado neste dispositivo"
+    }
+  },
+  "SelectTenantPage": {
+    "loading": "Carregando opções de acesso...",
+    "title": "Escolha como deseja entrar no Valora.",
+    "description": "Sua conta Google foi validada. Agora falta definir o licenciado ativo que vai governar o contexto operacional da sessão.",
+    "activeListTitle": "Organizações ativas",
+    "inviteListTitle": "Convites pendentes",
+    "createTitle": "Preparando seu contexto inicial",
+    "createDescription": "Não encontramos licenciado ativo nem convite pendente. O Valora pode criar o primeiro contexto para você seguir direto para a configuração administrativa.",
+    "createAction": "Criar licenciado inicial",
+    "createPending": "Criando licenciado inicial...",
+    "acceptAction": "Aceitar convite",
+    "rejectAction": "Recusar convite",
+    "selectAction": "Entrar nesse licenciado",
+    "processing": "Processando...",
+    "empty": "Nenhuma opção de acesso foi encontrada para esta conta.",
+    "backToLogin": "Voltar para a entrada",
+    "genericError": "Não foi possível concluir esta ação agora. Tente novamente."
+  },
+  "State": {
+    "loadingDescription": "Carregando a base da aplicação.",
+    "errorTitle": "Não foi possível carregar esta área.",
+    "errorDescription": "Ocorreu um problema ao renderizar a interface. Você pode tentar novamente sem sair do fluxo atual.",
+    "retry": "Tentar novamente"
+  }
 }

@@ -159,7 +159,7 @@
         },
         "history": {
             "title": "Change history",
-            "description": "A timeline of record changes will appear here when directory auditing is available. Until then, this block stays as a layout and traceability placeholder."
+            "description": "Review recent changes to member records: who changed what, when, and a clear summary of each update."
         },
         "section": {
             "profile": {
@@ -212,7 +212,7 @@
         "empty": "No scopes were found for the active tenant.",
         "history": {
             "title": "Change history",
-            "description": "A timeline of scope changes will appear here when structural auditing is available. Until then, this block stays as a layout and traceability placeholder."
+            "description": "Review recent changes to scopes for this tenant: who made each change, when, and a summary of what changed."
         },
         "section": {
             "identity": {
@@ -262,7 +262,7 @@
         },
         "history": {
             "title": "Change history",
-            "description": "A timeline of location hierarchy changes will appear here when structural auditing is available. Until then, this tab stays as a layout and traceability placeholder."
+            "description": "Review recent changes to your location hierarchy: who changed what, when, and a summary of each update."
         },
         "section": {
             "identity": {
@@ -321,7 +321,7 @@
         },
         "history": {
             "title": "Change history",
-            "description": "A timeline of hierarchy changes will appear here when structural auditing is available. Until then, this tab stays as a layout and traceability placeholder."
+            "description": "Review recent changes to productive units: who changed what, when, and a summary of each update."
         },
         "section": {
             "identity": {
@@ -378,7 +378,7 @@
         },
         "history": {
             "title": "Change history",
-            "description": "A timeline of who changed what will appear here when the audit API is available. Until then, this block remains the reserved space for layout and traceability next to the form."
+            "description": "Review recent changes to the active tenant’s details: who changed what, when, and a summary of each update."
         },
         "section": {
             "display": {

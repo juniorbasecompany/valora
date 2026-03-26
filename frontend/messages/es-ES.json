@@ -159,7 +159,7 @@
         },
         "history": {
             "title": "Historial de cambios",
-            "description": "Una línea de tiempo de los cambios de registro aparecerá aquí cuando la auditoría del directorio esté disponible. Hasta entonces, este bloque queda como referencia de layout y trazabilidad."
+            "description": "Consulta los cambios recientes en los miembros: quién modificó qué, cuándo y un resumen claro de cada cambio."
         },
         "section": {
             "profile": {
@@ -212,7 +212,7 @@
         "empty": "No se encontraron alcances para el licenciatario activo.",
         "history": {
             "title": "Historial de cambios",
-            "description": "Una línea de tiempo de los cambios de alcance aparecerá aquí cuando la auditoría estructural esté disponible. Hasta entonces, este bloque queda como referencia de layout y trazabilidad."
+            "description": "Consulta los cambios recientes en los ámbitos de este licenciado: quién cambió qué, cuándo y un resumen de lo modificado."
         },
         "section": {
             "identity": {
@@ -262,7 +262,7 @@
         },
         "history": {
             "title": "Historial de cambios",
-            "description": "Una línea de tiempo de los cambios de jerarquía aparecerá aquí cuando la auditoría estructural esté disponible. Hasta entonces, esta pestaña queda como referencia de layout y trazabilidad."
+            "description": "Consulta los cambios recientes en la jerarquía de ubicaciones: quién modificó qué, cuándo y un resumen de cada cambio."
         },
         "section": {
             "identity": {
@@ -321,7 +321,7 @@
         },
         "history": {
             "title": "Historial de cambios",
-            "description": "Una línea de tiempo de los cambios aparecerá aquí cuando la auditoría estructural esté disponible. Hasta entonces, esta pestaña queda como referencia de diseño y trazabilidad."
+            "description": "Consulta los cambios recientes en las unidades productivas: quién modificó qué, cuándo y un resumen de cada cambio."
         },
         "section": {
             "identity": {
@@ -378,7 +378,7 @@
         },
         "history": {
             "title": "Historial de cambios",
-            "description": "Una línea de tiempo de quién cambió qué aparecerá aquí cuando exista la API de auditoría. Hasta entonces, este bloque permanece como espacio reservado de diseño y trazabilidad junto al formulario."
+            "description": "Consulta los cambios recientes en los datos del licenciado activo: quién modificó qué, cuándo y un resumen de cada cambio."
         },
         "section": {
             "display": {

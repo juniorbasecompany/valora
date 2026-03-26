@@ -687,6 +687,163 @@
       ],
       "x": -560.1361397830926,
       "y": -665.0369646216051
+    },
+    {
+      "id": "field_def",
+      "name": "field_def",
+      "comment": "Definição do campo",
+      "color": "#1757ff",
+      "fields": [
+        {
+          "id": "id",
+          "name": "id",
+          "comment": "",
+          "type": "bigint",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "value_type",
+          "name": "value_type",
+          "type": "text",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "default": "",
+          "comment": ""
+        }
+      ],
+      "x": 520,
+      "y": 80,
+      "indices": []
+    },
+    {
+      "id": "field_def_locale",
+      "name": "field_def_locale",
+      "comment": "Textos por idioma",
+      "color": "#1757ff",
+      "fields": [
+        {
+          "id": 0,
+          "name": "field_def_id",
+          "type": "bigint",
+          "primary": true,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "default": "",
+          "comment": ""
+        },
+        {
+          "id": 1,
+          "name": "locale",
+          "type": "text",
+          "primary": true,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "default": "",
+          "comment": ""
+        },
+        {
+          "id": 2,
+          "name": "label",
+          "type": "text",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "default": "",
+          "comment": ""
+        }
+      ],
+      "x": 960,
+      "y": 80,
+      "indices": []
+    },
+    {
+      "id": "field_value",
+      "name": "field_value",
+      "comment": "Evento/valor do campo",
+      "color": "#1757ff",
+      "fields": [
+        {
+          "id": 0,
+          "name": "id",
+          "type": "bigint",
+          "primary": true,
+          "unique": true,
+          "notNull": true,
+          "increment": false,
+          "default": "",
+          "comment": ""
+        },
+        {
+          "id": 1,
+          "name": "field_def_id",
+          "type": "bigint",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "default": "",
+          "comment": ""
+        },
+        {
+          "id": 2,
+          "name": "location_id",
+          "type": "bigint",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "default": "",
+          "comment": ""
+        },
+        {
+          "id": 3,
+          "name": "unity_id",
+          "type": "bigint",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "default": "",
+          "comment": ""
+        },
+        {
+          "id": 4,
+          "name": "moment",
+          "type": "timestamp",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "default": "",
+          "comment": ""
+        },
+        {
+          "id": 5,
+          "name": "value_number",
+          "type": "numeric",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "default": "",
+          "comment": ""
+        }
+      ],
+      "x": 520,
+      "y": 320,
+      "indices": []
     }
   ],
   "relationships": [

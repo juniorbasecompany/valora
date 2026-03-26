@@ -643,6 +643,20 @@
           "values": []
         },
         {
+          "id": "row_id",
+          "name": "row_id",
+          "comment": "Identificador da linha que foi modificada.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
           "id": "row",
           "name": "row",
           "comment": "Conteúdo da linha. NULL em caso de delete.",

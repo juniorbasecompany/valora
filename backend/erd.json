@@ -779,6 +779,8 @@
       "deleteConstraint": "Cascade"
     }
   ],
+  "notes": [],
+  "subjectAreas": [],
   "database": "postgresql",
   "types": [],
   "enums": [],

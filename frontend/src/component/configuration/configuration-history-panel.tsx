@@ -68,11 +68,11 @@ function buildHistoryLineText(
   });
 
   if (item.action_type === "I") {
-    return `${meta} --- ${t("lineInsert")}`;
+    return `${meta} --- ${t("verbInsert")}`;
   }
 
   if (item.action_type === "D") {
-    return `${meta} --- ${t("lineDelete")}`;
+    return `${meta} --- ${t("verbDelete")}`;
   }
 
   if (item.diff_state === "ready" && item.field_change_list.length > 0) {
@@ -90,16 +90,16 @@ function buildHistoryLineText(
   return `${meta} --- ${t("diffEmpty")}`;
 }
 
-function actionTypeAriaLabel(actionType: AuditLogActionType, t: (key: string) => string) {
+function actionVerbLabel(actionType: AuditLogActionType, t: (key: string) => string) {
   if (actionType === "I") {
-    return t("action.insert");
+    return t("verbInsert");
   }
 
   if (actionType === "U") {
-    return t("action.update");
+    return t("verbUpdate");
   }
 
-  return t("action.delete");
+  return t("verbDelete");
 }
 
 function HistoryEntryCenter({
@@ -112,8 +112,10 @@ function HistoryEntryCenter({
   if (item.action_type === "I") {
     return (
       <div className="ui-history-log-cell-center-inner">
-        <div className="ui-history-change-pill">
-          <span className="ui-history-change-pill-message">{t("lineInsert")}</span>
+        <div className="ui-history-log-identity-pill ui-history-log-identity-pill-single">
+          <span className="ui-history-log-chip-value ui-history-log-chip-value-plain">
+            {t("lineInsert")}
+          </span>
         </div>
       </div>
     );
@@ -122,8 +124,10 @@ function HistoryEntryCenter({
   if (item.action_type === "D") {
     return (
       <div className="ui-history-log-cell-center-inner">
-        <div className="ui-history-change-pill">
-          <span className="ui-history-change-pill-message">{t("lineDelete")}</span>
+        <div className="ui-history-log-identity-pill ui-history-log-identity-pill-single">
+          <span className="ui-history-log-chip-value ui-history-log-chip-value-plain">
+            {t("lineDelete")}
+          </span>
         </div>
       </div>
     );
@@ -135,24 +139,20 @@ function HistoryEntryCenter({
         {item.field_change_list.map((fieldChange) => (
           <div
             key={`${item.id}-${fieldChange.field_name}`}
-            className="ui-history-change-pill"
+            className="ui-history-log-identity-pill"
           >
-            <span className="ui-history-change-pill-field">{fieldChange.field_name}</span>
-            <span className="ui-history-change-pill-delta">
+            <span className="ui-history-log-chip-muted">{fieldChange.field_name}</span>
+            <span className="ui-history-log-chip-value ui-history-log-chip-value-delta">
               <span className="ui-sr-only">
                 {`${fieldChange.field_name}. ${t("srBeforeAfter", {
                   before: stringifyHistoryValue(fieldChange.previous_value),
                   after: stringifyHistoryValue(fieldChange.current_value)
                 })}`}
               </span>
-              <span className="ui-history-change-pill-visual" aria-hidden="true">
-                <span className="ui-history-change-pill-value">
-                  {stringifyHistoryValue(fieldChange.previous_value)}
-                </span>
-                <span className="ui-history-change-pill-arrow">→</span>
-                <span className="ui-history-change-pill-value">
-                  {stringifyHistoryValue(fieldChange.current_value)}
-                </span>
+              <span className="ui-history-log-delta-inline" aria-hidden="true">
+                <span>{stringifyHistoryValue(fieldChange.previous_value)}</span>
+                <span className="ui-history-log-delta-arrow">→</span>
+                <span>{stringifyHistoryValue(fieldChange.current_value)}</span>
               </span>
             </span>
           </div>
@@ -166,8 +166,8 @@ function HistoryEntryCenter({
 
   return (
     <div className="ui-history-log-cell-center-inner">
-      <div className="ui-history-change-pill">
-        <span className="ui-history-change-pill-message">{hint}</span>
+      <div className="ui-history-log-identity-pill ui-history-log-identity-pill-single">
+        <span className="ui-history-log-chip-value ui-history-log-chip-value-plain">{hint}</span>
       </div>
     </div>
   );
@@ -291,57 +291,51 @@ export function ConfigurationHistoryPanel({
       ) : null}
 
       {!isLoading && !errorMessage && itemList.length > 0 ? (
-        <>
-          <ul className="ui-history-log-list">
-            {itemList.map((item) => {
-              const lineText = buildHistoryLineText(item, t);
-              const ariaLabel = `${actionTypeAriaLabel(item.action_type, t)}. ${lineText}. ${t("entryLabel", { id: String(item.id) })}`;
-              const isoAttr = toIsoDateTimeAttr(item.moment_utc);
-              return (
-                <li
-                  key={item.id}
-                  className="ui-history-log-entry"
-                  data-action={item.action_type}
-                  aria-label={ariaLabel}
-                >
-                  <div className="ui-history-log-entry-row">
-                    <div className="ui-history-log-cell ui-history-log-cell-start">
-                      <div className="ui-history-log-identity-pill">
-                        <span className="ui-history-log-chip-muted">
-                          {item.actor_name ?? t("unknownUser")}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="ui-history-log-cell ui-history-log-cell-center">
-                      <HistoryEntryCenter item={item} t={t} />
-                    </div>
-                    <div className="ui-history-log-cell ui-history-log-cell-end">
-                      <div className="ui-history-log-identity-pill">
-                        <span className="ui-history-log-chip-muted">
-                          {formatHistoryLogIdDisplay(item.id)}
-                        </span>
-                        <time
-                          className="ui-history-log-chip-value"
-                          dateTime={isoAttr}
-                          suppressHydrationWarning
-                        >
-                          {formatHistoryMomentCompact(item.moment_utc)}
-                        </time>
-                      </div>
+        <ul className="ui-history-log-list">
+          {itemList.map((item) => {
+            const lineText = buildHistoryLineText(item, t);
+            const ariaLabel = `${actionVerbLabel(item.action_type, t)}. ${lineText}. ${t("entryLabel", { id: String(item.id) })}`;
+            const isoAttr = toIsoDateTimeAttr(item.moment_utc);
+            return (
+              <li
+                key={item.id}
+                className="ui-history-log-entry"
+                data-action={item.action_type}
+                aria-label={ariaLabel}
+              >
+                <div className="ui-history-log-entry-row">
+                  <div className="ui-history-log-cell ui-history-log-cell-start">
+                    <div className="ui-history-log-identity-pill">
+                      <span className="ui-history-log-chip-muted">
+                        {item.actor_name ?? t("unknownUser")}
+                      </span>
+                      <span className="ui-history-log-chip-value ui-history-log-chip-value-plain">
+                        {actionVerbLabel(item.action_type, t)}
+                      </span>
                     </div>
                   </div>
-                </li>
-              );
-            })}
-          </ul>
-          <div className="ui-history-log-legend" role="note" aria-label={t("legendAria")}>
-            <div className="ui-badge-row ui-history-log-legend-row">
-              <span className="ui-badge ui-badge-positive">{t("action.insert")}</span>
-              <span className="ui-badge ui-badge-active">{t("action.update")}</span>
-              <span className="ui-badge ui-badge-danger">{t("action.delete")}</span>
-            </div>
-          </div>
-        </>
+                  <div className="ui-history-log-cell ui-history-log-cell-center">
+                    <HistoryEntryCenter item={item} t={t} />
+                  </div>
+                  <div className="ui-history-log-cell ui-history-log-cell-end">
+                    <div className="ui-history-log-identity-pill">
+                      <span className="ui-history-log-chip-muted">
+                        {formatHistoryLogIdDisplay(item.id)}
+                      </span>
+                      <time
+                        className="ui-history-log-chip-value"
+                        dateTime={isoAttr}
+                        suppressHydrationWarning
+                      >
+                        {formatHistoryMomentCompact(item.moment_utc)}
+                      </time>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       ) : null}
 
       {!errorMessage && hasMore && nextOffset != null ? (

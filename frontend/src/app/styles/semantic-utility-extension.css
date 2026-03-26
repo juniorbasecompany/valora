@@ -600,7 +600,7 @@
   max-width: 100%;
   min-width: 0;
   margin: 0;
-  padding-block: 0.55rem;
+  padding-block: 1rem;
 }
 
 .ui-history-log-entry-row {
@@ -618,16 +618,16 @@
 
 .ui-history-log-entry-row::before {
   content: "";
-  position: absolute;
   z-index: 0;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 2px;
   border-radius: var(--radius-indicator);
-  transform: translateY(-50%);
-  background: var(--color-accent-border-soft);
+  background: var(--color-border);
   pointer-events: none;
+  height: 1px;
+  position: absolute;
+  bottom: 0;
+  left: 2px;
+  right: 2px;
+  transform: translateY(-50%);
 }
 
 .ui-history-log-cell {
@@ -660,13 +660,25 @@
 .ui-history-log-cell-start .ui-history-log-identity-pill {
   min-width: 0;
   flex: 1 1 auto;
+  width: 100%;
+}
+
+.ui-history-log-cell-start .ui-history-log-chip-muted {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ui-history-log-cell-start .ui-history-log-chip-value-plain {
+  flex: 0 0 auto;
+  text-align: right;
 }
 
 .ui-history-log-chip-muted {
   box-sizing: border-box;
   padding: 0.28rem 0.55rem;
-  background: var(--color-surface-muted);
-  color: var(--color-text-subtle);
+  background: var(--color-accent-surface-strong);
+  color: var(--color-accent-strong);
+  font-family: var(--font-sans);
   font-size: 0.8125rem;
   font-weight: 600;
   line-height: 1.35;
@@ -680,12 +692,47 @@
   box-sizing: border-box;
   padding: 0.28rem 0.55rem;
   background: var(--color-surface);
-  font-family: "Cascadia Mono", "Consolas", ui-monospace, monospace;
-  font-size: 0.6875rem;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
   font-variant-numeric: tabular-nums;
   line-height: 1.35;
   color: var(--color-text);
   white-space: nowrap;
+}
+
+.ui-history-log-chip-value-plain {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.ui-history-log-chip-value-delta {
+  white-space: normal;
+  min-width: 0;
+}
+
+.ui-history-log-delta-inline {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.35rem;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--color-text);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.ui-history-log-delta-arrow {
+  flex-shrink: 0;
+  color: var(--color-text-subtle);
+  font-size: 0.8125rem;
+}
+
+.ui-history-log-identity-pill-single {
+  width: 100%;
+  max-width: 100%;
 }
 
 .ui-history-log-cell-center {
@@ -703,77 +750,12 @@
   min-width: 0;
 }
 
-.ui-history-change-pill {
-  display: inline-flex;
-  max-width: 100%;
-  flex-wrap: wrap;
-  align-items: stretch;
-  border: var(--border-width-default) solid var(--color-border);
-  border-radius: var(--radius-card);
-  overflow: hidden;
-}
-
-.ui-history-change-pill-field {
-  padding: 0.28rem 0.55rem;
-  background: var(--color-accent-surface-muted);
-  color: var(--color-accent-strong);
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.ui-history-change-pill-delta {
-  display: flex;
-  min-width: 0;
-  flex: 1 1 auto;
-  align-items: center;
-}
-
-.ui-history-change-pill-visual {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.25rem 0.4rem;
-  padding: 0.28rem 0.55rem;
-  background: var(--color-surface);
-  font-family: "Cascadia Mono", "Consolas", ui-monospace, monospace;
-  font-size: 0.6875rem;
-  line-height: 1.35;
-  color: var(--color-text);
-  word-break: break-word;
-  overflow-wrap: anywhere;
-}
-
-.ui-history-change-pill-value {
-  max-width: 100%;
-}
-
-.ui-history-change-pill-arrow {
-  flex-shrink: 0;
-  color: var(--color-text-subtle);
-  font-size: 0.75rem;
-}
-
-.ui-history-change-pill-message {
-  padding: 0.32rem 0.6rem;
-  font-size: 0.75rem;
-  line-height: 1.35;
-  color: var(--color-text-muted);
-}
-
 .ui-history-log-cell-end {
   display: flex;
   flex: 0 0 auto;
   justify-content: flex-end;
   margin-left: auto;
   text-align: right;
-}
-
-.ui-history-log-legend {
-  margin-top: 0.75rem;
-}
-
-.ui-history-log-legend-row {
-  flex-wrap: wrap;
 }
 
 .ui-history-log-caption {

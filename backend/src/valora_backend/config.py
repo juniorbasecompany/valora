@@ -3,7 +3,14 @@
 from typing import Self
 from urllib.parse import quote_plus
 
-from pydantic import AliasChoices, Field, SecretStr, computed_field, model_validator
+from pydantic import (
+    AliasChoices,
+    Field,
+    SecretStr,
+    computed_field,
+    field_validator,
+    model_validator,
+)
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -54,6 +61,17 @@ class Settings(BaseSettings):
         default=None,
         validation_alias=AliasChoices("DATABASE_URL", "VALORA_DATABASE_URL"),
     )
+
+    @field_validator("database_url_override", mode="before")
+    @classmethod
+    def _database_url_vazio_e_none(cls, value: object) -> object:
+        """Referência Railway mal resolvida pode vir como string vazia."""
+        if value is None:
+            return None
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
+
     google_client_id: str | None = Field(
         default=None,
         validation_alias=AliasChoices("GOOGLE_CLIENT_ID", "google_client_id"),

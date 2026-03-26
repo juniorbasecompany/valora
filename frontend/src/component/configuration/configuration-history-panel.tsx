@@ -293,7 +293,7 @@ export function ConfigurationHistoryPanel({
       {!isLoading && !errorMessage && itemList.length > 0 ? (
         <>
           <ul className="ui-history-log-list">
-            {itemList.map((item, index) => {
+            {itemList.map((item) => {
               const lineText = buildHistoryLineText(item, t);
               const ariaLabel = `${actionTypeAriaLabel(item.action_type, t)}. ${lineText}. ${t("entryLabel", { id: String(item.id) })}`;
               const isoAttr = toIsoDateTimeAttr(item.moment_utc);
@@ -304,9 +304,6 @@ export function ConfigurationHistoryPanel({
                   data-action={item.action_type}
                   aria-label={ariaLabel}
                 >
-                  {index > 0 ? (
-                    <hr className="ui-history-log-separator" aria-hidden="true" />
-                  ) : null}
                   <div className="ui-history-log-entry-row">
                     <div className="ui-history-log-cell ui-history-log-cell-start">
                       <div className="ui-history-log-identity-pill">

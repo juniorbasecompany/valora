@@ -1,0 +1,11 @@
+# Configuração Railway: use Root Directory = backend no painel do serviço (monorepo).
+# O app FastAPI expõe valora_backend.main:app; na raiz do repositório não há pyproject.toml,
+# então o Railpack não detecta Python sem esse diretório raiz.
+
+[build]
+builder = "RAILPACK"
+watchPatterns = ["src/**", "pyproject.toml", "alembic/**"]
+
+[deploy]
+startCommand = "uvicorn valora_backend.main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/health"

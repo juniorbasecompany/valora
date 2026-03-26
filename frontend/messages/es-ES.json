@@ -414,6 +414,27 @@
         },
         "discardConfirm": "¿Descartar los cambios no guardados?"
     },
+    "AuditHistory": {
+        "loading": "Cargando historial...",
+        "empty": "No se encontraron registros de historial.",
+        "unknownUser": "Usuario desconocido",
+        "entryLabel": "Registro #{id}",
+        "metaLine": "{actor} el {moment}",
+        "srBeforeAfter": "Valor anterior: {before}. Valor actual: {after}.",
+        "diffUnavailable": "No se pudo comparar esta actualización con el registro anterior.",
+        "diffEmpty": "No se detectaron diferencias respecto al registro anterior.",
+        "deletedNote": "Esta entrada representa una eliminación. El registro no incluye payload de fila en este caso.",
+        "action": {
+            "insert": "Alta",
+            "update": "Actualización",
+            "delete": "Baja",
+            "loadMore": "Ver más",
+            "loadingMore": "Cargando..."
+        },
+        "error": {
+            "load": "No se pudo cargar el historial. Inténtalo de nuevo."
+        }
+    },
     "LoginPage": {
         "eyebrow": "Acceso al sistema",
         "title": "Autentícate para entrar en el espacio operativo de Valora.",

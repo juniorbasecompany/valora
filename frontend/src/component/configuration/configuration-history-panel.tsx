@@ -22,43 +22,11 @@ type ConfigurationHistoryPanelProps = {
   refreshKey?: number;
 };
 
-type HistoryFilterState = {
-  action: "ALL" | AuditLogActionType;
-  actor: string;
-  from: string;
-  to: string;
-};
-
-const initialFilters: HistoryFilterState = {
-  action: "ALL",
-  actor: "",
-  from: "",
-  to: ""
-};
-
-function buildHistorySearchParams(filters: HistoryFilterState, offset: number) {
-  const searchParams = new URLSearchParams({
+function buildLogSearchParams(offset: number) {
+  return new URLSearchParams({
     limit: String(PAGE_SIZE),
     offset: String(offset)
   });
-
-  if (filters.action !== "ALL") {
-    searchParams.set("action", filters.action);
-  }
-
-  if (filters.actor.trim()) {
-    searchParams.set("actor", filters.actor.trim());
-  }
-
-  if (filters.from) {
-    searchParams.set("from", filters.from);
-  }
-
-  if (filters.to) {
-    searchParams.set("to", filters.to);
-  }
-
-  return searchParams;
 }
 
 function stringifyHistoryValue(value: unknown) {
@@ -67,11 +35,6 @@ function stringifyHistoryValue(value: unknown) {
   }
 
   const serialized = JSON.stringify(value);
-  return serialized ?? "null";
-}
-
-function stringifyHistoryJson(value: unknown) {
-  const serialized = JSON.stringify(value ?? null, null, 2);
   return serialized ?? "null";
 }
 
@@ -104,9 +67,6 @@ export function ConfigurationHistoryPanel({
   const t = useTranslations("AuditHistory");
   const requestIdRef = useRef(0);
 
-  const [draftFilters, setDraftFilters] = useState<HistoryFilterState>(initialFilters);
-  const [appliedFilters, setAppliedFilters] =
-    useState<HistoryFilterState>(initialFilters);
   const [itemList, setItemList] = useState<AuditLogRecord[]>([]);
   const [hasMore, setHasMore] = useState(false);
   const [nextOffset, setNextOffset] = useState<number | null>(null);
@@ -127,7 +87,7 @@ export function ConfigurationHistoryPanel({
       setErrorMessage(null);
 
       try {
-        const searchParams = buildHistorySearchParams(appliedFilters, offset);
+        const searchParams = buildLogSearchParams(offset);
         const response = await fetch(
           `/api/auth/tenant/current/logs/${tableName}?${searchParams.toString()}`,
           {
@@ -177,7 +137,7 @@ export function ConfigurationHistoryPanel({
         }
       }
     },
-    [appliedFilters, tableName, t]
+    [tableName, t]
   );
 
   useEffect(() => {
@@ -196,106 +156,6 @@ export function ConfigurationHistoryPanel({
           </h2>
           <p className="ui-copy-body">{description}</p>
         </div>
-      </div>
-
-      <div className="ui-history-filter-grid">
-        <div className="ui-field">
-          <label className="ui-field-label" htmlFor={`${tableName}-history-action`}>
-            {t("filter.action")}
-          </label>
-          <select
-            id={`${tableName}-history-action`}
-            className="ui-input"
-            value={draftFilters.action}
-            onChange={(event) =>
-              setDraftFilters((previous) => ({
-                ...previous,
-                action: event.target.value as HistoryFilterState["action"]
-              }))
-            }
-          >
-            <option value="ALL">{t("filter.allActions")}</option>
-            <option value="I">{t("action.insert")}</option>
-            <option value="U">{t("action.update")}</option>
-            <option value="D">{t("action.delete")}</option>
-          </select>
-        </div>
-
-        <div className="ui-field">
-          <label className="ui-field-label" htmlFor={`${tableName}-history-actor`}>
-            {t("filter.actor")}
-          </label>
-          <input
-            id={`${tableName}-history-actor`}
-            className="ui-input"
-            value={draftFilters.actor}
-            onChange={(event) =>
-              setDraftFilters((previous) => ({
-                ...previous,
-                actor: event.target.value
-              }))
-            }
-            placeholder={t("filter.actorPlaceholder")}
-          />
-        </div>
-
-        <div className="ui-field">
-          <label className="ui-field-label" htmlFor={`${tableName}-history-from`}>
-            {t("filter.from")}
-          </label>
-          <input
-            id={`${tableName}-history-from`}
-            className="ui-input"
-            type="date"
-            value={draftFilters.from}
-            onChange={(event) =>
-              setDraftFilters((previous) => ({
-                ...previous,
-                from: event.target.value
-              }))
-            }
-          />
-        </div>
-
-        <div className="ui-field">
-          <label className="ui-field-label" htmlFor={`${tableName}-history-to`}>
-            {t("filter.to")}
-          </label>
-          <input
-            id={`${tableName}-history-to`}
-            className="ui-input"
-            type="date"
-            value={draftFilters.to}
-            onChange={(event) =>
-              setDraftFilters((previous) => ({
-                ...previous,
-                to: event.target.value
-              }))
-            }
-          />
-        </div>
-      </div>
-
-      <div className="ui-button-row">
-        <button
-          type="button"
-          className="ui-button-primary"
-          onClick={() => setAppliedFilters({ ...draftFilters })}
-          disabled={isLoading || isLoadingMore}
-        >
-          {t("action.applyFilters")}
-        </button>
-        <button
-          type="button"
-          className="ui-button-secondary"
-          onClick={() => {
-            setDraftFilters(initialFilters);
-            setAppliedFilters(initialFilters);
-          }}
-          disabled={isLoading || isLoadingMore}
-        >
-          {t("action.clearFilters")}
-        </button>
       </div>
 
       {errorMessage ? (
@@ -330,15 +190,13 @@ export function ConfigurationHistoryPanel({
                           ? t("action.update")
                           : t("action.delete")}
                     </span>
+                    <span className="ui-badge ui-badge-neutral">
+                      {t("metaLine", {
+                        actor: item.actor_name ?? t("unknownUser"),
+                        moment: formatHistoryMoment(item.moment_utc)
+                      })}
+                    </span>
                   </div>
-                  <p className="ui-text-body-strong">
-                    {formatHistoryMoment(item.moment_utc)}
-                  </p>
-                  <p className="ui-history-log-caption">
-                    {t("actorLabel", {
-                      actorName: item.actor_name ?? t("unknownUser")
-                    })}
-                  </p>
                 </div>
 
                 <p className="ui-history-log-caption">
@@ -348,34 +206,32 @@ export function ConfigurationHistoryPanel({
 
               {item.action_type === "U" ? (
                 <section className="ui-history-log-section">
-                  <p className="ui-text-body-strong">{t("diffTitle")}</p>
                   {item.diff_state === "ready" && item.field_change_list.length > 0 ? (
                     <div className="ui-history-diff-list">
                       {item.field_change_list.map((fieldChange) => (
                         <div
                           key={`${item.id}-${fieldChange.field_name}`}
-                          className="ui-history-diff-item"
+                          className="ui-history-diff-item ui-history-diff-item-compact"
                         >
                           <p className="ui-history-diff-field">
                             {fieldChange.field_name}
                           </p>
-                          <div className="ui-history-diff-values">
-                            <div className="ui-history-diff-value-card">
-                              <p className="ui-history-diff-label">
-                                {t("previousValue")}
-                              </p>
-                              <pre className="ui-history-diff-value">
-                                {stringifyHistoryValue(fieldChange.previous_value)}
-                              </pre>
-                            </div>
-                            <div className="ui-history-diff-value-card">
-                              <p className="ui-history-diff-label">
-                                {t("currentValue")}
-                              </p>
-                              <pre className="ui-history-diff-value">
-                                {stringifyHistoryValue(fieldChange.current_value)}
-                              </pre>
-                            </div>
+                          <div className="ui-history-diff-inline">
+                            <span className="ui-sr-only">
+                              {t("srBeforeAfter", {
+                                before: stringifyHistoryValue(fieldChange.previous_value),
+                                after: stringifyHistoryValue(fieldChange.current_value)
+                              })}
+                            </span>
+                            <code className="ui-history-diff-chip">
+                              {stringifyHistoryValue(fieldChange.previous_value)}
+                            </code>
+                            <span className="ui-history-diff-arrow" aria-hidden="true">
+                              →
+                            </span>
+                            <code className="ui-history-diff-chip">
+                              {stringifyHistoryValue(fieldChange.current_value)}
+                            </code>
                           </div>
                         </div>
                       ))}
@@ -391,11 +247,6 @@ export function ConfigurationHistoryPanel({
               {item.action_type === "D" ? (
                 <p className="ui-field-hint">{t("deletedNote")}</p>
               ) : null}
-
-              <section className="ui-history-log-section">
-                <p className="ui-text-body-strong">{t("rowTitle")}</p>
-                <pre className="ui-history-json">{stringifyHistoryJson(item.row)}</pre>
-              </section>
             </article>
           ))}
         </div>

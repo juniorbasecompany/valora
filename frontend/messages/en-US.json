@@ -414,6 +414,27 @@
         },
         "discardConfirm": "Discard unsaved changes?"
     },
+    "AuditHistory": {
+        "loading": "Loading history...",
+        "empty": "No history records found.",
+        "unknownUser": "Unknown user",
+        "entryLabel": "Log #{id}",
+        "metaLine": "{actor} on {moment}",
+        "srBeforeAfter": "Previous value: {before}. Current value: {after}.",
+        "diffUnavailable": "This update could not be compared to the previous record.",
+        "diffEmpty": "No differences were detected compared to the previous record.",
+        "deletedNote": "This entry represents a deletion. The log has no row payload in this case.",
+        "action": {
+            "insert": "Insert",
+            "update": "Update",
+            "delete": "Delete",
+            "loadMore": "Load more",
+            "loadingMore": "Loading..."
+        },
+        "error": {
+            "load": "Could not load history. Try again."
+        }
+    },
     "LoginPage": {
         "eyebrow": "System access",
         "title": "Authenticate to enter Valora's operational workspace.",

@@ -443,35 +443,33 @@
         }
     },
     "LoginPage": {
-        "eyebrow": "System access",
-        "title": "Authenticate to enter Valora's operational workspace.",
-        "description": "Use your Google account to sign in to Valora. Authentication already connects the account to the relationship between account, tenant, and member.",
+        "productName": "Valora",
+        "tagline": "Planning the future with confidence",
+        "title": "Your business presented in numbers you stand behind with purpose and provenance.",
+        "description": "One source of truth that grows with the company, with aligned versions, improving results and lowering risk. Sign in with Google to open the right organizational context for this session.",
         "notice": {
-            "authRequired": "Sign in to access the protected area of the application.",
-            "signedOut": "Session ended. Sign in again to continue."
+            "authRequired": "Sign in to access this area."
         },
         "cards": {
             "workspace": {
-                "title": "A serious workspace from the start",
-                "description": "Navigation is already prepared to grow into modules without looking like a generic admin template."
+                "title": "See the whole, drill down when it matters",
+                "description": "Room for the team to execute, and visibility for you to steer the next step."
             },
             "traceability": {
-                "title": "Foundation oriented toward traceability",
-                "description": "The interface starts ready to receive history, audit, and contextual explanations in the next phases."
+                "title": "Stand behind the numbers",
+                "description": "Changes stay on record. What you show partners or auditors rests on history and context."
             },
             "nextStep": {
-                "title": "Next useful delivery",
-                "description": "After authentication, the user lands on the home page and proceeds to the initial administrative configuration."
+                "title": "After you sign in",
+                "description": "Quick entry to your environment. With several tenants or invites, you pick where to work this session."
             }
         },
         "form": {
-            "title": "Sign in",
-            "description": "At this stage, the initial product access happens through Google authentication and real organizational context.",
-            "submitIdle": "Loading Google authentication...",
+            "title": "Access Valora",
+            "submitIdle": "Preparing Google sign-in...",
             "submitPending": "Signing in with Google...",
-            "helper": "If there is only one active relationship, access goes directly into the application. When multiple relationships or invites exist, Valora will ask you to choose the tenant.",
-            "accessPolicy": "On the first access without a relationship or invite, Valora automatically creates an initial context so you can complete the administrative setup.",
-            "googleUnavailable": "Google sign-in is unavailable because the public Google client identifier has not been configured in the environment yet.",
+            "accessPolicy": "First visit: we help you set tenant, team, and scope so the company can get started.",
+            "googleUnavailable": "Google sign-in is unavailable: the public Google client identifier has not been configured in this environment yet.",
             "error": "Could not complete the Google sign-in. Try again.",
             "rememberMeLabel": "Stay authenticated on this device"
         }

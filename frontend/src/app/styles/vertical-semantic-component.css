@@ -561,7 +561,26 @@
   padding: 1rem 1rem;
 }
 
+.ui-shell.ui-auth-page {
+  isolation: isolate;
+  background: var(--gradient-app-background);
+  background-color: var(--color-background);
+}
+
+.ui-shell.ui-auth-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.38;
+  background-image: var(--gradient-app-grid);
+  background-size: 32px 32px;
+}
+
 .ui-auth-layout {
+  position: relative;
+  z-index: var(--z-content);
   margin-inline: auto;
   display: grid;
   min-height: 100vh;
@@ -578,13 +597,92 @@
 }
 
 .ui-auth-hero {
-  gap: 1.75rem;
-  padding: 1.75rem;
+  gap: 1.5rem;
+  padding: 2rem 2rem 2.1rem;
+  box-shadow: var(--shadow-md);
 }
 
 .ui-auth-panel {
   gap: 1.5rem;
-  padding: 1.5rem;
+  border-left: var(--border-width-emphasis) solid var(--color-accent);
+  padding: 1.5rem 1.5rem 1.5rem 1.65rem;
+  box-shadow: var(--shadow-md);
+}
+
+.ui-auth-tagline {
+  margin: 0;
+  max-width: var(--measure-copy-wide);
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1.55;
+  color: var(--color-accent-strong);
+}
+
+.ui-auth-pillar-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.ui-auth-pillar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  overflow: hidden;
+  border: var(--border-width-default) solid var(--color-border);
+  border-radius: var(--radius-panel);
+  background: var(--gradient-surface-muted);
+  padding: 1.2rem 1.25rem 1.35rem;
+  box-shadow: var(--shadow-xs);
+}
+
+.ui-auth-pillar::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  pointer-events: none;
+  background: var(--gradient-accent-emphasis);
+  opacity: 0.88;
+}
+
+.ui-auth-pillar-accent::before {
+  background: linear-gradient(
+    90deg,
+    var(--color-construction-text),
+    var(--color-construction-border)
+  );
+  opacity: 0.92;
+}
+
+.ui-auth-pillar-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.ui-auth-pillar-step {
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  color: var(--color-accent-strong);
+}
+
+.ui-auth-pillar-accent .ui-auth-pillar-step {
+  color: var(--color-construction-text);
+}
+
+.ui-auth-pillar-body {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .ui-auth-mark {
@@ -597,9 +695,14 @@
   box-shadow: var(--shadow-xs);
 }
 
-.ui-auth-card-grid {
-  display: grid;
-  gap: 1rem;
+.ui-auth-product-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.65rem, 1.2rem + 1.6vw, 2.15rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--color-text);
 }
 
 .ui-auth-card {
@@ -1146,6 +1249,16 @@
   height: 1px;
   pointer-events: none;
   background: var(--gradient-surface-panel-line);
+}
+
+.ui-auth-hero.ui-panel {
+  background-image:
+    radial-gradient(
+      ellipse 100% 85% at 96% -6%,
+      var(--color-auth-hero-radial),
+      transparent 52%
+    ),
+    var(--gradient-surface-default);
 }
 
 .ui-card-coming-soon {

@@ -75,7 +75,7 @@ Isto significa:
   - `Auditoria`
   - `Configuração`
 - O topo da navegação deve acomodar contexto organizacional (`tenant`, unidade, escopo ativo) quando existir.
-- **i18n:** qualquer alteração de texto deve ser aplicada **no mesmo ciclo de trabalho** a **todos** os arquivos de mensagens do frontend (`messages/*.json` por locale suportado), em **paridade de chaves e de significado** — ver [skills/implementation/i18n/SKILL.md](../../../skills/implementation/i18n/SKILL.md) e [skills/implementation/i18n/policy.md](../../../skills/implementation/i18n/policy.md).
+- **i18n:** qualquer alteração de texto deve ser aplicada **no mesmo ciclo de trabalho** a **todos** os arquivos de mensagens do frontend (`messages/*.json` por locale suportado), em **paridade de chaves e de significado**; ver [skills/implementation/i18n/SKILL.md](../../../skills/implementation/i18n/SKILL.md) e [skills/implementation/i18n/policy.md](../../../skills/implementation/i18n/policy.md). Em copy de produto e mensagens, não usar travessão longo (`—`); preferir vírgula ou reestruturação da frase ([policy.md](../../../skills/implementation/i18n/policy.md)).
 
 ### Navegação local
 

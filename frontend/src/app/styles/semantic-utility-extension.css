@@ -1088,8 +1088,9 @@
 }
 
 @media (min-width: 768px) {
-  .ui-auth-card-grid {
+  .ui-auth-pillar-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
   }
 }
 

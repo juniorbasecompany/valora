@@ -148,6 +148,7 @@
   --color-shell-footer-surface: rgba(245, 248, 252, 0.78);
   --color-auth-google-skeleton: rgb(from var(--color-border) r g b / 0.25);
   --color-auth-remember-surface: rgb(from var(--color-background-muted) r g b / 0.7);
+  --color-auth-hero-radial: rgb(from var(--color-accent) r g b / 0.13);
   --color-shadow-outline: rgba(19, 32, 51, 0.03);
   --color-accent-border-emphasis: rgba(37, 117, 216, 0.2);
   --color-construction-border-default: rgba(232, 189, 106, 0.6);

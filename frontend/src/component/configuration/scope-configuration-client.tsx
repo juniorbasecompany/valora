@@ -61,7 +61,7 @@ type ScopeConfigurationClientProps = {
 type ScopeSelectionKey = number | "new" | null;
 
 function resolveScopeLabel(scope: TenantScopeRecord) {
-    return scope.name.trim() || scope.display_name.trim() || "—";
+    return scope.name.trim() || scope.display_name.trim() || "-";
 }
 
 function parseSelectedScopeKey(raw: string | null): ScopeSelectionKey {
@@ -98,7 +98,7 @@ function resolveSelectedScopeKey(
         return canCreate ? "new" : (itemList[0]?.id ?? null);
     }
 
-    /* Sem query explícita: mesmo padrão que locais/unidades — painel vazio (novo), quando permitido. */
+    /* Sem query explícita: mesmo padrão que locais/unidades, painel vazio (novo), quando permitido. */
     return canCreate ? "new" : (itemList[0]?.id ?? null);
 }
 
@@ -482,7 +482,7 @@ export function ScopeConfigurationClient({
                                         </span>
                                         {": "}
                                         <span className="ui-info-topic-value">
-                                            {selectedScope.name.trim() || "—"}
+                                            {selectedScope.name.trim() || "-"}
                                         </span>
                                     </p>
                                 </li>
@@ -493,7 +493,7 @@ export function ScopeConfigurationClient({
                                         </span>
                                         {": "}
                                         <span className="ui-info-topic-value">
-                                            {selectedScope.display_name.trim() || "—"}
+                                            {selectedScope.display_name.trim() || "-"}
                                         </span>
                                     </p>
                                 </li>

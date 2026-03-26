@@ -443,35 +443,33 @@
         }
     },
     "LoginPage": {
-        "eyebrow": "Acceso al sistema",
-        "title": "Autentícate para entrar en el espacio operativo de Valora.",
-        "description": "Usa tu cuenta de Google para iniciar sesión en Valora. La autenticación ya conecta la cuenta con la relación entre cuenta, licenciatario y miembro.",
+        "productName": "Valora",
+        "tagline": "Planificando el futuro con seguridad",
+        "title": "Tu negocio presentado en cifras que respaldas con propósito y origen.",
+        "description": "Una fuente única de verdad que crece con la empresa, con versiones alineadas, mejorando resultados y reduciendo riesgos. Entra con Google para abrir el contexto correcto de tu organización en esta sesión.",
         "notice": {
-            "authRequired": "Inicia sesión para acceder al área protegida de la aplicación.",
-            "signedOut": "Sesión finalizada. Inicia sesión de nuevo para continuar."
+            "authRequired": "Inicia sesión para acceder a esta área."
         },
         "cards": {
             "workspace": {
-                "title": "Un espacio serio desde el principio",
-                "description": "La navegación ya está preparada para crecer en módulos sin parecer una plantilla genérica de administración."
+                "title": "Ve el conjunto, profundiza cuando importe",
+                "description": "Espacio para que el equipo ejecute y visibilidad para guiar el siguiente paso."
             },
             "traceability": {
-                "title": "Base orientada a la trazabilidad",
-                "description": "La interfaz nace lista para recibir historial, auditoría y explicaciones contextuales en las próximas fases."
+                "title": "Cifras con respaldo",
+                "description": "Los cambios quedan registrados. Lo que muestras a socios o auditoría se apoya en historial y contexto."
             },
             "nextStep": {
-                "title": "Próxima entrega útil",
-                "description": "Después de la autenticación, el usuario llegará a la página principal y seguirá hacia la configuración administrativa inicial."
+                "title": "Después de entrar",
+                "description": "Acceso rápido al entorno. Con varios licenciatarios o invitaciones, eliges dónde actuar en esta sesión."
             }
         },
         "form": {
-            "title": "Iniciar sesión",
-            "description": "En esta fase, el acceso inicial al producto ocurre mediante autenticación con Google y contexto organizativo real.",
-            "submitIdle": "Cargando autenticación de Google...",
+            "title": "Acceder a Valora",
+            "submitIdle": "Preparando acceso con Google...",
             "submitPending": "Entrando con Google...",
-            "helper": "Si solo existe una relación activa, el acceso entra directamente en la aplicación. Cuando existan varias relaciones o invitaciones, Valora te pedirá que elijas el licenciatario.",
-            "accessPolicy": "En el primer acceso sin relación ni invitación, Valora crea automáticamente un contexto inicial para que completes la configuración administrativa.",
-            "googleUnavailable": "El acceso con Google no está disponible porque el identificador público del cliente de Google aún no se ha configurado en el entorno.",
+            "accessPolicy": "Primera visita: te ayudamos a definir licenciatario, equipo y ámbito para empezar.",
+            "googleUnavailable": "Acceso con Google no disponible: el identificador público del cliente de Google aún no está configurado en este entorno.",
             "error": "No se pudo completar el acceso con Google. Inténtalo de nuevo.",
             "rememberMeLabel": "Permanecer autenticado en este dispositivo"
         }

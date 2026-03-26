@@ -19,10 +19,11 @@ Garantir que **texto de produto e mensagens de erro** não fiquem espalhados com
 ## Regras obrigatórias
 
 - Usar **chaves estáveis em inglês** com **namespaces** (`common`, `auth`, `error`, `domain.*`); uma chave, um significado.
-- **Não** usar frase de UI ou de produto em português (ou outro idioma) como **única** fonte de verdade em JSX ou em Python — mensagens vivem em ficheiros de tradução ou camada equivalente.
+- **Não** usar frase de UI ou de produto em português (ou outro idioma) como **única** fonte de verdade em JSX ou em Python; mensagens vivem em ficheiros de tradução ou camada equivalente.
 - Sempre que **adicionar, alterar ou remover** texto governado por i18n, aplicar a mesma mudança a **todos os idiomas suportados** no mesmo ciclo de trabalho. As traduções devem permanecer sincronizadas em **chaves, hierarquia, placeholders/interpolações, estados de UI e conteúdo equivalente**, sem idiomas “atrasados” ou com estrutura divergente.
 - **API:** expor **`code` estável** e detalhes estruturados; no cliente, mapear `code` → chave i18n (com interpolação a partir dos detalhes). Evitar depender só de `message` livre para a UI.
-- **Formatação:** datas, números e moeda de exibição com **`Intl`** (ou API do next-intl), segundo o locale efectivo — não formatar “na mão” por cópia de símbolos.
+- **Formatação:** datas, números e moeda de exibição com **`Intl`** (ou API do next-intl), segundo o locale efectivo; não formatar “na mão” por cópia de símbolos.
+- **Pontuação em copy:** seguir [policy.md](./policy.md): não usar `—` (travessão longo) em mensagens; preferir vírgula ou nova oração.
 - **Idioma da UI** e **contexto operacional multi-país** (tenant, regra fiscal, moeda funcional) são conceitos distintos; regra de negócio e sobrescrita por país seguem [multi-country-localization](../../application/multi-country-localization/SKILL.md), não ramificações só para trocar texto.
 
 ## Stack

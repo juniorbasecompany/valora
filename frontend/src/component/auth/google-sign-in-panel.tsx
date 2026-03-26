@@ -46,7 +46,7 @@ type GoogleSignInPanelProps = {
   clientId?: string;
   buttonLabel: string;
   buttonPendingLabel: string;
-  helperText: string;
+  helperText?: string;
   unavailableText: string;
   genericErrorText: string;
   rememberMeLabel: string;
@@ -189,9 +189,9 @@ export function GoogleSignInPanel({
   return (
     <div className="ui-stack-xl">
       <div className="ui-stack-sm">
-        <div className="ui-auth-helper">
-          {helperText}
-        </div>
+        {helperText ? (
+          <div className="ui-auth-helper">{helperText}</div>
+        ) : null}
         {errorMessage ? (
           <div className="ui-notice-attention ui-notice-block">
             {errorMessage}

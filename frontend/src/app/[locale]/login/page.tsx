@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 
 import { GoogleSignInPanel } from "@/component/auth/google-sign-in-panel";
 import { LoginLocaleBar } from "@/component/i18n/login-locale-bar";
-import { Badge } from "@/component/ui/badge";
 import {
     AuditIcon,
     SparkIcon,
@@ -33,14 +32,10 @@ export default async function LoginPage({
     }
 
     const noticeMessage =
-        reason === "signed_out"
-            ? t("notice.signedOut")
-            : reason === "auth_required"
-                ? t("notice.authRequired")
-                : null;
+        reason === "auth_required" ? t("notice.authRequired") : null;
 
     return (
-        <main className="ui-shell ui-shell-page">
+        <main className="ui-shell ui-shell-page ui-auth-page">
             <LoginLocaleBar currentLocale={locale} />
             <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
             <section className="ui-auth-layout">
@@ -49,10 +44,10 @@ export default async function LoginPage({
                         <div className="ui-auth-mark">
                             <ValoraMark />
                         </div>
-                        <Badge>
-                            {t("eyebrow")}
-                        </Badge>
+                        <span className="ui-auth-product-name">{t("productName")}</span>
                     </div>
+
+                    <p className="ui-auth-tagline">{t("tagline")}</p>
 
                     <div className="ui-heading-stack-lg">
                         <h1 className="ui-header-title ui-title-page ui-title-page-hero">
@@ -63,41 +58,65 @@ export default async function LoginPage({
                         </p>
                     </div>
 
-                    <div className="ui-auth-card-grid">
-                        <article className="ui-card ui-auth-card">
-                            <div className="ui-icon-badge">
-                                <SparkIcon className="ui-icon" />
+                    <div className="ui-auth-pillar-list" role="list">
+                        <article className="ui-auth-pillar" role="listitem">
+                            <div className="ui-auth-pillar-top">
+                                <div className="ui-icon-badge">
+                                    <SparkIcon className="ui-icon" />
+                                </div>
+                                <span className="ui-auth-pillar-step" aria-hidden>
+                                    01
+                                </span>
                             </div>
-                            <h2 className="ui-header-title ui-title-section">
-                                {t("cards.workspace.title")}
-                            </h2>
-                            <p className="ui-copy-body">
-                                {t("cards.workspace.description")}
-                            </p>
+                            <div className="ui-auth-pillar-body">
+                                <h2 className="ui-header-title ui-title-section">
+                                    {t("cards.workspace.title")}
+                                </h2>
+                                <p className="ui-copy-body">
+                                    {t("cards.workspace.description")}
+                                </p>
+                            </div>
                         </article>
 
-                        <article className="ui-card ui-auth-card">
-                            <div className="ui-icon-badge ui-icon-badge-attention">
-                                <AuditIcon className="ui-icon" />
+                        <article
+                            className="ui-auth-pillar ui-auth-pillar-accent"
+                            role="listitem"
+                        >
+                            <div className="ui-auth-pillar-top">
+                                <div className="ui-icon-badge ui-icon-badge-attention">
+                                    <AuditIcon className="ui-icon" />
+                                </div>
+                                <span className="ui-auth-pillar-step" aria-hidden>
+                                    02
+                                </span>
                             </div>
-                            <h2 className="ui-header-title ui-title-section">
-                                {t("cards.traceability.title")}
-                            </h2>
-                            <p className="ui-copy-body">
-                                {t("cards.traceability.description")}
-                            </p>
+                            <div className="ui-auth-pillar-body">
+                                <h2 className="ui-header-title ui-title-section">
+                                    {t("cards.traceability.title")}
+                                </h2>
+                                <p className="ui-copy-body">
+                                    {t("cards.traceability.description")}
+                                </p>
+                            </div>
                         </article>
 
-                        <article className="ui-card ui-auth-card">
-                            <div className="ui-icon-badge">
-                                <WorkflowIcon className="ui-icon" />
+                        <article className="ui-auth-pillar" role="listitem">
+                            <div className="ui-auth-pillar-top">
+                                <div className="ui-icon-badge">
+                                    <WorkflowIcon className="ui-icon" />
+                                </div>
+                                <span className="ui-auth-pillar-step" aria-hidden>
+                                    03
+                                </span>
                             </div>
-                            <h2 className="ui-header-title ui-title-section">
-                                {t("cards.nextStep.title")}
-                            </h2>
-                            <p className="ui-copy-body">
-                                {t("cards.nextStep.description")}
-                            </p>
+                            <div className="ui-auth-pillar-body">
+                                <h2 className="ui-header-title ui-title-section">
+                                    {t("cards.nextStep.title")}
+                                </h2>
+                                <p className="ui-copy-body">
+                                    {t("cards.nextStep.description")}
+                                </p>
+                            </div>
                         </article>
                     </div>
                 </div>
@@ -107,9 +126,6 @@ export default async function LoginPage({
                         <h2 className="ui-header-title ui-title-section ui-title-section-xl">
                             {t("form.title")}
                         </h2>
-                        <p className="ui-copy-body">
-                            {t("form.description")}
-                        </p>
                     </div>
 
                     {noticeMessage ? (
@@ -123,7 +139,6 @@ export default async function LoginPage({
                         clientId={googleClientId}
                         buttonLabel={t("form.submitIdle")}
                         buttonPendingLabel={t("form.submitPending")}
-                        helperText={t("form.helper")}
                         unavailableText={t("form.googleUnavailable")}
                         genericErrorText={t("form.error")}
                         rememberMeLabel={t("form.rememberMeLabel")}

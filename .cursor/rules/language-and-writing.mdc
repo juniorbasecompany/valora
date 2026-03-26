@@ -10,3 +10,4 @@ alwaysApply: true
 - Use português do Brasil no conteúdo textual dos arquivos Markdown do projeto.
 - No português do Brasil, prefira vocabulário e convenções brasileiros; evite formas típicas de Portugal (por exemplo: "arquivo", não "ficheiro"; "celular", não "telemóvel").
 - Em Markdown, preserve em inglês todo termo que representar elemento de código, identificador, estrutura técnica, comando ou exemplo de código.
+- Em textos de produto, mensagens de interface (i18n) e copy de sistema, evite o travessão longo (U+2014, `—`); prefira vírgula ou reestruturação da frase. Detalhe operacional: [skills/implementation/i18n/policy.md](../../skills/implementation/i18n/policy.md).

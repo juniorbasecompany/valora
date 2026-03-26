@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Generator
 from contextlib import contextmanager
+from datetime import datetime
 
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, event, select
@@ -17,6 +18,7 @@ from valora_backend.db import get_session
 from valora_backend.main import create_app
 from valora_backend.model.base import Base
 from valora_backend.model.identity import Account, Location, Member, Scope, Tenant, Unity
+from valora_backend.model.log import Log
 
 
 @contextmanager
@@ -166,6 +168,28 @@ def build_test_client(
         app.dependency_overrides.clear()
         session.close()
         engine.dispose()
+
+
+def _seed_log(
+    session: Session,
+    *,
+    tenant_id: int,
+    account_id: int | None,
+    table_name: str,
+    action_type: str,
+    row_payload: dict[str, object] | None,
+    moment_utc: datetime,
+) -> None:
+    session.add(
+        Log(
+            tenant_id=tenant_id,
+            account_id=account_id,
+            table_name=table_name,
+            action_type=action_type,
+            row_payload=row_payload,
+            moment_utc=moment_utc,
+        )
+    )
 
 
 def test_get_current_tenant_member_directory_exposes_capabilities() -> None:
@@ -824,3 +848,175 @@ def test_member_cannot_create_unity() -> None:
 
     assert response.status_code == 403
     assert response.json()["detail"] == "Insufficient permissions to create unity"
+
+
+def test_tenant_history_endpoint_returns_latest_scope_logs_with_diff() -> None:
+    with build_test_client(current_member_key="admin") as (client, session, _):
+        tenant = session.scalar(select(Tenant))
+        admin_account = session.scalar(select(Account).where(Account.email == "admin@example.com"))
+        scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
+
+        assert tenant is not None
+        assert admin_account is not None
+        assert scope_id is not None
+
+        base_time = datetime(2026, 3, 25, 10, 0, 0)
+        _seed_log(
+            session,
+            tenant_id=tenant.id,
+            account_id=admin_account.id,
+            table_name="scope",
+            action_type="I",
+            row_payload={
+                "id": scope_id,
+                "name": "Aves",
+                "display_name": "Aves para producao de ovos",
+                "tenant_id": tenant.id,
+            },
+            moment_utc=base_time,
+        )
+        _seed_log(
+            session,
+            tenant_id=tenant.id,
+            account_id=admin_account.id,
+            table_name="scope",
+            action_type="U",
+            row_payload={
+                "id": scope_id,
+                "name": "Aves",
+                "display_name": "Aves postura",
+                "tenant_id": tenant.id,
+            },
+            moment_utc=base_time.replace(minute=5),
+        )
+        _seed_log(
+            session,
+            tenant_id=tenant.id,
+            account_id=admin_account.id,
+            table_name="scope",
+            action_type="U",
+            row_payload={
+                "id": scope_id,
+                "name": "Aves",
+                "display_name": "Aves especiais",
+                "tenant_id": tenant.id,
+            },
+            moment_utc=base_time.replace(minute=10),
+        )
+        _seed_log(
+            session,
+            tenant_id=tenant.id,
+            account_id=admin_account.id,
+            table_name="scope",
+            action_type="D",
+            row_payload=None,
+            moment_utc=base_time.replace(minute=15),
+        )
+        _seed_log(
+            session,
+            tenant_id=tenant.id,
+            account_id=admin_account.id,
+            table_name="member",
+            action_type="U",
+            row_payload={"id": 999, "display_name": "Ignored"},
+            moment_utc=base_time.replace(minute=20),
+        )
+        session.commit()
+
+        response = client.get("/auth/tenant/current/logs/scope")
+
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert [item["action_type"] for item in payload["item_list"]] == ["D", "U", "U", "I"]
+    assert payload["has_more"] is False
+    assert payload["next_offset"] is None
+
+    delete_item = payload["item_list"][0]
+    latest_update = payload["item_list"][1]
+    previous_update = payload["item_list"][2]
+    insert_item = payload["item_list"][3]
+
+    assert delete_item["row"] is None
+    assert delete_item["diff_state"] == "not_applicable"
+    assert delete_item["actor_name"] == "Admin User"
+
+    assert latest_update["diff_state"] == "ready"
+    assert latest_update["field_change_list"] == [
+        {
+            "field_name": "display_name",
+            "previous_value": "Aves postura",
+            "current_value": "Aves especiais",
+        }
+    ]
+
+    assert previous_update["diff_state"] == "ready"
+    assert previous_update["field_change_list"] == [
+        {
+            "field_name": "display_name",
+            "previous_value": "Aves para producao de ovos",
+            "current_value": "Aves postura",
+        }
+    ]
+
+    assert insert_item["row"]["id"] == scope_id
+    assert insert_item["diff_state"] == "not_applicable"
+
+
+def test_tenant_history_endpoint_supports_actor_filter_and_pagination() -> None:
+    with build_test_client(current_member_key="admin") as (client, session, _):
+        tenant = session.scalar(select(Tenant))
+        admin_account = session.scalar(select(Account).where(Account.email == "admin@example.com"))
+        master_account = session.scalar(
+            select(Account).where(Account.email == "master@example.com")
+        )
+        scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
+
+        assert tenant is not None
+        assert admin_account is not None
+        assert master_account is not None
+        assert scope_id is not None
+
+        base_time = datetime(2026, 3, 26, 9, 0, 0)
+        _seed_log(
+            session,
+            tenant_id=tenant.id,
+            account_id=admin_account.id,
+            table_name="scope",
+            action_type="I",
+            row_payload={"id": scope_id, "name": "Aves", "display_name": "Aves A"},
+            moment_utc=base_time,
+        )
+        _seed_log(
+            session,
+            tenant_id=tenant.id,
+            account_id=admin_account.id,
+            table_name="scope",
+            action_type="U",
+            row_payload={"id": scope_id, "name": "Aves", "display_name": "Aves B"},
+            moment_utc=base_time.replace(minute=10),
+        )
+        _seed_log(
+            session,
+            tenant_id=tenant.id,
+            account_id=master_account.id,
+            table_name="scope",
+            action_type="U",
+            row_payload={"id": scope_id, "name": "Aves", "display_name": "Aves C"},
+            moment_utc=base_time.replace(minute=20),
+        )
+        session.commit()
+
+        response = client.get(
+            "/auth/tenant/current/logs/scope",
+            params={"actor": "Admin", "limit": 1},
+        )
+
+    assert response.status_code == 200
+    payload = response.json()
+
+    assert len(payload["item_list"]) == 1
+    assert payload["item_list"][0]["actor_name"] == "Admin User"
+    assert payload["item_list"][0]["action_type"] == "U"
+    assert payload["has_more"] is True
+    assert payload["next_offset"] == 1

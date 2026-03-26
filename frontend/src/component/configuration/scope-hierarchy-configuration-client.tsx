@@ -18,7 +18,11 @@ import { ConfigurationNameDisplayNameFields } from "@/component/configuration/co
 import { DirectoryCreateToolbarButton } from "@/component/configuration/directory-create-toolbar-button";
 import { useEditorPanelFlash } from "@/component/configuration/use-editor-panel-flash";
 import { useReplaceConfigurationPath } from "@/component/configuration/use-replace-configuration-path";
-import type { TenantScopeHierarchyItemBase, TenantScopeRecord } from "@/lib/auth/types";
+import type {
+    AuditLogTableName,
+    TenantScopeHierarchyItemBase,
+    TenantScopeRecord
+} from "@/lib/auth/types";
 import { parseErrorDetail } from "@/lib/api/parse-error-detail";
 
 export type ScopeHierarchySavePayload = {
@@ -48,6 +52,7 @@ export type ScopeHierarchyConfigurationClientProps<
     configurationSegment: string;
     queryParamKey: string;
     apiSegment: string;
+    historyTableName: AuditLogTableName;
     formIds: {
         nameInput: string;
         displayTextarea: string;
@@ -213,6 +218,7 @@ export function ScopeHierarchyConfigurationClient<
     configurationSegment,
     queryParamKey,
     apiSegment,
+    historyTableName,
     formIds,
     getParentId,
     buildSavePayload
@@ -274,6 +280,7 @@ export function ScopeHierarchyConfigurationClient<
     const [requestErrorMessage, setRequestErrorMessage] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isDeletePending, setIsDeletePending] = useState(false);
+    const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
     const editorPanelElementRef = useRef<HTMLDivElement | null>(null);
     const itemList = useMemo(() => directory?.item_list ?? [], [directory]);
     const childrenByParent = useMemo(() => {
@@ -463,6 +470,7 @@ export function ScopeHierarchyConfigurationClient<
         const nextDirectory = data as TDirectory;
         setDirectory(nextDirectory);
         syncEditor(null, true, null);
+        setHistoryRefreshKey((previous) => previous + 1);
     }, [
         apiSegment,
         buildSavePayload,
@@ -611,7 +619,9 @@ export function ScopeHierarchyConfigurationClient<
             history={{
                 headingId: formIds.historyHeading,
                 title: copy.historyTitle,
-                description: copy.historyDescription
+                description: copy.historyDescription,
+                tableName: historyTableName,
+                refreshKey: historyRefreshKey
             }}
             footer={{
                 configurationPath,

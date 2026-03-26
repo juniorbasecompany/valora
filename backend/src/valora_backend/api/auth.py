@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from datetime import date, datetime, time, timedelta
+from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import or_, select, text
 from sqlalchemy.orm import Session
@@ -43,6 +45,7 @@ from valora_backend.model.identity import (
     Tenant,
     Unity,
 )
+from valora_backend.model.log import Log
 from valora_backend.model.null_if_empty import commit_session_with_null_if_empty
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -51,6 +54,10 @@ ACTIVE_STATUS = 1
 PENDING_STATUS = 2
 DISABLED_STATUS = 3
 GOOGLE_PROVIDER = "google"
+HISTORY_TABLE_NAME_SET = {"tenant", "member", "scope", "location", "unity"}
+HISTORY_ACTION_TYPE_SET = {"I", "U", "D"}
+DEFAULT_HISTORY_PAGE_SIZE = 5
+MAX_HISTORY_PAGE_SIZE = 50
 
 
 class GoogleTokenRequest(BaseModel):
@@ -382,6 +389,30 @@ class AuthSessionResponse(BaseModel):
     account: SessionAccount
     member: SessionMember
     tenant: SessionTenant
+
+
+class TenantHistoryDiffFieldResponse(BaseModel):
+    field_name: str
+    previous_value: Any | None = None
+    current_value: Any | None = None
+
+
+class TenantHistoryRecordResponse(BaseModel):
+    id: int
+    moment_utc: datetime
+    actor_name: str | None = None
+    action_type: str
+    row: dict[str, Any] | None = None
+    field_change_list: list[TenantHistoryDiffFieldResponse] = Field(
+        default_factory=list
+    )
+    diff_state: str = "not_applicable"
+
+
+class TenantHistoryResponse(BaseModel):
+    item_list: list[TenantHistoryRecordResponse] = Field(default_factory=list)
+    has_more: bool
+    next_offset: int | None = None
 
 
 def _sync_account_name(account: Account, identity: GoogleIdentity) -> bool:
@@ -1236,6 +1267,250 @@ def _validate_member_status_transition(target: Member, next_status: int) -> None
         )
 
 
+def _validate_history_table_name(table_name: str) -> str:
+    if table_name not in HISTORY_TABLE_NAME_SET:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="History table not found",
+        )
+    return table_name
+
+
+def _extract_log_record_id(row_payload: Any | None) -> int | None:
+    if not isinstance(row_payload, dict):
+        return None
+
+    record_id = row_payload.get("id")
+    return record_id if isinstance(record_id, int) else None
+
+
+def _resolve_history_actor_name(
+    *,
+    display_name: str | None,
+    name: str | None,
+    email: str | None,
+) -> str | None:
+    for candidate in (display_name, name, email):
+        if candidate and candidate.strip():
+            return candidate.strip()
+    return None
+
+
+def _build_history_field_change_list(
+    *,
+    current_row: dict[str, Any] | None,
+    previous_row: dict[str, Any] | None,
+) -> list[TenantHistoryDiffFieldResponse]:
+    if current_row is None or previous_row is None:
+        return []
+
+    return [
+        TenantHistoryDiffFieldResponse(
+            field_name=field_name,
+            previous_value=previous_row.get(field_name),
+            current_value=current_row.get(field_name),
+        )
+        for field_name in sorted(set(previous_row) | set(current_row))
+        if previous_row.get(field_name) != current_row.get(field_name)
+    ]
+
+
+def _build_previous_row_payload_by_log_id(
+    session: Session,
+    *,
+    table_name: str,
+    tenant_id: int,
+    page_row_list: list[dict[str, Any]],
+) -> dict[int, dict[str, Any]]:
+    pending_lookup_by_record_id: dict[int, list[dict[str, int]]] = defaultdict(list)
+    previous_row_payload_by_log_id: dict[int, dict[str, Any]] = {}
+    max_before_id = 0
+
+    for page_row in page_row_list:
+        if page_row["action_type"] != "U":
+            continue
+
+        record_id = _extract_log_record_id(page_row["row_payload"])
+        if record_id is None:
+            continue
+
+        log_id = int(page_row["id"])
+        pending_lookup_by_record_id[record_id].append(
+            {"log_id": log_id, "before_id": log_id}
+        )
+        max_before_id = max(max_before_id, log_id)
+
+    if not pending_lookup_by_record_id:
+        return previous_row_payload_by_log_id
+
+    for pending_list in pending_lookup_by_record_id.values():
+        pending_list.sort(key=lambda item: item["before_id"], reverse=True)
+
+    prior_log_stream = session.scalars(
+        select(Log)
+        .where(
+            Log.tenant_id == tenant_id,
+            Log.table_name == table_name,
+            Log.row_payload.is_not(None),
+            Log.id < max_before_id,
+        )
+        .order_by(Log.id.desc())
+    )
+
+    for prior_log in prior_log_stream:
+        record_id = _extract_log_record_id(prior_log.row_payload)
+        if record_id is None:
+            continue
+
+        pending_list = pending_lookup_by_record_id.get(record_id)
+        if not pending_list:
+            continue
+
+        while pending_list and prior_log.id < pending_list[0]["before_id"]:
+            if isinstance(prior_log.row_payload, dict):
+                previous_row_payload_by_log_id[pending_list[0]["log_id"]] = (
+                    prior_log.row_payload
+                )
+            pending_list.pop(0)
+
+        if not pending_list:
+            pending_lookup_by_record_id.pop(record_id, None)
+            if not pending_lookup_by_record_id:
+                break
+
+    return previous_row_payload_by_log_id
+
+
+def _build_tenant_history_response(
+    session: Session,
+    *,
+    actor: Member,
+    table_name: str,
+    limit: int,
+    offset: int,
+    action_type: str | None,
+    actor_query: str | None,
+    moment_from: date | None,
+    moment_to: date | None,
+) -> TenantHistoryResponse:
+    validated_table_name = _validate_history_table_name(table_name)
+
+    if action_type is not None and action_type not in HISTORY_ACTION_TYPE_SET:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid history action",
+        )
+
+    if moment_from and moment_to and moment_from > moment_to:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid history period",
+        )
+
+    history_query = (
+        select(
+            Log.id.label("id"),
+            Log.moment_utc.label("moment_utc"),
+            Log.action_type.label("action_type"),
+            Log.row_payload.label("row_payload"),
+            Account.display_name.label("actor_display_name"),
+            Account.name.label("actor_name"),
+            Account.email.label("actor_email"),
+        )
+        .select_from(Log)
+        .outerjoin(Account, Account.id == Log.account_id)
+        .where(
+            Log.tenant_id == actor.tenant_id,
+            Log.table_name == validated_table_name,
+        )
+    )
+
+    if action_type is not None:
+        history_query = history_query.where(Log.action_type == action_type)
+
+    if actor_query and actor_query.strip():
+        like_pattern = f"%{actor_query.strip()}%"
+        history_query = history_query.where(
+            or_(
+                Account.display_name.ilike(like_pattern),
+                Account.name.ilike(like_pattern),
+                Account.email.ilike(like_pattern),
+            )
+        )
+
+    if moment_from is not None:
+        history_query = history_query.where(
+            Log.moment_utc >= datetime.combine(moment_from, time.min)
+        )
+
+    if moment_to is not None:
+        history_query = history_query.where(
+            Log.moment_utc < datetime.combine(moment_to + timedelta(days=1), time.min)
+        )
+
+    raw_row_list = (
+        session.execute(
+            history_query.order_by(Log.moment_utc.desc(), Log.id.desc())
+            .offset(offset)
+            .limit(limit + 1)
+        )
+        .mappings()
+        .all()
+    )
+    page_row_list = [dict(row) for row in raw_row_list[:limit]]
+    has_more = len(raw_row_list) > limit
+
+    previous_row_payload_by_log_id = _build_previous_row_payload_by_log_id(
+        session,
+        table_name=validated_table_name,
+        tenant_id=actor.tenant_id,
+        page_row_list=page_row_list,
+    )
+
+    item_list: list[TenantHistoryRecordResponse] = []
+    for history_row in page_row_list:
+        row_payload = (
+            history_row["row_payload"]
+            if isinstance(history_row["row_payload"], dict)
+            else None
+        )
+        diff_state = "not_applicable"
+        field_change_list: list[TenantHistoryDiffFieldResponse] = []
+
+        if history_row["action_type"] == "U":
+            previous_row = previous_row_payload_by_log_id.get(int(history_row["id"]))
+            if previous_row is None:
+                diff_state = "missing_previous"
+            else:
+                diff_state = "ready"
+                field_change_list = _build_history_field_change_list(
+                    current_row=row_payload,
+                    previous_row=previous_row,
+                )
+
+        item_list.append(
+            TenantHistoryRecordResponse(
+                id=int(history_row["id"]),
+                moment_utc=history_row["moment_utc"],
+                actor_name=_resolve_history_actor_name(
+                    display_name=history_row["actor_display_name"],
+                    name=history_row["actor_name"],
+                    email=history_row["actor_email"],
+                ),
+                action_type=history_row["action_type"],
+                row=row_payload,
+                field_change_list=field_change_list,
+                diff_state=diff_state,
+            )
+        )
+
+    return TenantHistoryResponse(
+        item_list=item_list,
+        has_more=has_more,
+        next_offset=(offset + limit) if has_more else None,
+    )
+
+
 @router.get("/tenant/current", response_model=TenantCurrentResponse)
 def get_current_tenant_detail(
     member: Member = Depends(get_current_member),
@@ -1264,6 +1539,35 @@ def get_current_tenant_scope_directory(
     session: Session = Depends(get_session),
 ):
     return _build_tenant_scope_directory(session, actor=member)
+
+
+@router.get("/tenant/current/logs/{table_name}", response_model=TenantHistoryResponse)
+def get_current_tenant_history(
+    table_name: str,
+    limit: int = Query(
+        default=DEFAULT_HISTORY_PAGE_SIZE,
+        ge=1,
+        le=MAX_HISTORY_PAGE_SIZE,
+    ),
+    offset: int = Query(default=0, ge=0),
+    action: str | None = Query(default=None),
+    actor: str | None = Query(default=None),
+    moment_from: date | None = Query(default=None, alias="from"),
+    moment_to: date | None = Query(default=None, alias="to"),
+    current_member: Member = Depends(get_current_member),
+    session: Session = Depends(get_session),
+):
+    return _build_tenant_history_response(
+        session,
+        actor=current_member,
+        table_name=table_name,
+        limit=limit,
+        offset=offset,
+        action_type=action,
+        actor_query=actor,
+        moment_from=moment_from,
+        moment_to=moment_to,
+    )
 
 
 @router.patch("/me/current-scope", response_model=CurrentScopeSelectionResponse)

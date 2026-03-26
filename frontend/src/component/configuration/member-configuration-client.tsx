@@ -159,6 +159,7 @@ export function MemberConfigurationClient({
     const [requestErrorMessage, setRequestErrorMessage] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isDeletePending, setIsDeletePending] = useState(false);
+    const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
     const editorPanelElementRef = useRef<HTMLDivElement | null>(null);
     const initialSearchMemberIdRef = useRef<number | null>(initialSearchMemberId);
     const selectedMemberIdRef = useRef<number | null>(initialSelectedMemberId);
@@ -322,6 +323,7 @@ export function MemberConfigurationClient({
 
             const updatedDirectory = data as TenantMemberDirectoryResponse;
             syncFromDirectory(updatedDirectory, selectedMember.id);
+            setHistoryRefreshKey((previous) => previous + 1);
         } catch {
             setRequestErrorMessage(isDeletePending ? copy.deleteError : copy.saveError);
         } finally {
@@ -522,7 +524,9 @@ export function MemberConfigurationClient({
             history={{
                 headingId: "member-history-heading",
                 title: copy.historyTitle,
-                description: copy.historyDescription
+                description: copy.historyDescription,
+                tableName: "member",
+                refreshKey: historyRefreshKey
             }}
             footer={{
                 configurationPath,

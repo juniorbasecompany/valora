@@ -159,7 +159,7 @@
         },
         "history": {
             "title": "Histórico de alterações",
-            "description": "Uma linha do tempo das alterações de cadastro aparecerá aqui quando a auditoria do diretório estiver disponível. Até lá, este bloco permanece como referência de layout e rastreabilidade."
+            "description": "Veja as alterações mais recentes do cadastro de membros, com quem alterou, quando alterou e o payload gravado no log."
         },
         "section": {
             "profile": {
@@ -212,7 +212,7 @@
         "empty": "Nenhum escopo foi encontrado para o licenciado ativo.",
         "history": {
             "title": "Histórico de alterações",
-            "description": "Uma linha do tempo das alterações de escopo aparecerá aqui quando a auditoria estrutural estiver disponível. Até lá, este bloco permanece como referência de layout e rastreabilidade."
+            "description": "Veja as alterações mais recentes dos escopos do licenciado, com data, usuário, tipo de ação e o JSON salvo no log."
         },
         "section": {
             "identity": {
@@ -262,7 +262,7 @@
         },
         "history": {
             "title": "Histórico de alterações",
-            "description": "Uma linha do tempo das alterações de hierarquia aparecerá aqui quando a auditoria estrutural estiver disponível. Até lá, esta aba permanece como referência de layout e rastreabilidade."
+            "description": "Veja as alterações mais recentes da tabela de locais, incluindo data, usuário, tipo de ação e o JSON gravado no log."
         },
         "section": {
             "identity": {
@@ -321,7 +321,7 @@
         },
         "history": {
             "title": "Histórico de alterações",
-            "description": "Uma linha do tempo das alterações aparecerá aqui quando a auditoria estrutural estiver disponível. Até lá, esta aba permanece como referência de layout e rastreabilidade."
+            "description": "Veja as alterações mais recentes da tabela de unidades produtivas, com data, usuário, tipo de ação e o JSON gravado no log."
         },
         "section": {
             "identity": {
@@ -378,7 +378,7 @@
         },
         "history": {
             "title": "Histórico de alterações",
-            "description": "Uma linha do tempo de quem alterou o quê aparecerá aqui quando a API de auditoria estiver disponível. Até lá, este bloco permanece como referência de layout e rastreabilidade ao lado do formulário."
+            "description": "Veja as alterações mais recentes do licenciado ativo, com data, usuário, tipo de ação e o JSON gravado no log."
         },
         "section": {
             "display": {
@@ -413,6 +413,40 @@
             "validation": "Este campo não pode ficar vazio."
         },
         "discardConfirm": "Descartar alterações não salvas?"
+    },
+    "AuditHistory": {
+        "loading": "Carregando histórico...",
+        "empty": "Nenhum registro de histórico foi encontrado para os filtros atuais.",
+        "unknownUser": "Usuário não encontrado",
+        "entryLabel": "Log #{id}",
+        "actorLabel": "Usuário: {actorName}",
+        "diffTitle": "Diferenças em relação ao registro anterior",
+        "diffUnavailable": "Não foi possível comparar este update com o registro anterior.",
+        "diffEmpty": "Nenhuma diferença foi detectada em relação ao registro anterior.",
+        "deletedNote": "Este registro representa uma exclusão. O log não possui payload da row para este caso.",
+        "rowTitle": "JSON da row",
+        "previousValue": "Antes",
+        "currentValue": "Depois",
+        "filter": {
+            "action": "Ação",
+            "allActions": "Todas as ações",
+            "actor": "Usuário",
+            "actorPlaceholder": "Filtrar por nome ou email",
+            "from": "De",
+            "to": "Até"
+        },
+        "action": {
+            "insert": "Inclusão",
+            "update": "Atualização",
+            "delete": "Exclusão",
+            "applyFilters": "Aplicar filtros",
+            "clearFilters": "Limpar filtros",
+            "loadMore": "Ver mais",
+            "loadingMore": "Carregando..."
+        },
+        "error": {
+            "load": "Não foi possível carregar o histórico. Tente novamente."
+        }
     },
     "LoginPage": {
         "eyebrow": "Entrada do sistema",

@@ -35,6 +35,7 @@ export function LocationConfigurationClient({
             configurationSegment="location"
             queryParamKey="location"
             apiSegment="locations"
+            historyTableName="location"
             formIds={{
                 nameInput: "location-name",
                 displayTextarea: "location-display-name",

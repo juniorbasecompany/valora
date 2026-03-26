@@ -150,6 +150,7 @@ export function ScopeConfigurationClient({
     const [requestErrorMessage, setRequestErrorMessage] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isDeletePending, setIsDeletePending] = useState(false);
+    const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
     const editorPanelElementRef = useRef<HTMLDivElement | null>(null);
     const initialSearchScopeKeyRef = useRef<ScopeSelectionKey>(initialSearchScopeKey);
     const selectedScopeKeyRef = useRef<ScopeSelectionKey>(initialSelectedScopeKey);
@@ -326,6 +327,7 @@ export function ScopeConfigurationClient({
 
                 const updatedDirectory = data as TenantScopeDirectoryResponse;
                 syncFromDirectory(updatedDirectory, "new");
+                setHistoryRefreshKey((previous) => previous + 1);
                 return;
             }
 
@@ -358,6 +360,7 @@ export function ScopeConfigurationClient({
 
             const updatedDirectory = data as TenantScopeDirectoryResponse;
             syncFromDirectory(updatedDirectory, "new");
+            setHistoryRefreshKey((previous) => previous + 1);
         } catch {
             setRequestErrorMessage(
                 isCreateMode
@@ -533,7 +536,9 @@ export function ScopeConfigurationClient({
             history={{
                 headingId: "scope-history-heading",
                 title: copy.historyTitle,
-                description: copy.historyDescription
+                description: copy.historyDescription,
+                tableName: "scope",
+                refreshKey: historyRefreshKey
             }}
             footer={{
                 configurationPath,

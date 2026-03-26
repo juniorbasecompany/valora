@@ -12,13 +12,14 @@ for /f "tokens=5" %%P in ('netstat -ano ^| findstr /R /C:":%BACKEND_PORT% .*LIST
 )
 
 if defined BACKEND_PID (
-    echo Porta %BACKEND_PORT% ja esta em uso por PID %BACKEND_PID%. Ignorando novo uvicorn.
-    echo Se esse processo nao for a API do Valora, finalize-o e execute start.bat novamente.
-) else (
-    cd backend
-    start /B "" .\.venv\Scripts\python.exe -m uvicorn valora_backend.main:app --port %BACKEND_PORT%
-    cd ..
+    echo Reiniciando backend na porta %BACKEND_PORT%, PID atual %BACKEND_PID%...
+    taskkill /PID %BACKEND_PID% /F >nul
+    timeout /t 2 /nobreak >nul
 )
+
+cd backend
+start /B "" .\.venv\Scripts\python.exe -m uvicorn valora_backend.main:app --port %BACKEND_PORT%
+cd ..
 
 cd frontend
 npm run dev

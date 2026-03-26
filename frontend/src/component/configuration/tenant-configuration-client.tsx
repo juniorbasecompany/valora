@@ -82,6 +82,7 @@ export function TenantConfigurationClient({
     const [requestErrorMessage, setRequestErrorMessage] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isDeletePending, setIsDeletePending] = useState(false);
+    const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
     useEffect(() => {
         setTenant(initialTenant);
@@ -212,6 +213,7 @@ export function TenantConfigurationClient({
                 legalName: updated.name
             });
             setIsDeletePending(false);
+            setHistoryRefreshKey((previous) => previous + 1);
             router.refresh();
         } catch {
             setRequestErrorMessage(isDeletePending ? copy.deleteError : copy.saveError);
@@ -317,7 +319,9 @@ export function TenantConfigurationClient({
             history={{
                 headingId: "tenant-history-heading",
                 title: copy.historyTitle,
-                description: copy.historyDescription
+                description: copy.historyDescription,
+                tableName: "tenant",
+                refreshKey: historyRefreshKey
             }}
             footer={{
                 configurationPath,

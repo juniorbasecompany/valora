@@ -32,6 +32,7 @@ export function UnityConfigurationClient({
             configurationSegment="unity"
             queryParamKey="unity"
             apiSegment="unities"
+            historyTableName="unity"
             formIds={{
                 nameInput: "unity-name",
                 displayTextarea: "unity-display-name",

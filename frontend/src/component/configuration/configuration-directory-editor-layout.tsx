@@ -9,7 +9,8 @@ import {
     ConfigurationEditorFooter,
     type ConfigurationEditorFooterProps
 } from "@/component/configuration/configuration-editor-footer";
-import { ConfigurationHistoryPlaceholder } from "@/component/configuration/configuration-history-placeholder";
+import { ConfigurationHistoryPanel } from "@/component/configuration/configuration-history-panel";
+import type { AuditLogTableName } from "@/lib/auth/types";
 
 export type ConfigurationDirectoryEditorLayoutProps = {
     headerTitle: string;
@@ -22,6 +23,8 @@ export type ConfigurationDirectoryEditorLayoutProps = {
         headingId: string;
         title: string;
         description: string;
+        tableName: AuditLogTableName;
+        refreshKey?: number;
     };
     footer: ConfigurationEditorFooterProps;
 };
@@ -64,10 +67,12 @@ export function ConfigurationDirectoryEditorLayout({
                 </div>
             </div>
 
-            <ConfigurationHistoryPlaceholder
+            <ConfigurationHistoryPanel
                 headingId={history.headingId}
                 title={history.title}
                 description={history.description}
+                tableName={history.tableName}
+                refreshKey={history.refreshKey}
             />
 
             {portalTarget

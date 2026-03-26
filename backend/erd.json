@@ -737,6 +737,62 @@
           "increment": false,
           "size": "",
           "values": []
+        },
+        {
+          "id": "from_field_id",
+          "name": "from_field_id",
+          "comment": "Origem do valor (se vazio, é ele próprio, iniciando com zero).",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "from_operation",
+          "name": "from_operation",
+          "comment": "Como o campo interage com a origem",
+          "type": "TEXT",
+          "default": "",
+          "check": "math IN ( '+', '-', '*', '/' )",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "to_field_id",
+          "name": "to_field_id",
+          "comment": "Campo de destino do valor",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "to_operation",
+          "name": "to_operation",
+          "comment": "Como o valor deve interagir com o destino",
+          "type": "TEXT",
+          "default": "",
+          "check": "math IN ( '+', '-', '*', '/' )",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "size": "",
+          "values": []
         }
       ],
       "indices": [],
@@ -932,7 +988,7 @@
         }
       ],
       "indices": [],
-      "color": "#0000ff"
+      "color": "#00bb00"
     }
   ],
   "relationships": [

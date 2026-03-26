@@ -26,13 +26,29 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    postgres_host: str = "localhost"
-    postgres_port: int = 5434
-    postgres_user: str = "valora"
-    postgres_db: str = "valora"
+    postgres_host: str = Field(
+        default="localhost",
+        validation_alias=AliasChoices("POSTGRES_HOST", "PGHOST", "postgres_host"),
+    )
+    postgres_port: int = Field(
+        default=5434,
+        validation_alias=AliasChoices("POSTGRES_PORT", "PGPORT", "postgres_port"),
+    )
+    postgres_user: str = Field(
+        default="valora",
+        validation_alias=AliasChoices("POSTGRES_USER", "PGUSER", "postgres_user"),
+    )
+    postgres_db: str = Field(
+        default="valora",
+        validation_alias=AliasChoices("POSTGRES_DB", "PGDATABASE", "postgres_db"),
+    )
     postgres_password: SecretStr | None = Field(
         default=None,
-        validation_alias=AliasChoices("POSTGRES_PASSWORD", "postgres_password"),
+        validation_alias=AliasChoices(
+            "POSTGRES_PASSWORD",
+            "PGPASSWORD",
+            "postgres_password",
+        ),
     )
     database_url_override: str | None = Field(
         default=None,
@@ -71,8 +87,8 @@ class Settings(BaseSettings):
     def _exige_postgres_ou_database_url(self) -> Self:
         if self.database_url_override is None and self.postgres_password is None:
             raise ValueError(
-                "Defina DATABASE_URL (ex.: Railway com Postgres ligado) ou POSTGRES_PASSWORD "
-                "com host/porta corretos para o PostgreSQL."
+                "Defina DATABASE_URL (no Railway: referencia tipo ${{NomeDoPostgres.DATABASE_URL}}), "
+                "ou PGPASSWORD/PGHOST/... referenciados do Postgres, ou POSTGRES_PASSWORD e host/porta."
             )
         return self
 

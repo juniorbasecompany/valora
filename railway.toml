@@ -18,6 +18,6 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-# Usa o CMD do Dockerfile (sh -c + ${PORT:-8000}). Um startCommand aqui sem shell pode
+# Usa o CMD do Dockerfile (Alembic + sh -c + ${PORT:-8000}). Um startCommand aqui sem shell pode
 # deixar $PORT literal e o Uvicorn nunca escuta na porta que o healthcheck usa.
 healthcheckPath = "/health"

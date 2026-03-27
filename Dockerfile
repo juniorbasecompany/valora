@@ -23,4 +23,5 @@ RUN pip install --upgrade pip && pip install .
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "exec uvicorn valora_backend.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Aplica schema antes do servidor (Railway: mesmo DATABASE_URL / PG* do runtime).
+CMD ["sh", "-c", "python -m alembic upgrade head && exec uvicorn valora_backend.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

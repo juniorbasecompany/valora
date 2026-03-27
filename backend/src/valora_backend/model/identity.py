@@ -137,14 +137,6 @@ class Member(Base):
             "status IN (1, 2, 3)",
             name="member_status_chk",
         ),
-        CheckConstraint(
-            "status = 2 OR name IS NOT NULL",
-            name="member_name_empty",
-        ),
-        CheckConstraint(
-            "status = 2 OR display_name IS NOT NULL",
-            name="member_display_name_empty",
-        ),
         Index(
             "member_unique_tenant_account",
             "tenant_id",

@@ -260,6 +260,31 @@ def test_master_can_invite_member_by_email() -> None:
     assert any(item["email"] == "novo.convite@example.com" for item in payload["item_list"])
 
 
+def test_master_can_invite_member_with_empty_name_fields() -> None:
+    with build_test_client(current_member_key="master") as (
+        client,
+        session,
+        _member_id_by_key,
+    ):
+        response = client.post(
+            "/auth/tenant/current/members",
+            json={
+                "email": "convite.sem.nome@example.com",
+                "name": "",
+                "display_name": "",
+            },
+        )
+        session.expire_all()
+        created = session.scalar(
+            select(Member).where(Member.email == "convite.sem.nome@example.com")
+        )
+
+    assert response.status_code == 200
+    assert created is not None
+    assert created.name is None
+    assert created.display_name is None
+
+
 def test_invite_member_rejects_duplicate_email() -> None:
     with build_test_client(current_member_key="master") as (client, _, member_id_by_key):
         response = client.post(
@@ -316,6 +341,30 @@ def test_admin_can_update_member_profile_without_changing_access() -> None:
     assert updated_member.display_name == "Updated Member"
     assert updated_member.role == 3
     assert updated_member.status == 1
+
+
+def test_admin_can_clear_member_name_and_display_name() -> None:
+    with build_test_client(current_member_key="admin") as (
+        client,
+        session,
+        member_id_by_key,
+    ):
+        response = client.patch(
+            f"/auth/tenant/current/members/{member_id_by_key['member']}",
+            json={
+                "name": "",
+                "display_name": "   ",
+                "role": 3,
+                "status": 1,
+            },
+        )
+        session.expire_all()
+        updated_member = session.get(Member, member_id_by_key["member"])
+
+    assert response.status_code == 200
+    assert updated_member is not None
+    assert updated_member.name is None
+    assert updated_member.display_name is None
 
 
 def test_admin_cannot_change_member_access() -> None:

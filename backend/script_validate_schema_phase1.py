@@ -87,8 +87,6 @@ def main() -> None:
             )
         }
         need_chk = {
-            "member_name_empty",
-            "member_display_name_empty",
             "member_status_chk",
         }
         if chk != need_chk:

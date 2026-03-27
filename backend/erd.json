@@ -295,14 +295,6 @@
       ],
       "constraints": [
         {
-          "name": "member_name_empty",
-          "constraint": "status = 2 OR name IS NOT NULL"
-        },
-        {
-          "name": "member_display_name_empty",
-          "constraint": "status = 2 OR display_name IS NOT NULL"
-        },
-        {
           "name": "member_unique_tenant_account",
           "constraint": "UNIQUE (tenant_id, account_id) WHERE account_id IS NOT NULL"
         }

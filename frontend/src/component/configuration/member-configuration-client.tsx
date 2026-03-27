@@ -350,23 +350,12 @@ export function MemberConfigurationClient({
     }, [copy.emailValidationError, inviteEmail]);
 
     const validate = useCallback(() => {
-        const nextError: { displayName?: string; name?: string } = {};
-
-        if (!displayName.trim()) {
-            nextError.displayName = copy.validationError;
-        }
-
-        if (!name.trim()) {
-            nextError.name = copy.validationError;
-        }
-
-        setFieldError(nextError);
-        const namesOk = Object.keys(nextError).length === 0;
+        setFieldError({});
         if (isCreateMode) {
-            return namesOk && validateInviteEmail();
+            return validateInviteEmail();
         }
-        return namesOk;
-    }, [copy.validationError, displayName, isCreateMode, name, validateInviteEmail]);
+        return true;
+    }, [isCreateMode, validateInviteEmail]);
 
     const handleStartCreate = useCallback(() => {
         if (!directoryAllowsMemberInvite(directory) || isSaving) {
@@ -458,8 +447,14 @@ export function MemberConfigurationClient({
                 return;
             }
 
+            const memberId = selectedMember.id;
+            if (!Number.isInteger(memberId) || memberId < 1) {
+                setRequestErrorMessage(copy.saveError);
+                return;
+            }
+
             const response = await fetch(
-                `/api/auth/tenant/current/members/${selectedMember.id}`,
+                `/api/auth/tenant/current/members/${String(memberId)}`,
                 isDeletePending
                     ? {
                           method: "DELETE"

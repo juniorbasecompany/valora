@@ -203,11 +203,8 @@ class TenantMemberCreateRequest(BaseModel):
 
     @field_validator("name", "display_name")
     @classmethod
-    def strip_non_empty_invite_name(cls, value: str) -> str:
-        cleaned = value.strip()
-        if not cleaned:
-            raise ValueError("must not be empty")
-        return cleaned
+    def strip_optional_invite_name(cls, value: str) -> str:
+        return value.strip()
 
 
 class TenantMemberUpdateRequest(BaseModel):
@@ -218,11 +215,8 @@ class TenantMemberUpdateRequest(BaseModel):
 
     @field_validator("name", "display_name")
     @classmethod
-    def strip_non_empty_member_name(cls, value: str) -> str:
-        cleaned = value.strip()
-        if not cleaned:
-            raise ValueError("must not be empty")
-        return cleaned
+    def strip_optional_member_name(cls, value: str) -> str:
+        return value.strip()
 
     @field_validator("role")
     @classmethod

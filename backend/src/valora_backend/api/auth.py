@@ -467,7 +467,11 @@ def _apply_member_audit_context(session: Session, actor: Member) -> None:
     apply_audit_gucs_for_session(session, actor.tenant_id, actor.account_id)
 
 
-def _find_or_create_account(session: Session, identity: GoogleIdentity) -> Account:
+def _find_or_create_account(
+    session: Session,
+    identity: GoogleIdentity,
+    request: Request | None = None,
+) -> Account:
     account = session.scalar(
         select(Account).where(
             Account.provider == GOOGLE_PROVIDER,
@@ -478,6 +482,8 @@ def _find_or_create_account(session: Session, identity: GoogleIdentity) -> Accou
         account = session.scalar(select(Account).where(Account.email == identity.email))
 
     if account:
+        if request is not None:
+            set_request_audit_state(request, tenant_id=None, account_id=account.id)
         if _sync_account_name(account, identity):
             session.add(account)
             apply_audit_gucs_for_session(session, None, account.id)
@@ -497,6 +503,8 @@ def _find_or_create_account(session: Session, identity: GoogleIdentity) -> Accou
     session.add(account)
     if account.id is None:
         session.flush()
+    if request is not None:
+        set_request_audit_state(request, tenant_id=None, account_id=account.id)
     apply_audit_gucs_for_session(session, None, account.id)
     commit_session_with_null_if_empty(session)
     session.refresh(account)
@@ -525,7 +533,11 @@ def _sync_member_identity(member: Member, account: Account) -> bool:
     return changed
 
 
-def _link_pending_member_to_account(session: Session, account: Account) -> None:
+def _link_pending_member_to_account(
+    session: Session,
+    account: Account,
+    request: Request | None = None,
+) -> None:
     pending_member_list = session.scalars(
         select(Member).where(
             Member.email == account.email,
@@ -535,6 +547,12 @@ def _link_pending_member_to_account(session: Session, account: Account) -> None:
     ).all()
 
     for pending_member in pending_member_list:
+        if request is not None:
+            set_request_audit_state(
+                request,
+                tenant_id=pending_member.tenant_id,
+                account_id=account.id,
+            )
         if _sync_member_identity(pending_member, account):
             session.add(pending_member)
             apply_audit_gucs_for_session(session, pending_member.tenant_id, account.id)
@@ -735,12 +753,13 @@ def _resolve_member_for_access(
 
 @router.post("/google", response_model=AuthResponse)
 def auth_google(
+    request: Request,
     body: GoogleTokenRequest,
     session: Session = Depends(get_session),
 ):
     identity = verify_google_token(body.id_token)
-    account = _find_or_create_account(session, identity)
-    _link_pending_member_to_account(session, account)
+    account = _find_or_create_account(session, identity, request)
+    _link_pending_member_to_account(session, account, request)
 
     tenant_option_list, invite_option_list = _get_account_context_option_list(
         session,
@@ -778,6 +797,9 @@ def auth_google(
         )
 
     if _sync_member_identity(member, account):
+        set_request_audit_state(
+            request, tenant_id=member.tenant_id, account_id=account.id
+        )
         session.add(member)
         apply_audit_gucs_for_session(session, member.tenant_id, account.id)
         commit_session_with_null_if_empty(session)
@@ -793,12 +815,16 @@ def auth_google(
 
 @router.post("/google/select-tenant", response_model=TokenResponse)
 def auth_google_select_tenant(
+    request: Request,
     body: GoogleSelectTenantRequest,
     session: Session = Depends(get_session),
 ):
     identity = verify_google_token(body.id_token)
-    account = _find_or_create_account(session, identity)
-    _link_pending_member_to_account(session, account)
+    account = _find_or_create_account(session, identity, request)
+    _link_pending_member_to_account(session, account, request)
+    set_request_audit_state(
+        request, tenant_id=body.tenant_id, account_id=account.id
+    )
 
     member = _resolve_member_for_access(
         session,
@@ -819,8 +845,8 @@ def auth_google_create_tenant(
     session: Session = Depends(get_session),
 ):
     identity = verify_google_token(body.id_token)
-    account = _find_or_create_account(session, identity)
-    _link_pending_member_to_account(session, account)
+    account = _find_or_create_account(session, identity, request)
+    _link_pending_member_to_account(session, account, request)
 
     tenant_option_list, invite_option_list = _get_account_context_option_list(
         session,

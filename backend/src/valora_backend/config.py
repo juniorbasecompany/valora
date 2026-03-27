@@ -1,7 +1,8 @@
 # Configuração da aplicação via variáveis de ambiente.
 
+import os
 from typing import Self
-from urllib.parse import quote_plus
+from urllib.parse import parse_qsl, quote_plus, urlencode, urlparse, urlunparse
 
 from pydantic import (
     AliasChoices,
@@ -22,6 +23,29 @@ def _sqlalchemy_url_with_psycopg3(url: str) -> str:
     if u.startswith("postgresql://") and not u.startswith("postgresql+"):
         return "postgresql+psycopg://" + u.removeprefix("postgresql://")
     return u
+
+
+def _should_append_sslmode_require() -> bool:
+    """Railway injeta RAILWAY_ENVIRONMENT; Postgres gerido exige TLS quando a URL omite sslmode."""
+    if os.environ.get("RAILWAY_ENVIRONMENT"):
+        return True
+    flag = (os.environ.get("VALORA_FORCE_POSTGRES_SSL") or "").strip().lower()
+    return flag in ("1", "true", "yes")
+
+
+def _ensure_psycopg_sslmode_for_remote_hosts(url: str) -> str:
+    """Evita falha de handshake quando só PG* está definido (sem sslmode na URL)."""
+    if not _should_append_sslmode_require():
+        return url
+    parsed = urlparse(url)
+    host = (parsed.hostname or "").lower()
+    if host in ("", "localhost", "127.0.0.1"):
+        return url
+    pairs = parse_qsl(parsed.query, keep_blank_values=True)
+    if any(k.lower() == "sslmode" for k, _ in pairs):
+        return url
+    pairs.append(("sslmode", "require"))
+    return urlunparse(parsed._replace(query=urlencode(pairs)))
 
 
 class Settings(BaseSettings):
@@ -115,10 +139,13 @@ class Settings(BaseSettings):
     def database_url(self) -> str:
         """URL SQLAlchemy com driver psycopg v3."""
         if self.database_url_override:
-            return _sqlalchemy_url_with_psycopg3(self.database_url_override)
+            return _ensure_psycopg_sslmode_for_remote_hosts(
+                _sqlalchemy_url_with_psycopg3(self.database_url_override)
+            )
         assert self.postgres_password is not None
         pw = quote_plus(self.postgres_password.get_secret_value())
-        return (
+        built = (
             f"postgresql+psycopg://{self.postgres_user}:{pw}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
+        return _ensure_psycopg_sslmode_for_remote_hosts(built)

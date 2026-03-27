@@ -28,6 +28,19 @@ export default function proxy(request: NextRequest) {
     );
   }
 
+  // Google Identity Services (postMessage); alinha com next.config headers.
+  if (
+    pathname === `/${locale}/login` ||
+    pathname.startsWith(`/${locale}/login?`) ||
+    pathname === `/${locale}/select-tenant` ||
+    pathname.startsWith(`/${locale}/select-tenant?`)
+  ) {
+    response.headers.set(
+      "Cross-Origin-Opener-Policy",
+      "same-origin-allow-popups"
+    );
+  }
+
   return response;
 }
 

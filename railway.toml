@@ -9,6 +9,9 @@
 #   container não aponta para o Postgres do Railway. Ou defines DATABASE_URL / PG*, ou POSTGRES_HOST na rede interna.
 # - APP_JWT_SECRET, GOOGLE_CLIENT_ID: como no .env local.
 # - PORT é injetado pelo Railway (não precisas criar).
+# - O Postgres do Railway exige TLS: se usares só PGHOST/PG* (sem DATABASE_URL completa),
+#   o backend acrescenta sslmode=require quando RAILWAY_ENVIRONMENT está definido.
+#   Noutro PaaS: define VALORA_FORCE_POSTGRES_SSL=1 se precisares do mesmo comportamento.
 
 [build]
 builder = "DOCKERFILE"

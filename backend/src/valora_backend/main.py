@@ -1,7 +1,10 @@
+import os
+import sys
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, Request
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError
 from sqlalchemy import text
 from sqlalchemy.exc import DBAPIError, IntegrityError
 from sqlalchemy.orm import Session
@@ -12,10 +15,29 @@ from valora_backend.db import dispose_engine, get_session
 from valora_backend.middleware.audit_request_context import AuditRequestContextMiddleware
 
 
+def _log_valora_db_env_presence() -> None:
+    """Diagnóstico em runtime: confirma se o PaaS injetou variáveis (sem revelar valores)."""
+    keys = (
+        "DATABASE_URL",
+        "VALORA_DATABASE_URL",
+        "POSTGRES_PASSWORD",
+        "PGPASSWORD",
+        "PGHOST",
+    )
+    parts = [
+        f"{k}={'yes' if (os.environ.get(k) or '').strip() else 'no'}" for k in keys
+    ]
+    print(f"VALORA_BOOT {' '.join(parts)}", file=sys.stderr, flush=True)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Valida env (DATABASE_URL ou POSTGRES_PASSWORD) antes de marcar o serviço como pronto.
-    Settings()
+    try:
+        Settings()
+    except ValidationError:
+        _log_valora_db_env_presence()
+        raise
     yield
     dispose_engine()
 

@@ -4,8 +4,8 @@
       "id": "tenant",
       "name": "tenant",
       "comment": "Este é o licenciado que está contratando o sistema.",
-      "x": -566.7990790845206,
-      "y": -203.09160112294114,
+      "x": -565.0887397264042,
+      "y": -221.05016438316238,
       "locked": false,
       "fields": [
         {
@@ -18,7 +18,9 @@
           "primary": true,
           "unique": true,
           "notNull": true,
-          "increment": true
+          "increment": true,
+          "size": "",
+          "values": []
         },
         {
           "id": "name",
@@ -56,8 +58,8 @@
       "id": "account",
       "name": "account",
       "comment": "Esta é a conta do usuário do sistema.",
-      "x": 392.2134428868419,
-      "y": -167.9444226708904,
+      "x": 389.6479338496674,
+      "y": -183.33747689393726,
       "locked": false,
       "fields": [
         {
@@ -522,7 +524,7 @@
         {
           "id": "parent_unity_id",
           "name": "parent_unity_id",
-          "comment": "Em caso de hierarquia, é unidade produtiva a qual esta pertence.",
+          "comment": "Em caso de hierarquia, é a unidade produtiva à qual esta pertence.",
           "type": "BIGINT",
           "default": "",
           "check": "",
@@ -685,8 +687,8 @@
           "values": []
         }
       ],
-      "x": -560.1361397830926,
-      "y": -665.0369646216051
+      "x": -825.2387402911213,
+      "y": 710.9310489829701
     },
     {
       "id": "field_definition",
@@ -1090,6 +1092,28 @@
       "cardinality": "one_to_many",
       "updateConstraint": "No action",
       "deleteConstraint": "No action"
+    },
+    {
+      "id": "field_definition.from_field_id",
+      "name": "field_definition.from_field_id",
+      "startTableId": "field_definition",
+      "startFieldId": "id",
+      "endTableId": "field_definition",
+      "endFieldId": "from_field_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Set null"
+    },
+    {
+      "id": "field_definition.to_field_id",
+      "name": "field_definition.to_field_id",
+      "startTableId": "field_definition",
+      "startFieldId": "id",
+      "endTableId": "field_definition",
+      "endFieldId": "to_field_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Set null"
     },
     {
       "id": "field_value.unity_id",

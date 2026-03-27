@@ -5,7 +5,7 @@ from collections import defaultdict
 from datetime import date, datetime, time, timedelta
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import or_, select, text
 from sqlalchemy.orm import Session
@@ -36,7 +36,10 @@ from valora_backend.api.scope_hierarchy_directory_support import (
     normalize_scope_hierarchy_order,
     validate_scope_hierarchy_parent_change,
 )
-from valora_backend.audit_request import apply_audit_gucs_for_session
+from valora_backend.audit_request import (
+    apply_audit_gucs_for_session,
+    set_request_audit_state,
+)
 from valora_backend.db import get_session
 from valora_backend.model.identity import (
     Account,
@@ -654,7 +657,19 @@ def _issue_token_for_member(
     )
 
 
-def _create_initial_tenant_member(session: Session, account: Account) -> Member:
+def _create_initial_tenant_member(
+    session: Session, account: Account, request: Request
+) -> Member:
+    # Rotas só com id_token não têm JWT: request.state estava vazio e o before_flush
+    # reaplicava GUCs vazias antes do flush, quebrando o trigger (INSERT tenant exige account_id).
+    #
+    # Auditoria (valora_audit_row_to_log): o INSERT em `log` usa account_id/tenant_id das GUCs
+    # (não o JSON da linha) para as FKs em log.account_id / log.tenant_id. No INSERT em
+    # `tenant`, a política do trigger permite tenant_id NULL no log; account_id tem de
+    # apontar para uma conta já persistida (a de _find_or_create_account). No INSERT em
+    # `member`, ambas as GUCs têm de existir em `tenant` e `account`, daí o primeiro
+    # commit só do tenant e só depois o membro, com set_request_audit_state atualizado.
+    set_request_audit_state(request, tenant_id=None, account_id=account.id)
     tenant = Tenant(
         id=_preallocate_bigint_pk_if_postgresql(session, table_name="tenant"),
         name=account.display_name,
@@ -667,6 +682,7 @@ def _create_initial_tenant_member(session: Session, account: Account) -> Member:
     commit_session_with_null_if_empty(session)
     session.refresh(tenant)
 
+    set_request_audit_state(request, tenant_id=tenant.id, account_id=account.id)
     member = Member(
         name=account.name,
         display_name=account.display_name,
@@ -798,6 +814,7 @@ def auth_google_select_tenant(
 
 @router.post("/google/create-tenant", response_model=TokenResponse)
 def auth_google_create_tenant(
+    request: Request,
     body: GoogleTokenRequest,
     session: Session = Depends(get_session),
 ):
@@ -815,7 +832,7 @@ def auth_google_create_tenant(
             detail="Account already has tenant access or pending invite",
         )
 
-    member = _create_initial_tenant_member(session, account)
+    member = _create_initial_tenant_member(session, account, request)
     return TokenResponse(
         access_token=_issue_token_for_member(
             member, account_id=account.id, remember_me=body.remember_me

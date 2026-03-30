@@ -1,4 +1,4 @@
-# Modelo de auditoria: alteracoes em tabelas principais.
+﻿# Modelo de auditoria: alteracoes em tabelas principais.
 
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ class Log(Base):
     __table_args__ = (
         CheckConstraint(
             "table_name IN ("
-            "'tenant', 'account', 'member', 'scope', 'location', 'unity')",
+            "'account', 'action', 'event', 'field', 'formula', 'input', 'label', 'location', 'member', 'result', 'scope', 'tenant', 'unity')",
             name="log_table_name_chk",
         ),
         CheckConstraint(

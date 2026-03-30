@@ -4,8 +4,8 @@
       "id": "tenant",
       "name": "tenant",
       "comment": "Este é o licenciado que está contratando o sistema.",
-      "x": -565.0887397264042,
-      "y": -221.05016438316238,
+      "x": -599.6422436676634,
+      "y": -218.45865158756794,
       "locked": false,
       "fields": [
         {
@@ -72,7 +72,9 @@
           "primary": true,
           "unique": true,
           "notNull": true,
-          "increment": true
+          "increment": true,
+          "size": "",
+          "values": []
         },
         {
           "id": "name",
@@ -176,7 +178,9 @@
           "primary": true,
           "unique": true,
           "notNull": true,
-          "increment": true
+          "increment": true,
+          "size": "",
+          "values": []
         },
         {
           "id": "name",
@@ -556,7 +560,7 @@
           "values": []
         }
       ],
-      "x": -85.23192874460136,
+      "x": -1.4396816870482212,
       "y": 510.82134408336117
     },
     {
@@ -614,7 +618,7 @@
           "comment": "Nome da tabela que foi modificada",
           "type": "TEXT",
           "default": "",
-          "check": "table_name IN ( 'tenant', 'account', 'member', 'scope', 'location', 'unity', 'field_definition', 'field_locale', 'field_value' )",
+          "check": "table_name IN ( 'account', 'action', 'event', 'field', 'formula', 'input', 'label', 'location', 'member', 'result', 'scope', 'tenant', 'unity' )",
           "primary": false,
           "unique": false,
           "notNull": true,
@@ -679,15 +683,15 @@
           "values": []
         }
       ],
-      "x": -825.2387402911213,
-      "y": 710.9310489829701
+      "x": -917.6948279343994,
+      "y": 615.340856673818
     },
     {
-      "id": "field_definition",
-      "name": "field_definition",
-      "comment": "Definição do campo",
-      "x": -231.6941478921202,
-      "y": 930.0386609838083,
+      "id": "field",
+      "name": "field",
+      "comment": "Definição do campo. Ex: quantidade, mortes, valor",
+      "x": -152.55051937152876,
+      "y": 1413.775393481917,
       "locked": false,
       "fields": [
         {
@@ -701,20 +705,6 @@
           "unique": true,
           "notNull": true,
           "increment": true,
-          "size": "",
-          "values": []
-        },
-        {
-          "id": "value_type",
-          "name": "value_type",
-          "comment": "Tipo do valor armazenado (ex.: numérico, texto).",
-          "type": "TEXT",
-          "default": "",
-          "check": "value_type IN ( 'NUMBER' )",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
           "size": "",
           "values": []
         },
@@ -733,147 +723,9 @@
           "values": []
         },
         {
-          "id": "from_field_id",
-          "name": "from_field_id",
-          "comment": "Origem do valor (se vazio, é ele próprio, iniciando com zero).",
-          "type": "BIGINT",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": false,
-          "increment": false,
-          "size": "",
-          "values": []
-        },
-        {
-          "id": "from_operation",
-          "name": "from_operation",
-          "comment": "Como o campo interage com a origem",
-          "type": "TEXT",
-          "default": "",
-          "check": "from_operation IN ( '+', '-', '*', '/' )",
-          "primary": false,
-          "unique": false,
-          "notNull": false,
-          "increment": false,
-          "size": "",
-          "values": []
-        },
-        {
-          "id": "to_field_id",
-          "name": "to_field_id",
-          "comment": "Campo de destino do valor",
-          "type": "BIGINT",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": false,
-          "increment": false,
-          "size": "",
-          "values": []
-        },
-        {
-          "id": "to_operation",
-          "name": "to_operation",
-          "comment": "Como o valor deve interagir com o destino",
-          "type": "TEXT",
-          "default": "",
-          "check": "to_operation IN ( '+', '-', '*', '/' )",
-          "primary": false,
-          "unique": false,
-          "notNull": false,
-          "increment": false,
-          "size": "",
-          "values": []
-        }
-      ],
-      "indices": [],
-      "color": "#0000ff"
-    },
-    {
-      "id": "field_locale",
-      "name": "field_locale",
-      "comment": "Textos por idioma",
-      "x": 505.0497307410609,
-      "y": 822.2872814224806,
-      "locked": false,
-      "fields": [
-        {
-          "id": "id",
-          "name": "id",
-          "comment": "Identificador da ligação à definição do campo.",
-          "type": "BIGINT",
-          "default": "",
-          "check": "",
-          "primary": true,
-          "unique": true,
-          "notNull": true,
-          "increment": true,
-          "size": "",
-          "values": []
-        },
-        {
-          "id": "name",
-          "name": "name",
-          "comment": "Nome do campo",
-          "type": "TEXT",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "size": "",
-          "values": []
-        },
-        {
-          "id": "display_name",
-          "name": "display_name",
-          "comment": "Nome resumido do campo",
-          "type": "TEXT",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "size": "",
-          "values": []
-        },
-        {
-          "id": "field_definition_id",
-          "name": "field_definition_id",
-          "comment": "Ligação com a definição do campo.",
-          "type": "BIGINT",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "size": "",
-          "values": []
-        },
-        {
-          "id": "locale",
-          "name": "locale",
-          "comment": "Código do idioma (ex.: pt-BR).",
-          "type": "TEXT",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "size": "",
-          "values": []
-        },
-        {
-          "id": "description",
-          "name": "description",
-          "comment": "Descrição do campo, para que serve, o que mede, etc.",
+          "id": "type",
+          "name": "type",
+          "comment": "Tipo do valor armazenado, considerando o padrão do dados do Postgres para tipo SQL completo como INTEGER, NUMERIC, NUMERIC( 15, 2 ), BOOLEAN, etc.",
           "type": "TEXT",
           "default": "",
           "check": "",
@@ -889,17 +741,17 @@
       "color": "#0000ff"
     },
     {
-      "id": "field_value",
-      "name": "field_value",
-      "comment": "Evento, valor, medida do campo",
-      "x": 504.60694577695335,
-      "y": 459.3926576864799,
+      "id": "event",
+      "name": "event",
+      "comment": "É o momento em que determinada fórmula é aplicada.",
+      "x": 473.1705048074481,
+      "y": 439.6040187669232,
       "locked": false,
       "fields": [
         {
           "id": "id",
           "name": "id",
-          "comment": "Identificador do registro de valor.",
+          "comment": "Identificador do evento.",
           "type": "BIGINT",
           "default": "",
           "check": "",
@@ -939,20 +791,6 @@
           "values": []
         },
         {
-          "id": "field_definition_id",
-          "name": "field_definition_id",
-          "comment": "Ligação à definição do campo.",
-          "type": "BIGINT",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "size": "",
-          "values": []
-        },
-        {
           "id": "moment_utc",
           "name": "moment_utc",
           "comment": "Momento do evento ou da medição.",
@@ -967,10 +805,160 @@
           "values": []
         },
         {
-          "id": "value_number",
-          "name": "value_number",
-          "comment": "Valor numérico quando o tipo permitir.",
-          "type": "NUMERIC",
+          "id": "action_id",
+          "name": "action_id",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "",
+          "size": "",
+          "values": []
+        }
+      ],
+      "indices": [],
+      "color": "#0000ff"
+    },
+    {
+      "id": "label",
+      "name": "label",
+      "comment": "Serve basicamente para dar um nome amigável para o campo ou para a ação. Exatamente um entre field_id e action_id deve estar preenchido.\nunique por (lang, field_id) e por (lang, action_id)",
+      "x": -919.4009264802504,
+      "y": 1075.5541042315704,
+      "locked": false,
+      "fields": [
+        {
+          "id": "id",
+          "name": "id",
+          "comment": "Identificador do registro de valor.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": true,
+          "increment": true,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "lang",
+          "name": "lang",
+          "comment": "Identificação da linguagem.",
+          "type": "TEXT",
+          "default": "",
+          "check": "lang IN ( 'pt-BR', 'en', 'es' )",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "name",
+          "name": "name",
+          "comment": "Nome amigável do campo ou da ação.",
+          "type": "TEXT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "field_id",
+          "name": "field_id",
+          "comment": "LIgação com o campo. Nem sempre está informado, pois pode estar ligado à ação.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "action_id",
+          "name": "action_id",
+          "comment": "LIgação com a ação. Nem sempre está informado, pois pode estar ligado ao campo.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "size": "",
+          "values": []
+        }
+      ],
+      "indices": [],
+      "color": "#00aa00"
+    },
+    {
+      "id": "formula",
+      "name": "formula",
+      "comment": "Fórmula que deve ser aplicada aos eventos da ação.",
+      "x": 427.6825789619935,
+      "y": 864.4909368329262,
+      "locked": false,
+      "fields": [
+        {
+          "id": "id",
+          "name": "id",
+          "comment": "Identificador da fórmula.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": true,
+          "increment": true,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "action_id",
+          "name": "action_id",
+          "comment": "Identificação da ação.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "step",
+          "name": "step",
+          "comment": "Ordem que as fórmulas devem ser executadas. UNIQUE por action_id + step.",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "statement",
+          "name": "statement",
+          "comment": "Instrução matemática. Ex: ${field:1} = ${field:1} * ${field:2}, que para o usuário, será mostrado como: Mortalidade = Quantidade * Fator",
+          "type": "TEXT",
           "default": "",
           "check": "",
           "primary": false,
@@ -982,10 +970,225 @@
         }
       ],
       "indices": [],
-      "color": "#00bb00"
+      "color": "#0000ff"
+    },
+    {
+      "id": "action",
+      "name": "action",
+      "comment": "Tabela para definir as ações. Ex: Alojamento, Mortalidade, etc...",
+      "x": -81.27556345178834,
+      "y": 899.0078003292905,
+      "locked": false,
+      "fields": [
+        {
+          "id": "id",
+          "name": "id",
+          "comment": "Identificador da ação. A ação pode ter uma ou mais fórmulas associadas.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": true,
+          "increment": true,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "scope_id",
+          "name": "scope_id",
+          "comment": "Ligação com o escopo.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "size": "",
+          "values": []
+        }
+      ],
+      "indices": [],
+      "color": "#0000ff"
+    },
+    {
+      "id": "input",
+      "name": "input",
+      "comment": "Aqui ficam registrados os valores dos parâmetros de entrada das ações aplicadas aos eventos em cada dia.",
+      "x": 490.2227727276779,
+      "y": 1183.4176625952002,
+      "locked": false,
+      "fields": [
+        {
+          "id": "id",
+          "name": "id",
+          "comment": "Identificador do parâmetro de entrada da ação.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": true,
+          "increment": true,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "event_id",
+          "name": "event_id",
+          "comment": "Ligação com o evento onde o parâmetro de entrada deverá ser solicitado ao usuário.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "field_id",
+          "name": "field_id",
+          "comment": "Ligação com a definição do campo. Este é o campo de entrada da ação.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "value",
+          "name": "value",
+          "comment": "Este é o valor do parâmetro, representado em um formato que pode ser convertido de 'text' para o formato nativo do postgres, indicado no campo field.type. Ex: \"123\" poderá ser convertido para o numérico 123.00 se o field.type for \"NUMERIC( 10, 2 )\"",
+          "type": "TEXT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        }
+      ],
+      "indices": [],
+      "color": "#0000ff"
+    },
+    {
+      "id": "result",
+      "name": "result",
+      "comment": "Aqui ficam registrados os resultados das fórmulas aplicadas aos eventos em cada dia.",
+      "x": 933.120169232245,
+      "y": 1220.2710971046238,
+      "locked": false,
+      "fields": [
+        {
+          "id": "id",
+          "name": "id",
+          "comment": "Identificador do resultado da fórmula aplicada ao evento.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": true,
+          "increment": true,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "event_id",
+          "name": "event_id",
+          "comment": "Ligação com o evento onde o resultado da fórmula foi aplicado.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "value",
+          "name": "value",
+          "comment": "Este é o valor resultado da aplicação da fórmula em determinado evento. É gravado no formato 'text'. Este valor, submetido field.type, volta ao tipo nativo do postgres. Ex: \"123\" será convertido para inteiro se field.type for \"INTEGER\"",
+          "type": "TEXT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "parent_result_id",
+          "name": "parent_result_id",
+          "comment": "Ligação com o result anterior. Se o result pai for apagado ou modificado, todo os filhos devem ser apagados.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "moment_utc",
+          "name": "moment_utc",
+          "comment": "Este é o momento em que o cálculo foi efetuado.",
+          "type": "TIMESTAMP",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "field_id",
+          "name": "field_id",
+          "comment": "Ligação com a definição do campo. Este campo é o resultado da aplicação da fórmula em determinado evento.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        }
+      ],
+      "indices": [],
+      "color": "#0000ff"
     }
   ],
   "relationships": [
+    {
+      "id": "field.scope_id",
+      "name": "field.scope_id",
+      "startTableId": "scope",
+      "startFieldId": "id",
+      "endTableId": "field",
+      "endFieldId": "scope_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Cascade"
+    },
     {
       "id": "member.tenant_id",
       "name": "member.tenant_id",
@@ -1075,84 +1278,173 @@
       "deleteConstraint": "Cascade"
     },
     {
-      "id": "field_definition.scope_id",
-      "name": "field_definition.scope_id",
-      "startTableId": "scope",
-      "startFieldId": "id",
-      "endTableId": "field_definition",
-      "endFieldId": "scope_id",
-      "cardinality": "one_to_many",
-      "updateConstraint": "No action",
-      "deleteConstraint": "No action"
-    },
-    {
-      "id": "field_definition.from_field_id",
-      "name": "field_definition.from_field_id",
-      "startTableId": "field_definition",
-      "startFieldId": "id",
-      "endTableId": "field_definition",
-      "endFieldId": "from_field_id",
-      "cardinality": "one_to_many",
-      "updateConstraint": "Cascade",
-      "deleteConstraint": "Set null"
-    },
-    {
-      "id": "field_definition.to_field_id",
-      "name": "field_definition.to_field_id",
-      "startTableId": "field_definition",
-      "startFieldId": "id",
-      "endTableId": "field_definition",
-      "endFieldId": "to_field_id",
-      "cardinality": "one_to_many",
-      "updateConstraint": "Cascade",
-      "deleteConstraint": "Set null"
-    },
-    {
-      "id": "field_value.unity_id",
-      "name": "field_value.unity_id",
+      "id": "event.unity_id",
+      "name": "event.unity_id",
       "startTableId": "unity",
       "startFieldId": "id",
-      "endTableId": "field_value",
+      "endTableId": "event",
       "endFieldId": "unity_id",
       "cardinality": "one_to_many",
-      "updateConstraint": "No action",
-      "deleteConstraint": "No action"
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Restrict"
     },
     {
-      "id": "field_locale.field_definition_id",
-      "name": "field_locale.field_definition_id",
-      "startTableId": "field_definition",
-      "startFieldId": "id",
-      "endTableId": "field_locale",
-      "endFieldId": "field_definition_id",
-      "cardinality": "one_to_many",
-      "updateConstraint": "No action",
-      "deleteConstraint": "No action"
-    },
-    {
-      "id": "field_value.field_definition_id",
-      "name": "field_value.field_definition_id",
-      "startTableId": "field_definition",
-      "startFieldId": "id",
-      "endTableId": "field_value",
-      "endFieldId": "field_definition_id",
-      "cardinality": "one_to_many",
-      "updateConstraint": "No action",
-      "deleteConstraint": "No action"
-    },
-    {
-      "id": "field_value.location_id",
-      "name": "field_value.location_id",
+      "id": "event.location_id",
+      "name": "event.location_id",
       "startTableId": "location",
       "startFieldId": "id",
-      "endTableId": "field_value",
+      "endTableId": "event",
       "endFieldId": "location_id",
       "cardinality": "one_to_many",
-      "updateConstraint": "No action",
-      "deleteConstraint": "No action"
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Restrict"
+    },
+    {
+      "id": "label.field_id",
+      "name": "label.field_id",
+      "startTableId": "field",
+      "startFieldId": "id",
+      "endTableId": "label",
+      "endFieldId": "field_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Cascade"
+    },
+    {
+      "id": "label.action_id",
+      "name": "label.action_id",
+      "startTableId": "action",
+      "startFieldId": "id",
+      "endTableId": "label",
+      "endFieldId": "action_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Cascade"
+    },
+    {
+      "id": "formula.action_id",
+      "name": "formula.action_id",
+      "startTableId": "action",
+      "startFieldId": "id",
+      "endTableId": "formula",
+      "endFieldId": "action_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Cascade"
+    },
+    {
+      "id": "input.event_id",
+      "name": "input.event_id",
+      "startTableId": "event",
+      "startFieldId": "id",
+      "endTableId": "input",
+      "endFieldId": "event_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Cascade"
+    },
+    {
+      "id": "event.action_id",
+      "name": "event.action_id",
+      "startTableId": "action",
+      "startFieldId": "id",
+      "endTableId": "event",
+      "endFieldId": "action_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Restrict"
+    },
+    {
+      "id": "result.parent_result_id",
+      "name": "result.parent_result_id",
+      "startTableId": "result",
+      "startFieldId": "id",
+      "endTableId": "result",
+      "endFieldId": "parent_result_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Restrict"
+    },
+    {
+      "id": "input.field_id",
+      "name": "input.field_id",
+      "startTableId": "field",
+      "startFieldId": "id",
+      "endTableId": "input",
+      "endFieldId": "field_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Restrict"
+    },
+    {
+      "id": "result.field_id",
+      "name": "result.field_id",
+      "startTableId": "field",
+      "startFieldId": "id",
+      "endTableId": "result",
+      "endFieldId": "field_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Restrict"
+    },
+    {
+      "id": "result.event_id",
+      "name": "result.event_id",
+      "startTableId": "event",
+      "startFieldId": "id",
+      "endTableId": "result",
+      "endFieldId": "event_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Restrict"
+    },
+    {
+      "id": "7gzMh6oILIYpEsoxWvnTx",
+      "name": "action.scope_id",
+      "startTableId": "scope",
+      "startFieldId": "id",
+      "endTableId": "action",
+      "endFieldId": "scope_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Restrict"
     }
   ],
-  "notes": [],
+  "notes": [
+    {
+      "id": 0,
+      "x": 926.4351999261188,
+      "y": 441.00045572927445,
+      "title": "formula.statement e field.id",
+      "content": "Os tokens ${field:X} e ${input:X} mantêm um vínculo lógico com field.id = X.\nEssa relação não é uma FK explícita, pois está embutida na instrução textual, exigindo validação por parsing.\nA integridade deve ser garantida na aplicação (ou via validação prévia), assegurando que todo X referenciado exista em field.",
+      "locked": false,
+      "color": "#fcf7ac",
+      "height": 258,
+      "width": 321.03470996432253
+    },
+    {
+      "id": 1,
+      "x": 920.1669905943709,
+      "y": 775.5661288113066,
+      "title": "formula.statement e tokens",
+      "content": "Os tokens `${field:X}` e `${input:X}` são identificadores estruturados usados para resolver valores durante a execução da fórmula.\nEles codificam dois aspectos: o `field_id` (X) e a origem do valor (`field` = estado, `input` = evento).\nDevem seguir um padrão rígido e ser validados por parsing, garantindo que sejam reconhecíveis e semanticamente consistentes.",
+      "locked": false,
+      "color": "#fcf7ac",
+      "height": 306,
+      "width": 330.43702396194396
+    },
+    {
+      "id": 2,
+      "x": -906.3368598347091,
+      "y": 1433.8343132127152,
+      "title": "label.field_id e label.action_id",
+      "content": "field_id, action_id, ao menos 1 e no máximo 1 deve estar preenchido.",
+      "locked": false,
+      "color": "#fcf7ac",
+      "height": 90,
+      "width": 329.2430793273256
+    }
+  ],
   "subjectAreas": [],
   "database": "postgresql",
   "types": [],

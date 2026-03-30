@@ -17,6 +17,7 @@ Decisão canónica de runtime para o front e o back. **Versões concretas** vive
 
 - O cliente web fala com o backend por **API HTTP** (padrão REST/JSON).
 - `frontend/` e `backend/` são **projetos separados** no mesmo monorepo, sem misturar dependências.
+- **Tradução assistida de rótulos em base de dados** (`label`): serviço externo planejado **DeepL API**; decisão e âmbito em [skills/implementation/i18n/policy.md](../skills/implementation/i18n/policy.md).
 
 ## Relação com o resto da arquitectura
 

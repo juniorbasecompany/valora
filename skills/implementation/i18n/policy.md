@@ -25,6 +25,15 @@ Este ficheiro é a **fonte canónica** no repositório para a **política estáv
 
 ---
 
+## Tradução assistida para metadado em base de dados
+
+- **Decisão:** usar a **DeepL API** como provedor para gerar ou sugerir traduções de textos curtos persistidos na tabela `label` (associada a `field` ou `action`), alinhada aos valores de `lang` já definidos no modelo (`pt-BR`, `en`, `es`).
+- **Âmbito:** rótulos curtos de domínio (por exemplo, nome amigável de campo). Não substitui o fluxo de mensagens da UI em arquivos por locale (**next-intl**), descrito nas regras fixas desta política.
+- **Estado:** por ora apenas decisão documentada; não há integração implementada no backend nem na UI.
+- **Implementação futura (orientação):** chamadas somente no servidor; credencial recomendada via variável de ambiente (por exemplo, `DEEPL_API_KEY`); mapear `pt-BR`, `en` e `es` para os códigos de idioma aceitos pela API DeepL; prever revisão humana após tradução automática.
+
+---
+
 ## Documentos relacionados
 
 | Documento | Papel |
@@ -35,6 +44,12 @@ Este ficheiro é a **fonte canónica** no repositório para a **política estáv
 | [../../../.cursor/plans/plan-frontend-valora.md](../../../.cursor/plans/plan-frontend-valora.md) | Roadmap volátil do frontend, incluindo checkpoints de i18n por fase. |
 
 Planos de trabalho temporários em `.cursor/plans/` podem referenciar este ficheiro; **não** são substitutos desta política.
+
+---
+
+## Decisões tomadas
+
+- Tradução automática de rótulos em BD (`label` / `field` / `action`): **DeepL API** (detalhes na secção **Tradução assistida para metadado em base de dados**).
 
 ---
 
@@ -50,3 +65,4 @@ Planos de trabalho temporários em `.cursor/plans/` podem referenciar este fiche
 
 - [next-intl](https://next-intl-docs.vercel.app/)
 - [MDN, Intl](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl)
+- [DeepL API documentation](https://developers.deepl.com/docs)

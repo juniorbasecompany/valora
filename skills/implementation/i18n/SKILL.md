@@ -31,9 +31,13 @@ Garantir que **texto de produto e mensagens de erro** não fiquem espalhados com
 - **Frontend:** **next-intl**, mensagens em `messages/` (ou estrutura documentada no projeto), segmento **`[locale]`** no App Router quando aplicável. Alternativa **react-i18next** só se [policy.md](./policy.md) e esta skill forem actualizados explicitamente.
 - **Backend:** códigos de erro estáveis; ficheiros ou templates de tradução **só** onde o servidor envia texto final ao utilizador (e-mail, PDF, etc.).
 
+## Metadado (rótulos em base de dados)
+
+- Para tradução assistida de `label` ligada a `field` ou `action` (preenchimento automático ou sugestão entre `pt-BR`, `en`, `es`), seguir a secção **Tradução assistida para metadado em base de dados** em [policy.md](./policy.md) (provedor: **DeepL API**).
+
 ## Referências
 
-- Política estável: [policy.md](./policy.md)
+- Política estável: [policy.md](./policy.md) (inclui DeepL para rótulos em BD)
 - Stack canónica: [skills/implementation/stack/SKILL.md](../stack/SKILL.md)
 - Multi-país (domínio): [skills/application/multi-country-localization/SKILL.md](../../application/multi-country-localization/SKILL.md)
 - Arquitectura: [architecture/technology-stack.md](../../../architecture/technology-stack.md)

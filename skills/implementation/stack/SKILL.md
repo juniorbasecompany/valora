@@ -50,6 +50,7 @@ Aplicar o stack acordado em [architecture/technology-stack.md](../../../architec
 
 - Usar **FastAPI**, **SQLAlchemy**, **Alembic**, **PostgreSQL**, **Pydantic** e **Uvicorn**.
 - Respeitar o que já estiver declarado em [backend/pyproject.toml](../../../backend/pyproject.toml).
+- Para o modelo relacional exposto pelo backend, alinhar diagrama e metadados em [backend/erd.json](../../../backend/erd.json) com modelos e migrações; ver [backend/README.md](../../../backend/README.md) e [architecture/source-of-truth.md](../../../architecture/source-of-truth.md).
 - Não propor **SQLModel** como ORM principal nem substituir SQLAlchemy por outro ORM sem mudança explícita em [architecture/technology-stack.md](../../../architecture/technology-stack.md) e nesta skill.
 
 ### Encoding e texto
@@ -67,6 +68,9 @@ Aplicar o stack acordado em [architecture/technology-stack.md](../../../architec
 ## Referências
 
 - [architecture/technology-stack.md](../../../architecture/technology-stack.md)
+- [architecture/source-of-truth.md](../../../architecture/source-of-truth.md)
 - [architecture/configuration-panels.md](../../../architecture/configuration-panels.md)
 - [frontend/package.json](../../../frontend/package.json)
 - [backend/pyproject.toml](../../../backend/pyproject.toml)
+- [backend/README.md](../../../backend/README.md)
+- [backend/erd.json](../../../backend/erd.json)

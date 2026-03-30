@@ -1,12 +1,31 @@
 ## backend
 
-Serviço FastAPI do Valora.
+Serviço **FastAPI** do Valora: API HTTP, persistência em **PostgreSQL** (SQLAlchemy + Alembic), autenticação Google e JWT da aplicação.
 
-## Autenticação Google
+### Modelo relacional (`erd.json`)
 
-O backend valida o `id_token` do Google, encontra ou cria `account`, reconcilia `member` pendente por email e emite um JWT próprio da aplicação com `account_id` e `tenant_id`.
+A fonte de verdade do diagrama entidade-relacionamento (JSON drawDB) é [`erd.json`](erd.json). Tabelas previstas no diagrama alinhadas à implementação atual:
 
-## Variáveis de ambiente
+| Tabela    | Módulo ORM | Notas |
+|-----------|------------|--------|
+| `tenant`  | [`model/identity.py`](src/valora_backend/model/identity.py) | Licenciado. |
+| `account` | idem | Conta de autenticação; unicidade de `email` e de `(provider, provider_subject)`. |
+| `member`  | idem | Vínculo conta ↔ tenant; papel, status, `current_scope_id`. |
+| `scope`   | idem | Escopo operacional por tenant. |
+| `location`| idem | Hierarquia por escopo (`parent_location_id`, `sort_order`). |
+| `unity`   | idem | Hierarquia por escopo (`parent_unity_id`, `sort_order`). |
+| `log`     | [`model/log.py`](src/valora_backend/model/log.py) | Auditoria (`table_name`, `action_type`, `row_id`, `row`, `moment_utc`). |
+| `field`   | [`model/rules.py`](src/valora_backend/model/rules.py) | Definição de campo por escopo; coluna SQL `type` (tipo lógico / SQL no modelo). |
+| `action`  | idem | Ação por escopo. |
+| `formula` | idem | Passos de fórmula por ação (`step`, `statement`). |
+| `label`   | idem | Rótulo i18n ligado a `field` **ou** `action`. |
+| `event`   | idem | Evento operacional (`location_id`, `unity_id`, `action_id`, `moment_utc`). |
+| `input`   | idem | Entrada por evento e campo. |
+| `result`  | idem | Resultado por evento e campo; opcionalmente `parent_result_id`. |
+
+Convenções e extensões do JSON (por exemplo `constraints`, `nullIfEmpty` em campos) estão descritas na skill [`.cursor/skills/export-erd-drawdb/SKILL.md`](../.cursor/skills/export-erd-drawdb/SKILL.md).
+
+### Variáveis de ambiente
 
 ```bash
 POSTGRES_PASSWORD=
@@ -14,23 +33,49 @@ GOOGLE_CLIENT_ID=
 APP_JWT_SECRET=
 ```
 
-## Fluxos implementados
+Opcional em deploy: `DATABASE_URL` ou `VALORA_DATABASE_URL` (ver [`config.py`](src/valora_backend/config.py)).
 
-- `POST /auth/google`
-- `POST /auth/google/select-tenant`
-- `POST /auth/google/create-tenant`
-- `POST /auth/switch-tenant`
-- `GET /auth/tenant/list`
-- `GET /auth/me`
-- `POST /auth/invites/{member_id}/accept`
-- `POST /auth/invites/{member_id}/reject`
-# backend
+### Autenticação e sessão
 
-Projeto Python do núcleo executável do sistema.
+O backend valida o `id_token` do Google, encontra ou cria `account`, reconcilia `member` pendente por email e emite JWT da aplicação com `account_id` e `tenant_id`. O middleware de auditoria preenche contexto de transação para triggers que gravam em `log`.
 
-## Objetivo
+### API (visão geral)
 
-Esta pasta concentra a API, a regra de aplicação, a integração com PostgreSQL e a evolução do motor oficial do sistema.
+Rotas públicas de saúde: `GET /health`, `GET /health/db`.
+
+Documentação interativa OpenAPI: ao subir o servidor, **`/docs`** (Swagger).
+
+**Autenticação e tenant atual** — prefixo `/auth` ([`api/auth.py`](src/valora_backend/api/auth.py)):
+
+- `POST /auth/google`, `POST /auth/google/select-tenant`, `POST /auth/google/create-tenant`, `POST /auth/switch-tenant`
+- `GET /auth/tenant/list`, `GET /auth/me`
+- `GET /auth/tenant/current`, `PATCH /auth/tenant/current`, `DELETE /auth/tenant/current`
+- `GET /auth/tenant/current/members`, `POST /auth/tenant/current/members`, `PATCH /auth/tenant/current/members/{member_id}`, `DELETE /auth/tenant/current/members/{member_id}`
+- `POST /auth/tenant/current/members/{member_id}/invite`
+- `GET /auth/tenant/current/scopes`, `POST /auth/tenant/current/scopes`, `PATCH /auth/tenant/current/scopes/{scope_id}`, `DELETE /auth/tenant/current/scopes/{scope_id}`
+- `GET /auth/tenant/current/scopes/{scope_id}/locations` (+ `POST`, `PATCH`, `DELETE`, `POST .../move`)
+- `GET /auth/tenant/current/scopes/{scope_id}/unities` (+ `POST`, `PATCH`, `DELETE`, `POST .../move`)
+- `GET /auth/tenant/current/logs/{table_name}` (histórico a partir de `log`)
+- `PATCH /auth/me/current-scope`
+- `POST /auth/invites/{member_id}/accept`, `POST /auth/invites/{member_id}/reject`
+
+**Regras por escopo** (campos, ações, fórmulas, rótulos, eventos, entradas, resultados) — prefixo `/auth/tenant/current` ([`api/rules.py`](src/valora_backend/api/rules.py)), sempre sob um `scope_id` do tenant atual:
+
+- `.../scopes/{scope_id}/fields` e `.../fields/{field_id}`
+- `.../scopes/{scope_id}/actions` e `.../actions/{action_id}`
+- `.../actions/{action_id}/formulas` e `.../formulas/{formula_id}`
+- `.../scopes/{scope_id}/labels` e `.../labels/{label_id}` (filtros opcionais `field_id` / `action_id` na listagem)
+- `.../scopes/{scope_id}/events` e `.../events/{event_id}`
+- `.../events/{event_id}/inputs` e `.../inputs/{input_id}`
+- `.../events/{event_id}/results` e `.../results/{result_id}`
+
+Edição das regras por escopo exige papel **master** ou **admin** no `member`; leitura segue o acesso ao tenant.
+
+---
+
+## Objetivo desta pasta
+
+Concentra a API, a regra de aplicação, a integração com PostgreSQL e a evolução do motor oficial do sistema.
 
 ## Isolamento de dependência
 
@@ -49,7 +94,7 @@ Para subir a API localmente (com dependências instaladas):
 uv run uvicorn valora_backend.main:app --reload --port 8003
 ```
 
-Se o comando `uv` não for reconhecido no PowerShell (CLI do `uv` ausente ou fora do `PATH`), use o interpretador do ambiente virtual do próprio `backend` — ele já inclui o `uvicorn` após `uv sync` ou `pip install -e .`:
+Se o comando `uv` não for reconhecido no PowerShell (CLI do `uv` ausente ou fora do `PATH`), use o interpretador do ambiente virtual do próprio `backend`, que já inclui o `uvicorn` após `uv sync` ou `pip install -e .`:
 
 ```powershell
 .\.venv\Scripts\python.exe -m uvicorn valora_backend.main:app --reload --port 8003
@@ -68,9 +113,9 @@ docker compose up -d
 
 Isso sobe o Postgres com o banco **valora**, utilizador `valora` e porta **5434** no host (mapeada para 5432 no container). A senha é apenas a que estiver em `POSTGRES_PASSWORD` no `.env` da raiz.
 
-### Variáveis de ambiente
+### Variáveis de ambiente (detalhe)
 
-- **`POSTGRES_PASSWORD`** (obrigatória para o backend e para o Compose): defina-a no arquivo **`.env` na raiz do monorepo** (copiado de `.env.example`). O mesmo arquivo é lido pelo Docker Compose e por [config.py](src/valora_backend/config.py), que monta a URL do PostgreSQL (`database_url`) com host `localhost`, porta `5434`, utilizador `valora` e base `valora`.
+- **`POSTGRES_PASSWORD`** (obrigatória para o backend e para o Compose): defina-a no arquivo **`.env` na raiz do monorepo** (copiado de `.env.example`). O mesmo arquivo é lido pelo Docker Compose e por [`config.py`](src/valora_backend/config.py), que monta a URL do PostgreSQL (`database_url`) com host `localhost`, porta `5434`, utilizador `valora` e base `valora`.
 - **`GOOGLE_CLIENT_ID`** (obrigatória para login Google): usada pelo backend para validar o `id_token` enviado pelo frontend.
 - **`APP_JWT_SECRET`** (obrigatória para sessão da aplicação): usada pelo backend para assinar o JWT próprio da aplicação. Não deixe o ambiente cair no valor padrão de desenvolvimento.
 
@@ -97,7 +142,9 @@ cd backend
 python -m alembic revision --autogenerate -m "descrição"
 ```
 
-### Validação do schema (fase 1 — E.1)
+### Validação parcial do schema (fase 1 — E.1)
+
+O script [`script_validate_schema_phase1.py`](script_validate_schema_phase1.py) **não** valida o schema completo do repositório: ele confere apenas as tabelas **`tenant`**, **`account`**, **`member`**, PKs, FKs (incluindo `ON DELETE` / `UPDATE`), `CHECK`s e o índice único parcial em `member`. Útil como verificação mínima de identidade; o restante do modelo segue `erd.json`, modelos SQLAlchemy e migrações.
 
 Com o Postgres acessível e migrations aplicadas, na pasta `backend`:
 
@@ -105,7 +152,7 @@ Com o Postgres acessível e migrations aplicadas, na pasta `backend`:
 python script_validate_schema_phase1.py
 ```
 
-O script confere as tabelas `tenant`, `account`, `member`, PKs, FKs (incl. `ON DELETE` / `UPDATE`), `CHECK`s e o índice único parcial em `member`. Exit code `0` se passar.
+Exit code `0` se passar.
 
 ### Testes de triggers de auditoria (`log`)
 
@@ -115,7 +162,7 @@ Com Postgres acessível e `alembic upgrade head` aplicado, na pasta `backend`:
 python -m pytest tests/test_audit_triggers_pg.py -q
 ```
 
-Se a URL atual nao for PostgreSQL ou o banco estiver indisponivel, os testes sao ignorados.
+Se a URL atual não for PostgreSQL ou o banco estiver indisponível, os testes são ignorados.
 
 Política atual de auditoria:
 
@@ -124,18 +171,18 @@ Política atual de auditoria:
 - `account` permite `tenant_id` ausente; `account_id` em `INSERT` continua como exceção temporária.
 - `log.account_id` e `log.tenant_id` preservam IDs históricos e não são mais reescritos por FK ao apagar `account` ou `tenant`.
 
-### Sessão e API (fase 1 — E.2)
+### Sessão e infraestrutura da API
 
 - [`src/valora_backend/db.py`](src/valora_backend/db.py): `engine`, `SessionLocal`, dependency `get_session` (injeta `Request` e, no PostgreSQL, aplica `set_config` local para auditoria após `after_begin`) e alias `SessionDep`.
 - [`src/valora_backend/middleware/audit_request_context.py`](src/valora_backend/middleware/audit_request_context.py): preenche `request.state` com `tenant_id` e `account_id` a partir do JWT válido.
-- O endpoint `GET /health/db` usa a sessão para `SELECT 1` e confirma ligação ao banco.
+- [`src/valora_backend/main.py`](src/valora_backend/main.py): montagem da app, handlers de erro de integridade / DB e routers.
 
-## Estrutura inicial
+## Estrutura do pacote
 
 - `pyproject.toml`: dependências e configuração do projeto Python.
-- `src/valora_backend/`: pacote da aplicação.
-- `src/valora_backend/config.py`: configuração via `pydantic-settings` (`POSTGRES_PASSWORD` → URL do banco em `database_url`).
-- `src/valora_backend/model/`: modelos SQLAlchemy (fase 1: `tenant`, `account`, `member` em `identity.py`).
-- `src/valora_backend/db.py`: engine, sessão e dependency FastAPI (`get_session` com contexto de auditoria no PostgreSQL).
+- `src/valora_backend/config.py`: configuração via `pydantic-settings`.
+- `src/valora_backend/model/`: metadados SQLAlchemy — [`identity.py`](src/valora_backend/model/identity.py) (`tenant`, `account`, `member`, `scope`, `location`, `unity`), [`log.py`](src/valora_backend/model/log.py) (`log`), [`rules.py`](src/valora_backend/model/rules.py) (`field`, `action`, `formula`, `label`, `event`, `input`, `result`); [`__init__.py`](src/valora_backend/model/__init__.py) importa tudo para o Alembic.
+- `src/valora_backend/api/`: [`auth.py`](src/valora_backend/api/auth.py), [`rules.py`](src/valora_backend/api/rules.py).
 - `alembic/`: migrations; `env.py` usa `Base.metadata` e a mesma URL que o backend.
-- `script_validate_schema_phase1.py`: validação automática do schema da fase 1 (E.1).
+- `erd.json`: ERD drawDB (fonte de verdade do diagrama).
+- `script_validate_schema_phase1.py`: checagem automática mínima do subconjunto identidade (E.1).

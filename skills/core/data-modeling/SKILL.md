@@ -7,6 +7,8 @@ description: Use quando desenhar ou revisar modelo de dados relacional com rigor
 
 Use esta skill quando a tarefa exigir desenho estrutural de banco com clareza semântica, consistência relacional e trade-off explícito.
 
+No repositório Valora, o diagrama canônico (drawDB) e os metadados de tabelas/colunas/constraints do modelo relacional implementado no backend estão em **`backend/erd.json`**; a materialização no PostgreSQL segue os modelos em `backend/src/valora_backend/model/` e as revisões em `backend/alembic/versions/`. Ver também [`architecture/source-of-truth.md`](../../architecture/source-of-truth.md) e [`backend/README.md`](../../backend/README.md).
+
 ## Fluxo
 
 1. Delimite o domínio e questione premissa ambígua antes de propor tabela ou coluna.

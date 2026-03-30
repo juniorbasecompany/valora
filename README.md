@@ -5,7 +5,7 @@ Repositório de documentação canônica para a construção gradual de um siste
 ## Mapa do repositório
 
 - `.cursor/rules/`: convenções persistentes do agente e de escrita aplicadas em toda sessão do projeto.
-- `backend/`: projeto Python do núcleo executável, com dependência isolada do restante do repositório.
+- `backend/`: projeto Python do núcleo executável, com dependência isolada do restante do repositório. O ERD em formato drawDB (fonte de verdade do diagrama relacional) está em [`backend/erd.json`](backend/erd.json); detalhes de schema e API em [`backend/README.md`](backend/README.md).
 - `frontend/`: projeto web separado, com dependência própria e sem mistura com o backend.
 - `skills/`: verdade operacional. Define como cada parte do sistema deve ser implementada. O subconjunto [`skills/implementation/stack/`](skills/implementation/stack/SKILL.md) fixa o stack de front e back na implementação e revisão.
 - `architecture/`: verdade decisória curta. Registra princípios, limites e decisões permanentes. O ficheiro [`technology-stack.md`](architecture/technology-stack.md) regista a decisão canónica de stack (frontend e backend).

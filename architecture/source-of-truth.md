@@ -10,6 +10,12 @@ A documentação do projeto tem autoridade explícita por camada.
 4. `reference/` é material de consulta.
 5. `archive/` é material histórico e superado.
 
+## Modelo relacional do backend
+
+- **Diagrama e metadados estruturais:** a fonte de verdade do ERD (formato drawDB) é [`backend/erd.json`](../backend/erd.json). Colunas, comentários, `constraints` declaradas no JSON e relacionamentos do diagrama orientam o alinhamento entre documentação, migrações e API.
+- **Implementação física:** o schema efetivo no PostgreSQL vem das revisões Alembic em `backend/alembic/versions/` e dos modelos SQLAlchemy em `backend/src/valora_backend/model/`. Em caso de divergência entre diagrama e banco, o fluxo esperado é atualizar `erd.json` e depois refletir em modelo e migração (ou corrigir o diagrama se o banco já for a decisão vigente).
+- **Contrato HTTP:** rotas e payloads expostos pela FastAPI devem ser consistentes com as tabelas e regras que efetivamente persistem dados; detalhes operacionais ficam em [`backend/README.md`](../backend/README.md) e, quando existir, no OpenAPI em tempo de execução (`/docs`).
+
 ## Convenções persistentes do agente
 
 As convenções sempre ativas de idioma, escrita e nomenclatura ficam em `.cursor/rules/`.

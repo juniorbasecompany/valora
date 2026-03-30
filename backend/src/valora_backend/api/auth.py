@@ -50,6 +50,7 @@ from valora_backend.model.identity import (
     Tenant,
     Unity,
 )
+from valora_backend.model.rules import Action as ScopeAction, Field as ScopeField
 from valora_backend.model.log import Log
 from valora_backend.model.null_if_empty import commit_session_with_null_if_empty
 from valora_backend.locale.member_invite_email import resolve_member_invite_locale
@@ -2054,6 +2055,24 @@ def delete_current_tenant_scope(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Cannot delete scope while it still has unities",
+        )
+
+    has_scope_field = session.scalar(
+        select(ScopeField.id).where(ScopeField.scope_id == target_scope.id).limit(1)
+    )
+    if has_scope_field is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete scope while it still has field definitions",
+        )
+
+    has_scope_action = session.scalar(
+        select(ScopeAction.id).where(ScopeAction.scope_id == target_scope.id).limit(1)
+    )
+    if has_scope_action is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete scope while it still has actions",
         )
 
     _apply_member_audit_context(session, current_member)

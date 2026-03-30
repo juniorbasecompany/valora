@@ -11,6 +11,7 @@ from sqlalchemy.exc import DBAPIError, IntegrityError
 from sqlalchemy.orm import Session
 
 from valora_backend.api.auth import router as auth_router
+from valora_backend.api.rules import router as scope_rules_router
 from valora_backend.config import Settings
 from valora_backend.db import dispose_engine, get_session
 from valora_backend.middleware.audit_request_context import AuditRequestContextMiddleware
@@ -121,6 +122,7 @@ def create_app() -> FastAPI:
         return {"status": "ok", "database": "connected"}
 
     app.include_router(auth_router)
+    app.include_router(scope_rules_router)
 
     return app
 

@@ -224,15 +224,34 @@ export function FieldConfigurationClient({
         [t]
     );
 
+    /** Resumo de tipo numérico: inteiro, 1 decimal ou vários (lista + Informações). */
+    const infoSqlTypeSummary = useCallback(
+        (raw: string) => {
+            const p = parseFieldSqlType(raw);
+            if (p.kind === "number") {
+                const scale = p.scale ?? 0;
+                if (scale === 0) {
+                    return t("section.info.typeValueInteger");
+                }
+                if (scale === 1) {
+                    return t("section.info.typeValueNumberOne");
+                }
+                return t("section.info.typeValueNumberMany", { scale });
+            }
+            return sqlTypeCaption(raw);
+        },
+        [sqlTypeCaption, t]
+    );
+
     const resolveDirectoryTitle = useCallback(
         (item: TenantScopeFieldRecord) => {
             const name = item.label_name?.trim();
             if (name && name.length > 0) {
                 return name;
             }
-            return sqlTypeCaption(item.sql_type);
+            return infoSqlTypeSummary(item.sql_type);
         },
-        [sqlTypeCaption]
+        [infoSqlTypeSummary]
     );
 
     const selectedField = useMemo(() => {
@@ -620,9 +639,11 @@ export function FieldConfigurationClient({
                                 }
                             >
                                 <p className="ui-directory-title">{resolveDirectoryTitle(item)}</p>
-                                <p className="ui-directory-caption-wrap">
-                                    {sqlTypeCaption(item.sql_type)}
-                                </p>
+                                {item.label_name?.trim() ? (
+                                    <p className="ui-directory-caption-wrap">
+                                        {infoSqlTypeSummary(item.sql_type)}
+                                    </p>
+                                ) : null}
                             </button>
                         ))}
 
@@ -754,7 +775,7 @@ export function FieldConfigurationClient({
                                             </span>
                                             {": "}
                                             <span className="ui-info-topic-value">
-                                                {sqlTypeCaption(selectedField.sql_type)}
+                                                {infoSqlTypeSummary(selectedField.sql_type)}
                                             </span>
                                         </p>
                                     </li>

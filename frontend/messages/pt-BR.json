@@ -9,6 +9,7 @@
       "unity": "Unidades",
       "field": "Campos",
       "action": "Ações",
+      "event": "Eventos",
       "configuration": "Configuração",
       "comingSoon": "em breve"
     },
@@ -383,6 +384,78 @@
         "formula_unknown_field_id": "A fórmula usa uma informação que não existe neste escopo. Ajuste os itens escolhidos ou o texto.",
         "formula_expression_invalid": "A conta à direita do igual não pôde ser validada. Confira parênteses, operadores e funções permitidas (como abs, min, max, round, Decimal e date)."
       }
+    },
+    "discardConfirm": "Descartar alterações não salvas?"
+  },
+  "EventConfigurationPage": {
+    "title": "Eventos",
+    "description": "Registre e ajuste os eventos do escopo ativo. A lista permite filtrar por período, local, unidade e ação, mantendo edição e histórico no mesmo fluxo.",
+    "empty": "Nenhum evento foi encontrado para os filtros aplicados.",
+    "list": {
+      "emptyScope": "Crie um escopo antes de registrar eventos.",
+      "missingCurrentScope": "Defina um escopo ativo no seletor do cabeçalho antes de registrar eventos.",
+      "loadError": "Não foi possível carregar os eventos deste escopo. Tente novamente.",
+      "fallbackLocation": "Local indisponível",
+      "fallbackUnity": "Unidade indisponível",
+      "fallbackAction": "Ação indisponível",
+      "fallbackEvent": "Evento indisponível"
+    },
+    "history": {
+      "title": "Histórico de alterações",
+      "description": "Consulte o histórico dos eventos do escopo ativo: quem alterou, quando e um resumo do que mudou."
+    },
+    "section": {
+      "moment": {
+        "label": "Data e hora do evento",
+        "hint": "Informe o momento em que o evento aconteceu. O sistema salva em UTC e exibe no seu horário local."
+      },
+      "location": {
+        "label": "Local",
+        "hint": "Selecione o local onde o evento aconteceu."
+      },
+      "unity": {
+        "label": "Unidade",
+        "hint": "Selecione a unidade produtiva relacionada ao evento."
+      },
+      "action": {
+        "label": "Ação",
+        "hint": "Selecione a ação que descreve o evento."
+      },
+      "info": {
+        "title": "Informações",
+        "description": "Resumo do evento em foco no servidor.",
+        "summaryLabel": "Resumo",
+        "createLead": "Novo evento",
+        "createHint": "Você está registrando um novo evento para o escopo ativo. Salve para registrar no diretório."
+      }
+    },
+    "filter": {
+      "title": "Filtros da lista",
+      "momentFromLabel": "Período inicial",
+      "momentToLabel": "Período final",
+      "locationLabel": "Filtrar por local",
+      "unityLabel": "Filtrar por unidade",
+      "actionLabel": "Filtrar por ação",
+      "all": "Todos"
+    },
+    "buttons": {
+      "cancel": "Cancelar",
+      "new": "Novo",
+      "delete": "Apagar",
+      "undoDelete": "Desmarcar exclusão",
+      "save": "Salvar",
+      "saving": "Salvando..."
+    },
+    "readOnlyNotice": "Você pode consultar os eventos do escopo ativo, mas só membros master ou administrador podem criar ou editar eventos.",
+    "error": {
+      "save": "Não foi possível salvar o evento. Tente novamente.",
+      "create": "Não foi possível criar o evento. Tente novamente.",
+      "delete": "Não foi possível apagar o evento. Tente novamente.",
+      "deleteBlockedDetail": "Não é possível apagar o evento enquanto resultados ainda o referenciam.",
+      "momentRequired": "Informe a data e hora do evento.",
+      "locationRequired": "Selecione um local.",
+      "unityRequired": "Selecione uma unidade.",
+      "actionRequired": "Selecione uma ação."
     },
     "discardConfirm": "Descartar alterações não salvas?"
   },

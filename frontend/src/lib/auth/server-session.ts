@@ -12,6 +12,7 @@ import type {
   TenantMemberDirectoryResponse,
   TenantScopeActionDirectoryResponse,
   TenantScopeDirectoryResponse,
+  TenantScopeEventDirectoryResponse,
   TenantScopeFieldDirectoryResponse,
   TenantUnityDirectoryResponse
 } from "@/lib/auth/types";
@@ -243,6 +244,62 @@ export async function getTenantScopeActionDirectory(
     }
 
     return (await response.json()) as TenantScopeActionDirectoryResponse;
+  } catch {
+    return null;
+  }
+}
+
+export async function getTenantScopeEventDirectory(
+  scopeId: number,
+  filter: {
+    moment_from_utc?: string;
+    moment_to_utc?: string;
+    location_id?: number;
+    unity_id?: number;
+    action_id?: number;
+  } = {}
+) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(authTokenCookieName)?.value;
+  if (!hasAuthSession(token)) {
+    return null;
+  }
+
+  const query = new URLSearchParams();
+  if (filter.moment_from_utc) {
+    query.set("moment_from_utc", filter.moment_from_utc);
+  }
+  if (filter.moment_to_utc) {
+    query.set("moment_to_utc", filter.moment_to_utc);
+  }
+  if (filter.location_id != null) {
+    query.set("location_id", String(filter.location_id));
+  }
+  if (filter.unity_id != null) {
+    query.set("unity_id", String(filter.unity_id));
+  }
+  if (filter.action_id != null) {
+    query.set("action_id", String(filter.action_id));
+  }
+  const suffix = query.toString();
+
+  try {
+    const response = await fetch(
+      `${apiUrl}/auth/tenant/current/scopes/${scopeId}/events${suffix ? `?${suffix}` : ""}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        cache: "no-store"
+      }
+    );
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return (await response.json()) as TenantScopeEventDirectoryResponse;
   } catch {
     return null;
   }

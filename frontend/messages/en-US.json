@@ -9,6 +9,7 @@
       "unity": "Units",
       "field": "Fields",
       "action": "Actions",
+      "event": "Events",
       "configuration": "Configuration",
       "comingSoon": "coming soon"
     },
@@ -383,6 +384,78 @@
         "formula_unknown_field_id": "The formula references information that does not exist in this scope. Adjust the chosen items or the text.",
         "formula_expression_invalid": "The calculation to the right of the equals sign could not be validated. Check parentheses, operators, and allowed functions (such as abs, min, max, round, Decimal, and date)."
       }
+    },
+    "discardConfirm": "Discard unsaved changes?"
+  },
+  "EventConfigurationPage": {
+    "title": "Events",
+    "description": "Record and adjust events for the active scope. The list can be filtered by period, location, unit, and action while keeping edit and history in one flow.",
+    "empty": "No events were found for the current filters.",
+    "list": {
+      "emptyScope": "Create a scope before recording events.",
+      "missingCurrentScope": "Select an active scope in the header before recording events.",
+      "loadError": "Could not load events for this scope. Try again.",
+      "fallbackLocation": "Unavailable location",
+      "fallbackUnity": "Unavailable unit",
+      "fallbackAction": "Unavailable action",
+      "fallbackEvent": "Unavailable event"
+    },
+    "history": {
+      "title": "Change history",
+      "description": "Review the event history for the active scope: who changed what, when, and a concise summary."
+    },
+    "section": {
+      "moment": {
+        "label": "Event date and time",
+        "hint": "Enter when the event happened. The system stores UTC and shows your local time."
+      },
+      "location": {
+        "label": "Location",
+        "hint": "Choose where the event happened."
+      },
+      "unity": {
+        "label": "Unit",
+        "hint": "Choose the productive unit related to the event."
+      },
+      "action": {
+        "label": "Action",
+        "hint": "Choose the action that describes the event."
+      },
+      "info": {
+        "title": "Information",
+        "description": "Summary of the selected event on the server.",
+        "summaryLabel": "Summary",
+        "createLead": "New event",
+        "createHint": "You are recording a new event for the active scope. Save to register it in the directory."
+      }
+    },
+    "filter": {
+      "title": "List filters",
+      "momentFromLabel": "Start period",
+      "momentToLabel": "End period",
+      "locationLabel": "Filter by location",
+      "unityLabel": "Filter by unit",
+      "actionLabel": "Filter by action",
+      "all": "All"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "new": "New",
+      "delete": "Delete",
+      "undoDelete": "Undo delete",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "readOnlyNotice": "You can view events in the active scope, but only master or administrator members can create or edit events.",
+    "error": {
+      "save": "Could not save the event. Try again.",
+      "create": "Could not create the event. Try again.",
+      "delete": "Could not delete the event. Try again.",
+      "deleteBlockedDetail": "The event cannot be deleted while results still reference it.",
+      "momentRequired": "Enter the event date and time.",
+      "locationRequired": "Select a location.",
+      "unityRequired": "Select a unit.",
+      "actionRequired": "Select an action."
     },
     "discardConfirm": "Discard unsaved changes?"
   },

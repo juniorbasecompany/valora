@@ -145,6 +145,19 @@ export type TenantScopeActionDirectoryResponse = {
   item_list: TenantScopeActionRecord[];
 };
 
+export type TenantScopeEventRecord = {
+  id: number;
+  location_id: number;
+  unity_id: number;
+  action_id: number;
+  moment_utc: string;
+};
+
+export type TenantScopeEventDirectoryResponse = {
+  can_edit: boolean;
+  item_list: TenantScopeEventRecord[];
+};
+
 export type ScopeFormulaRecord = {
   id: number;
   action_id: number;
@@ -164,7 +177,8 @@ export type AuditLogTableName =
   | "location"
   | "unity"
   | "field"
-  | "action";
+  | "action"
+  | "event";
 
 export type AuditLogActionType = "I" | "U" | "D";
 

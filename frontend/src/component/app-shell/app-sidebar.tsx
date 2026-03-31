@@ -12,7 +12,7 @@ type NavigationItem = {
     href: string;
 };
 
-type NavigationIconKind = "home" | "location" | "unity" | "field" | "action";
+type NavigationIconKind = "home" | "location" | "unity" | "field" | "action" | "event";
 
 type AppSidebarProps = {
     productName: string;

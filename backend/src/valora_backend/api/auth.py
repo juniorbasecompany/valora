@@ -62,7 +62,16 @@ ACTIVE_STATUS = 1
 PENDING_STATUS = 2
 DISABLED_STATUS = 3
 GOOGLE_PROVIDER = "google"
-HISTORY_TABLE_NAME_SET = {"tenant", "member", "scope", "location", "unity", "field", "action"}
+HISTORY_TABLE_NAME_SET = {
+    "tenant",
+    "member",
+    "scope",
+    "location",
+    "unity",
+    "field",
+    "action",
+    "event",
+}
 HISTORY_ACTION_TYPE_SET = {"I", "U", "D"}
 DEFAULT_HISTORY_PAGE_SIZE = 5
 MAX_HISTORY_PAGE_SIZE = 50

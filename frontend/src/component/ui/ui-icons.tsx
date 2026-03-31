@@ -5,7 +5,7 @@ type IconProps = {
 };
 
 type NavigationIconProps = IconProps & {
-    kind: "home" | "location" | "unity" | "field" | "action";
+    kind: "home" | "location" | "unity" | "field" | "action" | "event";
 };
 
 function mergeClassName(className?: string, fallback = "ui-icon") {
@@ -437,6 +437,8 @@ export function NavigationIcon({
             return <RulerIcon className={className} />;
         case "action":
             return <MilestonePathIcon className={className} />;
+        case "event":
+            return <ClockIcon className={className} />;
         default:
             return <DashboardIcon className={className} />;
     }

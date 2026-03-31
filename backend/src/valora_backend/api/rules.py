@@ -1142,12 +1142,14 @@ class ScopeEventCreateRequest(BaseModel):
     location_id: int
     unity_id: int
     action_id: int
+    moment_utc: datetime | None = None
 
 
 class ScopeEventPatchRequest(BaseModel):
     location_id: int | None = None
     unity_id: int | None = None
     action_id: int | None = None
+    moment_utc: datetime | None = None
 
 
 @router.get(
@@ -1156,10 +1158,34 @@ class ScopeEventPatchRequest(BaseModel):
 )
 def list_scope_events(
     scope_id: int,
+    moment_from_utc: datetime | None = Query(default=None),
+    moment_to_utc: datetime | None = Query(default=None),
+    location_id: int | None = Query(default=None),
+    unity_id: int | None = Query(default=None),
+    action_id: int | None = Query(default=None),
     member: Member = Depends(get_current_member),
     session: Session = Depends(get_session),
 ):
     _get_tenant_scope(session, actor=member, scope_id=scope_id)
+    if moment_from_utc is not None and moment_from_utc.tzinfo is not None:
+        moment_from_utc = moment_from_utc.astimezone(UTC).replace(tzinfo=None)
+    if moment_to_utc is not None and moment_to_utc.tzinfo is not None:
+        moment_to_utc = moment_to_utc.astimezone(UTC).replace(tzinfo=None)
+    if (
+        moment_from_utc is not None
+        and moment_to_utc is not None
+        and moment_from_utc > moment_to_utc
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid event period",
+        )
+    if location_id is not None:
+        _location_in_scope_or_404(session, scope_id=scope_id, location_id=location_id)
+    if unity_id is not None:
+        _unity_in_scope_or_404(session, scope_id=scope_id, unity_id=unity_id)
+    if action_id is not None:
+        _action_in_scope_or_404(session, scope_id=scope_id, action_id=action_id)
     action_id_list = list(
         session.scalars(select(Action.id).where(Action.scope_id == scope_id))
     )
@@ -1168,13 +1194,18 @@ def list_scope_events(
             can_edit=_member_can_edit_scope_rules(member),
             item_list=[],
         )
-    rows = list(
-        session.scalars(
-            select(Event)
-            .where(Event.action_id.in_(action_id_list))
-            .order_by(Event.moment_utc.desc(), Event.id.desc())
-        )
-    )
+    query = select(Event).where(Event.action_id.in_(action_id_list))
+    if moment_from_utc is not None:
+        query = query.where(Event.moment_utc >= moment_from_utc)
+    if moment_to_utc is not None:
+        query = query.where(Event.moment_utc <= moment_to_utc)
+    if location_id is not None:
+        query = query.where(Event.location_id == location_id)
+    if unity_id is not None:
+        query = query.where(Event.unity_id == unity_id)
+    if action_id is not None:
+        query = query.where(Event.action_id == action_id)
+    rows = list(session.scalars(query.order_by(Event.moment_utc.desc(), Event.id.desc())))
     return ScopeEventListResponse(
         can_edit=_member_can_edit_scope_rules(member),
         item_list=[
@@ -1207,10 +1238,14 @@ def create_scope_event(
     action = _action_in_scope_or_404(
         session, scope_id=scope_id, action_id=body.action_id
     )
+    moment = body.moment_utc or datetime.now(UTC)
+    if moment.tzinfo is not None:
+        moment = moment.astimezone(UTC).replace(tzinfo=None)
     row = Event(
         location_id=body.location_id,
         unity_id=body.unity_id,
         action_id=action.id,
+        moment_utc=moment,
     )
     session.add(row)
     _apply_member_audit_context(session, member)
@@ -1243,6 +1278,11 @@ def patch_scope_event(
     if body.action_id is not None:
         _action_in_scope_or_404(session, scope_id=scope_id, action_id=body.action_id)
         row.action_id = body.action_id
+    if body.moment_utc is not None:
+        moment = body.moment_utc
+        if moment.tzinfo is not None:
+            moment = moment.astimezone(UTC).replace(tzinfo=None)
+        row.moment_utc = moment
     session.add(row)
     _apply_member_audit_context(session, member)
     commit_session_with_null_if_empty(session)

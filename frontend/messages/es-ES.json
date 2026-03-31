@@ -9,6 +9,7 @@
       "unity": "Unidades",
       "field": "Campos",
       "action": "Acciones",
+      "event": "Eventos",
       "configuration": "Configuración",
       "comingSoon": "próximamente"
     },
@@ -383,6 +384,78 @@
         "formula_unknown_field_id": "La fórmula usa una información que no existe en este alcance. Ajusta los elementos elegidos o el texto.",
         "formula_expression_invalid": "El cálculo a la derecha del igual no pudo validarse. Revisa paréntesis, operadores y funciones permitidas (como abs, min, max, round, Decimal y date)."
       }
+    },
+    "discardConfirm": "¿Descartar los cambios no guardados?"
+  },
+  "EventConfigurationPage": {
+    "title": "Eventos",
+    "description": "Registra y ajusta eventos del alcance activo. La lista permite filtrar por período, ubicación, unidad y acción, manteniendo edición e historial en el mismo flujo.",
+    "empty": "No se encontraron eventos para los filtros aplicados.",
+    "list": {
+      "emptyScope": "Crea un alcance antes de registrar eventos.",
+      "missingCurrentScope": "Define un alcance activo en el encabezado antes de registrar eventos.",
+      "loadError": "No se pudieron cargar los eventos de este alcance. Inténtalo de nuevo.",
+      "fallbackLocation": "Ubicación no disponible",
+      "fallbackUnity": "Unidad no disponible",
+      "fallbackAction": "Acción no disponible",
+      "fallbackEvent": "Evento no disponible"
+    },
+    "history": {
+      "title": "Historial de cambios",
+      "description": "Consulta el historial de eventos del alcance activo: quién cambió qué, cuándo y un resumen breve."
+    },
+    "section": {
+      "moment": {
+        "label": "Fecha y hora del evento",
+        "hint": "Indica cuándo ocurrió el evento. El sistema guarda en UTC y muestra en tu hora local."
+      },
+      "location": {
+        "label": "Ubicación",
+        "hint": "Selecciona dónde ocurrió el evento."
+      },
+      "unity": {
+        "label": "Unidad",
+        "hint": "Selecciona la unidad productiva relacionada con el evento."
+      },
+      "action": {
+        "label": "Acción",
+        "hint": "Selecciona la acción que describe el evento."
+      },
+      "info": {
+        "title": "Información",
+        "description": "Resumen del evento seleccionado en el servidor.",
+        "summaryLabel": "Resumen",
+        "createLead": "Nuevo evento",
+        "createHint": "Estás registrando un nuevo evento para el alcance activo. Guarda para registrarlo en el directorio."
+      }
+    },
+    "filter": {
+      "title": "Filtros de la lista",
+      "momentFromLabel": "Período inicial",
+      "momentToLabel": "Período final",
+      "locationLabel": "Filtrar por ubicación",
+      "unityLabel": "Filtrar por unidad",
+      "actionLabel": "Filtrar por acción",
+      "all": "Todos"
+    },
+    "buttons": {
+      "cancel": "Cancelar",
+      "new": "Nuevo",
+      "delete": "Eliminar",
+      "undoDelete": "Desmarcar eliminación",
+      "save": "Guardar",
+      "saving": "Guardando..."
+    },
+    "readOnlyNotice": "Puedes consultar los eventos del alcance activo, pero solo miembros master o administradores pueden crear o editar eventos.",
+    "error": {
+      "save": "No se pudo guardar el evento. Inténtalo de nuevo.",
+      "create": "No se pudo crear el evento. Inténtalo de nuevo.",
+      "delete": "No se pudo eliminar el evento. Inténtalo de nuevo.",
+      "deleteBlockedDetail": "No es posible eliminar el evento mientras resultados aún lo referencian.",
+      "momentRequired": "Indica la fecha y hora del evento.",
+      "locationRequired": "Selecciona una ubicación.",
+      "unityRequired": "Selecciona una unidad.",
+      "actionRequired": "Selecciona una acción."
     },
     "discardConfirm": "¿Descartar los cambios no guardados?"
   },

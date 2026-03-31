@@ -1,13 +1,13 @@
 ---
 name: rule-formula-simpleeval
-description: User-configurable formula steps evaluated with simpleeval (whitelist functions, named steps, accumulated context). Use when implementing or reviewing backend rule expressions, security of eval surfaces, or wiring formulas to the daily calc engine and provenance.
+description: Validação e avaliação restrita de `formula.statement` com simpleeval (lista branca de funções), com atribuição direta para `${field:id}` e sem variáveis intermediárias entre fórmulas.
 ---
 
-# Expressões de regra com SimpleEval (passos nomeados)
+# Expressões de regra com SimpleEval (atribuição direta)
 
 ## Objetivo
 
-Padronizar a execução de **expressões Python restritas** com **[simpleeval](https://pypi.org/project/simpleeval/)** em **cadeia de passos com nomes** (`step_list`: cada passo tem `name` e `expression`), em vez de `exec`/`eval` livre ou scripts multilinha não controlados.
+Padronizar a validação de **expressões Python restritas** com **[simpleeval](https://pypi.org/project/simpleeval/)** para `formula.statement` no contrato atual da API, evitando `exec`/`eval` livre ou scripts multilinha não controlados.
 
 ## Quando usar
 
@@ -15,37 +15,26 @@ Padronizar a execução de **expressões Python restritas** com **[simpleeval](h
 - Rever **segurança** e superfície de funções expostas ao utilizador.
 - Alinhar com o fluxo do [motor diário](../../core/daily-calc-engine/SKILL.md) e com a **proveniência** dos valores calculados.
 
-## Contrato do passo
-
-Cada item de `step_list` segue o formato:
-
-- `name`: identificador do resultado deste passo (string).
-- `expression`: **uma** expressão avaliável pelo SimpleEval (string).
-
-O **contexto** é um dicionário que começa com `input_context` e, após cada passo, passa a incluir `context[name] = valor` do passo atual. **A ordem dos passos é semântica**: passos posteriores podem referenciar nomes definidos em passos anteriores.
-
-### `formula.statement` na API (atribuição)
+## `formula.statement` na API (atribuição)
 
 O texto persistido em [`formula.statement`](../../../backend/src/valora_backend/model/rules.py) usa **uma única linha lógica** de atribuição:
 
 - **Lado esquerdo:** exclusivamente `${field:<id>}` (quem recebe o valor).
 - **Separador:** primeiro caractere `=` na instrução (após trim).
 - **Lado direito:** expressão de cálculo com referências `${field:…}` e funções da lista branca; internamente substituídas por nomes `f_<id>` para o SimpleEval.
+- **Regra de modelagem:** não há variáveis/campos temporários intermediários entre fórmulas no contrato atual. Cada fórmula atribui diretamente para `${field:<id>}`.
 
 Na gravação (`POST`/`PATCH` de fórmulas), o backend valida este formato, a existência dos `field_id` no escopo e um **dry-run** da RHS com valores stub (`Decimal("0")` por campo referido na expressão). Códigos estáveis de erro: `formula_invalid_assignment`, `formula_invalid_target`, `formula_unknown_field_id`, `formula_expression_invalid`. Implementação: `valora_backend/rules/formula_statement_validate.py` e `formula_simple_eval.py`.
 
-## API conceptual
+## API conceitual
 
-- `build_evaluator(context)`  
-  Constrói um `SimpleEval` com `names` ligado ao contexto atual e `functions` restrito a uma **lista branca** (ver abaixo).
+- `build_formula_simple_eval(names)`  
+  Constrói um `SimpleEval` com `names` e `functions` restritos à lista branca.
 
-- `execute_steps(input_context, step_list) -> dict`  
-  Executa os passos em sequência e devolve o **contexto final** (entradas + todos os nomes de passo).
+- `validate_formula_statement_for_scope(session, scope_id, statement)`  
+  Valida a atribuição (`LHS = RHS`), confirma referências no escopo e faz dry-run da `RHS`.
 
-- `RuleExecutionError`  
-  Exceção de domínio ao falhar um passo; a mensagem deve identificar o `name` do passo e, quando fizer sentido, trecho da `expression` (sem vazar dados sensíveis em logs públicos).
-
-Implementação de referência (exemplo completo): [reference.md](./reference.md).
+Implementação de referência: [reference.md](./reference.md).
 
 ## Funções permitidas (baseline)
 
@@ -64,7 +53,8 @@ O conjunto inicial documentado para o projeto:
 
 ## Limitações explícitas
 
-- Cada `expression` é **uma** expressão SimpleEval: **sem** `import`, **sem** módulo completo, **sem** atribuições dentro da string (usar **passos nomeados** para variáveis intermédias).
+- Cada `statement` deve seguir atribuição única `${field:id} = <expressão>`.
+- Cada `expression` é **uma** expressão SimpleEval: **sem** `import`, **sem** módulo completo e sem outro operador de atribuição fora do separador principal.
 - Não usar este padrão misturado com **FEEL**, **JSONLogic** ou outro motor na mesma regra sem decisão arquitectural e contrato de proveniência claros.
 
 ## Proveniência

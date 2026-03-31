@@ -12,7 +12,7 @@ Leia estas referências conforme necessário:
 - `references/provenance.md`
 - `references/materialized-facts.md`
 
-Para **fórmulas configuráveis** no backend (expressões com SimpleEval em passos nomeados, lista branca de funções e erros de passo), ver [skills/implementation/rule-formula-simpleeval/SKILL.md](../../implementation/rule-formula-simpleeval/SKILL.md).
+Para **fórmulas configuráveis** no backend (expressões com SimpleEval, lista branca de funções e validação de `formula.statement` com atribuição direta para `${field:id}`), ver [skills/implementation/rule-formula-simpleeval/SKILL.md](../../implementation/rule-formula-simpleeval/SKILL.md).
 
 ## Fluxo
 

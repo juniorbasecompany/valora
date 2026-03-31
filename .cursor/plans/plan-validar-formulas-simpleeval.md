@@ -68,9 +68,8 @@ Erros retornam `422` com códigos estáveis:
 
 - A validação de gravação é estrutural e sintática; não cobre todos os erros dependentes de dado real em execução de evento.
 - O dry-run usa valores stub para nomes da RHS.
-- O motor em cadeia por ordem de `step` permanece como evolução separada da validação no write path.
+- O contrato atual exige atribuição direta para `${field:id}`, sem variáveis intermediárias entre fórmulas.
 
 ## Evoluções futuras
 
-- Dry-run com contexto acumulado por `step`.
 - Extensão de gramática caso surja necessidade de novos formatos de atribuição.

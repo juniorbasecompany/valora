@@ -73,7 +73,7 @@ flowchart LR
 |-------|---------------------|
 | [backend/erd.json](../../backend/erd.json) | Tabela `formula`: `action_id`, `step`, `statement` |
 | [backend/README.md](../../backend/README.md) | Menção a `.../actions/{action_id}/formulas` |
-| [skills/implementation/rule-formula-simpleeval/SKILL.md](../../skills/implementation/rule-formula-simpleeval/SKILL.md) | Execução futura com passos nomeados; o armazenamento atual continua sendo `step` + `statement` no banco |
+| [skills/implementation/rule-formula-simpleeval/SKILL.md](../../skills/implementation/rule-formula-simpleeval/SKILL.md) | Validação de `statement` com atribuição direta para `${field:id}`; o armazenamento atual continua sendo `step` + `statement` no banco |
 
 ## Conclusão
 

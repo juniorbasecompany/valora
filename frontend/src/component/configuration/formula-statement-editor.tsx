@@ -81,6 +81,25 @@ function displayLabel(field: FormulaFieldOption, unknownFieldLabel: string): str
     return `${unknownFieldLabel} (${field.id})`;
 }
 
+function selectedClipboardText(
+    view: EditorView,
+    idToLabel: Map<number, string>,
+    unknownFieldLabel: string
+): { rangeList: readonly { from: number; to: number }[]; text: string } | null {
+    const rangeList = view.state.selection.ranges.filter((range) => !range.empty);
+    if (rangeList.length === 0) {
+        return null;
+    }
+    const chunkList = rangeList.map((range) =>
+        clipboardPrettyText(
+            view.state.sliceDoc(range.from, range.to),
+            idToLabel,
+            unknownFieldLabel
+        )
+    );
+    return { rangeList, text: chunkList.join("\n") };
+}
+
 function createFieldAutocompleteSource(
     fieldList: FormulaFieldOption[],
     unknownFieldLabel: string
@@ -185,8 +204,6 @@ function buildFieldTokenExtension(
         { decorations: (value) => value.decorations }
     );
 
-    const idToLabelForClipboard = idToLabel;
-
     return [
         fieldPlugin,
         EditorView.atomicRanges.of((view) => fieldTokenAtomicRangeSet(view.state.doc.toString())),
@@ -195,18 +212,15 @@ function buildFieldTokenExtension(
                 if (!event.clipboardData) {
                     return false;
                 }
-                const rangeList = view.state.selection.ranges.filter((r) => !r.empty);
-                if (rangeList.length === 0) {
+                const selectionData = selectedClipboardText(
+                    view,
+                    idToLabel,
+                    unknownFieldLabel
+                );
+                if (!selectionData) {
                     return false;
                 }
-                const chunks = rangeList.map((r) =>
-                    clipboardPrettyText(
-                        view.state.sliceDoc(r.from, r.to),
-                        idToLabelForClipboard,
-                        unknownFieldLabel
-                    )
-                );
-                event.clipboardData.setData("text/plain", chunks.join("\n"));
+                event.clipboardData.setData("text/plain", selectionData.text);
                 event.preventDefault();
                 return true;
             },
@@ -214,21 +228,22 @@ function buildFieldTokenExtension(
                 if (readOnly || !event.clipboardData) {
                     return false;
                 }
-                const rangeList = view.state.selection.ranges.filter((r) => !r.empty);
-                if (rangeList.length === 0) {
+                const selectionData = selectedClipboardText(
+                    view,
+                    idToLabel,
+                    unknownFieldLabel
+                );
+                if (!selectionData) {
                     return false;
                 }
-                const chunks = rangeList.map((r) =>
-                    clipboardPrettyText(
-                        view.state.sliceDoc(r.from, r.to),
-                        idToLabelForClipboard,
-                        unknownFieldLabel
-                    )
-                );
-                event.clipboardData.setData("text/plain", chunks.join("\n"));
+                event.clipboardData.setData("text/plain", selectionData.text);
                 event.preventDefault();
                 view.dispatch({
-                    changes: rangeList.map((r) => ({ from: r.from, to: r.to, insert: "" }))
+                    changes: selectionData.rangeList.map((range) => ({
+                        from: range.from,
+                        to: range.to,
+                        insert: ""
+                    }))
                 });
                 return true;
             }
@@ -247,9 +262,8 @@ export type FormulaStatementEditorProps = {
     disabled: boolean;
     fieldList: FormulaFieldOption[];
     unknownFieldLabel: string;
-    /** Rótulo para leitores de tela quando não há `ariaLabelledBy`. */
+    /** Rótulo para leitores de tela. */
     ariaLabel?: string;
-    ariaLabelledBy?: string;
     id: string;
 };
 
@@ -260,7 +274,6 @@ export function FormulaStatementEditor({
     fieldList,
     unknownFieldLabel,
     ariaLabel,
-    ariaLabelledBy,
     id
 }: FormulaStatementEditorProps) {
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -317,10 +330,6 @@ export function FormulaStatementEditor({
         if (ariaLabel) {
             staticExtensions.push(
                 EditorView.contentAttributes.of({ "aria-label": ariaLabel })
-            );
-        } else if (ariaLabelledBy) {
-            staticExtensions.push(
-                EditorView.contentAttributes.of({ "aria-labelledby": ariaLabelledBy })
             );
         }
 

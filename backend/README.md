@@ -65,7 +65,7 @@ Documentação interativa OpenAPI: ao subir o servidor, **`/docs`** (Swagger).
 
 - `.../scopes/{scope_id}/fields` e `.../fields/{field_id}`
 - `.../scopes/{scope_id}/actions` e `.../actions/{action_id}`
-- `.../actions/{action_id}/formulas` e `.../formulas/{formula_id}` (em `POST`/`PATCH`, a `statement` é validada: atribuição `${field:id} = …`, campos do escopo e dry-run da expressão com [simpleeval](https://pypi.org/project/simpleeval/); ver `valora_backend/rules/`; erros 422 incluem `step` (ordem 1..n). Para reproduzir no terminal: `PYTHONPATH=src python script_try_formula_validate.py 1,2 '"${field:1} = …"' …`.)
+- `.../actions/{action_id}/formulas` e `.../formulas/{formula_id}` (em `POST`/`PATCH`, a `statement` é validada com contrato de atribuição: exatamente um operador `=` de atribuição, `LHS` obrigatório `${field:id}` e `RHS` com `${field:id}` e `${input:id}`; todas as referências devem existir no escopo e a `RHS` passa por dry-run com [simpleeval](https://pypi.org/project/simpleeval/). Códigos 422 estáveis: `formula_invalid_assignment`, `formula_invalid_target`, `formula_unknown_field_id`, `formula_expression_invalid`, com `step` no detalhe quando disponível. Implementação em `valora_backend/rules/`; para reproduzir no terminal: `PYTHONPATH=src python script_try_formula_validate.py 1,2 '"${field:1} = …"' …`.)
 - `.../scopes/{scope_id}/labels` e `.../labels/{label_id}` (filtros opcionais `field_id` / `action_id` na listagem)
 - `.../scopes/{scope_id}/events` e `.../events/{event_id}`
 - `.../events/{event_id}/inputs` e `.../inputs/{input_id}`

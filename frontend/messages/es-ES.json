@@ -364,7 +364,8 @@
         },
         "formulas": {
             "title": "Fórmulas",
-            "description": "Las fórmulas son pasos de cálculo que se aplican al procesar eventos de esta operación. Cada paso es un texto con expresiones que pueden referenciar campos y entradas del alcance según la convención de la documentación de reglas.\n\nEl orden de la lista es el orden de ejecución, de arriba abajo. Arrastra la asa de cada fila para reordenar antes de guardar.",
+            "description": "Las fórmulas son pasos de cálculo que se aplican al procesar eventos de esta operación. Cada paso es un texto donde puedes escribir números, operaciones (como + y *) y referencias a la información del alcance.\n\nEscribe @ para abrir una lista y elegir una información. El nombre elegido aparece subrayado en el texto y puedes seguir escribiendo con normalidad. Vuelve a escribir @ cuando quieras insertar otra información.\n\nEl orden de la lista es el orden de ejecución, de arriba abajo. Arrastra el asa junto a la fórmula para cambiar el orden antes de guardar.",
+            "unknownFieldLabel": "Información no disponible",
             "loading": "Cargando fórmulas…",
             "newFormula": "nueva",
             "removeAriaLabel": "Marcar fórmula para eliminar al guardar",

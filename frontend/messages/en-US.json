@@ -364,7 +364,8 @@
         },
         "formulas": {
             "title": "Formulas",
-            "description": "Formulas are calculation steps applied when events for this action are processed. Each step is a text expression that can reference scope fields and inputs using the token conventions described in the rules documentation.\n\nThe list order is execution order, top to bottom. Drag the handle on each row to reorder before saving.",
+            "description": "Formulas are calculation steps applied when events for this action are processed. Each step is text where you can write numbers, operations (such as + and *), and references to information in the scope.\n\nType @ to open a list and pick a piece of information. The name you pick appears underlined in the text and you can keep typing as usual. Type @ again whenever you want to add another piece of information.\n\nThe list order is execution order, top to bottom. Drag the handle beside a formula to reorder before saving.",
+            "unknownFieldLabel": "Information unavailable",
             "loading": "Loading formulas…",
             "newFormula": "new",
             "removeAriaLabel": "Mark formula for removal on save",

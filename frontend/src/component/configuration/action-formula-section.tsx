@@ -18,6 +18,10 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ConfigurationDirectoryCreateButton } from "@/component/configuration/configuration-directory-create-button";
+import {
+    FormulaStatementEditor,
+    type FormulaFieldOption
+} from "@/component/configuration/formula-statement-editor";
 import { TrashIconButton } from "@/component/ui/trash-icon-button";
 import { useTranslations } from "next-intl";
 import { useMemo, type CSSProperties } from "react";
@@ -33,6 +37,7 @@ type ActionFormulaSectionProps = {
     canEdit: boolean;
     disabled: boolean;
     isLoading: boolean;
+    fieldList: FormulaFieldOption[];
     rowList: ActionFormulaDraftRow[];
     onChangeRowList: (next: ActionFormulaDraftRow[]) => void;
     onAdd: () => void;
@@ -50,6 +55,8 @@ function SortableFormulaRow({
     canEdit,
     disabled,
     copy,
+    fieldList,
+    unknownFieldLabel,
     onChangeStatement,
     onToggleRemove
 }: {
@@ -57,6 +64,8 @@ function SortableFormulaRow({
     canEdit: boolean;
     disabled: boolean;
     copy: FormulaRowCopy;
+    fieldList: FormulaFieldOption[];
+    unknownFieldLabel: string;
     onChangeStatement: (statement: string) => void;
     onToggleRemove: () => void;
 }) {
@@ -81,17 +90,21 @@ function SortableFormulaRow({
         >
             <div className="ui-formula-row-layout">
                 <div className="ui-formula-row-field ui-field">
-                    <label className="ui-field-label" htmlFor={`formula-stmt-${row.clientKey}`}>
+                    <label
+                        className="ui-field-label"
+                        id={`formula-stmt-label-${row.clientKey}`}
+                        htmlFor={`formula-stmt-${row.clientKey}`}
+                    >
                         {copy.statementLabel}
                     </label>
-                    <textarea
+                    <FormulaStatementEditor
                         id={`formula-stmt-${row.clientKey}`}
-                        className="ui-input"
-                        rows={3}
                         value={row.statement}
-                        onChange={(event) => onChangeStatement(event.target.value)}
+                        onChange={onChangeStatement}
                         disabled={disabled || !canEdit || row.pendingDelete}
-                        autoComplete="off"
+                        fieldList={fieldList}
+                        unknownFieldLabel={unknownFieldLabel}
+                        ariaLabelledBy={`formula-stmt-label-${row.clientKey}`}
                     />
                 </div>
                 <div className="ui-formula-row-actions">
@@ -125,11 +138,13 @@ export function ActionFormulaSection({
     canEdit,
     disabled,
     isLoading,
+    fieldList,
     rowList,
     onChangeRowList,
     onAdd
 }: ActionFormulaSectionProps) {
     const t = useTranslations("ActionConfigurationPage.formulas");
+    const unknownFieldLabel = t("unknownFieldLabel");
 
     const rowCopy: FormulaRowCopy = {
         statementLabel: t("statementLabel"),
@@ -199,6 +214,8 @@ export function ActionFormulaSection({
                                     canEdit={canEdit}
                                     disabled={disabled}
                                     copy={rowCopy}
+                                    fieldList={fieldList}
+                                    unknownFieldLabel={unknownFieldLabel}
                                     onChangeStatement={(statement) => updateRow(row.clientKey, { statement })}
                                     onToggleRemove={() =>
                                         updateRow(row.clientKey, { pendingDelete: !row.pendingDelete })

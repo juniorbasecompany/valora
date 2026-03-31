@@ -364,7 +364,8 @@
     },
     "formulas": {
       "title": "Fórmulas",
-      "description": "As fórmulas são passos de cálculo aplicados quando eventos desta operação são processados. Cada passo é um texto com expressões que podem referenciar campos e entradas do escopo pelos identificadores usados na documentação de regras.\n\nA lista abaixo define a ordem de execução, de cima para baixo. Arraste e solte as fórmulas para deixá-las na ordem correta para a execução.",
+      "description": "As fórmulas são passos de cálculo usados quando os eventos desta operação são processados. Cada passo é um texto onde você pode escrever números, operações (como + e *) e referências às informações do escopo.\n\nDigite @ para abrir uma lista e escolher uma informação. O nome escolhido aparece sublinhado no texto e você pode continuar digitando normalmente. Use @ de novo sempre que quiser inserir outra informação.\n\nA ordem da lista abaixo é a ordem de execução, de cima para baixo. Arraste pelo ícone ao lado da fórmula para mudar a ordem antes de salvar.",
+      "unknownFieldLabel": "Informação indisponível",
       "loading": "Carregando fórmulas…",
       "newFormula": "nova",
       "removeAriaLabel": "Marcar fórmula para exclusão ao salvar",

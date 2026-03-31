@@ -15,6 +15,7 @@ import {
     ActionFormulaSection,
     type ActionFormulaDraftRow
 } from "@/component/configuration/action-formula-section";
+import type { FormulaFieldOption } from "@/component/configuration/formula-statement-editor";
 import { TrashIconButton } from "@/component/ui/trash-icon-button";
 import { EditorPanelFlashOverlay } from "@/component/configuration/editor-panel-flash-overlay";
 import { useEditorPanelFlash } from "@/component/configuration/use-editor-panel-flash";
@@ -25,6 +26,7 @@ import type {
     ScopeFormulaRecord,
     TenantScopeActionDirectoryResponse,
     TenantScopeActionRecord,
+    TenantScopeFieldDirectoryResponse,
     TenantScopeRecord
 } from "@/lib/auth/types";
 import type { LabelLang } from "@/lib/i18n/label-lang";
@@ -222,6 +224,7 @@ export function ActionConfigurationClient({
     const [formulasCanEdit, setFormulasCanEdit] = useState(false);
     const [formulaLoading, setFormulaLoading] = useState(false);
     const [formulaLoadError, setFormulaLoadError] = useState<string | null>(null);
+    const [scopeFieldList, setScopeFieldList] = useState<FormulaFieldOption[]>([]);
     const editorPanelElementRef = useRef<HTMLDivElement | null>(null);
     const initialSearchActionKeyRef = useRef<ActionSelectionKey>(initialSearchActionKey);
     const selectedActionKeyRef = useRef<ActionSelectionKey>(initialSelectedActionKey);
@@ -338,6 +341,37 @@ export function ActionConfigurationClient({
     }, [initialActionDirectory, syncFromDirectory]);
 
     const scopeId = currentScope?.id;
+
+    const loadScopeFields = useCallback(async () => {
+        if (scopeId == null) {
+            setScopeFieldList([]);
+            return;
+        }
+        try {
+            const query = new URLSearchParams({ label_lang: labelLang });
+            const response = await fetch(
+                `/api/auth/tenant/current/scopes/${scopeId}/fields?${query.toString()}`
+            );
+            const data: unknown = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                setScopeFieldList([]);
+                return;
+            }
+            const parsed = data as TenantScopeFieldDirectoryResponse;
+            setScopeFieldList(
+                parsed.item_list.map((item) => ({
+                    id: item.id,
+                    labelName: item.label_name?.trim() ?? ""
+                }))
+            );
+        } catch {
+            setScopeFieldList([]);
+        }
+    }, [scopeId, labelLang]);
+
+    useEffect(() => {
+        void loadScopeFields();
+    }, [loadScopeFields]);
 
     const loadFormulas = useCallback(async () => {
         if (scopeId == null || selectedActionId == null || isCreateMode) {
@@ -788,6 +822,7 @@ export function ActionConfigurationClient({
                                     }
                                     disabled={isSaving || isDeletePending}
                                     isLoading={!isCreateMode && formulaLoading}
+                                    fieldList={scopeFieldList}
                                     rowList={formulaRowList}
                                     onChangeRowList={setFormulaRowList}
                                     onAdd={handleAddFormula}

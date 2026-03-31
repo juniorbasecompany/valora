@@ -1764,6 +1764,50 @@
   box-sizing: border-box;
 }
 
+/* Editor de instrução (CodeMirror): mantém o contorno do .ui-input no wrapper. */
+.ui-formula-statement-editor {
+  padding: 0;
+  overflow: hidden;
+}
+
+.ui-formula-statement-editor:focus-within {
+  outline: none;
+  border-color: var(--color-focus-ring);
+  box-shadow: var(--shadow-focus-ring);
+}
+
+.ui-formula-statement-editor[data-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.76;
+  background: var(--gradient-surface-input-disabled);
+}
+
+.ui-formula-statement-editor .cm-editor {
+  border-radius: inherit;
+}
+
+.ui-formula-statement-editor .cm-editor.cm-focused {
+  outline: none;
+}
+
+/* Nome amigável do campo inserido na fórmula (${field:id} no texto guardado). */
+.ui-formula-field-token {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  color: var(--color-text);
+}
+
+/* Painel de sugestões ao digitar @ */
+.cm-tooltip.cm-tooltip-autocomplete > ul {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  max-height: 12rem;
+  border-radius: var(--radius-control);
+  border: var(--border-width-default) solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
 .ui-formula-row-actions {
   display: flex;
   flex-direction: column;

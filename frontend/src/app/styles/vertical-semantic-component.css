@@ -1741,6 +1741,46 @@
   margin-bottom: 0;
 }
 
+.ui-formula-example-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.ui-formula-example-card {
+  margin: 0;
+  height: auto;
+  min-width: 200px;
+  width: auto;
+  max-width: 100%;
+  flex: 0 1 auto;
+  align-self: start;
+  overflow-wrap: anywhere;
+}
+
+.ui-formula-example-list {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.ui-formula-example-list li {
+  position: relative;
+  padding-left: 1.4rem;
+}
+
+.ui-formula-example-list li::before {
+  content: "\2022";
+  position: absolute;
+  left: 0.35rem;
+  top: 0;
+}
+
+.ui-formula-example-list li + li {
+  margin-top: 0.35rem;
+}
+
 /* Linha do item de fórmula: campo flexível à esquerda, ações compactas à direita. */
 .ui-formula-row-layout {
   display: flex;
@@ -1801,6 +1841,12 @@
   color: var(--color-text);
 }
 
+.ui-formula-input-token {
+  text-decoration: none;
+  border-bottom: 3px double currentColor;
+  padding-bottom: 1px;
+}
+
 /* Painel de sugestões ao digitar @ */
 .cm-tooltip.cm-tooltip-autocomplete > ul {
   font-family: var(--font-sans);
@@ -1831,6 +1877,10 @@
 }
 
 @media (max-width: 30rem) {
+  .ui-formula-example-card {
+    flex: 1 1 200px;
+  }
+
   .ui-formula-row-field {
     flex: 1 1 100%;
   }

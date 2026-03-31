@@ -31,9 +31,9 @@ export type FormulaFieldOption = {
     labelName: string;
 };
 
-const FIELD_TOKEN = /\$\{field:(\d+)\}/g;
+const FORMULA_REFERENCE_TOKEN = /\$\{(field|input):(\d+)\}/g;
 
-/** Intervalos `${field:id}` tratados como um bloco único (cursor e apagar não entram no meio). */
+/** Intervalos `${field:id}` e `${input:id}` tratados como bloco único. */
 class FieldTokenAtomicMarker extends RangeValue {
     eq(other: RangeValue): boolean {
         return other instanceof FieldTokenAtomicMarker;
@@ -44,7 +44,7 @@ const fieldTokenAtomicInstance = new FieldTokenAtomicMarker();
 
 function listFieldTokenSpans(docText: string): { from: number; to: number }[] {
     const spanList: { from: number; to: number }[] = [];
-    const re = new RegExp(FIELD_TOKEN.source, "g");
+    const re = new RegExp(FORMULA_REFERENCE_TOKEN.source, "g");
     let match: RegExpExecArray | null;
     while ((match = re.exec(docText)) != null) {
         spanList.push({ from: match.index, to: match.index + match[0].length });
@@ -67,7 +67,7 @@ function clipboardPrettyText(
     idToLabel: Map<number, string>,
     unknownFieldLabel: string
 ): string {
-    return slice.replace(/\$\{field:(\d+)\}/g, (_full, idStr: string) => {
+    return slice.replace(FORMULA_REFERENCE_TOKEN, (_full, _kind: string, idStr: string) => {
         const id = Number(idStr);
         return idToLabel.get(id) ?? `${unknownFieldLabel} (${id})`;
     });
@@ -86,10 +86,12 @@ function createFieldAutocompleteSource(
     unknownFieldLabel: string
 ) {
     return (context: CompletionContext) => {
-        const before = context.matchBefore(/@([^\n@]*)$/);
+        const before = context.matchBefore(/([@#])([^\n@#]*)$/);
         if (!before) {
             return null;
         }
+        const trigger = before.text[0];
+        const referenceKind = trigger === "#" ? "input" : "field";
         const query = before.text.slice(1).trim().toLowerCase();
         const filtered = fieldList.filter((field) => {
             const label = displayLabel(field, unknownFieldLabel).toLowerCase();
@@ -104,7 +106,7 @@ function createFieldAutocompleteSource(
             filter: false,
             options: filtered.map((field) => ({
                 label: displayLabel(field, unknownFieldLabel),
-                apply: `\${field:${field.id}}`,
+                apply: `\${${referenceKind}:${field.id}}`,
                 type: "constant" as const
             }))
         };
@@ -112,24 +114,32 @@ function createFieldAutocompleteSource(
 }
 
 class FieldLabelWidget extends WidgetType {
-    constructor(readonly label: string) {
+    constructor(
+        readonly label: string,
+        readonly referenceKind: "field" | "input"
+    ) {
         super();
     }
 
     eq(other: FieldLabelWidget): boolean {
-        return other.label === this.label;
+        return (
+            other.label === this.label
+            && other.referenceKind === this.referenceKind
+        );
     }
 
     toDOM(): HTMLElement {
         const span = document.createElement("span");
-        span.className = "ui-formula-field-token";
+        span.className = this.referenceKind === "input"
+            ? "ui-formula-field-token ui-formula-input-token"
+            : "ui-formula-field-token";
         span.textContent = this.label;
         return span;
     }
 
     /**
      * Ignora eventos no widget visual para o editor tratar o intervalo como texto único
-     * (junto com atomicRanges), evitando apagamento caractere a caractere no miolo de `${field:id}`.
+     * (junto com atomicRanges), evitando apagamento caractere a caractere no miolo do token.
      */
     ignoreEvent(): boolean {
         return true;
@@ -147,13 +157,14 @@ function buildFieldTokenExtension(
     }
 
     const decorator = new MatchDecorator({
-        regexp: FIELD_TOKEN,
+        regexp: FORMULA_REFERENCE_TOKEN,
         decoration: (match) => {
-            const id = Number(match[1]);
+            const referenceKind = match[1] === "input" ? "input" : "field";
+            const id = Number(match[2]);
             const label =
                 idToLabel.get(id) ?? `${unknownFieldLabel} (${id})`;
             return Decoration.replace({
-                widget: new FieldLabelWidget(label),
+                widget: new FieldLabelWidget(label, referenceKind),
                 inclusive: true
             });
         }

@@ -8,7 +8,7 @@
       "location": "Locais",
       "unity": "Unidades",
       "field": "Campos",
-      "action": "Operações",
+      "action": "Ações",
       "configuration": "Configuração",
       "comingSoon": "em breve"
     },
@@ -82,7 +82,7 @@
     "openMemberEditor": "Editar membros",
     "openScopeEditor": "Editar escopos",
     "openFieldEditor": "Editar campos",
-    "openActionEditor": "Editar operações",
+    "openActionEditor": "Editar ações",
     "cards": {
       "organization": {
         "title": "Licenciado",
@@ -101,8 +101,8 @@
         "description": "Campos definem tipos de valor usados nas regras do escopo ativo (por exemplo números inteiros ou decimais). A lista e o editor respeitam o escopo que você escolhe no cabeçalho, no mesmo padrão dos locais."
       },
       "action": {
-        "title": "Operações",
-        "description": "Operações (ações) são os tipos de evento de negócio no escopo ativo, por exemplo alojamento ou mortalidade. Cada uma tem um nome amigável por idioma e pode ter fórmulas associadas. A lista segue o escopo do cabeçalho, no mesmo padrão dos campos."
+        "title": "Ações",
+        "description": "Ações são os tipos de evento de negócio no escopo ativo, por exemplo alojamento ou mortalidade. Cada uma tem um nome amigável por idioma e pode ter fórmulas associadas. A lista segue o escopo do cabeçalho, no mesmo padrão dos campos."
       }
     }
   },
@@ -320,30 +320,30 @@
     "discardConfirm": "Descartar alterações não salvas?"
   },
   "ActionConfigurationPage": {
-    "title": "Operações",
-    "description": "Defina aqui os tipos de operação ou medição que viram eventos no escopo ativo (por exemplo alojamento ou mortalidade). Para cada operação você informa um nome claro; esse nome aparece ao montar regras e registrar eventos.",
-    "empty": "Nenhuma operação foi encontrada para o escopo ativo e sua permissão atual não permite cadastrar novas.",
+    "title": "Ações",
+    "description": "Defina aqui os tipos de ação ou medição que viram eventos no escopo ativo (por exemplo alojamento ou mortalidade). Para cada ação você informa um nome claro; esse nome aparece ao montar regras e registrar eventos.",
+    "empty": "Nenhuma ação foi encontrada para o escopo ativo e sua permissão atual não permite cadastrar novas.",
     "list": {
-      "emptyScope": "Crie um escopo antes de editar operações.",
-      "missingCurrentScope": "Defina um escopo ativo no seletor do cabeçalho antes de editar operações.",
-      "loadError": "Não foi possível carregar as operações deste escopo. Tente novamente.",
-      "fallbackTitle": "Operação #{id}"
+      "emptyScope": "Crie um escopo antes de editar ações.",
+      "missingCurrentScope": "Defina um escopo ativo no seletor do cabeçalho antes de editar ações.",
+      "loadError": "Não foi possível carregar as ações deste escopo. Tente novamente.",
+      "fallbackTitle": "Ação #{id}"
     },
     "history": {
       "title": "Histórico de alterações",
-      "description": "Consulte o histórico das definições de operação do escopo ativo: quem alterou, quando e um resumo do que mudou."
+      "description": "Consulte o histórico das definições de ação do escopo ativo: quem alterou, quando e um resumo do que mudou."
     },
     "section": {
       "actionName": {
-        "label": "Nome da operação",
+        "label": "Nome da ação",
         "hint": "Nome curto e fácil de entender, usado em fórmulas, telas e relatórios."
       },
       "info": {
         "title": "Informações",
-        "description": "Resumo da operação em foco no servidor.",
+        "description": "Resumo da ação em foco no servidor.",
         "actionNameRegisteredLabel": "Nome",
-        "createLead": "Nova operação",
-        "createHint": "Você está definindo uma nova operação para o escopo ativo. Salve para registrá-la no diretório."
+        "createLead": "Nova ação",
+        "createHint": "Você está definindo uma nova ação para o escopo ativo. Salve para registrá-la no diretório."
       }
     },
     "buttons": {
@@ -354,17 +354,18 @@
       "save": "Salvar",
       "saving": "Salvando..."
     },
-    "readOnlyNotice": "Você pode consultar as operações do escopo ativo, mas só membros master ou administrador podem criar ou editar definições de regras.",
+    "readOnlyNotice": "Você pode consultar as ações do escopo ativo, mas só membros master ou administrador podem criar ou editar definições de regras.",
     "error": {
-      "save": "Não foi possível salvar a operação. Tente novamente.",
-      "create": "Não foi possível criar a operação. Tente novamente.",
-      "delete": "Não foi possível apagar a operação. Tente novamente.",
-      "deleteBlockedDetail": "Não é possível apagar a operação enquanto eventos ainda a referenciam.",
-      "actionNameRequired": "Informe o nome da operação."
+      "save": "Não foi possível salvar a ação. Tente novamente.",
+      "create": "Não foi possível criar a ação. Tente novamente.",
+      "delete": "Não foi possível apagar a ação. Tente novamente.",
+      "deleteBlockedDetail": "Não é possível apagar a ação enquanto eventos ainda a referenciam.",
+      "actionNameRequired": "Informe o nome da ação."
     },
     "formulas": {
       "title": "Fórmulas",
-      "description": "As fórmulas são passos de cálculo usados quando os eventos desta operação são processados. Cada passo é um texto onde você pode escrever números, operações (como + e *) e referências às informações do escopo.\n\nDigite @ para abrir uma lista e escolher uma informação. O nome escolhido aparece sublinhado no texto e você pode continuar digitando normalmente. Use @ de novo sempre que quiser inserir outra informação.\n\nA ordem da lista abaixo é a ordem de execução, de cima para baixo. Arraste pelo ícone ao lado da fórmula para mudar a ordem antes de salvar.",
+      "description": "As fórmulas são contas que o sistema faz quando esta ação acontece. Cada linha é um passo, você pode escrever números, operações matemáticas, valores de entrada e valores calculados anteriormente.\n\nPara inserir uma informação, digite @ e escolha um item da lista. Para inserir um valor de entrada, digite # e escolha na mesma lista. O nome escolhido aparece sublinhado no texto e você pode continuar digitando normalmente.\n\nEm outras palavras, quando você usa @ o sistema busca o valor calculado anteriormente. Quando você usa # o sistema vai usar o valor informado no momento do evento.\n\nAs formulas são executadas de cima para baixo, na ordem em que aparecem. Para mudar a ordem arraste usando o ícone ao lado da fórmula.",
+      "exampleList": "Exemplos matemáticos:\nAdição: x + y\nSubtração: x - y\nMultiplicação: x * y\nDivisão: x / y\nDivisão inteira: x // y\nMódulo: x % y\nPotência: x ** 2\nParênteses: (x + y) * z\nArredondamento: round((x * y) / z, 2)\nMínimo: min(x, y, z)\nMáximo: max(x, y, z)\nValor absoluto: abs(x - y)\nDecimal: Decimal(\"0.2\") * x\n\nExemplos condicionais:\nCondição simples: x if y > 0 else 0\nCondição com igualdade: x + 10 if y == 1 else x - 10\nCondição com max/min: max(x, y) if z > 100 else min(x, y)\nCondição com divisão segura: round(x / y, 2) if y != 0 else 0\nCondição com and: x if (y > 0 and z > 0) else 0\n\nOutros recursos suportados:\nComparações: x == y, x != y, x > y, x >= y, x < y, x <= y\nLógicos: x > 0 and y > 0, x > 0 or y > 0, not (x > y)\nData: x if data_ref > date(2026, 1, 1) else y\nFunções: abs, min, max, round, Decimal e date",
       "unknownFieldLabel": "Informação indisponível",
       "loading": "Carregando fórmulas…",
       "newFormula": "nova",
@@ -376,9 +377,9 @@
       "loadError": "Não foi possível carregar as fórmulas. Tente novamente.",
       "statementRequired": "Cada fórmula ativa precisa de uma instrução não vazia.",
       "validationError": {
-        "whichFormula": "A {step}ª fórmula não está correta. Verifique os operadores, parênteses e funções permitidas, como abs, min, max, round, Decimal e date.",
-        "formula_invalid_assignment": "A instrução precisa ser uma atribuição: quem recebe o valor, sinal de igual e em seguida a conta. Confira se há um igual e se os dois lados não estão vazios.",
-        "formula_invalid_target": "À esquerda do igual deve ficar só a informação que vai receber o resultado (a que você insere com @ no editor), nada mais.",
+        "whichFormula": "A {step}ª fórmula não está correta. {description}",
+        "formula_invalid_assignment": "Apenas um campo pode ser atualizado em cada fórmula.",
+        "formula_invalid_target": "Não é possível fazer atribuição de valores aos campos de entrada.",
         "formula_unknown_field_id": "A fórmula usa uma informação que não existe neste escopo. Ajuste os itens escolhidos ou o texto.",
         "formula_expression_invalid": "A conta à direita do igual não pôde ser validada. Confira parênteses, operadores e funções permitidas (como abs, min, max, round, Decimal e date)."
       }

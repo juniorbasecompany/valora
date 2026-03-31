@@ -13,10 +13,15 @@ from valora_backend.rules.formula_simple_eval import build_formula_simple_eval
 
 logger = logging.getLogger(__name__)
 
-# Referência a campo no texto persistido (ex.: ${field:1}).
+# Referências no texto persistido (ex.: ${field:1}, ${input:1}).
 FIELD_REF_PATTERN = re.compile(r"\$\{field:(\d+)\}")
+INPUT_REF_PATTERN = re.compile(r"\$\{input:(\d+)\}")
+RHS_REF_PATTERN = re.compile(r"\$\{(field|input):(\d+)\}")
+# Operador de atribuição simples "=" (não confundir com ==, <=, >=, !=).
+ASSIGNMENT_OPERATOR_PATTERN = re.compile(r"(?<![<>=!])=(?!=)")
 # Lado esquerdo deve ser exclusivamente um token de campo.
 TARGET_LHS_PATTERN = re.compile(r"^\$\{field:(\d+)\}$")
+INPUT_TARGET_LHS_PATTERN = re.compile(r"^\$\{input:(\d+)\}$")
 
 
 class FormulaStatementValidationError(Exception):
@@ -32,12 +37,21 @@ def _python_name_for_field(field_id: int) -> str:
     return f"f_{field_id}"
 
 
-def _replace_field_tokens_with_eval_names(rhs: str) -> str:
-    """Substitui ${field:n} por identificador Python seguro f_n."""
+def _python_name_for_input(field_id: int) -> str:
+    return f"i_{field_id}"
 
-    return FIELD_REF_PATTERN.sub(
-        lambda m: _python_name_for_field(int(m.group(1))), rhs
-    )
+
+def _replace_rhs_tokens_with_eval_names(rhs: str) -> str:
+    """Substitui referências de RHS por identificadores Python seguros."""
+
+    def _replacement(match: re.Match[str]) -> str:
+        kind = match.group(1)
+        field_id = int(match.group(2))
+        if kind == "input":
+            return _python_name_for_input(field_id)
+        return _python_name_for_field(field_id)
+
+    return RHS_REF_PATTERN.sub(_replacement, rhs)
 
 
 def validate_formula_statement_for_scope(
@@ -60,12 +74,13 @@ def validate_formula_statement_for_scope(
             "Expected assignment: target = expression.",
         )
 
-    eq_index = text.find("=")
-    if eq_index < 0:
+    assignment_match_list = list(ASSIGNMENT_OPERATOR_PATTERN.finditer(text))
+    if len(assignment_match_list) != 1:
         raise FormulaStatementValidationError(
             "formula_invalid_assignment",
-            "Expected assignment: target = expression.",
+            "Expected exactly one assignment: target = expression.",
         )
+    eq_index = assignment_match_list[0].start()
 
     lhs = text[:eq_index].strip()
     rhs = text[eq_index + 1 :].strip()
@@ -77,14 +92,20 @@ def validate_formula_statement_for_scope(
 
     target_match = TARGET_LHS_PATTERN.match(lhs)
     if not target_match:
+        if INPUT_TARGET_LHS_PATTERN.match(lhs):
+            raise FormulaStatementValidationError(
+                "formula_invalid_target",
+                "Left side must be a field reference. Input reference is not allowed as target.",
+            )
         raise FormulaStatementValidationError(
             "formula_invalid_target",
             "Left side must be exactly one field reference: ${field:<id>}.",
         )
     target_id = int(target_match.group(1))
 
-    ids_in_rhs = {int(x) for x in FIELD_REF_PATTERN.findall(rhs)}
-    all_referenced = {target_id} | ids_in_rhs
+    field_id_in_rhs = {int(x) for x in FIELD_REF_PATTERN.findall(rhs)}
+    input_id_in_rhs = {int(x) for x in INPUT_REF_PATTERN.findall(rhs)}
+    all_referenced = {target_id} | field_id_in_rhs | input_id_in_rhs
 
     scope_field_ids = set(
         session.scalars(select(Field.id).where(Field.scope_id == scope_id)).all()
@@ -96,13 +117,15 @@ def validate_formula_statement_for_scope(
             "One or more field references are not in this scope.",
         )
 
-    transformed_rhs = _replace_field_tokens_with_eval_names(rhs)
-    # Só são necessários nomes para campos que aparecem na RHS (${field:…}).
+    transformed_rhs = _replace_rhs_tokens_with_eval_names(rhs)
+    # Só são necessários nomes para referências que aparecem na RHS.
     # Usar int 0: com Decimal("0") o dry-run falha em expressões com literais float
     # (ex.: f_1 + 0.20) porque Python não soma Decimal + float.
-    stub_names = dict.fromkeys(
-        (_python_name_for_field(fid) for fid in ids_in_rhs), 0
-    )
+    stub_names: dict[str, int] = {}
+    for field_id in field_id_in_rhs:
+        stub_names[_python_name_for_field(field_id)] = 0
+    for field_id in input_id_in_rhs:
+        stub_names[_python_name_for_input(field_id)] = 0
 
     try:
         evaluator = build_formula_simple_eval(stub_names)

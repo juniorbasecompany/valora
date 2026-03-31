@@ -138,6 +138,10 @@ export function ActionFormulaSection({
 }: ActionFormulaSectionProps) {
     const t = useTranslations("ActionConfigurationPage.formulas");
     const unknownFieldLabel = t("unknownFieldLabel");
+    const exampleBlockList = t("exampleList")
+        .split("\n\n")
+        .map((block) => block.trim())
+        .filter((block) => block.length > 0);
 
     const rowCopy: FormulaRowCopy = {
         statementAriaLabel: t("statementLabel"),
@@ -219,6 +223,26 @@ export function ActionFormulaSection({
                     </SortableContext>
                 </DndContext>
             )}
+            <div className="ui-formula-example-grid" style={{ marginTop: "0.75rem" }}>
+                {exampleBlockList.map((exampleBlock, index) => (
+                    <div
+                        key={`formula-example-${index}`}
+                        className="ui-field-hint ui-formula-example-card"
+                    >
+                        <ul className="ui-formula-example-list">
+                            {exampleBlock
+                                .split("\n")
+                                .map((line) => line.trim())
+                                .filter((line) => line.length > 0)
+                                .map((line, lineIndex) => (
+                                    <li key={`formula-example-${index}-line-${lineIndex}`}>
+                                        {line}
+                                    </li>
+                                ))}
+                        </ul>
+                    </div>
+                ))}
+            </div>
         </section>
     );
 }

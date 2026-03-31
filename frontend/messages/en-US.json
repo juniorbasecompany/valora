@@ -1,637 +1,638 @@
 {
-    "AppShell": {
-        "productName": "Valora",
-        "productStage": "Phase 1 in progress",
-        "workspaceLabel": "Operational and auditable workspace",
-        "navigation": {
-            "home": "Home",
-            "location": "Locations",
-            "unity": "Units",
-            "field": "Fields",
-            "action": "Actions",
-            "configuration": "Configuration",
-            "comingSoon": "coming soon"
-        },
-        "topbar": {
-            "tenantLabel": "Active tenant",
-            "accountLabel": "Account",
-            "localeLabel": "Language and region",
-            "openNavigation": "Open navigation",
-            "closeNavigation": "Close navigation",
-            "signOut": "Sign out",
-            "signOutPending": "Signing out..."
-        },
-        "menu": {
-            "tenantSectionLabel": "Tenant",
-            "tenantTriggerAriaLabel": "Choose tenant",
-            "tenantMenuAriaLabel": "Available tenants",
-            "scopeTriggerAriaLabel": "Choose scope",
-            "scopeMenuAriaLabel": "Available scopes",
-            "localeFlagTriggerAriaLabel": "Choose language and region",
-            "localeFlagMenuAriaLabel": "Available languages",
-            "configurationLabel": "Configuration",
-            "loadingTenantList": "Loading...",
-            "tenantListError": "Could not load the tenant list.",
-            "emptyTenantList": "No tenant available.",
-            "switchingTenant": "Switching tenant...",
-            "loadingScopeList": "Loading scopes...",
-            "scopeListError": "Could not load the scope list.",
-            "emptyScopeList": "No scope available.",
-            "switchingScope": "Saving scope...",
-            "switchingLocale": "Switching language...",
-            "activeLabel": "active",
-            "noScopeLabel": "No scope"
-        }
+  "AppShell": {
+    "productName": "Valora",
+    "productStage": "Phase 1 in progress",
+    "workspaceLabel": "Operational and auditable workspace",
+    "navigation": {
+      "home": "Home",
+      "location": "Locations",
+      "unity": "Units",
+      "field": "Fields",
+      "action": "Actions",
+      "configuration": "Configuration",
+      "comingSoon": "coming soon"
     },
-    "HomePage": {
-        "title": "Welcome to Valora",
-        "description": "This page gives you a simple overview of what the system already does and how it supports your daily work.",
-        "status": {
-            "title": "System ready to use",
-            "description": "You can already navigate the workspace, organize your structure, and evolve your records safely."
-        },
-        "context": {
-            "workspace": {
-                "title": "Current workspace",
-                "description": "You are in the protected area with an active session and everything prepared for a smooth workflow."
-            },
-            "locale": {
-                "title": "Language and region",
-                "description": "The platform is already prepared to support multiple languages without losing navigation consistency."
-            },
-            "entryFlow": {
-                "title": "Current flow",
-                "description": "At sign-in, the system already identifies your context so you can continue from the right place without manual setup."
-            }
-        },
-        "card": {
-            "tenant": {
-                "title": "Organization and team",
-                "description": "Define who is part of the operation and which role each person has in daily work."
-            },
-            "location": {
-                "title": "Location structure",
-                "description": "Organize your operation by units and hierarchy levels to keep a clear view of the whole."
-            }
-        }
+    "topbar": {
+      "tenantLabel": "Active tenant",
+      "accountLabel": "Account",
+      "localeLabel": "Language and region",
+      "openNavigation": "Open navigation",
+      "closeNavigation": "Close navigation",
+      "signOut": "Sign out",
+      "signOutPending": "Signing out..."
     },
-    "ConfigurationPage": {
-        "title": "Organization, who can act, and which context",
-        "description": "Before day-to-day operations, Valora needs three things spelled out: which contracting organization this is (the tenant), who may act inside it (members and roles), and which slice of context data lives in, scopes: branches, projects, sites, whatever matches your operation. This screen is where you maintain that backbone; without it, records and permissions lack a clear frame of reference. The locations tree lives under its own sidebar entry and always follows the active scope you pick in the header.",
-        "openTenantEditor": "Edit tenant",
-        "openMemberEditor": "Edit members",
-        "openScopeEditor": "Edit scopes",
-        "openFieldEditor": "Edit fields",
-        "openActionEditor": "Edit actions",
-        "cards": {
-            "organization": {
-                "title": "Tenant",
-                "description": "The contracting organization for this workspace: the name shown in the top bar, tenant switcher, and other surfaces. Here you align display name (what people see every day) and full legal or formal name when you need an official reference. Changes apply to the tenant active in your session; if you manage more than one, switch from the menu before editing."
-            },
-            "member": {
-                "title": "Members",
-                "description": "A member is a person tied to this tenant in the product, not just the sign-in account, but the link with role (master, administrator, member) and status. Everyone listed here can operate in this organization; roles and status control what they can change, including sensitive configuration."
-            },
-            "scope": {
-                "title": "Scope",
-                "description": "A scope is a context unit inside the tenant: where records, and later the locations hierarchy, stay separated instead of mixed together. Think branch, job site, venue, or project,  the label is yours, but the job is always to isolate data that should not appear in one pile. The scope selected in the header is what applies when you work on locations and anything that depends on it."
-            },
-            "field": {
-                "title": "Fields",
-                "description": "Fields define value types used by rules in the active scope (for example integers or decimals). The list and editor follow the scope you pick in the header, the same pattern as locations."
-            },
-            "action": {
-                "title": "Actions",
-                "description": "Actions are business event kinds in the active scope (for example housing or mortality). Each has a friendly name per language and may have formulas attached. The list follows the header scope, the same pattern as fields."
-            }
-        }
-    },
-    "MemberConfigurationPage": {
-        "title": "Members",
-        "description": "Edit the records of the members linked to the active tenant. Name, role, and status stay centralized in this directory.",
-        "list": {
-            "empty": "No members were found for the active tenant."
-        },
-        "history": {
-            "title": "Change history",
-            "description": "Review recent changes to member records: who changed what, when, and a clear summary of each update."
-        },
-        "section": {
-            "profile": {
-                "displayNameLabel": "Display name",
-                "displayNameHint": "Used across the tenant's internal surfaces.",
-                "nameLabel": "Full name",
-                "nameHint": "Use the most complete name for administrative reference."
-            },
-            "invite": {
-                "title": "Invite",
-                "description": "New records start as a pending invite until the person accepts with the account for the email you enter.",
-                "createLead": "Invite registration",
-                "createHint": "Save to register the invite. The person will see this tenant after signing in with a Google account that uses the same email.",
-                "emailFieldHint": "Enter the email that will receive the invite. First sign-in uses a Google account with that same address."
-            },
-            "idle": {
-                "title": "Information",
-                "description": "How to use this panel: pick a member in the list on the left to edit their record, or use New to register an invite when you have permission.",
-                "selectLead": "No member selected",
-                "selectHint": "Click a member in the list or use the New button to register an email invite.",
-                "emptyLead": "No members found",
-                "emptyHint": "There are no members in this tenant and your current permission does not allow registering invites."
-            },
-            "access": {
-                "title": "Access",
-                "description": "Role and status control the member's reach inside this tenant.",
-                "emailLabel": "Email",
-                "memberEmailHint": "Invite and first-login address. You can change it anytime; it does not have to match the Google account email after the link is established.",
-                "roleLabel": "Role",
-                "statusLabel": "Status",
-                "accountLinked": "Linked account",
-                "accountPending": "Waiting for account link",
-                "accountTopicLabel": "Account"
-            }
-        },
-        "action": {
-            "cancel": "Cancel",
-            "new": "New",
-            "delete": "Delete",
-            "undoDelete": "Undo delete",
-            "save": "Save",
-            "saving": "Saving..."
-        },
-        "readOnlyNotice": "You can review the member directory, but only master or admin members can edit records.",
-        "protectedRecordNotice": "This record is protected by the current permissions. Select another member to edit.",
-        "role": {
-            "master": "Master",
-            "admin": "Administrator",
-            "member": "Member"
-        },
-        "statusValue": {
-            "ACTIVE": "Active",
-            "PENDING": "Pending",
-            "DISABLED": "Disabled"
-        },
-        "error": {
-            "save": "Could not save the member. Try again.",
-            "create": "Could not register the member. Try again.",
-            "delete": "Could not delete the member. Try again.",
-            "validation": "This field cannot be empty.",
-            "emailValidation": "Enter a valid email address."
-        },
-        "inviteSend": {
-            "sendInvite": "Send invite",
-            "sendInviteAriaLabel": "Send invitation email to {email}",
-            "sending": "Sending...",
-            "successNotice": "Invitation sent to {email}.",
-            "error": {
-                "generic": "Could not send the invitation. Try again.",
-                "member_invite_forbidden": "You do not have permission to send invitations.",
-                "member_invite_not_found": "Member was not found for this tenant.",
-                "member_invite_already_linked": "This member already has a linked account.",
-                "member_invite_invalid_status": "Invitations can only be sent to pending members.",
-                "member_invite_no_email": "This member has no email address for the invitation.",
-                "member_invite_delivery_failed": "The message could not be delivered. Check email settings or try again."
-            }
-        },
-        "discardConfirm": "Discard unsaved changes?"
-    },
-    "ScopeConfigurationPage": {
-        "title": "Scopes",
-        "description": "Edit the minimum structural foundation of the active tenant. Each scope defines an initial slice that will support later records and modules.",
-        "empty": "No scopes were found for the active tenant.",
-        "history": {
-            "title": "Change history",
-            "description": "Review recent changes to scopes for this tenant: who made each change, when, and a summary of what changed."
-        },
-        "section": {
-            "identity": {
-                "nameLabel": "Scope name",
-                "nameHint": "Use a short label to identify the scope, such as Poultry, Soy, or Milk.",
-                "displayNameLabel": "Scope description",
-                "displayNameHint": "Explain the scope slice with more context, such as Poultry for egg production."
-            },
-            "info": {
-                "title": "Information",
-                "description": "Summary of the scope in focus: values saved on the server, and what this session may change.",
-                "nameRegisteredLabel": "Saved name",
-                "displayRegisteredLabel": "Saved description",
-                "canEditLabel": "Can edit",
-                "canDeleteLabel": "Can delete",
-                "yes": "Yes",
-                "no": "No",
-                "createLead": "New structural scope",
-                "createHint": "You are defining a new slice for the active tenant. Save to register it in the directory."
-            }
-        },
-        "action": {
-            "cancel": "Cancel",
-            "new": "New",
-            "delete": "Delete",
-            "undoDelete": "Undo delete",
-            "save": "Save",
-            "saving": "Saving..."
-        },
-        "readOnlyNotice": "You can review the scope directory, but only master or admin members can create or edit structural records.",
-        "selectPrompt": "Select a scope from the list to edit it, or use the New button to create one.",
-        "error": {
-            "save": "Could not save the scope. Try again.",
-            "create": "Could not create the scope. Try again.",
-            "delete": "Could not delete the scope. Try again.",
-            "validation": "This field cannot be empty."
-        },
-        "discardConfirm": "Discard unsaved changes?"
-    },
-    "FieldConfigurationPage": {
-        "title": "Fields",
-        "description": "Adjust here the names of the information you measure or record in events. For every name (such as quantity or amount), you tell the system how to read the content: whole numbers, values with cents, yes or no, and similar choices. That applies when you build calculation rules and when you record events, so values stay consistent and are not misread.",
-        "empty": "No fields were found for the active scope and your current permission does not allow creating new ones.",
-        "list": {
-            "emptyScope": "Create a scope before editing fields.",
-            "missingCurrentScope": "Set an active scope from the header selector before editing fields.",
-            "loadError": "Could not load fields for this scope. Try again."
-        },
-        "history": {
-            "title": "Change history",
-            "description": "Review recent changes to field definitions for the active scope: who changed what, when, and a summary of each update."
-        },
-        "section": {
-            "fieldName": {
-                "label": "Field name",
-                "hint": "Field name. Enter a short, easy-to-understand name, for example: quantity, value, growth percentage. This name is used in formulas, charts, and reports."
-            },
-            "info": {
-                "title": "Information",
-                "description": "Summary of the field in focus: stable identifier and type saved on the server.",
-                "idLabel": "Identifier",
-                "fieldNameRegisteredLabel": "Name",
-                "friendlyTypeLabel": "Type",
-                "typeValueInteger": "Whole number",
-                "typeValueNumberOne": "Number with 1 decimal place",
-                "typeValueNumberMany": "Number with {scale} decimal places",
-                "sqlTypeRegisteredLabel": "PostgreSQL type",
-                "canEditLabel": "Can edit",
-                "yes": "Yes",
-                "no": "No",
-                "createLead": "New field",
-                "createHint": "You are defining a new field for the active scope. Save to register it in the directory."
-            }
-        },
-        "action": {
-            "cancel": "Cancel",
-            "new": "New",
-            "delete": "Delete",
-            "undoDelete": "Undo delete",
-            "save": "Save",
-            "saving": "Saving..."
-        },
-        "readOnlyNotice": "You can review fields for the active scope, but only master or admin members can create or edit rule definitions.",
-        "error": {
-            "save": "Could not save the field. Try again.",
-            "create": "Could not create the field. Try again.",
-            "delete": "Could not delete the field. Try again.",
-            "deleteBlockedDetail": "This field cannot be deleted while event inputs or results still reference it.",
-            "validation": "Choose a valid data type.",
-            "fieldNameRequired": "Enter a field name."
-        },
-        "fieldType": {
-            "label": "Content type",
-            "hint": "Describe what kind of content this field holds.",
-            "option": {
-                "number": "Number",
-                "text": "Text",
-                "boolean": "Yes or no",
-                "timestamp": "Date",
-                "legacy": "Other (existing value)"
-            },
-            "scaleLabel": "Decimal places",
-            "scaleHint": "Enter how many digits after the decimal separator the number should have. Use 0 to 10 decimal places.",
-            "legacyHelp": "This record uses a type outside the list. Pick a standard type to replace it on save, or keep this option.",
-            "caption": {
-                "number": "Number ({scale} dp)",
-                "text": "Text",
-                "boolean": "Yes or no",
-                "timestamp": "Date",
-                "legacy": "{value}"
-            },
-            "error": {
-                "empty": "Select or define a data type.",
-                "scaleRange": "Use a decimal place count between 0 and 10."
-            }
-        },
-        "discardConfirm": "Discard unsaved changes?"
-    },
-    "ActionConfigurationPage": {
-        "title": "Actions",
-        "description": "Define here the kinds of operations or measurements that become events in the active scope (for example housing or mortality). For each action you provide a clear name; that name appears when you build rules and record events.",
-        "empty": "No actions were found for the active scope and your current permission does not allow creating new ones.",
-        "list": {
-            "emptyScope": "Create a scope before editing actions.",
-            "missingCurrentScope": "Set an active scope from the header selector before editing actions.",
-            "loadError": "Could not load actions for this scope. Try again.",
-            "fallbackTitle": "Action #{id}"
-        },
-        "history": {
-            "title": "Change history",
-            "description": "Review recent changes to action definitions for the active scope: who changed what, when, and a summary of each update."
-        },
-        "section": {
-            "actionName": {
-                "label": "Action name",
-                "hint": "Short, easy-to-understand name used in formulas, screens, and reports."
-            },
-            "info": {
-                "title": "Information",
-                "description": "Summary of the action in focus on the server.",
-                "actionNameRegisteredLabel": "Name",
-                "createLead": "New action",
-                "createHint": "You are defining a new action for the active scope. Save to register it in the directory."
-            }
-        },
-        "buttons": {
-            "cancel": "Cancel",
-            "new": "New",
-            "delete": "Delete",
-            "undoDelete": "Undo delete",
-            "save": "Save",
-            "saving": "Saving..."
-        },
-        "readOnlyNotice": "You can review actions for the active scope, but only master or admin members can create or edit rule definitions.",
-        "error": {
-            "save": "Could not save the action. Try again.",
-            "create": "Could not create the action. Try again.",
-            "delete": "Could not delete the action. Try again.",
-            "deleteBlockedDetail": "This action cannot be deleted while events still reference it.",
-            "actionNameRequired": "Enter an action name."
-        },
-        "formulas": {
-            "title": "Formulas",
-            "description": "Formulas are calculation steps applied when events for this action are processed. Each step is text where you can write numbers, operations (such as + and *), and references to information in the scope.\n\nType @ to open a list and pick a piece of information. The name you pick appears underlined in the text and you can keep typing as usual. Type @ again whenever you want to add another piece of information.\n\nThe list order is execution order, top to bottom. Drag the handle beside a formula to reorder before saving.",
-            "unknownFieldLabel": "Information unavailable",
-            "loading": "Loading formulas…",
-            "newFormula": "new",
-            "removeAriaLabel": "Mark formula for removal on save",
-            "unmarkAriaLabel": "Unmark removal for this formula",
-            "statementLabel": "Statement",
-            "dragHandleAria": "Drag to reorder",
-            "empty": "No formulas yet. Use new to add one.",
-            "loadError": "Could not load formulas. Try again.",
-            "statementRequired": "Each active formula needs a non-empty statement.",
-            "validationError": {
-                "whichFormula": "Formula {step} is not correct. Check operators, parentheses, and allowed functions such as abs, min, max, round, Decimal, and date.",
-                "formula_invalid_assignment": "Each step must be an assignment: what receives the value, an equals sign, then the calculation. Check that you have an equals sign and that neither side is empty.",
-                "formula_invalid_target": "Only the field that should receive the result may appear to the left of the equals sign (the one you insert with @ in the editor), nothing else.",
-                "formula_unknown_field_id": "The formula references information that does not exist in this scope. Adjust the chosen items or the text.",
-                "formula_expression_invalid": "The calculation to the right of the equals sign could not be validated. Check parentheses, operators, and allowed functions (such as abs, min, max, round, Decimal, and date)."
-            }
-        },
-        "discardConfirm": "Discard unsaved changes?"
-    },
-    "LocationConfigurationPage": {
-        "title": "Locations",
-        "description": "In this panel you see your location tree. The hierarchy appears on the left; beside it is the form to edit the name and other information about the location, plus the history panel. Select a location in the tree to edit it, or click the New button to create a new subdivision at that location.",
-        "list": {
-            "empty": "No locations were found for the selected scope.",
-            "emptyScope": "Create a scope first before editing the location hierarchy.",
-            "missingCurrentScope": "Set an active scope from the header selector before editing the location hierarchy."
-        },
-        "history": {
-            "title": "Change history",
-            "description": "Review recent changes to your location hierarchy: who changed what, when, and a summary of each update."
-        },
-        "section": {
-            "identity": {
-                "nameLabel": "Location name",
-                "nameHint": "Use a short name to identify this location. For example: Willow instead of Willow Farm, Brookside instead of Brookside Poultry, or East instead of East Field.",
-                "displayNameLabel": "Location description",
-                "displayNameHint": "Enter the full name of the location. For example: Willow Farm instead of Willow, Brookside Poultry instead of Brookside, or East Field instead of just East."
-            },
-            "structure": {
-                "title": "Information",
-                "description": "Summary of the location in focus, with the level in the hierarchy and the order among siblings of the same location.",
-                "levelLabel": "Hierarchy level",
-                "levelHint": "Counted from the scope root (1 = root).",
-                "parentLabel": "Parent location",
-                "parentRoot": "Scope root (no parent above)",
-                "orderLabel": "Order among siblings",
-                "orderHintEdit": "Used when listing locations at the same level.",
-                "orderHintCreate": "Assigned when you save the new location.",
-                "orderPending": "-"
-            }
-        },
-        "dragDropHint": "Drag a handle to reorder before or after a sibling, or drop on a row to move under that location.",
-        "action": {
-            "cancel": "Cancel",
-            "new": "New",
-            "newChild": "New child",
-            "newSibling": "New sibling",
-            "delete": "Delete",
-            "undoDelete": "Undo delete",
-            "save": "Save",
-            "saving": "Saving...",
-            "moveUp": "Move up",
-            "moveDown": "Move down"
-        },
-        "readOnlyNotice": "You can review the location directory, but only master or admin members can create or edit hierarchical records.",
-        "createdNotice": "Location created successfully.",
-        "deletedNotice": "Location deleted successfully.",
-        "movedNotice": "Location moved successfully.",
-        "error": {
-            "load": "Could not load the location directory. Try again.",
-            "save": "Could not save the location. Try again.",
-            "create": "Could not create the location. Try again.",
-            "delete": "Could not delete the location. Try again.",
-            "move": "Could not move the location. Try again.",
-            "validation": "This field cannot be empty."
-        },
-        "discardConfirm": "Discard unsaved changes?"
-    },
-    "UnityConfigurationPage": {
-        "title": "Productive units",
-        "description": "This panel shows the productive-unit tree for the scope. The hierarchy is on the left; beside it is the form to edit the name and description, plus the history panel. Select an item in the tree to edit it, or use the New button to add a child under the chosen item.",
-        "list": {
-            "empty": "No productive units were found for the selected scope.",
-            "emptyScope": "Create a scope before editing productive units.",
-            "missingCurrentScope": "Set an active scope from the header selector before editing productive units."
-        },
-        "history": {
-            "title": "Change history",
-            "description": "Review recent changes to productive units: who changed what, when, and a summary of each update."
-        },
-        "section": {
-            "identity": {
-                "nameLabel": "Short name",
-                "nameHint": "Use a short label you will recognize in daily work (for example: White, Female, Core).",
-                "displayNameLabel": "Description",
-                "displayNameHint": "Describe what this productive unit represents in the operation with a bit more context."
-            },
-            "structure": {
-                "title": "Information",
-                "description": "Summary of the item in focus: level in the hierarchy, order among siblings, and parent link.",
-                "levelLabel": "Hierarchy level",
-                "levelHint": "Counted from the scope root (1 = root).",
-                "parentLabel": "Parent unit",
-                "parentRoot": "Scope root (no parent above)",
-                "orderLabel": "Order among siblings",
-                "orderHintEdit": "Used when listing items at the same level.",
-                "orderHintCreate": "Assigned when you save the new record.",
-                "orderPending": "-"
-            }
-        },
-        "dragDropHint": "Drag a handle to reorder before or after a sibling, or drop on a row to move under that item.",
-        "action": {
-            "cancel": "Cancel",
-            "new": "New",
-            "newChild": "New child",
-            "newSibling": "New sibling",
-            "delete": "Delete",
-            "undoDelete": "Undo delete",
-            "save": "Save",
-            "saving": "Saving...",
-            "moveUp": "Move up",
-            "moveDown": "Move down"
-        },
-        "readOnlyNotice": "You can review productive units, but only master or admin members can create or edit hierarchical records.",
-        "createdNotice": "Productive unit created successfully.",
-        "deletedNotice": "Productive unit deleted successfully.",
-        "movedNotice": "Productive unit moved successfully.",
-        "error": {
-            "load": "Could not load the directory. Try again.",
-            "save": "Could not save. Try again.",
-            "create": "Could not create. Try again.",
-            "delete": "Could not delete. Try again.",
-            "move": "Could not move. Try again.",
-            "validation": "This field cannot be empty."
-        },
-        "discardConfirm": "Discard unsaved changes?"
-    },
-    "TenantConfigurationPage": {
-        "title": "Tenant",
-        "description": "These fields identify the contracting organization in the workspace, top bar, and lists. Changes apply to the active tenant of your session.",
-        "editor": {
-            "selectToEdit": "Select the tenant in the list to view and edit its details, or use New to open an empty form."
-        },
-        "history": {
-            "title": "Change history",
-            "description": "Review recent changes to the active tenant’s details: who changed what, when, and a summary of each update."
-        },
-        "section": {
-            "display": {
-                "title": "Interface name",
-                "description": "Short label shown across the application for the active tenant.",
-                "nameLabel": "Display name",
-                "nameHint": "Used in the top bar, tenant switcher, and other navigation surfaces."
-            },
-            "legal": {
-                "title": "Full legal name",
-                "description": "Official or complete name of the contracting organization.",
-                "nameLabel": "Full name",
-                "nameHint": "Use the formal name; it can match the display name when no shorter label is needed."
-            }
-        },
-        "metadata": {
-            "idLabel": "Internal identifier",
-            "sectionTitle": "System reference",
-            "sectionDescription": "Stable identifier for this tenant in the database.",
-            "createLead": "Empty form for the active tenant",
-            "createHint": "Fill in the display name and full legal name. Save to update the tenant for this session; the internal identifier does not change."
-        },
-        "action": {
-            "cancel": "Cancel",
-            "new": "New",
-            "delete": "Delete",
-            "undoDelete": "Undo delete",
-            "save": "Save",
-            "saving": "Saving..."
-        },
-        "readOnlyNotice": "You can view tenant data, but only master or admin members can edit it.",
-        "error": {
-            "save": "Could not save changes. Try again.",
-            "delete": "Could not delete the tenant. Try again.",
-            "validation": "This field cannot be empty."
-        },
-        "discardConfirm": "Discard unsaved changes?"
-    },
-    "AuditHistory": {
-        "loading": "Loading history...",
-        "empty": "No history records found.",
-        "unknownUser": "Unknown user",
-        "entryLabel": "Log #{id}",
-        "metaLine": "{actor} on {moment}",
-        "lineInsert": "Insert",
-        "lineDelete": "Delete",
-        "verbInsert": "added",
-        "verbUpdate": "updated",
-        "verbDelete": "removed",
-        "srBeforeAfter": "Previous value: {before}. Current value: {after}.",
-        "srInsertedValue": "Included value: {value}.",
-        "srDeletedValue": "Value before deletion: {value}.",
-        "diffUnavailable": "This update could not be compared to the previous record.",
-        "diffEmpty": "No differences were detected compared to the previous record.",
-        "deletedNote": "This entry represents a deletion. The log has no row payload in this case.",
-        "action": {
-            "insert": "Insert",
-            "update": "Update",
-            "delete": "Delete",
-            "loadMore": "Load more",
-            "loadingMore": "Loading..."
-        },
-        "error": {
-            "load": "Could not load history. Try again."
-        }
-    },
-    "LoginPage": {
-        "productName": "Valora",
-        "tagline": "Planning the future with confidence",
-        "title": "Your business presented in numbers you stand behind with purpose and provenance.",
-        "description": "One source of truth that grows with the company, with aligned versions, improving results and lowering risk. Sign in with Google to open the right organizational context for this session.",
-        "notice": {
-            "authRequired": "Sign in to access this area."
-        },
-        "cards": {
-            "workspace": {
-                "title": "See the whole, drill down when it matters",
-                "description": "Room for the team to execute, and visibility for you to steer the next step."
-            },
-            "traceability": {
-                "title": "Stand behind the numbers",
-                "description": "Changes stay on record. What you show partners or auditors rests on history and context."
-            },
-            "nextStep": {
-                "title": "After you sign in",
-                "description": "Quick entry to your environment. With several tenants or invites, you pick where to work this session."
-            }
-        },
-        "form": {
-            "title": "Access Valora",
-            "submitIdle": "Preparing Google sign-in...",
-            "submitPending": "Signing in with Google...",
-            "accessPolicy": "First visit: we help you set tenant, team, and scope so the company can get started.",
-            "googleUnavailable": "Google sign-in is unavailable: the public Google client identifier has not been configured in this environment yet.",
-            "error": "Could not complete the Google sign-in. Try again.",
-            "rememberMeLabel": "Stay authenticated on this device"
-        }
-    },
-    "SelectTenantPage": {
-        "loading": "Loading access options...",
-        "title": "Choose how you want to enter Valora.",
-        "description": "Your Google account has been validated. Now you only need to define the active tenant that will govern the session's operational context.",
-        "activeListTitle": "Active organizations",
-        "inviteListTitle": "Pending invites",
-        "createTitle": "Preparing your initial context",
-        "createDescription": "We did not find an active tenant or pending invite. Valora can create the first context for you so you can go straight to the initial administrative configuration.",
-        "createAction": "Create initial tenant",
-        "createPending": "Creating initial tenant...",
-        "acceptAction": "Accept invite",
-        "rejectAction": "Reject invite",
-        "selectAction": "Enter this tenant",
-        "processing": "Processing...",
-        "empty": "No access option was found for this account.",
-        "backToLogin": "Back to sign in",
-        "genericError": "Could not complete this action right now. Try again."
-    },
-    "State": {
-        "loadingDescription": "Loading the application foundation.",
-        "errorTitle": "Could not load this area.",
-        "errorDescription": "There was a problem rendering the interface. You can try again without leaving the current flow.",
-        "retry": "Try again"
+    "menu": {
+      "tenantSectionLabel": "Tenant",
+      "tenantTriggerAriaLabel": "Choose tenant",
+      "tenantMenuAriaLabel": "Available tenants",
+      "scopeTriggerAriaLabel": "Choose scope",
+      "scopeMenuAriaLabel": "Available scopes",
+      "localeFlagTriggerAriaLabel": "Choose language and region",
+      "localeFlagMenuAriaLabel": "Available languages",
+      "configurationLabel": "Configuration",
+      "loadingTenantList": "Loading...",
+      "tenantListError": "Could not load the tenant list.",
+      "emptyTenantList": "No tenant available.",
+      "switchingTenant": "Switching tenant...",
+      "loadingScopeList": "Loading scopes...",
+      "scopeListError": "Could not load the scope list.",
+      "emptyScopeList": "No scope available.",
+      "switchingScope": "Saving scope...",
+      "switchingLocale": "Switching language...",
+      "activeLabel": "active",
+      "noScopeLabel": "No scope"
     }
+  },
+  "HomePage": {
+    "title": "Welcome to Valora",
+    "description": "This page gives you a simple overview of what the system already does and how it supports your daily work.",
+    "status": {
+      "title": "System ready to use",
+      "description": "You can already navigate the workspace, organize your structure, and evolve your records safely."
+    },
+    "context": {
+      "workspace": {
+        "title": "Current workspace",
+        "description": "You are in the protected area with an active session and everything prepared for a smooth workflow."
+      },
+      "locale": {
+        "title": "Language and region",
+        "description": "The platform is already prepared to support multiple languages without losing navigation consistency."
+      },
+      "entryFlow": {
+        "title": "Current flow",
+        "description": "At sign-in, the system already identifies your context so you can continue from the right place without manual setup."
+      }
+    },
+    "card": {
+      "tenant": {
+        "title": "Organization and team",
+        "description": "Define who is part of the operation and which role each person has in daily work."
+      },
+      "location": {
+        "title": "Location structure",
+        "description": "Organize your operation by units and hierarchy levels to keep a clear view of the whole."
+      }
+    }
+  },
+  "ConfigurationPage": {
+    "title": "Organization, who can act, and which context",
+    "description": "Before day-to-day operations, Valora needs three things spelled out: which contracting organization this is (the tenant), who may act inside it (members and roles), and which slice of context data lives in, scopes: branches, projects, sites, whatever matches your operation. This screen is where you maintain that backbone; without it, records and permissions lack a clear frame of reference. The locations tree lives under its own sidebar entry and always follows the active scope you pick in the header.",
+    "openTenantEditor": "Edit tenant",
+    "openMemberEditor": "Edit members",
+    "openScopeEditor": "Edit scopes",
+    "openFieldEditor": "Edit fields",
+    "openActionEditor": "Edit actions",
+    "cards": {
+      "organization": {
+        "title": "Tenant",
+        "description": "The contracting organization for this workspace: the name shown in the top bar, tenant switcher, and other surfaces. Here you align display name (what people see every day) and full legal or formal name when you need an official reference. Changes apply to the tenant active in your session; if you manage more than one, switch from the menu before editing."
+      },
+      "member": {
+        "title": "Members",
+        "description": "A member is a person tied to this tenant in the product, not just the sign-in account, but the link with role (master, administrator, member) and status. Everyone listed here can operate in this organization; roles and status control what they can change, including sensitive configuration."
+      },
+      "scope": {
+        "title": "Scope",
+        "description": "A scope is a context unit inside the tenant: where records, and later the locations hierarchy, stay separated instead of mixed together. Think branch, job site, venue, or project,  the label is yours, but the job is always to isolate data that should not appear in one pile. The scope selected in the header is what applies when you work on locations and anything that depends on it."
+      },
+      "field": {
+        "title": "Fields",
+        "description": "Fields define value types used by rules in the active scope (for example integers or decimals). The list and editor follow the scope you pick in the header, the same pattern as locations."
+      },
+      "action": {
+        "title": "Actions",
+        "description": "Actions are business event kinds in the active scope (for example housing or mortality). Each has a friendly name per language and may have formulas attached. The list follows the header scope, the same pattern as fields."
+      }
+    }
+  },
+  "MemberConfigurationPage": {
+    "title": "Members",
+    "description": "Edit the records of the members linked to the active tenant. Name, role, and status stay centralized in this directory.",
+    "list": {
+      "empty": "No members were found for the active tenant."
+    },
+    "history": {
+      "title": "Change history",
+      "description": "Review recent changes to member records: who changed what, when, and a clear summary of each update."
+    },
+    "section": {
+      "profile": {
+        "displayNameLabel": "Display name",
+        "displayNameHint": "Used across the tenant's internal surfaces.",
+        "nameLabel": "Full name",
+        "nameHint": "Use the most complete name for administrative reference."
+      },
+      "invite": {
+        "title": "Invite",
+        "description": "New records start as a pending invite until the person accepts with the account for the email you enter.",
+        "createLead": "Invite registration",
+        "createHint": "Save to register the invite. The person will see this tenant after signing in with a Google account that uses the same email.",
+        "emailFieldHint": "Enter the email that will receive the invite. First sign-in uses a Google account with that same address."
+      },
+      "idle": {
+        "title": "Information",
+        "description": "How to use this panel: pick a member in the list on the left to edit their record, or use New to register an invite when you have permission.",
+        "selectLead": "No member selected",
+        "selectHint": "Click a member in the list or use the New button to register an email invite.",
+        "emptyLead": "No members found",
+        "emptyHint": "There are no members in this tenant and your current permission does not allow registering invites."
+      },
+      "access": {
+        "title": "Access",
+        "description": "Role and status control the member's reach inside this tenant.",
+        "emailLabel": "Email",
+        "memberEmailHint": "Invite and first-login address. You can change it anytime; it does not have to match the Google account email after the link is established.",
+        "roleLabel": "Role",
+        "statusLabel": "Status",
+        "accountLinked": "Linked account",
+        "accountPending": "Waiting for account link",
+        "accountTopicLabel": "Account"
+      }
+    },
+    "action": {
+      "cancel": "Cancel",
+      "new": "New",
+      "delete": "Delete",
+      "undoDelete": "Undo delete",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "readOnlyNotice": "You can review the member directory, but only master or admin members can edit records.",
+    "protectedRecordNotice": "This record is protected by the current permissions. Select another member to edit.",
+    "role": {
+      "master": "Master",
+      "admin": "Administrator",
+      "member": "Member"
+    },
+    "statusValue": {
+      "ACTIVE": "Active",
+      "PENDING": "Pending",
+      "DISABLED": "Disabled"
+    },
+    "error": {
+      "save": "Could not save the member. Try again.",
+      "create": "Could not register the member. Try again.",
+      "delete": "Could not delete the member. Try again.",
+      "validation": "This field cannot be empty.",
+      "emailValidation": "Enter a valid email address."
+    },
+    "inviteSend": {
+      "sendInvite": "Send invite",
+      "sendInviteAriaLabel": "Send invitation email to {email}",
+      "sending": "Sending...",
+      "successNotice": "Invitation sent to {email}.",
+      "error": {
+        "generic": "Could not send the invitation. Try again.",
+        "member_invite_forbidden": "You do not have permission to send invitations.",
+        "member_invite_not_found": "Member was not found for this tenant.",
+        "member_invite_already_linked": "This member already has a linked account.",
+        "member_invite_invalid_status": "Invitations can only be sent to pending members.",
+        "member_invite_no_email": "This member has no email address for the invitation.",
+        "member_invite_delivery_failed": "The message could not be delivered. Check email settings or try again."
+      }
+    },
+    "discardConfirm": "Discard unsaved changes?"
+  },
+  "ScopeConfigurationPage": {
+    "title": "Scopes",
+    "description": "Edit the minimum structural foundation of the active tenant. Each scope defines an initial slice that will support later records and modules.",
+    "empty": "No scopes were found for the active tenant.",
+    "history": {
+      "title": "Change history",
+      "description": "Review recent changes to scopes for this tenant: who made each change, when, and a summary of what changed."
+    },
+    "section": {
+      "identity": {
+        "nameLabel": "Scope name",
+        "nameHint": "Use a short label to identify the scope, such as Poultry, Soy, or Milk.",
+        "displayNameLabel": "Scope description",
+        "displayNameHint": "Explain the scope slice with more context, such as Poultry for egg production."
+      },
+      "info": {
+        "title": "Information",
+        "description": "Summary of the scope in focus: values saved on the server, and what this session may change.",
+        "nameRegisteredLabel": "Saved name",
+        "displayRegisteredLabel": "Saved description",
+        "canEditLabel": "Can edit",
+        "canDeleteLabel": "Can delete",
+        "yes": "Yes",
+        "no": "No",
+        "createLead": "New structural scope",
+        "createHint": "You are defining a new slice for the active tenant. Save to register it in the directory."
+      }
+    },
+    "action": {
+      "cancel": "Cancel",
+      "new": "New",
+      "delete": "Delete",
+      "undoDelete": "Undo delete",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "readOnlyNotice": "You can review the scope directory, but only master or admin members can create or edit structural records.",
+    "selectPrompt": "Select a scope from the list to edit it, or use the New button to create one.",
+    "error": {
+      "save": "Could not save the scope. Try again.",
+      "create": "Could not create the scope. Try again.",
+      "delete": "Could not delete the scope. Try again.",
+      "validation": "This field cannot be empty."
+    },
+    "discardConfirm": "Discard unsaved changes?"
+  },
+  "FieldConfigurationPage": {
+    "title": "Fields",
+    "description": "Adjust here the names of the information you measure or record in events. For every name (such as quantity or amount), you tell the system how to read the content: whole numbers, values with cents, yes or no, and similar choices. That applies when you build calculation rules and when you record events, so values stay consistent and are not misread.",
+    "empty": "No fields were found for the active scope and your current permission does not allow creating new ones.",
+    "list": {
+      "emptyScope": "Create a scope before editing fields.",
+      "missingCurrentScope": "Set an active scope from the header selector before editing fields.",
+      "loadError": "Could not load fields for this scope. Try again."
+    },
+    "history": {
+      "title": "Change history",
+      "description": "Review recent changes to field definitions for the active scope: who changed what, when, and a summary of each update."
+    },
+    "section": {
+      "fieldName": {
+        "label": "Field name",
+        "hint": "Field name. Enter a short, easy-to-understand name, for example: quantity, value, growth percentage. This name is used in formulas, charts, and reports."
+      },
+      "info": {
+        "title": "Information",
+        "description": "Summary of the field in focus: stable identifier and type saved on the server.",
+        "idLabel": "Identifier",
+        "fieldNameRegisteredLabel": "Name",
+        "friendlyTypeLabel": "Type",
+        "typeValueInteger": "Whole number",
+        "typeValueNumberOne": "Number with 1 decimal place",
+        "typeValueNumberMany": "Number with {scale} decimal places",
+        "sqlTypeRegisteredLabel": "PostgreSQL type",
+        "canEditLabel": "Can edit",
+        "yes": "Yes",
+        "no": "No",
+        "createLead": "New field",
+        "createHint": "You are defining a new field for the active scope. Save to register it in the directory."
+      }
+    },
+    "action": {
+      "cancel": "Cancel",
+      "new": "New",
+      "delete": "Delete",
+      "undoDelete": "Undo delete",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "readOnlyNotice": "You can review fields for the active scope, but only master or admin members can create or edit rule definitions.",
+    "error": {
+      "save": "Could not save the field. Try again.",
+      "create": "Could not create the field. Try again.",
+      "delete": "Could not delete the field. Try again.",
+      "deleteBlockedDetail": "This field cannot be deleted while event inputs or results still reference it.",
+      "validation": "Choose a valid data type.",
+      "fieldNameRequired": "Enter a field name."
+    },
+    "fieldType": {
+      "label": "Content type",
+      "hint": "Describe what kind of content this field holds.",
+      "option": {
+        "number": "Number",
+        "text": "Text",
+        "boolean": "Yes or no",
+        "timestamp": "Date",
+        "legacy": "Other (existing value)"
+      },
+      "scaleLabel": "Decimal places",
+      "scaleHint": "Enter how many digits after the decimal separator the number should have. Use 0 to 10 decimal places.",
+      "legacyHelp": "This record uses a type outside the list. Pick a standard type to replace it on save, or keep this option.",
+      "caption": {
+        "number": "Number ({scale} dp)",
+        "text": "Text",
+        "boolean": "Yes or no",
+        "timestamp": "Date",
+        "legacy": "{value}"
+      },
+      "error": {
+        "empty": "Select or define a data type.",
+        "scaleRange": "Use a decimal place count between 0 and 10."
+      }
+    },
+    "discardConfirm": "Discard unsaved changes?"
+  },
+  "ActionConfigurationPage": {
+    "title": "Actions",
+    "description": "Define here the kinds of operations or measurements that become events in the active scope (for example housing or mortality). For each action you provide a clear name; that name appears when you build rules and record events.",
+    "empty": "No actions were found for the active scope and your current permission does not allow creating new ones.",
+    "list": {
+      "emptyScope": "Create a scope before editing actions.",
+      "missingCurrentScope": "Set an active scope from the header selector before editing actions.",
+      "loadError": "Could not load actions for this scope. Try again.",
+      "fallbackTitle": "Action #{id}"
+    },
+    "history": {
+      "title": "Change history",
+      "description": "Review recent changes to action definitions for the active scope: who changed what, when, and a summary of each update."
+    },
+    "section": {
+      "actionName": {
+        "label": "Action name",
+        "hint": "Short, easy-to-understand name used in formulas, screens, and reports."
+      },
+      "info": {
+        "title": "Information",
+        "description": "Summary of the action in focus on the server.",
+        "actionNameRegisteredLabel": "Name",
+        "createLead": "New action",
+        "createHint": "You are defining a new action for the active scope. Save to register it in the directory."
+      }
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "new": "New",
+      "delete": "Delete",
+      "undoDelete": "Undo delete",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "readOnlyNotice": "You can review actions for the active scope, but only master or admin members can create or edit rule definitions.",
+    "error": {
+      "save": "Could not save the action. Try again.",
+      "create": "Could not create the action. Try again.",
+      "delete": "Could not delete the action. Try again.",
+      "deleteBlockedDetail": "This action cannot be deleted while events still reference it.",
+      "actionNameRequired": "Enter an action name."
+    },
+    "formulas": {
+      "title": "Formulas",
+      "description": "Formulas are calculation steps applied when events for this action are processed. Each step is text where you can write numbers, operations (such as + and *), and references to information in the scope.\n\nType @ to open a list and insert a field:n reference. Type # to open the same list and insert an input:n reference. The selected name appears underlined in the text and you can keep typing as usual.\n\nThe list order is execution order, top to bottom. Drag the handle beside a formula to reorder before saving.",
+      "exampleList": "Math examples:\nAddition: x + y\nSubtraction: x - y\nMultiplication: x * y\nDivision: x / y\nInteger division: x // y\nModulo: x % y\nPower: x ** 2\nParentheses: (x + y) * z\nRounding: round((x * y) / z, 2)\nMinimum: min(x, y, z)\nMaximum: max(x, y, z)\nAbsolute value: abs(x - y)\nDecimal: Decimal(\"0.2\") * x\n\nConditional examples:\nSimple condition: x if y > 0 else 0\nEquality condition: x + 10 if y == 1 else x - 10\nMax/min condition: max(x, y) if z > 100 else min(x, y)\nSafe division condition: round(x / y, 2) if y != 0 else 0\nAnd condition: x if (y > 0 and z > 0) else 0\n\nOther supported features:\nComparisons: x == y, x != y, x > y, x >= y, x < y, x <= y\nLogical: x > 0 and y > 0, x > 0 or y > 0, not (x > y)\nDate: x if data_ref > date(2026, 1, 1) else y\nFunctions: abs, min, max, round, Decimal, and date",
+      "unknownFieldLabel": "Information unavailable",
+      "loading": "Loading formulas…",
+      "newFormula": "new",
+      "removeAriaLabel": "Mark formula for removal on save",
+      "unmarkAriaLabel": "Unmark removal for this formula",
+      "statementLabel": "Statement",
+      "dragHandleAria": "Drag to reorder",
+      "empty": "No formulas yet. Use new to add one.",
+      "loadError": "Could not load formulas. Try again.",
+      "statementRequired": "Each active formula needs a non-empty statement.",
+      "validationError": {
+        "whichFormula": "Formula {step} is not correct. {description}",
+        "formula_invalid_assignment": "Each step must have exactly one assignment: what receives the value, an equals sign, then the calculation. Check that there is only one assignment equals sign and that neither side is empty.",
+        "formula_invalid_target": "Only the field that should receive the result may appear to the left of the equals sign (a field:n reference), nothing else.",
+        "formula_unknown_field_id": "The formula references information that does not exist in this scope. Adjust the chosen items or the text.",
+        "formula_expression_invalid": "The calculation to the right of the equals sign could not be validated. Check parentheses, operators, and allowed functions (such as abs, min, max, round, Decimal, and date)."
+      }
+    },
+    "discardConfirm": "Discard unsaved changes?"
+  },
+  "LocationConfigurationPage": {
+    "title": "Locations",
+    "description": "In this panel you see your location tree. The hierarchy appears on the left; beside it is the form to edit the name and other information about the location, plus the history panel. Select a location in the tree to edit it, or click the New button to create a new subdivision at that location.",
+    "list": {
+      "empty": "No locations were found for the selected scope.",
+      "emptyScope": "Create a scope first before editing the location hierarchy.",
+      "missingCurrentScope": "Set an active scope from the header selector before editing the location hierarchy."
+    },
+    "history": {
+      "title": "Change history",
+      "description": "Review recent changes to your location hierarchy: who changed what, when, and a summary of each update."
+    },
+    "section": {
+      "identity": {
+        "nameLabel": "Location name",
+        "nameHint": "Use a short name to identify this location. For example: Willow instead of Willow Farm, Brookside instead of Brookside Poultry, or East instead of East Field.",
+        "displayNameLabel": "Location description",
+        "displayNameHint": "Enter the full name of the location. For example: Willow Farm instead of Willow, Brookside Poultry instead of Brookside, or East Field instead of just East."
+      },
+      "structure": {
+        "title": "Information",
+        "description": "Summary of the location in focus, with the level in the hierarchy and the order among siblings of the same location.",
+        "levelLabel": "Hierarchy level",
+        "levelHint": "Counted from the scope root (1 = root).",
+        "parentLabel": "Parent location",
+        "parentRoot": "Scope root (no parent above)",
+        "orderLabel": "Order among siblings",
+        "orderHintEdit": "Used when listing locations at the same level.",
+        "orderHintCreate": "Assigned when you save the new location.",
+        "orderPending": "-"
+      }
+    },
+    "dragDropHint": "Drag a handle to reorder before or after a sibling, or drop on a row to move under that location.",
+    "action": {
+      "cancel": "Cancel",
+      "new": "New",
+      "newChild": "New child",
+      "newSibling": "New sibling",
+      "delete": "Delete",
+      "undoDelete": "Undo delete",
+      "save": "Save",
+      "saving": "Saving...",
+      "moveUp": "Move up",
+      "moveDown": "Move down"
+    },
+    "readOnlyNotice": "You can review the location directory, but only master or admin members can create or edit hierarchical records.",
+    "createdNotice": "Location created successfully.",
+    "deletedNotice": "Location deleted successfully.",
+    "movedNotice": "Location moved successfully.",
+    "error": {
+      "load": "Could not load the location directory. Try again.",
+      "save": "Could not save the location. Try again.",
+      "create": "Could not create the location. Try again.",
+      "delete": "Could not delete the location. Try again.",
+      "move": "Could not move the location. Try again.",
+      "validation": "This field cannot be empty."
+    },
+    "discardConfirm": "Discard unsaved changes?"
+  },
+  "UnityConfigurationPage": {
+    "title": "Productive units",
+    "description": "This panel shows the productive-unit tree for the scope. The hierarchy is on the left; beside it is the form to edit the name and description, plus the history panel. Select an item in the tree to edit it, or use the New button to add a child under the chosen item.",
+    "list": {
+      "empty": "No productive units were found for the selected scope.",
+      "emptyScope": "Create a scope before editing productive units.",
+      "missingCurrentScope": "Set an active scope from the header selector before editing productive units."
+    },
+    "history": {
+      "title": "Change history",
+      "description": "Review recent changes to productive units: who changed what, when, and a summary of each update."
+    },
+    "section": {
+      "identity": {
+        "nameLabel": "Short name",
+        "nameHint": "Use a short label you will recognize in daily work (for example: White, Female, Core).",
+        "displayNameLabel": "Description",
+        "displayNameHint": "Describe what this productive unit represents in the operation with a bit more context."
+      },
+      "structure": {
+        "title": "Information",
+        "description": "Summary of the item in focus: level in the hierarchy, order among siblings, and parent link.",
+        "levelLabel": "Hierarchy level",
+        "levelHint": "Counted from the scope root (1 = root).",
+        "parentLabel": "Parent unit",
+        "parentRoot": "Scope root (no parent above)",
+        "orderLabel": "Order among siblings",
+        "orderHintEdit": "Used when listing items at the same level.",
+        "orderHintCreate": "Assigned when you save the new record.",
+        "orderPending": "-"
+      }
+    },
+    "dragDropHint": "Drag a handle to reorder before or after a sibling, or drop on a row to move under that item.",
+    "action": {
+      "cancel": "Cancel",
+      "new": "New",
+      "newChild": "New child",
+      "newSibling": "New sibling",
+      "delete": "Delete",
+      "undoDelete": "Undo delete",
+      "save": "Save",
+      "saving": "Saving...",
+      "moveUp": "Move up",
+      "moveDown": "Move down"
+    },
+    "readOnlyNotice": "You can review productive units, but only master or admin members can create or edit hierarchical records.",
+    "createdNotice": "Productive unit created successfully.",
+    "deletedNotice": "Productive unit deleted successfully.",
+    "movedNotice": "Productive unit moved successfully.",
+    "error": {
+      "load": "Could not load the directory. Try again.",
+      "save": "Could not save. Try again.",
+      "create": "Could not create. Try again.",
+      "delete": "Could not delete. Try again.",
+      "move": "Could not move. Try again.",
+      "validation": "This field cannot be empty."
+    },
+    "discardConfirm": "Discard unsaved changes?"
+  },
+  "TenantConfigurationPage": {
+    "title": "Tenant",
+    "description": "These fields identify the contracting organization in the workspace, top bar, and lists. Changes apply to the active tenant of your session.",
+    "editor": {
+      "selectToEdit": "Select the tenant in the list to view and edit its details, or use New to open an empty form."
+    },
+    "history": {
+      "title": "Change history",
+      "description": "Review recent changes to the active tenant’s details: who changed what, when, and a summary of each update."
+    },
+    "section": {
+      "display": {
+        "title": "Interface name",
+        "description": "Short label shown across the application for the active tenant.",
+        "nameLabel": "Display name",
+        "nameHint": "Used in the top bar, tenant switcher, and other navigation surfaces."
+      },
+      "legal": {
+        "title": "Full legal name",
+        "description": "Official or complete name of the contracting organization.",
+        "nameLabel": "Full name",
+        "nameHint": "Use the formal name; it can match the display name when no shorter label is needed."
+      }
+    },
+    "metadata": {
+      "idLabel": "Internal identifier",
+      "sectionTitle": "System reference",
+      "sectionDescription": "Stable identifier for this tenant in the database.",
+      "createLead": "Empty form for the active tenant",
+      "createHint": "Fill in the display name and full legal name. Save to update the tenant for this session; the internal identifier does not change."
+    },
+    "action": {
+      "cancel": "Cancel",
+      "new": "New",
+      "delete": "Delete",
+      "undoDelete": "Undo delete",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "readOnlyNotice": "You can view tenant data, but only master or admin members can edit it.",
+    "error": {
+      "save": "Could not save changes. Try again.",
+      "delete": "Could not delete the tenant. Try again.",
+      "validation": "This field cannot be empty."
+    },
+    "discardConfirm": "Discard unsaved changes?"
+  },
+  "AuditHistory": {
+    "loading": "Loading history...",
+    "empty": "No history records found.",
+    "unknownUser": "Unknown user",
+    "entryLabel": "Log #{id}",
+    "metaLine": "{actor} on {moment}",
+    "lineInsert": "Insert",
+    "lineDelete": "Delete",
+    "verbInsert": "added",
+    "verbUpdate": "updated",
+    "verbDelete": "removed",
+    "srBeforeAfter": "Previous value: {before}. Current value: {after}.",
+    "srInsertedValue": "Included value: {value}.",
+    "srDeletedValue": "Value before deletion: {value}.",
+    "diffUnavailable": "This update could not be compared to the previous record.",
+    "diffEmpty": "No differences were detected compared to the previous record.",
+    "deletedNote": "This entry represents a deletion. The log has no row payload in this case.",
+    "action": {
+      "insert": "Insert",
+      "update": "Update",
+      "delete": "Delete",
+      "loadMore": "Load more",
+      "loadingMore": "Loading..."
+    },
+    "error": {
+      "load": "Could not load history. Try again."
+    }
+  },
+  "LoginPage": {
+    "productName": "Valora",
+    "tagline": "Planning the future with confidence",
+    "title": "Your business presented in numbers you stand behind with purpose and provenance.",
+    "description": "One source of truth that grows with the company, with aligned versions, improving results and lowering risk. Sign in with Google to open the right organizational context for this session.",
+    "notice": {
+      "authRequired": "Sign in to access this area."
+    },
+    "cards": {
+      "workspace": {
+        "title": "See the whole, drill down when it matters",
+        "description": "Room for the team to execute, and visibility for you to steer the next step."
+      },
+      "traceability": {
+        "title": "Stand behind the numbers",
+        "description": "Changes stay on record. What you show partners or auditors rests on history and context."
+      },
+      "nextStep": {
+        "title": "After you sign in",
+        "description": "Quick entry to your environment. With several tenants or invites, you pick where to work this session."
+      }
+    },
+    "form": {
+      "title": "Access Valora",
+      "submitIdle": "Preparing Google sign-in...",
+      "submitPending": "Signing in with Google...",
+      "accessPolicy": "First visit: we help you set tenant, team, and scope so the company can get started.",
+      "googleUnavailable": "Google sign-in is unavailable: the public Google client identifier has not been configured in this environment yet.",
+      "error": "Could not complete the Google sign-in. Try again.",
+      "rememberMeLabel": "Stay authenticated on this device"
+    }
+  },
+  "SelectTenantPage": {
+    "loading": "Loading access options...",
+    "title": "Choose how you want to enter Valora.",
+    "description": "Your Google account has been validated. Now you only need to define the active tenant that will govern the session's operational context.",
+    "activeListTitle": "Active organizations",
+    "inviteListTitle": "Pending invites",
+    "createTitle": "Preparing your initial context",
+    "createDescription": "We did not find an active tenant or pending invite. Valora can create the first context for you so you can go straight to the initial administrative configuration.",
+    "createAction": "Create initial tenant",
+    "createPending": "Creating initial tenant...",
+    "acceptAction": "Accept invite",
+    "rejectAction": "Reject invite",
+    "selectAction": "Enter this tenant",
+    "processing": "Processing...",
+    "empty": "No access option was found for this account.",
+    "backToLogin": "Back to sign in",
+    "genericError": "Could not complete this action right now. Try again."
+  },
+  "State": {
+    "loadingDescription": "Loading the application foundation.",
+    "errorTitle": "Could not load this area.",
+    "errorDescription": "There was a problem rendering the interface. You can try again without leaving the current flow.",
+    "retry": "Try again"
+  }
 }

@@ -46,6 +46,24 @@ def test_valid_field_plus_float_literal() -> None:
     )
 
 
+def test_valid_input_reference_on_rhs() -> None:
+    session = _session_with_field_ids([1, 2])
+    validate_formula_statement_for_scope(
+        session,
+        scope_id=10,
+        statement="${field:2} = ${input:1} + 1",
+    )
+
+
+def test_valid_mixed_field_and_input_on_rhs() -> None:
+    session = _session_with_field_ids([1, 2, 3])
+    validate_formula_statement_for_scope(
+        session,
+        scope_id=10,
+        statement="${field:3} = ${field:1} + ${input:2}",
+    )
+
+
 def test_invalid_missing_equals() -> None:
     session = _session_with_field_ids([1])
     with pytest.raises(FormulaStatementValidationError) as excinfo:
@@ -55,11 +73,31 @@ def test_invalid_missing_equals() -> None:
     assert excinfo.value.code == "formula_invalid_assignment"
 
 
+def test_invalid_multiple_assignment_in_same_statement() -> None:
+    session = _session_with_field_ids([1, 2])
+    with pytest.raises(FormulaStatementValidationError) as excinfo:
+        validate_formula_statement_for_scope(
+            session,
+            scope_id=10,
+            statement="${field:1} = ${field:2}; ${field:2} = 10",
+        )
+    assert excinfo.value.code == "formula_invalid_assignment"
+
+
 def test_invalid_lhs_not_only_token() -> None:
     session = _session_with_field_ids([1])
     with pytest.raises(FormulaStatementValidationError) as excinfo:
         validate_formula_statement_for_scope(
             session, scope_id=10, statement="x = ${field:1} + 1"
+        )
+    assert excinfo.value.code == "formula_invalid_target"
+
+
+def test_invalid_lhs_with_input_token() -> None:
+    session = _session_with_field_ids([1, 2])
+    with pytest.raises(FormulaStatementValidationError) as excinfo:
+        validate_formula_statement_for_scope(
+            session, scope_id=10, statement="${input:1} = ${field:2} + 1"
         )
     assert excinfo.value.code == "formula_invalid_target"
 
@@ -82,6 +120,17 @@ def test_rhs_reference_unknown_field() -> None:
             session,
             scope_id=10,
             statement="${field:1} = ${field:2} + 1",
+        )
+    assert excinfo.value.code == "formula_unknown_field_id"
+
+
+def test_rhs_reference_unknown_input_id() -> None:
+    session = _session_with_field_ids([1])
+    with pytest.raises(FormulaStatementValidationError) as excinfo:
+        validate_formula_statement_for_scope(
+            session,
+            scope_id=10,
+            statement="${field:1} = ${input:2} + 1",
         )
     assert excinfo.value.code == "formula_unknown_field_id"
 

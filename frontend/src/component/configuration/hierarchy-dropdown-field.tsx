@@ -320,27 +320,36 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
                 />
                 <line
                   x1="4.5"
-                  y1="5.5"
-                  x2="11.5"
-                  y2="5.5"
+                  y1="4.475"
+                  x2="11.65"
+                  y2="4.475"
                   stroke="currentColor"
                   strokeWidth="1.25"
                   strokeLinecap="round"
                 />
                 <line
-                  x1="5.5"
-                  y1="8"
+                  x1="7.0"
+                  y1="6.825"
                   x2="11.65"
-                  y2="8"
+                  y2="6.825"
                   stroke="currentColor"
                   strokeWidth="1.25"
                   strokeLinecap="round"
                 />
                 <line
-                  x1="5.5"
-                  y1="10.5"
+                  x1="7.0"
+                  y1="9.175"
                   x2="11.65"
-                  y2="10.5"
+                  y2="9.175"
+                  stroke="currentColor"
+                  strokeWidth="1.25"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="7.0"
+                  y1="11.525"
+                  x2="11.65"
+                  y2="11.525"
                   stroke="currentColor"
                   strokeWidth="1.25"
                   strokeLinecap="round"

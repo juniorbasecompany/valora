@@ -10,6 +10,7 @@ import {
 import { ConfigurationDirectoryEditorShell } from "@/component/configuration/configuration-directory-editor-shell";
 import { ConfigurationInfoSection } from "@/component/configuration/configuration-info-section";
 import { ConfigurationDirectoryCreateButton } from "@/component/configuration/configuration-directory-create-button";
+import { EventActionField } from "@/component/configuration/event-action-field";
 import { EventFilterPanel } from "@/component/configuration/event-filter-panel";
 import { HierarchySingleSelectField } from "@/component/configuration/hierarchy-dropdown-field";
 import { TrashIconButton } from "@/component/ui/trash-icon-button";
@@ -19,14 +20,18 @@ import { useEditorPanelFlash } from "@/component/configuration/use-editor-panel-
 import { useFocusFirstEditorFieldAfterFlash } from "@/component/configuration/use-focus-first-editor-field-after-flash";
 import { useReplaceConfigurationPath } from "@/component/configuration/use-replace-configuration-path";
 import type {
+  ScopeFormulaListResponse,
+  ScopeInputListResponse,
   TenantLocationDirectoryResponse,
   TenantScopeActionDirectoryResponse,
   TenantScopeEventDirectoryResponse,
   TenantScopeEventRecord,
+  TenantScopeFieldDirectoryResponse,
   TenantScopeRecord,
   TenantUnityDirectoryResponse
 } from "@/lib/auth/types";
 import { parseErrorDetail } from "@/lib/api/parse-error-detail";
+import type { LabelLang } from "@/lib/i18n/label-lang";
 
 export type EventConfigurationCopy = {
   title: string;
@@ -45,6 +50,12 @@ export type EventConfigurationCopy = {
   unityHint: string;
   actionLabel: string;
   actionHint: string;
+  actionInputSectionTitle: string;
+  actionInputSectionHint: string;
+  actionInputEmpty: string;
+  actionInputLoading: string;
+  actionInputLoadError: string;
+  actionInputSaveError: string;
   filterTitle: string;
   filterMomentFromLabel: string;
   filterMomentToLabel: string;
@@ -83,6 +94,7 @@ export type EventConfigurationCopy = {
 
 type EventConfigurationClientProps = {
   locale: string;
+  labelLang: LabelLang;
   currentScope: TenantScopeRecord | null;
   hasAnyScope: boolean;
   initialEventDirectory: TenantScopeEventDirectoryResponse | null;
@@ -204,6 +216,84 @@ function parseNumericFilter(value: string): number | null {
   return parsed;
 }
 
+type ScopeFieldOption = {
+  id: number;
+  sqlType: string;
+  label: string;
+};
+
+type EventActionInputDraft = {
+  fieldId: number;
+  sqlType: string;
+  label: string;
+  value: string;
+  serverInputId?: number;
+};
+
+const FORMULA_INPUT_TOKEN_PATTERN = /\$\{input:(\d+)\}/g;
+
+function cloneEventActionInputDraftList(
+  inputDraftList: EventActionInputDraft[]
+): EventActionInputDraft[] {
+  return inputDraftList.map((item) => ({ ...item }));
+}
+
+function areEventActionInputDraftListsEqual(
+  leftList: EventActionInputDraft[],
+  rightList: EventActionInputDraft[]
+): boolean {
+  if (leftList.length !== rightList.length) {
+    return false;
+  }
+  for (let index = 0; index < leftList.length; index += 1) {
+    const left = leftList[index];
+    const right = rightList[index];
+    if (
+      left.fieldId !== right.fieldId
+      || left.sqlType !== right.sqlType
+      || left.label !== right.label
+      || left.value !== right.value
+      || left.serverInputId !== right.serverInputId
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function buildFormulaInputFieldIdList(response: ScopeFormulaListResponse): number[] {
+  const seenIdSet = new Set<number>();
+  const inputFieldIdList: number[] = [];
+  const sortedFormulaList = [...response.item_list].sort(
+    (left, right) => left.step - right.step || left.id - right.id
+  );
+
+  for (const formula of sortedFormulaList) {
+    const regex = new RegExp(FORMULA_INPUT_TOKEN_PATTERN.source, "g");
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(formula.statement)) != null) {
+      const parsedId = Number(match[1]);
+      if (!Number.isInteger(parsedId) || parsedId < 1 || seenIdSet.has(parsedId)) {
+        continue;
+      }
+      seenIdSet.add(parsedId);
+      inputFieldIdList.push(parsedId);
+    }
+  }
+
+  return inputFieldIdList;
+}
+
+function normalizeScopeFieldOptionList(
+  response: TenantScopeFieldDirectoryResponse
+): ScopeFieldOption[] {
+  return response.item_list.map((item) => ({
+    id: item.id,
+    sqlType: item.sql_type,
+    label: item.label_name?.trim() || `#${item.id}`
+  }));
+}
+
 function isDeleteBlockedDetail(detail: string | null): boolean {
   if (!detail) {
     return false;
@@ -217,6 +307,7 @@ function isDeleteBlockedDetail(detail: string | null): boolean {
 
 export function EventConfigurationClient({
   locale,
+  labelLang,
   currentScope,
   hasAnyScope,
   initialEventDirectory,
@@ -337,6 +428,18 @@ export function EventConfigurationClient({
   const [filterLocationIdList, setFilterLocationIdList] = useState<number[]>([]);
   const [filterUnityIdList, setFilterUnityIdList] = useState<number[]>([]);
   const [filterActionId, setFilterActionId] = useState<number | null>(null);
+  const [scopeFieldOptionList, setScopeFieldOptionList] = useState<ScopeFieldOption[]>([]);
+  const [eventActionInputDraftList, setEventActionInputDraftList] = useState<
+    EventActionInputDraft[]
+  >([]);
+  const [eventActionInputBaselineList, setEventActionInputBaselineList] = useState<
+    EventActionInputDraft[]
+  >([]);
+  const [eventActionInputOrphanServerIdList, setEventActionInputOrphanServerIdList] = useState<
+    number[]
+  >([]);
+  const [actionInputLoading, setActionInputLoading] = useState(false);
+  const [actionInputErrorMessage, setActionInputErrorMessage] = useState<string | null>(null);
   const editorPanelElementRef = useRef<HTMLDivElement | null>(null);
   const initialSearchEventKeyRef = useRef<EventSelectionKey>(initialSearchEventKey);
   const selectedEventKeyRef = useRef<EventSelectionKey>(initialSelectedEventKey);
@@ -464,6 +567,34 @@ export function EventConfigurationClient({
 
   const scopeId = currentScope?.id;
 
+  const loadScopeFieldOptionList = useCallback(async () => {
+    if (scopeId == null) {
+      setScopeFieldOptionList([]);
+      return;
+    }
+
+    try {
+      const query = new URLSearchParams({ label_lang: labelLang });
+      const response = await fetch(
+        `/api/auth/tenant/current/scopes/${scopeId}/fields?${query.toString()}`
+      );
+      const data: unknown = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setScopeFieldOptionList([]);
+        return;
+      }
+      setScopeFieldOptionList(
+        normalizeScopeFieldOptionList(data as TenantScopeFieldDirectoryResponse)
+      );
+    } catch {
+      setScopeFieldOptionList([]);
+    }
+  }, [labelLang, scopeId]);
+
+  useEffect(() => {
+    void loadScopeFieldOptionList();
+  }, [loadScopeFieldOptionList]);
+
   const loadEventDirectory = useCallback(
     async (preferredKey?: EventSelectionKey) => {
       if (scopeId == null) {
@@ -530,6 +661,120 @@ export function EventConfigurationClient({
     void loadEventDirectory(selectedEventKeyRef.current);
   }, [loadEventDirectory]);
 
+  useEffect(() => {
+    if (scopeId == null || actionId == null) {
+      setActionInputLoading(false);
+      setActionInputErrorMessage(null);
+      setEventActionInputDraftList([]);
+      setEventActionInputBaselineList([]);
+      setEventActionInputOrphanServerIdList([]);
+      return;
+    }
+
+    let active = true;
+    const loadActionInputState = async () => {
+      setActionInputLoading(true);
+      setActionInputErrorMessage(null);
+      try {
+        const formulaResponse = await fetch(
+          `/api/auth/tenant/current/scopes/${scopeId}/actions/${actionId}/formulas`
+        );
+        const formulaData: unknown = await formulaResponse.json().catch(() => ({}));
+        if (!formulaResponse.ok) {
+          if (!active) {
+            return;
+          }
+          setActionInputErrorMessage(
+            parseErrorDetail(formulaData, copy.actionInputLoadError) ?? copy.actionInputLoadError
+          );
+          setEventActionInputDraftList([]);
+          setEventActionInputBaselineList([]);
+          setEventActionInputOrphanServerIdList([]);
+          return;
+        }
+
+        const formulaListResponse = formulaData as ScopeFormulaListResponse;
+        const inputFieldIdList = buildFormulaInputFieldIdList(formulaListResponse);
+        let inputItemList: ScopeInputListResponse["item_list"] = [];
+        if (!isCreateMode && selectedEventId != null) {
+          const inputResponse = await fetch(
+            `/api/auth/tenant/current/scopes/${scopeId}/events/${selectedEventId}/inputs`
+          );
+          const inputData: unknown = await inputResponse.json().catch(() => ({}));
+          if (!inputResponse.ok) {
+            if (!active) {
+              return;
+            }
+            setActionInputErrorMessage(
+              parseErrorDetail(inputData, copy.actionInputLoadError) ?? copy.actionInputLoadError
+            );
+            setEventActionInputDraftList([]);
+            setEventActionInputBaselineList([]);
+            setEventActionInputOrphanServerIdList([]);
+            return;
+          }
+          inputItemList = (inputData as ScopeInputListResponse).item_list;
+        }
+
+        const scopeFieldByIdMap = new Map<number, ScopeFieldOption>();
+        for (const scopeField of scopeFieldOptionList) {
+          scopeFieldByIdMap.set(scopeField.id, scopeField);
+        }
+        const inputByFieldIdMap = new Map<number, ScopeInputListResponse["item_list"][number]>();
+        for (const input of inputItemList) {
+          inputByFieldIdMap.set(input.field_id, input);
+        }
+        const inputFieldIdSet = new Set<number>(inputFieldIdList);
+        const orphanServerIdList = inputItemList
+          .filter((input) => !inputFieldIdSet.has(input.field_id))
+          .map((input) => input.id);
+
+        const nextInputDraftList: EventActionInputDraft[] = inputFieldIdList.map((fieldId) => {
+          const scopeField = scopeFieldByIdMap.get(fieldId);
+          const savedInput = inputByFieldIdMap.get(fieldId);
+          return {
+            fieldId,
+            sqlType: scopeField?.sqlType ?? "text",
+            label: scopeField?.label ?? `#${fieldId}`,
+            value: savedInput?.value ?? "",
+            serverInputId: savedInput?.id
+          };
+        });
+
+        if (!active) {
+          return;
+        }
+        setEventActionInputDraftList(nextInputDraftList);
+        setEventActionInputBaselineList(cloneEventActionInputDraftList(nextInputDraftList));
+        setEventActionInputOrphanServerIdList(orphanServerIdList);
+      } catch {
+        if (!active) {
+          return;
+        }
+        setActionInputErrorMessage(copy.actionInputLoadError);
+        setEventActionInputDraftList([]);
+        setEventActionInputBaselineList([]);
+        setEventActionInputOrphanServerIdList([]);
+      } finally {
+        if (active) {
+          setActionInputLoading(false);
+        }
+      }
+    };
+
+    void loadActionInputState();
+    return () => {
+      active = false;
+    };
+  }, [
+    actionId,
+    copy.actionInputLoadError,
+    isCreateMode,
+    scopeFieldOptionList,
+    scopeId,
+    selectedEventId
+  ]);
+
   const resolveLocationLabel = useCallback(
     (id: number | null) => (id == null ? "-" : (locationMap.get(id) ?? copy.fallbackLocation)),
     [copy.fallbackLocation, locationMap]
@@ -551,12 +796,22 @@ export function EventConfigurationClient({
     [resolveActionLabel, resolveLocationLabel, resolveUnityLabel]
   );
 
+  const eventActionInputDirty = useMemo(
+    () =>
+      !areEventActionInputDraftListsEqual(
+        eventActionInputDraftList,
+        eventActionInputBaselineList
+      ),
+    [eventActionInputBaselineList, eventActionInputDraftList]
+  );
+
   const isDirty = useMemo(
     () =>
       momentInput.trim() !== baseline.momentInput.trim() ||
       locationId !== baseline.locationId ||
       unityId !== baseline.unityId ||
       actionId !== baseline.actionId ||
+      eventActionInputDirty ||
       isDeletePending,
     [
       actionId,
@@ -564,6 +819,7 @@ export function EventConfigurationClient({
       baseline.locationId,
       baseline.momentInput,
       baseline.unityId,
+      eventActionInputDirty,
       isDeletePending,
       locationId,
       momentInput,
@@ -604,6 +860,110 @@ export function EventConfigurationClient({
     momentInput,
     unityId
   ]);
+
+  const handleChangeActionInputValue = useCallback((fieldId: number, value: string) => {
+    setRequestErrorMessage(null);
+    setEventActionInputDraftList((previous) =>
+      previous.map((item) => (item.fieldId === fieldId ? { ...item, value } : item))
+    );
+  }, []);
+
+  const persistEventActionInputDraftList = useCallback(
+    async (eventId: number) => {
+      if (scopeId == null) {
+        return;
+      }
+
+      const baselineByFieldIdMap = new Map<number, EventActionInputDraft>();
+      for (const baselineItem of eventActionInputBaselineList) {
+        baselineByFieldIdMap.set(baselineItem.fieldId, baselineItem);
+      }
+
+      for (const orphanServerId of eventActionInputOrphanServerIdList) {
+        const deleteResponse = await fetch(
+          `/api/auth/tenant/current/scopes/${scopeId}/events/${eventId}/inputs/${orphanServerId}`,
+          { method: "DELETE" }
+        );
+        const deleteData: unknown = await deleteResponse.json().catch(() => ({}));
+        if (!deleteResponse.ok) {
+          throw new Error(
+            parseErrorDetail(deleteData, copy.actionInputSaveError) ?? copy.actionInputSaveError
+          );
+        }
+      }
+
+      for (const draftItem of eventActionInputDraftList) {
+        const baselineItem = baselineByFieldIdMap.get(draftItem.fieldId);
+        const nextValue = draftItem.value.trim();
+        const baselineValue = baselineItem?.value.trim() ?? "";
+        const serverInputId = draftItem.serverInputId ?? baselineItem?.serverInputId;
+
+        if (!serverInputId) {
+          if (!nextValue) {
+            continue;
+          }
+          const createResponse = await fetch(
+            `/api/auth/tenant/current/scopes/${scopeId}/events/${eventId}/inputs`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                field_id: draftItem.fieldId,
+                value: nextValue
+              })
+            }
+          );
+          const createData: unknown = await createResponse.json().catch(() => ({}));
+          if (!createResponse.ok) {
+            throw new Error(
+              parseErrorDetail(createData, copy.actionInputSaveError) ?? copy.actionInputSaveError
+            );
+          }
+          continue;
+        }
+
+        if (!nextValue) {
+          const deleteResponse = await fetch(
+            `/api/auth/tenant/current/scopes/${scopeId}/events/${eventId}/inputs/${serverInputId}`,
+            { method: "DELETE" }
+          );
+          const deleteData: unknown = await deleteResponse.json().catch(() => ({}));
+          if (!deleteResponse.ok) {
+            throw new Error(
+              parseErrorDetail(deleteData, copy.actionInputSaveError) ?? copy.actionInputSaveError
+            );
+          }
+          continue;
+        }
+
+        if (nextValue === baselineValue) {
+          continue;
+        }
+
+        const patchResponse = await fetch(
+          `/api/auth/tenant/current/scopes/${scopeId}/events/${eventId}/inputs/${serverInputId}`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ value: nextValue })
+          }
+        );
+        const patchData: unknown = await patchResponse.json().catch(() => ({}));
+        if (!patchResponse.ok) {
+          throw new Error(
+            parseErrorDetail(patchData, copy.actionInputSaveError) ?? copy.actionInputSaveError
+          );
+        }
+      }
+    },
+    [
+      copy.actionInputSaveError,
+      eventActionInputBaselineList,
+      eventActionInputDraftList,
+      eventActionInputOrphanServerIdList,
+      scopeId
+    ]
+  );
 
   const handleStartCreate = useCallback(() => {
     if (!directory?.can_edit || isSaving) {
@@ -681,6 +1041,9 @@ export function EventConfigurationClient({
         const updatedDirectory = data as TenantScopeEventDirectoryResponse;
         const previousIdSet = new Set(directory.item_list.map((item) => item.id));
         const created = updatedDirectory.item_list.find((item) => !previousIdSet.has(item.id));
+        if (created && eventActionInputDirty) {
+          await persistEventActionInputDraftList(created.id);
+        }
         await loadEventDirectory(created?.id ?? "new");
         setHistoryRefreshKey((previous) => previous + 1);
         return;
@@ -721,16 +1084,23 @@ export function EventConfigurationClient({
       const nextKeyAfterMutation: EventSelectionKey = isDeletePending
         ? (directory.can_edit ? "new" : null)
         : selectedEvent.id;
+      if (!isDeletePending && eventActionInputDirty) {
+        await persistEventActionInputDraftList(selectedEvent.id);
+      }
       await loadEventDirectory(nextKeyAfterMutation);
       setHistoryRefreshKey((previous) => previous + 1);
-    } catch {
-      setRequestErrorMessage(
-        isCreateMode
-          ? copy.createError
-          : isDeletePending
-            ? copy.deleteError
-            : copy.saveError
-      );
+    } catch (error) {
+      if (error instanceof Error && error.message.trim()) {
+        setRequestErrorMessage(error.message);
+      } else {
+        setRequestErrorMessage(
+          isCreateMode
+            ? copy.createError
+            : isDeletePending
+              ? copy.deleteError
+              : copy.saveError
+        );
+      }
     } finally {
       setIsSaving(false);
     }
@@ -739,16 +1109,19 @@ export function EventConfigurationClient({
     copy.createError,
     copy.deleteBlockedDetail,
     copy.deleteError,
+    copy.actionInputSaveError,
     copy.momentRequired,
     copy.saveError,
     directory,
     isCreateMode,
     isDeletePending,
+    eventActionInputDirty,
     loadEventDirectory,
     locationId,
     momentInput,
     scopeId,
     selectedEvent,
+    persistEventActionInputDraftList,
     unityId,
     validate
   ]);
@@ -892,36 +1265,35 @@ export function EventConfigurationClient({
               </div>
             </section>
 
-            <section className="ui-card ui-form-section ui-border-accent">
-              <div className="ui-field">
-                <label className="ui-field-label" htmlFor="event-action">
-                  {copy.actionLabel}
-                </label>
-                <select
-                  id="event-action"
-                  className="ui-input ui-input-select"
-                  value={actionId == null ? "" : String(actionId)}
-                  onChange={(event) => {
-                    setActionId(parseNumericFilter(event.target.value));
-                    setFieldError((previous) => ({ ...previous, action: undefined }));
-                    setRequestErrorMessage(null);
-                  }}
-                  disabled={isDeletePending || !canEditForm}
-                  aria-invalid={Boolean(fieldError.action)}
-                >
-                  <option value="" aria-label={copy.filterAllAria}></option>
-                  {actionOptionList.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.label}
-                    </option>
-                  ))}
-                </select>
-                <p className="ui-field-hint">{copy.actionHint}</p>
-                {fieldError.action ? (
-                  <p className="ui-field-error">{fieldError.action}</p>
-                ) : null}
-              </div>
-            </section>
+            <EventActionField
+              copy={{
+                actionLabel: copy.actionLabel,
+                actionHint: copy.actionHint,
+                actionEmptyAriaLabel: copy.filterAllAria,
+                inputSectionTitle: copy.actionInputSectionTitle,
+                inputSectionHint: copy.actionInputSectionHint,
+                inputEmpty: copy.actionInputEmpty,
+                inputLoading: copy.actionInputLoading
+              }}
+              actionId={actionId}
+              actionOptionList={actionOptionList}
+              onChangeActionId={(value) => {
+                setActionId(parseNumericFilter(value));
+                setFieldError((previous) => ({ ...previous, action: undefined }));
+                setRequestErrorMessage(null);
+              }}
+              actionErrorMessage={fieldError.action}
+              disabled={isDeletePending || !canEditForm}
+              generatedInputFieldList={eventActionInputDraftList.map((item) => ({
+                fieldId: item.fieldId,
+                label: item.label,
+                sqlType: item.sqlType,
+                value: item.value
+              }))}
+              inputLoading={actionInputLoading}
+              inputErrorMessage={actionInputErrorMessage}
+              onChangeInputValue={handleChangeActionInputValue}
+            />
 
             <section className="ui-card ui-form-section ui-border-accent">
               <HierarchySingleSelectField

@@ -440,6 +440,14 @@
         "label": "Acción",
         "hint": "Selecciona la acción que describe el evento."
       },
+      "actionInput": {
+        "title": "Campos de input de la acción",
+        "hint": "Completa los campos usados como input en las fórmulas de la acción seleccionada.",
+        "empty": "La acción seleccionada no tiene inputs en fórmulas.",
+        "loading": "Cargando campos de input de la acción...",
+        "loadError": "No se pudieron cargar los campos de input de la acción.",
+        "saveError": "No se pudieron guardar los campos de input de la acción."
+      },
       "info": {
         "title": "Información",
         "description": "Resumen del evento seleccionado en el servidor.",

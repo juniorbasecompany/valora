@@ -57,6 +57,7 @@ export default async function EventConfigurationPage({ params }: EventConfigurat
     >
       <EventConfigurationClient
         locale={locale}
+        labelLang={labelLang}
         currentScope={currentScope}
         hasAnyScope={scopeDirectory.item_list.length > 0}
         initialEventDirectory={eventDirectory}
@@ -80,6 +81,12 @@ export default async function EventConfigurationPage({ params }: EventConfigurat
           unityHint: t("section.unity.hint"),
           actionLabel: t("section.action.label"),
           actionHint: t("section.action.hint"),
+          actionInputSectionTitle: t("section.actionInput.title"),
+          actionInputSectionHint: t("section.actionInput.hint"),
+          actionInputEmpty: t("section.actionInput.empty"),
+          actionInputLoading: t("section.actionInput.loading"),
+          actionInputLoadError: t("section.actionInput.loadError"),
+          actionInputSaveError: t("section.actionInput.saveError"),
           filterTitle: t("filter.title"),
           filterMomentFromLabel: t("filter.momentFromLabel"),
           filterMomentToLabel: t("filter.momentToLabel"),

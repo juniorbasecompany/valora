@@ -170,6 +170,18 @@ export type ScopeFormulaListResponse = {
   item_list: ScopeFormulaRecord[];
 };
 
+export type ScopeInputRecord = {
+  id: number;
+  event_id: number;
+  field_id: number;
+  value: string;
+};
+
+export type ScopeInputListResponse = {
+  can_edit: boolean;
+  item_list: ScopeInputRecord[];
+};
+
 export type AuditLogTableName =
   | "tenant"
   | "member"

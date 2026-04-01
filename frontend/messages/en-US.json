@@ -440,6 +440,14 @@
         "label": "Action",
         "hint": "Choose the action that describes the event."
       },
+      "actionInput": {
+        "title": "Action input fields",
+        "hint": "Fill in the fields used as input in formulas for the selected action.",
+        "empty": "The selected action has no formula inputs.",
+        "loading": "Loading action input fields...",
+        "loadError": "Could not load action input fields.",
+        "saveError": "Could not save action input fields."
+      },
       "info": {
         "title": "Information",
         "description": "Summary of the selected event on the server.",

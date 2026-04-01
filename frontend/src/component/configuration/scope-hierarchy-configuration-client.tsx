@@ -98,6 +98,11 @@ function resolveHierarchyLabel(item: TenantScopeHierarchyItemBase) {
   return item.name.trim() || item.display_name.trim() || `#${item.id}`;
 }
 
+/**
+ * Painel location/unity: o nível 0 é `ui-directory-item` (branco); os tons roxos começam no
+ * primeiro `ui-location-nest-box` (depth ≥ 1). A normalização `depth - 1` faz a variação
+ * ir do primeiro nest ao último, não do primeiro item da lista ao último (ver filtro).
+ */
 function resolveHierarchyToneRatio(depth: number, maxDepth: number) {
   const normalizedDepth = Math.max(depth - 1, 0);
   const normalizedMaxDepth = Math.max(maxDepth - 1, 0);

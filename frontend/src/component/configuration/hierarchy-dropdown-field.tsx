@@ -25,28 +25,34 @@ type HierarchyDropdownFieldProps<TItem extends HierarchyDropdownFieldItemBase> =
 type HierarchyDropdownNodeProps<TItem extends HierarchyDropdownFieldItemBase> = {
   item: TItem;
   childrenByParent: Map<number | null, TItem[]>;
+  minDepth: number;
   maxDepth: number;
   selectedIdSet: Set<number>;
   onToggle: (id: number) => void;
 };
 
-function resolveHierarchyToneRatio(depth: number, maxDepth: number) {
-  const normalizedDepth = Math.max(depth - 1, 0);
-  const normalizedMaxDepth = Math.max(maxDepth - 1, 0);
-
-  if (normalizedMaxDepth <= 0) {
+/**
+ * Tom do filtro: varre do nível mais raso ao mais profundo da lista (sem “pular” o primeiro
+ * nível aninhado, ao contrário do painel location/unity, onde o nível 1 é cartão branco).
+ */
+function resolveFilterHierarchyToneRatio(depth: number, minDepth: number, maxDepth: number) {
+  if (maxDepth <= minDepth) {
     return 0;
   }
 
-  return Math.max(0, Math.min(normalizedDepth / normalizedMaxDepth, 1));
+  return Math.max(0, Math.min((depth - minDepth) / (maxDepth - minDepth), 1));
 }
 
-function buildHierarchyToneStyle(depth: number, maxDepth: number): CSSProperties {
-  const toneRatio = resolveHierarchyToneRatio(depth, maxDepth);
+function buildFilterHierarchyToneStyle(
+  depth: number,
+  minDepth: number,
+  maxDepth: number
+): CSSProperties {
+  const toneRatio = resolveFilterHierarchyToneRatio(depth, minDepth, maxDepth);
   return {
-    "--ui-location-depth": String(depth),
-    "--ui-location-tone-light-share": `${((1 - toneRatio) * 100).toFixed(3)}%`,
-    "--ui-location-tone-dark-share": `${(toneRatio * 100).toFixed(3)}%`
+    "--ui-hierarchy-dropdown-depth": String(depth),
+    "--ui-hierarchy-dropdown-tone-light-share": `${((1 - toneRatio) * 100).toFixed(3)}%`,
+    "--ui-hierarchy-dropdown-tone-dark-share": `${(toneRatio * 100).toFixed(3)}%`
   } as CSSProperties;
 }
 
@@ -57,6 +63,7 @@ function resolveItemLabel(item: HierarchyDropdownFieldItemBase) {
 function HierarchyDropdownNode<TItem extends HierarchyDropdownFieldItemBase>({
   item,
   childrenByParent,
+  minDepth,
   maxDepth,
   selectedIdSet,
   onToggle
@@ -69,7 +76,7 @@ function HierarchyDropdownNode<TItem extends HierarchyDropdownFieldItemBase>({
     <section
       className="ui-hierarchy-dropdown-nest-box"
       data-selected={isSelected ? "true" : undefined}
-      style={buildHierarchyToneStyle(item.depth, maxDepth)}
+      style={buildFilterHierarchyToneStyle(item.depth, minDepth, maxDepth)}
     >
       <div className="ui-hierarchy-dropdown-head">
         <label className="ui-hierarchy-dropdown-toggle">
@@ -92,6 +99,7 @@ function HierarchyDropdownNode<TItem extends HierarchyDropdownFieldItemBase>({
               key={child.id}
               item={child}
               childrenByParent={childrenByParent}
+              minDepth={minDepth}
               maxDepth={maxDepth}
               selectedIdSet={selectedIdSet}
               onToggle={onToggle}
@@ -138,6 +146,13 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
   );
 
   const rootItemList = useMemo(() => childrenByParent.get(null) ?? [], [childrenByParent]);
+  const minDepth = useMemo(() => {
+    if (itemList.length === 0) {
+      return 0;
+    }
+    return itemList.reduce((min, item) => Math.min(min, item.depth), Number.POSITIVE_INFINITY);
+  }, [itemList]);
+
   const maxDepth = useMemo(
     () => itemList.reduce((max, item) => Math.max(max, item.depth), 0),
     [itemList]
@@ -399,6 +414,7 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
                     key={item.id}
                     item={item}
                     childrenByParent={childrenByParent}
+                    minDepth={minDepth}
                     maxDepth={maxDepth}
                     selectedIdSet={draftSelectedIdSet}
                     onToggle={handleToggleDraftValue}

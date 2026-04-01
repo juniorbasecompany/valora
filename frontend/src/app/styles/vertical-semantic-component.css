@@ -570,21 +570,23 @@
 }
 
 /*
- * Hierarquia só no filtro (dropdown): classes próprias.
- * Não reutilizar `ui-location-nest-*` do painel de locais/unidades (espaçamento e escala distintos).
+ * Hierarquia só no filtro (dropdown): classes e tons próprios (`--ui-hierarchy-dropdown-tone-*`).
+ * Não reutilizar `ui-location-nest-*` nem `--ui-location-tone-*` do painel de locais/unidades.
  */
 .ui-hierarchy-dropdown-nest-box {
   --ui-hierarchy-dropdown-nest-child-offset: 0.5rem;
+  --ui-hierarchy-dropdown-tone-light-share: 100%;
+  --ui-hierarchy-dropdown-tone-dark-share: 0%;
   position: relative;
   display: grid;
   gap: 0.3rem;
   border: var(--border-width-default) solid color-mix(in srgb,
-      var(--color-location-nest-border-start) var(--ui-location-tone-light-share),
-      var(--color-location-nest-border-end) var(--ui-location-tone-dark-share));
+      var(--color-location-nest-border-start) var(--ui-hierarchy-dropdown-tone-light-share),
+      var(--color-location-nest-border-end) var(--ui-hierarchy-dropdown-tone-dark-share));
   border-radius: calc(var(--radius-card) + 0.125rem);
   background: color-mix(in srgb,
-      var(--color-location-nest-start) var(--ui-location-tone-light-share),
-      var(--color-location-nest-end) var(--ui-location-tone-dark-share));
+      var(--color-location-nest-start) var(--ui-hierarchy-dropdown-tone-light-share),
+      var(--color-location-nest-end) var(--ui-hierarchy-dropdown-tone-dark-share));
   overflow: hidden;
   padding: 0.4rem;
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.42), var(--shadow-xs);

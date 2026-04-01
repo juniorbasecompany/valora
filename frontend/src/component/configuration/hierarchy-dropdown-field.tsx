@@ -240,6 +240,13 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
     setIsOpen(false);
   }
 
+  function handleClearSelection(event: React.MouseEvent<HTMLButtonElement>) {
+    event.stopPropagation();
+    onChange([]);
+    setDraftSelectedValueList([]);
+    setIsOpen(false);
+  }
+
   return (
     <div className="ui-field">
       <p className="ui-field-label" id={`${id}-label`}>
@@ -247,26 +254,101 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
       </p>
 
       <div className="ui-hierarchy-dropdown" ref={rootRef}>
-        <button
-          id={id}
-          type="button"
+        <div
           className="ui-input ui-hierarchy-dropdown-trigger"
           data-open={isOpen ? "true" : undefined}
-          aria-haspopup="dialog"
-          aria-expanded={isOpen}
-          aria-labelledby={`${id}-label ${id}-summary`}
-          onClick={handleToggleOpen}
-          disabled={disabled}
+          data-disabled={disabled ? "true" : undefined}
         >
-          <span
-            id={`${id}-summary`}
-            className="ui-hierarchy-dropdown-trigger-summary"
-            data-placeholder={selectedValueList.length === 0 ? "true" : undefined}
+          <button
+            id={id}
+            type="button"
+            className="ui-hierarchy-dropdown-summary-button"
+            aria-haspopup="dialog"
+            aria-expanded={isOpen}
+            aria-labelledby={`${id}-label ${id}-summary`}
+            onClick={handleToggleOpen}
+            disabled={disabled}
           >
-            {selectedSummary}
-          </span>
-          <span className="ui-hierarchy-dropdown-trigger-icon" aria-hidden />
-        </button>
+            <span
+              id={`${id}-summary`}
+              className="ui-hierarchy-dropdown-trigger-summary"
+              data-placeholder={selectedValueList.length === 0 ? "true" : undefined}
+            >
+              {selectedSummary}
+            </span>
+          </button>
+
+          <div className="ui-hierarchy-dropdown-trigger-actions">
+            {selectedValueList.length > 0 ? (
+              <button
+                type="button"
+                className="ui-hierarchy-dropdown-clear"
+                aria-label="Limpar seleção"
+                title="Limpar seleção"
+                onClick={handleClearSelection}
+                disabled={disabled}
+              >
+                <span aria-hidden>×</span>
+              </button>
+            ) : null}
+
+            <button
+              type="button"
+              className="ui-hierarchy-dropdown-icon-button"
+              aria-label={isOpen ? "Fechar seleção hierárquica" : "Abrir seleção hierárquica"}
+              title={isOpen ? "Fechar seleção hierárquica" : "Abrir seleção hierárquica"}
+              aria-haspopup="dialog"
+              aria-expanded={isOpen}
+              onClick={handleToggleOpen}
+              disabled={disabled}
+            >
+              <svg
+                className="ui-hierarchy-dropdown-trigger-icon"
+                aria-hidden
+                viewBox="0 0 16 16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="1.5"
+                  y="1.5"
+                  width="13"
+                  height="13"
+                  rx="2"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.25"
+                />
+                <line
+                  x1="4.5"
+                  y1="5.5"
+                  x2="11.5"
+                  y2="5.5"
+                  stroke="currentColor"
+                  strokeWidth="1.25"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="5.5"
+                  y1="8"
+                  x2="11.65"
+                  y2="8"
+                  stroke="currentColor"
+                  strokeWidth="1.25"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="5.5"
+                  y1="10.5"
+                  x2="11.65"
+                  y2="10.5"
+                  stroke="currentColor"
+                  strokeWidth="1.25"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
 
         {isOpen ? (
           <div

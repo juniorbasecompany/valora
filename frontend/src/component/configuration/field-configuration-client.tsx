@@ -479,12 +479,8 @@ export function FieldConfigurationClient({
       return;
     }
 
-    if (isDirty && !window.confirm(copy.discardConfirm)) {
-      return;
-    }
-
     syncFromDirectory(directory, "new");
-  }, [copy.discardConfirm, directory, isCreateMode, isDirty, isSaving, syncFromDirectory]);
+  }, [directory, isCreateMode, isSaving, syncFromDirectory]);
 
   const handleSelectField = useCallback(
     (item: TenantScopeFieldRecord) => {
@@ -496,13 +492,9 @@ export function FieldConfigurationClient({
         return;
       }
 
-      if (isDirty && !window.confirm(copy.discardConfirm)) {
-        return;
-      }
-
       syncFromDirectory(directory, item.id);
     },
-    [copy.discardConfirm, directory, isCreateMode, isDirty, selectedField, syncFromDirectory]
+    [directory, isCreateMode, selectedField, syncFromDirectory]
   );
 
   const handleToggleDelete = useCallback(() => {

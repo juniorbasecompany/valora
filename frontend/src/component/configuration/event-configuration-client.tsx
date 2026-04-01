@@ -972,11 +972,8 @@ export function EventConfigurationClient({
     if (isCreateMode) {
       return;
     }
-    if (isDirty && !window.confirm(copy.discardConfirm)) {
-      return;
-    }
     syncFromDirectory(directory, "new");
-  }, [copy.discardConfirm, directory, isCreateMode, isDirty, isSaving, syncFromDirectory]);
+  }, [directory, isCreateMode, isSaving, syncFromDirectory]);
 
   const handleSelectEvent = useCallback(
     (item: TenantScopeEventRecord) => {
@@ -986,12 +983,9 @@ export function EventConfigurationClient({
       if (!isCreateMode && item.id === selectedEvent?.id) {
         return;
       }
-      if (isDirty && !window.confirm(copy.discardConfirm)) {
-        return;
-      }
       syncFromDirectory(directory, item.id);
     },
-    [copy.discardConfirm, directory, isCreateMode, isDirty, selectedEvent, syncFromDirectory]
+    [directory, isCreateMode, selectedEvent, syncFromDirectory]
   );
 
   const handleToggleDelete = useCallback(() => {

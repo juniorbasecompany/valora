@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { MouseEvent, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export type ConfigurationEditorFooterProps = {
     configurationPath: string;
@@ -20,8 +20,6 @@ export type ConfigurationEditorFooterProps = {
 export function ConfigurationEditorFooter({
     configurationPath,
     cancelLabel,
-    discardConfirm,
-    isDirty,
     footerErrorMessage,
     footerNoticeMessage = null,
     footerNoticeTone = "success",
@@ -32,18 +30,11 @@ export function ConfigurationEditorFooter({
     isSaving,
     dangerAction
 }: ConfigurationEditorFooterProps) {
-    const handleBack = (event: MouseEvent<HTMLAnchorElement>) => {
-        if (isDirty && !window.confirm(discardConfirm)) {
-            event.preventDefault();
-        }
-    };
-
     return (
         <div className="ui-action-footer">
             <Link
                 href={configurationPath}
                 className="ui-button-secondary"
-                onClick={handleBack}
             >
                 {cancelLabel}
             </Link>

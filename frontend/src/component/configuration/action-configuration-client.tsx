@@ -568,12 +568,8 @@ export function ActionConfigurationClient({
       return;
     }
 
-    if (isDirty && !window.confirm(copy.discardConfirm)) {
-      return;
-    }
-
     syncFromDirectory(directory, "new");
-  }, [copy.discardConfirm, directory, isCreateMode, isDirty, isSaving, syncFromDirectory]);
+  }, [directory, isCreateMode, isSaving, syncFromDirectory]);
 
   const handleSelectAction = useCallback(
     (item: TenantScopeActionRecord) => {
@@ -585,13 +581,9 @@ export function ActionConfigurationClient({
         return;
       }
 
-      if (isDirty && !window.confirm(copy.discardConfirm)) {
-        return;
-      }
-
       syncFromDirectory(directory, item.id);
     },
-    [copy.discardConfirm, directory, isCreateMode, isDirty, selectedAction, syncFromDirectory]
+    [directory, isCreateMode, selectedAction, syncFromDirectory]
   );
 
   const handleToggleDelete = useCallback(() => {

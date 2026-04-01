@@ -195,22 +195,14 @@ export function TenantConfigurationClient({
 
   const handleTenantRowClick = useCallback(() => {
     if (editorContext === "edit") {
-      if (isDirty && !window.confirm(copy.discardConfirm)) {
-        return;
-      }
       collapseToNone();
       return;
     }
 
-    if (isDirty && !window.confirm(copy.discardConfirm)) {
-      return;
-    }
     loadEditFromTenant();
   }, [
     collapseToNone,
-    copy.discardConfirm,
     editorContext,
-    isDirty,
     loadEditFromTenant
   ]);
 
@@ -221,9 +213,6 @@ export function TenantConfigurationClient({
     if (editorContext === "new") {
       return;
     }
-    if (isDirty && !window.confirm(copy.discardConfirm)) {
-      return;
-    }
     setEditorContext("new");
     setDisplayName("");
     setLegalName("");
@@ -231,7 +220,7 @@ export function TenantConfigurationClient({
     setFieldError({});
     setRequestErrorMessage(null);
     setIsDeletePending(false);
-  }, [copy.discardConfirm, editorContext, isDirty, isSaving, tenant.can_edit]);
+  }, [editorContext, isSaving, tenant.can_edit]);
 
   const handleSave = useCallback(async () => {
     if (editorContext === "none") {

@@ -543,14 +543,10 @@ export function MemberConfigurationClient({
       return;
     }
 
-    if (isDirty && !window.confirm(copy.discardConfirm)) {
-      return;
-    }
-
     setFooterNoticeMessage(null);
     setRequestErrorMessage(null);
     syncFromDirectory(directory, "new");
-  }, [copy.discardConfirm, directory, isCreateMode, isDirty, isSaving, syncFromDirectory]);
+  }, [directory, isCreateMode, isSaving, syncFromDirectory]);
 
   const handleSendMemberInvite = useCallback(
     async (item: TenantMemberRecord) => {
@@ -607,19 +603,13 @@ export function MemberConfigurationClient({
         return;
       }
 
-      if (isDirty && !window.confirm(copy.discardConfirm)) {
-        return;
-      }
-
       setFooterNoticeMessage(null);
       setRequestErrorMessage(null);
       syncFromDirectory(directory, member.id);
     },
     [
-      copy.discardConfirm,
       directory,
       isCreateMode,
-      isDirty,
       selectedMemberId,
       syncFromDirectory
     ]

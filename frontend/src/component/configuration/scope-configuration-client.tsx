@@ -318,12 +318,8 @@ export function ScopeConfigurationClient({
       return;
     }
 
-    if (isDirty && !window.confirm(copy.discardConfirm)) {
-      return;
-    }
-
     syncFromDirectory(directory, "new");
-  }, [copy.discardConfirm, directory, isCreateMode, isDirty, isSaving, syncFromDirectory]);
+  }, [directory, isCreateMode, isSaving, syncFromDirectory]);
 
   const handleSelectScope = useCallback(
     (scope: TenantScopeRecord) => {
@@ -331,13 +327,9 @@ export function ScopeConfigurationClient({
         return;
       }
 
-      if (isDirty && !window.confirm(copy.discardConfirm)) {
-        return;
-      }
-
       syncFromDirectory(directory, scope.id);
     },
-    [copy.discardConfirm, directory, isCreateMode, isDirty, selectedScope, syncFromDirectory]
+    [directory, isCreateMode, selectedScope, syncFromDirectory]
   );
 
   const handleToggleDelete = useCallback(() => {

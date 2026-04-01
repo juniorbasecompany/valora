@@ -485,12 +485,9 @@ export function ScopeHierarchyConfigurationClient<
       if (!canCreateTarget) {
         return;
       }
-      if (isDirty && !window.confirm(copy.discardConfirm)) {
-        return;
-      }
       syncEditor(null, true, draftParentId);
     },
-    [copy.discardConfirm, directory?.can_create, isDirty, itemList, syncEditor]
+    [directory?.can_create, itemList, syncEditor]
   );
 
   const handleSelectItem = useCallback(
@@ -498,12 +495,9 @@ export function ScopeHierarchyConfigurationClient<
       if (!isCreateMode && item.id === selectedItem?.id) {
         return;
       }
-      if (isDirty && !window.confirm(copy.discardConfirm)) {
-        return;
-      }
       syncEditor(item, false, null);
     },
-    [copy.discardConfirm, isCreateMode, isDirty, selectedItem?.id, syncEditor]
+    [isCreateMode, selectedItem?.id, syncEditor]
   );
 
   const handleSave = useCallback(async () => {

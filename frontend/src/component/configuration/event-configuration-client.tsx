@@ -51,6 +51,7 @@ export type EventConfigurationCopy = {
   filterUnityLabel: string;
   filterActionLabel: string;
   filterAll: string;
+  filterAllAria: string;
   filterConfirm: string;
   sectionInfoTitle: string;
   sectionInfoDescription: string;
@@ -811,6 +812,7 @@ export function EventConfigurationClient({
               unityLabel: copy.filterUnityLabel,
               actionLabel: copy.filterActionLabel,
               allLabel: copy.filterAll,
+              allAriaLabel: copy.filterAllAria,
               confirmLabel: copy.filterConfirm
             }}
             filterMomentFromInput={filterMomentFromInput}
@@ -930,7 +932,7 @@ export function EventConfigurationClient({
                   disabled={isDeletePending || !canEditForm}
                   aria-invalid={Boolean(fieldError.location)}
                 >
-                  <option value="" aria-label={copy.filterAll}></option>
+                  <option value="" aria-label={copy.filterAllAria}></option>
                   {locationOptionList.map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.label}
@@ -961,7 +963,7 @@ export function EventConfigurationClient({
                   disabled={isDeletePending || !canEditForm}
                   aria-invalid={Boolean(fieldError.unity)}
                 >
-                  <option value="" aria-label={copy.filterAll}></option>
+                  <option value="" aria-label={copy.filterAllAria}></option>
                   {unityOptionList.map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.label}
@@ -992,7 +994,7 @@ export function EventConfigurationClient({
                   disabled={isDeletePending || !canEditForm}
                   aria-invalid={Boolean(fieldError.action)}
                 >
-                  <option value="" aria-label={copy.filterAll}></option>
+                  <option value="" aria-label={copy.filterAllAria}></option>
                   {actionOptionList.map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.label}

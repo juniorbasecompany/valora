@@ -247,6 +247,21 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
     setIsOpen(false);
   }
 
+  function handleTriggerKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (disabled) {
+      return;
+    }
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleToggleOpen();
+    }
+    if (event.key === "Escape" && isOpen) {
+      event.preventDefault();
+      setDraftSelectedValueList(selectedValueList);
+      setIsOpen(false);
+    }
+  }
+
   return (
     <div className="ui-field">
       <p className="ui-field-label" id={`${id}-label`}>
@@ -255,20 +270,23 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
 
       <div className="ui-hierarchy-dropdown" ref={rootRef}>
         <div
+          id={id}
+          role="combobox"
+          tabIndex={disabled ? -1 : 0}
           className="ui-input ui-hierarchy-dropdown-trigger"
           data-open={isOpen ? "true" : undefined}
           data-disabled={disabled ? "true" : undefined}
+          aria-haspopup="dialog"
+          aria-expanded={isOpen}
+          aria-labelledby={`${id}-label ${id}-summary`}
+          onClick={() => {
+            if (!disabled) {
+              handleToggleOpen();
+            }
+          }}
+          onKeyDown={handleTriggerKeyDown}
         >
-          <button
-            id={id}
-            type="button"
-            className="ui-hierarchy-dropdown-summary-button"
-            aria-haspopup="dialog"
-            aria-expanded={isOpen}
-            aria-labelledby={`${id}-label ${id}-summary`}
-            onClick={handleToggleOpen}
-            disabled={disabled}
-          >
+          <div className="ui-hierarchy-dropdown-summary">
             <span
               id={`${id}-summary`}
               className="ui-hierarchy-dropdown-trigger-summary"
@@ -276,31 +294,39 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
             >
               {selectedSummary}
             </span>
-          </button>
+          </div>
 
           <div className="ui-hierarchy-dropdown-trigger-actions">
             {selectedValueList.length > 0 ? (
               <button
                 type="button"
-                className="ui-hierarchy-dropdown-clear"
+                className="ui-input-trailing-icon ui-hierarchy-dropdown-clear"
                 aria-label="Limpar seleção"
                 title="Limpar seleção"
                 onClick={handleClearSelection}
                 disabled={disabled}
               >
-                <span aria-hidden>×</span>
+                <svg
+                  className="ui-hierarchy-dropdown-clear-icon"
+                  aria-hidden
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
               </button>
             ) : null}
 
-            <button
-              type="button"
-              className="ui-hierarchy-dropdown-icon-button"
-              aria-label={isOpen ? "Fechar seleção hierárquica" : "Abrir seleção hierárquica"}
+            <span
+              className="ui-input-trailing-icon ui-hierarchy-dropdown-trigger-icon-wrap"
+              aria-hidden
               title={isOpen ? "Fechar seleção hierárquica" : "Abrir seleção hierárquica"}
-              aria-haspopup="dialog"
-              aria-expanded={isOpen}
-              onClick={handleToggleOpen}
-              disabled={disabled}
             >
               <svg
                 className="ui-hierarchy-dropdown-trigger-icon"
@@ -316,7 +342,7 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
                   rx="2"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="1.25"
+                  strokeWidth="1.5"
                 />
                 <line
                   x1="4.5"
@@ -324,7 +350,7 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
                   x2="11.65"
                   y2="4.475"
                   stroke="currentColor"
-                  strokeWidth="1.25"
+                  strokeWidth="1.5"
                   strokeLinecap="round"
                 />
                 <line
@@ -333,7 +359,7 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
                   x2="11.65"
                   y2="6.825"
                   stroke="currentColor"
-                  strokeWidth="1.25"
+                  strokeWidth="1.5"
                   strokeLinecap="round"
                 />
                 <line
@@ -342,7 +368,7 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
                   x2="11.65"
                   y2="9.175"
                   stroke="currentColor"
-                  strokeWidth="1.25"
+                  strokeWidth="1.5"
                   strokeLinecap="round"
                 />
                 <line
@@ -351,11 +377,11 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
                   x2="11.65"
                   y2="11.525"
                   stroke="currentColor"
-                  strokeWidth="1.25"
+                  strokeWidth="1.5"
                   strokeLinecap="round"
                 />
               </svg>
-            </button>
+            </span>
           </div>
         </div>
 

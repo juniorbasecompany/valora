@@ -455,7 +455,8 @@
       "locationLabel": "Location",
       "unityLabel": "Unit",
       "actionLabel": "Action",
-      "all": "All",
+      "all": "",
+      "allAria": "No filter",
       "confirm": "Ok"
     },
     "buttons": {

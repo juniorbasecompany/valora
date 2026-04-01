@@ -21,6 +21,7 @@ type EventFilterPanelCopy = {
   unityLabel: string;
   actionLabel: string;
   allLabel: string;
+  allAriaLabel: string;
   confirmLabel: string;
 };
 
@@ -125,7 +126,7 @@ export function EventFilterPanel({
           label={copy.actionLabel}
           value={filterActionId == null ? "" : String(filterActionId)}
           onChange={onFilterActionChange}
-          allAriaLabel={copy.allLabel}
+          allAriaLabel={copy.allAriaLabel}
           optionList={actionOptionList.map((item) => ({
             value: String(item.id),
             label: item.label

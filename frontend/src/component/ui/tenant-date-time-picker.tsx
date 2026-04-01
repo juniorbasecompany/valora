@@ -331,7 +331,7 @@ export function TenantDateTimePicker({
             <button
               type="button"
               onClick={handleClear}
-              className="p-1 text-gray-400 hover:text-gray-600 focus:outline-none"
+              className="ui-input-trailing-icon p-1"
               aria-label="Limpar data e hora"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -343,7 +343,7 @@ export function TenantDateTimePicker({
             type="button"
             onClick={() => !disabled && setIsOpen((previous) => !previous)}
             disabled={disabled}
-            className="p-1 text-gray-400 hover:text-gray-600 focus:outline-none disabled:opacity-50"
+            className="ui-input-trailing-icon p-1"
             aria-label="Abrir calendário"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

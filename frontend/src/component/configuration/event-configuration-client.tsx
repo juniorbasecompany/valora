@@ -11,6 +11,7 @@ import { ConfigurationDirectoryEditorShell } from "@/component/configuration/con
 import { ConfigurationInfoSection } from "@/component/configuration/configuration-info-section";
 import { ConfigurationDirectoryCreateButton } from "@/component/configuration/configuration-directory-create-button";
 import { EventFilterPanel } from "@/component/configuration/event-filter-panel";
+import { HierarchySingleSelectField } from "@/component/configuration/hierarchy-dropdown-field";
 import { TrashIconButton } from "@/component/ui/trash-icon-button";
 import { TenantDateTimePicker } from "@/component/ui/tenant-date-time-picker";
 import { EditorPanelFlashOverlay } from "@/component/configuration/editor-panel-flash-overlay";
@@ -267,30 +268,6 @@ export function EventConfigurationClient({
     }
     return map;
   }, [initialActionDirectory?.item_list]);
-
-  const locationOptionList = useMemo(
-    () =>
-      (initialLocationDirectory?.item_list ?? []).map((item) => ({
-        id: item.id,
-        label:
-          item.path_labels.length > 0
-            ? item.path_labels.join(" / ")
-            : item.name.trim() || item.display_name.trim() || `#${item.id}`
-      })),
-    [initialLocationDirectory?.item_list]
-  );
-
-  const unityOptionList = useMemo(
-    () =>
-      (initialUnityDirectory?.item_list ?? []).map((item) => ({
-        id: item.id,
-        label:
-          item.path_labels.length > 0
-            ? item.path_labels.join(" / ")
-            : item.name.trim() || item.display_name.trim() || `#${item.id}`
-      })),
-    [initialUnityDirectory?.item_list]
-  );
 
   const actionOptionList = useMemo(
     () =>
@@ -916,65 +893,47 @@ export function EventConfigurationClient({
             </section>
 
             <section className="ui-card ui-form-section ui-border-accent">
-              <div className="ui-field">
-                <label className="ui-field-label" htmlFor="event-location">
-                  {copy.locationLabel}
-                </label>
-                <select
-                  id="event-location"
-                  className="ui-input ui-input-select"
-                  value={locationId == null ? "" : String(locationId)}
-                  onChange={(event) => {
-                    setLocationId(parseNumericFilter(event.target.value));
-                    setFieldError((previous) => ({ ...previous, location: undefined }));
-                    setRequestErrorMessage(null);
-                  }}
-                  disabled={isDeletePending || !canEditForm}
-                  aria-invalid={Boolean(fieldError.location)}
-                >
-                  <option value="" aria-label={copy.filterAllAria}></option>
-                  {locationOptionList.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.label}
-                    </option>
-                  ))}
-                </select>
-                <p className="ui-field-hint">{copy.locationHint}</p>
-                {fieldError.location ? (
-                  <p className="ui-field-error">{fieldError.location}</p>
-                ) : null}
-              </div>
+              <HierarchySingleSelectField
+                id="event-location"
+                label={copy.locationLabel}
+                itemList={initialLocationDirectory?.item_list ?? []}
+                value={locationId}
+                onChange={(nextValue) => {
+                  setLocationId(nextValue);
+                  setFieldError((previous) => ({ ...previous, location: undefined }));
+                  setRequestErrorMessage(null);
+                }}
+                getParentId={(item) => item.parent_location_id ?? null}
+                allLabel={copy.filterAll}
+                disabled={isDeletePending || !canEditForm}
+                ariaInvalid={Boolean(fieldError.location)}
+              />
+              <p className="ui-field-hint">{copy.locationHint}</p>
+              {fieldError.location ? (
+                <p className="ui-field-error">{fieldError.location}</p>
+              ) : null}
             </section>
 
             <section className="ui-card ui-form-section ui-border-accent">
-              <div className="ui-field">
-                <label className="ui-field-label" htmlFor="event-unity">
-                  {copy.unityLabel}
-                </label>
-                <select
-                  id="event-unity"
-                  className="ui-input ui-input-select"
-                  value={unityId == null ? "" : String(unityId)}
-                  onChange={(event) => {
-                    setUnityId(parseNumericFilter(event.target.value));
-                    setFieldError((previous) => ({ ...previous, unity: undefined }));
-                    setRequestErrorMessage(null);
-                  }}
-                  disabled={isDeletePending || !canEditForm}
-                  aria-invalid={Boolean(fieldError.unity)}
-                >
-                  <option value="" aria-label={copy.filterAllAria}></option>
-                  {unityOptionList.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.label}
-                    </option>
-                  ))}
-                </select>
-                <p className="ui-field-hint">{copy.unityHint}</p>
-                {fieldError.unity ? (
-                  <p className="ui-field-error">{fieldError.unity}</p>
-                ) : null}
-              </div>
+              <HierarchySingleSelectField
+                id="event-unity"
+                label={copy.unityLabel}
+                itemList={initialUnityDirectory?.item_list ?? []}
+                value={unityId}
+                onChange={(nextValue) => {
+                  setUnityId(nextValue);
+                  setFieldError((previous) => ({ ...previous, unity: undefined }));
+                  setRequestErrorMessage(null);
+                }}
+                getParentId={(item) => item.parent_unity_id ?? null}
+                allLabel={copy.filterAll}
+                disabled={isDeletePending || !canEditForm}
+                ariaInvalid={Boolean(fieldError.unity)}
+              />
+              <p className="ui-field-hint">{copy.unityHint}</p>
+              {fieldError.unity ? (
+                <p className="ui-field-error">{fieldError.unity}</p>
+              ) : null}
             </section>
 
             <section className="ui-card ui-form-section ui-border-accent">

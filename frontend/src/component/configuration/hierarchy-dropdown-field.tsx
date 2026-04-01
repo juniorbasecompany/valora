@@ -2,24 +2,38 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
+import { createPortal } from "react-dom";
 
 export type HierarchyDropdownFieldItemBase = {
   id: number;
   name: string;
   display_name: string;
   depth: number;
+  path_labels?: string[];
 };
 
-type HierarchyDropdownFieldProps<TItem extends HierarchyDropdownFieldItemBase> = {
+type HierarchyDropdownSharedProps<TItem extends HierarchyDropdownFieldItemBase> = {
   id: string;
   label: string;
   itemList: TItem[];
+  getParentId: (item: TItem) => number | null;
+  disabled?: boolean;
+};
+
+type HierarchyDropdownFieldProps<TItem extends HierarchyDropdownFieldItemBase> =
+  HierarchyDropdownSharedProps<TItem> & {
   selectedValueList: number[];
   onChange: (nextSelectedValueList: number[]) => void;
-  getParentId: (item: TItem) => number | null;
   allLabel: string;
   confirmLabel: string;
-  disabled?: boolean;
+};
+
+type HierarchySingleSelectFieldProps<TItem extends HierarchyDropdownFieldItemBase> =
+  HierarchyDropdownSharedProps<TItem> & {
+  value: number | null;
+  onChange: (nextValue: number | null) => void;
+  allLabel: string;
+  ariaInvalid?: boolean;
 };
 
 type HierarchyDropdownNodeProps<TItem extends HierarchyDropdownFieldItemBase> = {
@@ -29,7 +43,8 @@ type HierarchyDropdownNodeProps<TItem extends HierarchyDropdownFieldItemBase> = 
   maxDepth: number;
   selectedIdSet: Set<number>;
   disabled: boolean;
-  onToggle: (id: number) => void;
+  mode: "multi" | "single";
+  onSelect: (id: number) => void;
 };
 
 /**
@@ -61,6 +76,144 @@ function resolveItemLabel(item: HierarchyDropdownFieldItemBase) {
   return item.name.trim() || item.display_name.trim() || `#${item.id}`;
 }
 
+function resolveItemPathLabel(item: HierarchyDropdownFieldItemBase) {
+  if (item.path_labels && item.path_labels.length > 0) {
+    return item.path_labels.join(" / ");
+  }
+  return resolveItemLabel(item);
+}
+
+function useHierarchyDropdownStructure<TItem extends HierarchyDropdownFieldItemBase>(
+  itemList: TItem[],
+  getParentId: (item: TItem) => number | null
+) {
+  const childrenByParent = useMemo(() => {
+    const next = new Map<number | null, TItem[]>();
+
+    for (const item of itemList) {
+      const parentId = getParentId(item) ?? null;
+      const current = next.get(parentId) ?? [];
+      current.push(item);
+      next.set(parentId, current);
+    }
+
+    return next;
+  }, [getParentId, itemList]);
+
+  const itemById = useMemo(() => new Map(itemList.map((item) => [item.id, item])), [itemList]);
+  const rootItemList = useMemo(() => childrenByParent.get(null) ?? [], [childrenByParent]);
+  const minDepth = useMemo(() => {
+    if (itemList.length === 0) {
+      return 0;
+    }
+    return itemList.reduce((min, item) => Math.min(min, item.depth), Number.POSITIVE_INFINITY);
+  }, [itemList]);
+  const maxDepth = useMemo(
+    () => itemList.reduce((max, item) => Math.max(max, item.depth), 0),
+    [itemList]
+  );
+
+  return {
+    childrenByParent,
+    itemById,
+    rootItemList,
+    minDepth,
+    maxDepth
+  };
+}
+
+function useHierarchyDropdownDismiss(
+  isOpen: boolean,
+  rootRef: React.RefObject<HTMLDivElement | null>,
+  panelRef: React.RefObject<HTMLDivElement | null>,
+  onDismiss: () => void
+) {
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    function handlePointerDown(event: PointerEvent) {
+      const targetNode = event.target as Node;
+      const isInsideRoot = rootRef.current?.contains(targetNode);
+      const isInsidePanel = panelRef.current?.contains(targetNode);
+      if (!isInsideRoot && !isInsidePanel) {
+        onDismiss();
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        onDismiss();
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onDismiss, panelRef, rootRef]);
+}
+
+function useHierarchyDropdownPortalStyle(
+  isOpen: boolean,
+  triggerRef: React.RefObject<HTMLDivElement | null>
+) {
+  const [panelStyle, setPanelStyle] = useState<CSSProperties>({});
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    function updatePosition() {
+      const triggerElement = triggerRef.current;
+      if (!triggerElement) {
+        return;
+      }
+
+      const rect = triggerElement.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const spaceBelow = Math.max(0, viewportHeight - rect.bottom - 8);
+      const spaceAbove = Math.max(0, rect.top - 8);
+      const openUpward = spaceBelow < 240 && spaceAbove > spaceBelow;
+
+      const nextStyle: CSSProperties = {
+        position: "fixed",
+        left: `${rect.left}px`,
+        width: `${rect.width}px`,
+        right: "auto",
+        zIndex: "var(--z-menu-panel)"
+      };
+
+      if (openUpward) {
+        nextStyle.bottom = `${viewportHeight - rect.top + 8}px`;
+        nextStyle.top = "auto";
+        nextStyle.maxHeight = `${Math.max(160, spaceAbove)}px`;
+      } else {
+        nextStyle.top = `${rect.bottom + 8}px`;
+        nextStyle.bottom = "auto";
+        nextStyle.maxHeight = `${Math.max(160, spaceBelow)}px`;
+      }
+
+      setPanelStyle(nextStyle);
+    }
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [isOpen, triggerRef]);
+
+  return panelStyle;
+}
+
 function HierarchyDropdownNode<TItem extends HierarchyDropdownFieldItemBase>({
   item,
   childrenByParent,
@@ -68,7 +221,8 @@ function HierarchyDropdownNode<TItem extends HierarchyDropdownFieldItemBase>({
   maxDepth,
   selectedIdSet,
   disabled,
-  onToggle
+  mode,
+  onSelect
 }: HierarchyDropdownNodeProps<TItem>) {
   const childList = childrenByParent.get(item.id) ?? [];
   const label = resolveItemLabel(item);
@@ -83,7 +237,7 @@ function HierarchyDropdownNode<TItem extends HierarchyDropdownFieldItemBase>({
     if (hit !== self) {
       return;
     }
-    onToggle(item.id);
+    onSelect(item.id);
   }
 
   return (
@@ -95,22 +249,30 @@ function HierarchyDropdownNode<TItem extends HierarchyDropdownFieldItemBase>({
       onClick={handleBoxClick}
     >
       <div className="ui-hierarchy-dropdown-head">
-        <label
-          className="ui-hierarchy-dropdown-toggle"
-          onClick={(event) => event.stopPropagation()}
-        >
-          <input
-            type="checkbox"
-            className="ui-hierarchy-dropdown-checkbox"
-            checked={isSelected}
-            disabled={disabled}
-            onChange={() => onToggle(item.id)}
+        {mode === "multi" ? (
+          <label
+            className="ui-hierarchy-dropdown-toggle"
             onClick={(event) => event.stopPropagation()}
-          />
-          <div className="ui-hierarchy-dropdown-nest-copy">
-            <p className="ui-hierarchy-dropdown-nest-label">{label}</p>
+          >
+            <input
+              type="checkbox"
+              className="ui-hierarchy-dropdown-checkbox"
+              checked={isSelected}
+              disabled={disabled}
+              onChange={() => onSelect(item.id)}
+              onClick={(event) => event.stopPropagation()}
+            />
+            <div className="ui-hierarchy-dropdown-nest-copy">
+              <p className="ui-hierarchy-dropdown-nest-label">{label}</p>
+            </div>
+          </label>
+        ) : (
+          <div className="ui-hierarchy-dropdown-toggle">
+            <div className="ui-hierarchy-dropdown-nest-copy">
+              <p className="ui-hierarchy-dropdown-nest-label">{label}</p>
+            </div>
           </div>
-        </label>
+        )}
       </div>
 
       {childList.length > 0 ? (
@@ -124,7 +286,8 @@ function HierarchyDropdownNode<TItem extends HierarchyDropdownFieldItemBase>({
               maxDepth={maxDepth}
               selectedIdSet={selectedIdSet}
               disabled={disabled}
-              onToggle={onToggle}
+              mode={mode}
+              onSelect={onSelect}
             />
           ))}
         </div>
@@ -145,40 +308,15 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
   disabled = false
 }: HierarchyDropdownFieldProps<TItem>) {
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLDivElement | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [draftSelectedValueList, setDraftSelectedValueList] = useState<number[]>(
     selectedValueList
   );
 
-  const childrenByParent = useMemo(() => {
-    const next = new Map<number | null, TItem[]>();
-
-    for (const item of itemList) {
-      const parentId = getParentId(item) ?? null;
-      const current = next.get(parentId) ?? [];
-      current.push(item);
-      next.set(parentId, current);
-    }
-
-    return next;
-  }, [getParentId, itemList]);
-  const itemById = useMemo(
-    () => new Map(itemList.map((item) => [item.id, item])),
-    [itemList]
-  );
-
-  const rootItemList = useMemo(() => childrenByParent.get(null) ?? [], [childrenByParent]);
-  const minDepth = useMemo(() => {
-    if (itemList.length === 0) {
-      return 0;
-    }
-    return itemList.reduce((min, item) => Math.min(min, item.depth), Number.POSITIVE_INFINITY);
-  }, [itemList]);
-
-  const maxDepth = useMemo(
-    () => itemList.reduce((max, item) => Math.max(max, item.depth), 0),
-    [itemList]
-  );
+  const { childrenByParent, itemById, rootItemList, minDepth, maxDepth } =
+    useHierarchyDropdownStructure(itemList, getParentId);
   const draftSelectedIdSet = useMemo(
     () => new Set(draftSelectedValueList),
     [draftSelectedValueList]
@@ -196,33 +334,12 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
     return selectedLabelList.length > 0 ? selectedLabelList.join(", ") : allLabel;
   }, [allLabel, itemList, selectedValueList]);
 
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
+  const portalPanelStyle = useHierarchyDropdownPortalStyle(isOpen, triggerRef);
 
-    function handlePointerDown(event: PointerEvent) {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setDraftSelectedValueList(selectedValueList);
-        setIsOpen(false);
-      }
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setDraftSelectedValueList(selectedValueList);
-        setIsOpen(false);
-      }
-    }
-
-    document.addEventListener("pointerdown", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, selectedValueList]);
+  useHierarchyDropdownDismiss(isOpen, rootRef, panelRef, () => {
+    setDraftSelectedValueList(selectedValueList);
+    setIsOpen(false);
+  });
 
   function handleToggleDraftValue(id: number) {
     setDraftSelectedValueList((previous) => {
@@ -307,6 +424,7 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
 
       <div className="ui-hierarchy-dropdown" ref={rootRef}>
         <div
+          ref={triggerRef}
           id={id}
           role="combobox"
           tabIndex={disabled ? -1 : 0}
@@ -422,41 +540,283 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
           </div>
         </div>
 
-        {isOpen ? (
-          <div
-            className="ui-hierarchy-dropdown-panel"
-            role="dialog"
-            aria-modal="false"
-            aria-labelledby={`${id}-label`}
-          >
-            <div className="ui-hierarchy-dropdown-panel-body">
-              <div className="ui-hierarchy-dropdown-tree">
-                {rootItemList.map((item) => (
-                  <HierarchyDropdownNode
-                    key={item.id}
-                    item={item}
-                    childrenByParent={childrenByParent}
-                    minDepth={minDepth}
-                    maxDepth={maxDepth}
-                    selectedIdSet={draftSelectedIdSet}
-                    disabled={disabled}
-                    onToggle={handleToggleDraftValue}
-                  />
-                ))}
+        {isOpen
+          ? createPortal(
+            <div
+              ref={panelRef}
+              className="ui-hierarchy-dropdown-panel"
+              role="dialog"
+              aria-modal="false"
+              aria-labelledby={`${id}-label`}
+              style={portalPanelStyle}
+            >
+              <div className="ui-hierarchy-dropdown-panel-body">
+                <div className="ui-hierarchy-dropdown-tree">
+                  {rootItemList.map((item) => (
+                    <HierarchyDropdownNode
+                      key={item.id}
+                      item={item}
+                      childrenByParent={childrenByParent}
+                      minDepth={minDepth}
+                      maxDepth={maxDepth}
+                      selectedIdSet={draftSelectedIdSet}
+                      disabled={disabled}
+                      mode="multi"
+                      onSelect={handleToggleDraftValue}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
 
-            <div className="ui-hierarchy-dropdown-actions">
+              <div className="ui-hierarchy-dropdown-actions">
+                <button
+                  type="button"
+                  className="ui-button-primary"
+                  onClick={handleConfirm}
+                >
+                  {confirmLabel}
+                </button>
+              </div>
+            </div>,
+            document.body
+          )
+          : null}
+      </div>
+    </div>
+  );
+}
+
+export function HierarchySingleSelectField<TItem extends HierarchyDropdownFieldItemBase>({
+  id,
+  label,
+  itemList,
+  value,
+  onChange,
+  getParentId,
+  allLabel,
+  ariaInvalid = false,
+  disabled = false
+}: HierarchySingleSelectFieldProps<TItem>) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLDivElement | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const { childrenByParent, itemById, rootItemList, minDepth, maxDepth } =
+    useHierarchyDropdownStructure(itemList, getParentId);
+  const selectedIdSet = useMemo(
+    () => (value == null ? new Set<number>() : new Set<number>([value])),
+    [value]
+  );
+  const selectedSummary = useMemo(() => {
+    if (value == null) {
+      return allLabel;
+    }
+
+    const selectedItem = itemById.get(value);
+    if (!selectedItem) {
+      return allLabel;
+    }
+    return resolveItemPathLabel(selectedItem);
+  }, [allLabel, itemById, value]);
+
+  const portalPanelStyle = useHierarchyDropdownPortalStyle(isOpen, triggerRef);
+
+  useHierarchyDropdownDismiss(isOpen, rootRef, panelRef, () => {
+    setIsOpen(false);
+  });
+
+  function handleToggleOpen() {
+    if (disabled) {
+      return;
+    }
+    setIsOpen((previous) => !previous);
+  }
+
+  function handleSelect(id: number) {
+    if (disabled) {
+      return;
+    }
+    onChange(id);
+    setIsOpen(false);
+  }
+
+  function handleClearSelection(event: React.MouseEvent<HTMLButtonElement>) {
+    event.stopPropagation();
+    onChange(null);
+    setIsOpen(false);
+  }
+
+  function handleTriggerKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (disabled) {
+      return;
+    }
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleToggleOpen();
+    }
+    if (event.key === "Escape" && isOpen) {
+      event.preventDefault();
+      setIsOpen(false);
+    }
+  }
+
+  return (
+    <div className="ui-field">
+      <p className="ui-field-label" id={`${id}-label`}>
+        {label}
+      </p>
+
+      <div className="ui-hierarchy-dropdown" ref={rootRef}>
+        <div
+          ref={triggerRef}
+          id={id}
+          role="combobox"
+          tabIndex={disabled ? -1 : 0}
+          className="ui-input ui-hierarchy-dropdown-trigger"
+          data-open={isOpen ? "true" : undefined}
+          data-disabled={disabled ? "true" : undefined}
+          aria-haspopup="dialog"
+          aria-expanded={isOpen}
+          aria-labelledby={`${id}-label ${id}-summary`}
+          aria-invalid={ariaInvalid ? "true" : undefined}
+          onClick={() => {
+            if (!disabled) {
+              handleToggleOpen();
+            }
+          }}
+          onKeyDown={handleTriggerKeyDown}
+        >
+          <div className="ui-hierarchy-dropdown-summary">
+            <span
+              id={`${id}-summary`}
+              className="ui-hierarchy-dropdown-trigger-summary"
+              data-placeholder={value == null ? "true" : undefined}
+            >
+              {selectedSummary}
+            </span>
+          </div>
+
+          <div className="ui-hierarchy-dropdown-trigger-actions">
+            {value != null ? (
               <button
                 type="button"
-                className="ui-button-primary"
-                onClick={handleConfirm}
+                className="ui-input-trailing-icon ui-hierarchy-dropdown-clear"
+                aria-label="Limpar seleção"
+                title="Limpar seleção"
+                onClick={handleClearSelection}
+                disabled={disabled}
               >
-                {confirmLabel}
+                <svg
+                  className="ui-hierarchy-dropdown-clear-icon"
+                  aria-hidden
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
               </button>
-            </div>
+            ) : null}
+
+            <span
+              className="ui-input-trailing-icon ui-hierarchy-dropdown-trigger-icon-wrap"
+              aria-hidden
+              title={isOpen ? "Fechar seleção hierárquica" : "Abrir seleção hierárquica"}
+            >
+              <svg
+                className="ui-hierarchy-dropdown-trigger-icon"
+                aria-hidden
+                viewBox="0 0 16 16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="1.5"
+                  y="1.5"
+                  width="13"
+                  height="13"
+                  rx="2"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
+                <line
+                  x1="4.5"
+                  y1="4.475"
+                  x2="11.65"
+                  y2="4.475"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="7.0"
+                  y1="6.825"
+                  x2="11.65"
+                  y2="6.825"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="7.0"
+                  y1="9.175"
+                  x2="11.65"
+                  y2="9.175"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="7.0"
+                  y1="11.525"
+                  x2="11.65"
+                  y2="11.525"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </span>
           </div>
-        ) : null}
+        </div>
+
+        {isOpen
+          ? createPortal(
+            <div
+              ref={panelRef}
+              className="ui-hierarchy-dropdown-panel"
+              role="dialog"
+              aria-modal="false"
+              aria-labelledby={`${id}-label`}
+              style={portalPanelStyle}
+            >
+              <div className="ui-hierarchy-dropdown-panel-body">
+                <div className="ui-hierarchy-dropdown-tree">
+                  {rootItemList.map((item) => (
+                    <HierarchyDropdownNode
+                      key={item.id}
+                      item={item}
+                      childrenByParent={childrenByParent}
+                      minDepth={minDepth}
+                      maxDepth={maxDepth}
+                      selectedIdSet={selectedIdSet}
+                      disabled={disabled}
+                      mode="single"
+                      onSelect={handleSelect}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>,
+            document.body
+          )
+          : null}
       </div>
     </div>
   );

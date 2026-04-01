@@ -573,13 +573,14 @@
  * Hierarquia só no filtro (dropdown): classes e tons próprios (`--ui-hierarchy-dropdown-tone-*`).
  * Não reutilizar `ui-location-nest-*` nem `--ui-location-tone-*` do painel de locais/unidades.
  */
+/* Cabeçalho ↔ filhas: apenas `margin-top` nas caixas em `.ui-hierarchy-dropdown-nest-children` (como em `ui-location-nest-*`); `gap` no grid do pai somaria com esse espaço. */
 .ui-hierarchy-dropdown-nest-box {
   --ui-hierarchy-dropdown-nest-child-offset: 0.5rem;
   --ui-hierarchy-dropdown-tone-light-share: 100%;
   --ui-hierarchy-dropdown-tone-dark-share: 0%;
   position: relative;
   display: grid;
-  gap: 0.3rem;
+  gap: 0;
   cursor: pointer;
   border: var(--border-width-default) solid color-mix(in srgb,
       var(--color-location-nest-border-start) var(--ui-hierarchy-dropdown-tone-light-share),

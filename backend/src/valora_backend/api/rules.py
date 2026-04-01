@@ -159,6 +159,31 @@ def _expand_scope_location_id_list_with_descendants(
     return list(expanded)
 
 
+def _expand_scope_unity_id_list_with_descendants(
+    session: Session, *, scope_id: int, unity_id_list: list[int]
+) -> list[int]:
+    """Cada id selecionado vira ele próprio mais todas as unidades descendentes no escopo."""
+    if not unity_id_list:
+        return []
+    rows = list(
+        session.execute(
+            select(Unity.id, Unity.parent_unity_id).where(Unity.scope_id == scope_id)
+        )
+    )
+    children_by_parent: defaultdict[int | None, list[int]] = defaultdict(list)
+    for unity_row_id, parent_id in rows:
+        children_by_parent[parent_id].append(unity_row_id)
+    expanded: set[int] = set()
+    stack = list(unity_id_list)
+    while stack:
+        current = stack.pop()
+        if current in expanded:
+            continue
+        expanded.add(current)
+        stack.extend(children_by_parent.get(current, ()))
+    return list(expanded)
+
+
 def _unity_in_scope_or_404(
     session: Session, *, scope_id: int, unity_id: int
 ) -> Unity:
@@ -1293,7 +1318,10 @@ def list_scope_events(
         )
         query = query.where(Event.location_id.in_(expanded_location_id_list))
     if unity_id_list:
-        query = query.where(Event.unity_id.in_(unity_id_list))
+        expanded_unity_id_list = _expand_scope_unity_id_list_with_descendants(
+            session, scope_id=scope_id, unity_id_list=unity_id_list
+        )
+        query = query.where(Event.unity_id.in_(expanded_unity_id_list))
     if action_id is not None:
         query = query.where(Event.action_id == action_id)
     rows = list(session.scalars(query.order_by(Event.moment_utc.desc(), Event.id.desc())))

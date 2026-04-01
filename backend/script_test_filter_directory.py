@@ -88,6 +88,27 @@ def _expand_location_ids_with_descendants(
     return expanded
 
 
+def _expand_unity_ids_with_descendants(
+    unity_item_list: list[dict[str, Any]], seed_id_list: list[int]
+) -> set[int]:
+    """Espelha a regra da API: cada id de semente mais descendentes na árvore do escopo."""
+    children_by_parent: dict[int | None, list[int]] = {}
+    for item in unity_item_list:
+        uid = int(item["id"])
+        raw_parent = item.get("parent_unity_id")
+        parent_key: int | None = int(raw_parent) if raw_parent is not None else None
+        children_by_parent.setdefault(parent_key, []).append(uid)
+    expanded: set[int] = set()
+    stack = list(seed_id_list)
+    while stack:
+        current = stack.pop()
+        if current in expanded:
+            continue
+        expanded.add(current)
+        stack.extend(children_by_parent.get(current, ()))
+    return expanded
+
+
 def _get_item_list(payload: dict[str, Any], path: str) -> list[dict[str, Any]]:
     item_list = payload.get("item_list")
     if not isinstance(item_list, list):
@@ -372,10 +393,15 @@ def _assert_event_filters(ctx: TestContext, scope_id: int) -> None:
             )
     _print_ok("event location_id")
 
+    unity_path = f"/auth/tenant/current/scopes/{scope_id}/unities"
+    unity_item_list = _get_item_list(_request_json(ctx, unity_path), unity_path)
+    allowed_for_unity = _expand_unity_ids_with_descendants(unity_item_list, [unity_id])
     by_unity = _get_item_list(_request_json(ctx, path, {"unity_id": unity_id}), path)
     for row in by_unity:
-        if int(row["unity_id"]) != unity_id:
-            raise AssertionError("event unity_id retornou item fora da unidade informada")
+        if int(row["unity_id"]) not in allowed_for_unity:
+            raise AssertionError(
+                "event unity_id retornou item fora da unidade informada (nó + descendentes)"
+            )
     _print_ok("event unity_id")
 
     by_action = _get_item_list(_request_json(ctx, path, {"action_id": action_id}), path)

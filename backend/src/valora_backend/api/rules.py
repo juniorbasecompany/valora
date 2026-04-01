@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from collections import defaultdict
 from datetime import UTC, datetime
 from typing import Literal
 
@@ -129,6 +130,33 @@ def _location_in_scope_or_404(
             detail="Location not found for current scope",
         )
     return row
+
+
+def _expand_scope_location_id_list_with_descendants(
+    session: Session, *, scope_id: int, location_id_list: list[int]
+) -> list[int]:
+    """Cada id selecionado vira ele próprio mais todos os descendentes no escopo."""
+    if not location_id_list:
+        return []
+    rows = list(
+        session.execute(
+            select(Location.id, Location.parent_location_id).where(
+                Location.scope_id == scope_id
+            )
+        )
+    )
+    children_by_parent: defaultdict[int | None, list[int]] = defaultdict(list)
+    for loc_id, parent_id in rows:
+        children_by_parent[parent_id].append(loc_id)
+    expanded: set[int] = set()
+    stack = list(location_id_list)
+    while stack:
+        current = stack.pop()
+        if current in expanded:
+            continue
+        expanded.add(current)
+        stack.extend(children_by_parent.get(current, ()))
+    return list(expanded)
 
 
 def _unity_in_scope_or_404(
@@ -1260,7 +1288,10 @@ def list_scope_events(
     if moment_to_utc is not None:
         query = query.where(Event.moment_utc <= moment_to_utc)
     if location_id_list:
-        query = query.where(Event.location_id.in_(location_id_list))
+        expanded_location_id_list = _expand_scope_location_id_list_with_descendants(
+            session, scope_id=scope_id, location_id_list=location_id_list
+        )
+        query = query.where(Event.location_id.in_(expanded_location_id_list))
     if unity_id_list:
         query = query.where(Event.unity_id.in_(unity_id_list))
     if action_id is not None:

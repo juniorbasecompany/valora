@@ -441,12 +441,12 @@
         "hint": "Selecciona la acción que describe el evento."
       },
       "actionInput": {
-        "title": "Campos de input de la acción",
-        "hint": "Completa los campos usados como input en las fórmulas de la acción seleccionada.",
-        "empty": "La acción seleccionada no tiene inputs en fórmulas.",
-        "loading": "Cargando campos de input de la acción...",
-        "loadError": "No se pudieron cargar los campos de input de la acción.",
-        "saveError": "No se pudieron guardar los campos de input de la acción."
+        "title": "Campos de entrada de la acción",
+        "hint": "Completa los campos usados como entrada en las fórmulas de la acción seleccionada.",
+        "empty": "La acción seleccionada no tiene campos de entrada en fórmulas.",
+        "loading": "Cargando campos de entrada de la acción...",
+        "loadError": "No se pudieron cargar los campos de entrada de la acción.",
+        "saveError": "No se pudieron guardar los campos de entrada de la acción."
       },
       "info": {
         "title": "Información",
@@ -747,7 +747,7 @@
   "State": {
     "loadingDescription": "Cargando la base de la aplicación.",
     "errorTitle": "No se pudo cargar esta área.",
-    "errorDescription": "Se produjo un problema al renderizar la interfaz. Puedes intentarlo de nuevo sin salir del flujo actual.",
+    "errorDescription": "Se produjo un problema al mostrar la interfaz. Puedes intentarlo de nuevo sin salir del flujo actual.",
     "retry": "Intentar de nuevo"
   }
 }

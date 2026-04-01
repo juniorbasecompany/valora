@@ -441,12 +441,12 @@
         "hint": "Selecione a ação que descreve o evento."
       },
       "actionInput": {
-        "title": "Campos de input da ação",
-        "hint": "Preencha os campos usados como input nas fórmulas da ação selecionada.",
-        "empty": "A ação selecionada não possui inputs em fórmulas.",
-        "loading": "Carregando campos de input da ação...",
-        "loadError": "Não foi possível carregar os campos de input da ação.",
-        "saveError": "Não foi possível salvar os campos de input da ação."
+        "title": "Campos de entrada da ação",
+        "hint": "Preencha os campos usados como entrada nas fórmulas da ação selecionada.",
+        "empty": "A ação selecionada não possui campos de entrada em fórmulas.",
+        "loading": "Carregando campos de entrada da ação...",
+        "loadError": "Não foi possível carregar os campos de entrada da ação.",
+        "saveError": "Não foi possível salvar os campos de entrada da ação."
       },
       "info": {
         "title": "Informações",
@@ -670,7 +670,7 @@
     "loading": "Carregando histórico...",
     "empty": "Nenhum registro de histórico encontrado.",
     "unknownUser": "Usuário desconhecido",
-    "entryLabel": "Log #{id}",
+    "entryLabel": "Registro #{id}",
     "metaLine": "{actor} em {moment}",
     "lineInsert": "Inclusão",
     "lineDelete": "Exclusão",
@@ -682,7 +682,7 @@
     "srDeletedValue": "Valor antes da exclusão: {value}.",
     "diffUnavailable": "Não foi possível comparar esta alteração com o registro anterior.",
     "diffEmpty": "Nenhuma diferença foi detectada em relação ao registro anterior.",
-    "deletedNote": "Este registro representa uma exclusão. O log não inclui os dados da linha neste caso.",
+    "deletedNote": "Este registro representa uma exclusão. O registro não inclui os dados da linha neste caso.",
     "action": {
       "insert": "Inclusão",
       "update": "Atualização",
@@ -698,7 +698,7 @@
     "productName": "Valora",
     "tagline": "Planejando o futuro com segurança",
     "title": "Seu negócio apresentado em números que você sustenta com propósito e origem.",
-    "description": "Uma fonte de verdade que cresce com a empresa, com versões contradas, melhorando resultados e reduzindo riscos. Entre com Google para abrir o contexto certo da sua organização nesta sessão.",
+    "description": "Uma fonte de verdade que cresce com a empresa, com versões alinhadas, melhorando resultados e reduzindo riscos. Entre com Google para abrir o contexto certo da sua organização nesta sessão.",
     "notice": {
       "authRequired": "Entre na conta para acessar esta área."
     },
@@ -747,7 +747,7 @@
   "State": {
     "loadingDescription": "Carregando a base da aplicação.",
     "errorTitle": "Não foi possível carregar esta área.",
-    "errorDescription": "Ocorreu um problema ao renderizar a interface. Você pode tentar novamente sem sair do fluxo atual.",
+    "errorDescription": "Ocorreu um problema ao exibir a interface. Você pode tentar novamente sem sair do fluxo atual.",
     "retry": "Tentar novamente"
   }
 }

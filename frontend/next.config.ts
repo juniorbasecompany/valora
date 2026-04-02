@@ -6,7 +6,7 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const nextConfig: NextConfig = {
   // Permite acessar o dev server por 127.0.0.1 sem bloquear HMR/fontes (Next 16+).
   allowedDevOrigins: ["127.0.0.1"],
-  // /health: ver src/app/health/route.ts (retries até o FastAPI estar pronto).
+  // /health: liveness imediato (ver src/app/health/route.ts); readiness da API é outro fluxo.
   // Google Identity Services usa postMessage; COOP `same-origin` (ex.: hosting) bloqueia.
   // `same-origin-allow-popups` é o padrão recomendado para fluxos com popup/FedCM.
   async headers() {

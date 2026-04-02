@@ -1,5 +1,5 @@
 # Imagem única (monorepo): FastAPI + Next.js na mesma imagem, orquestrados por supervisord.
-# O processo público na PORT é o Next; /health faz rewrite para o Uvicorn em 127.0.0.1:8003.
+# O processo público na PORT é o Next; liveness em GET /health (rota Next, ver frontend/src/app/health/route.ts).
 # Build: definir NEXT_PUBLIC_* no Railway (ou Docker build-arg) para o passo npm run build.
 
 # syntax=docker/dockerfile:1

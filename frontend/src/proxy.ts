@@ -44,6 +44,8 @@ export default function proxy(request: NextRequest) {
   return response;
 }
 
+// Exclui /health: o probe do Railway precisa de 200 direto em GET /health (sem redirect para /pt-BR/health).
+// Next.js 16+: convenção `src/proxy.ts` (substitui `middleware.ts`).
 export const config = {
-  matcher: ["/((?!api|trpc|_next|_vercel|.*\\..*).*)"]
+  matcher: ["/((?!api|trpc|_next|_vercel|health|.*\\..*).*)"]
 };

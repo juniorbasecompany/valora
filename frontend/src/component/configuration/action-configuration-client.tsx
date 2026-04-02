@@ -24,6 +24,7 @@ import type { FormulaFieldOption } from "@/component/configuration/formula-state
 import { TrashIconButton } from "@/component/ui/trash-icon-button";
 import { EditorPanelFlashOverlay } from "@/component/configuration/editor-panel-flash-overlay";
 import { useEditorPanelFlash } from "@/component/configuration/use-editor-panel-flash";
+import { useEditorNewIntentGeneration } from "@/component/configuration/use-editor-new-intent-generation";
 import { useFocusFirstEditorFieldAfterFlash } from "@/component/configuration/use-focus-first-editor-field-after-flash";
 import { useReplaceConfigurationPath } from "@/component/configuration/use-replace-configuration-path";
 import {
@@ -284,6 +285,7 @@ export function ActionConfigurationClient({
   const [formulaLoadError, setFormulaLoadError] = useState<string | null>(null);
   const [scopeFieldList, setScopeFieldList] = useState<FormulaFieldOption[]>([]);
   const editorPanelElementRef = useRef<HTMLDivElement | null>(null);
+  const { newIntentGeneration, bumpNewIntent } = useEditorNewIntentGeneration();
   const initialSearchActionKeyRef = useRef<ActionSelectionKey>(initialSearchActionKey);
   const selectedActionKeyRef = useRef<ActionSelectionKey>(initialSelectedActionKey);
   const didResolveInitialUrlRef = useRef(false);
@@ -330,7 +332,7 @@ export function ActionConfigurationClient({
     }
 
     if (isCreateMode) {
-      return "new";
+      return `new:${String(newIntentGeneration)}`;
     }
 
     if (!selectedAction) {
@@ -338,7 +340,7 @@ export function ActionConfigurationClient({
     }
 
     return `id:${String(selectedAction.id)}:ln:${selectedAction.label_name ?? ""}`;
-  }, [directory, isCreateMode, selectedAction]);
+  }, [directory, isCreateMode, newIntentGeneration, selectedAction]);
 
   const isEditorFlashActive = useEditorPanelFlash(editorPanelElementRef, editorFlashKey);
   useFocusFirstEditorFieldAfterFlash(
@@ -564,12 +566,11 @@ export function ActionConfigurationClient({
       return;
     }
 
-    if (isCreateMode) {
-      return;
+    bumpNewIntent();
+    if (!isCreateMode) {
+      syncFromDirectory(directory, "new");
     }
-
-    syncFromDirectory(directory, "new");
-  }, [directory, isCreateMode, isSaving, syncFromDirectory]);
+  }, [bumpNewIntent, directory, isCreateMode, isSaving, syncFromDirectory]);
 
   const handleSelectAction = useCallback(
     (item: TenantScopeActionRecord) => {
@@ -872,6 +873,7 @@ export function ActionConfigurationClient({
                   id="action-display-name"
                   type="text"
                   className="ui-input"
+                  data-editor-primary-field="true"
                   value={actionName}
                   onChange={(event) => {
                     setActionName(event.target.value);

@@ -19,6 +19,7 @@ import {
 import { TrashIconButton } from "@/component/ui/trash-icon-button";
 import { EditorPanelFlashOverlay } from "@/component/configuration/editor-panel-flash-overlay";
 import { useEditorPanelFlash } from "@/component/configuration/use-editor-panel-flash";
+import { useEditorNewIntentGeneration } from "@/component/configuration/use-editor-new-intent-generation";
 import { useFocusFirstEditorFieldAfterFlash } from "@/component/configuration/use-focus-first-editor-field-after-flash";
 import { useReplaceConfigurationPath } from "@/component/configuration/use-replace-configuration-path";
 import {
@@ -202,6 +203,7 @@ export function FieldConfigurationClient({
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
   const [filterQuery, setFilterQuery] = useState("");
   const editorPanelElementRef = useRef<HTMLDivElement | null>(null);
+  const { newIntentGeneration, bumpNewIntent } = useEditorNewIntentGeneration();
   const initialSearchFieldKeyRef = useRef<FieldSelectionKey>(initialSearchFieldKey);
   const selectedFieldKeyRef = useRef<FieldSelectionKey>(initialSelectedFieldKey);
   const didResolveInitialUrlRef = useRef(false);
@@ -288,7 +290,7 @@ export function FieldConfigurationClient({
     }
 
     if (isCreateMode) {
-      return "new";
+      return `new:${String(newIntentGeneration)}`;
     }
 
     if (!selectedField) {
@@ -296,7 +298,7 @@ export function FieldConfigurationClient({
     }
 
     return `id:${String(selectedField.id)}:sql:${selectedField.sql_type}:ln:${selectedField.label_name ?? ""}`;
-  }, [directory, isCreateMode, selectedField]);
+  }, [directory, isCreateMode, newIntentGeneration, selectedField]);
 
   const isEditorFlashActive = useEditorPanelFlash(editorPanelElementRef, editorFlashKey);
   useFocusFirstEditorFieldAfterFlash(
@@ -475,12 +477,11 @@ export function FieldConfigurationClient({
       return;
     }
 
-    if (isCreateMode) {
-      return;
+    bumpNewIntent();
+    if (!isCreateMode) {
+      syncFromDirectory(directory, "new");
     }
-
-    syncFromDirectory(directory, "new");
-  }, [directory, isCreateMode, isSaving, syncFromDirectory]);
+  }, [bumpNewIntent, directory, isCreateMode, isSaving, syncFromDirectory]);
 
   const handleSelectField = useCallback(
     (item: TenantScopeFieldRecord) => {
@@ -724,6 +725,7 @@ export function FieldConfigurationClient({
                   id="field-display-name"
                   type="text"
                   className="ui-input"
+                  data-editor-primary-field="true"
                   value={fieldName}
                   onChange={(event) => {
                     setFieldName(event.target.value);

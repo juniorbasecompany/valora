@@ -18,6 +18,7 @@ import {
 import { TrashIconButton } from "@/component/ui/trash-icon-button";
 import { ConfigurationNameDisplayNameFields } from "@/component/configuration/configuration-name-display-name-fields";
 import { useEditorPanelFlash } from "@/component/configuration/use-editor-panel-flash";
+import { useEditorNewIntentGeneration } from "@/component/configuration/use-editor-new-intent-generation";
 import { useFocusFirstEditorFieldAfterFlash } from "@/component/configuration/use-focus-first-editor-field-after-flash";
 import type { TenantCurrentResponse } from "@/lib/auth/types";
 import { parseErrorDetail } from "@/lib/api/parse-error-detail";
@@ -89,6 +90,7 @@ export function TenantConfigurationClient({
   const router = useRouter();
   const configurationPath = `/${locale}/app/configuration`;
   const editorPanelElementRef = useRef<HTMLDivElement | null>(null);
+  const { newIntentGeneration, bumpNewIntent } = useEditorNewIntentGeneration();
 
   const [tenant, setTenant] = useState(initialTenant);
   /* Com `can_edit`, mesmo padrão que escopos: abre já em formulário vazio (Novo). Só leitura mantém painel de instrução. */
@@ -131,10 +133,10 @@ export function TenantConfigurationClient({
       return null;
     }
     if (editorContext === "new") {
-      return "new";
+      return `new:${String(newIntentGeneration)}`;
     }
     return `id:${String(tenant.id)}:legal:${tenant.name}:display:${tenant.display_name}`;
-  }, [editorContext, tenant.display_name, tenant.id, tenant.name]);
+  }, [editorContext, newIntentGeneration, tenant.display_name, tenant.id, tenant.name]);
   const isEditorFlashActive = useEditorPanelFlash(editorPanelElementRef, editorFlashKey);
   useFocusFirstEditorFieldAfterFlash(
     editorPanelElementRef,
@@ -210,17 +212,17 @@ export function TenantConfigurationClient({
     if (!tenant.can_edit || isSaving) {
       return;
     }
-    if (editorContext === "new") {
-      return;
+    bumpNewIntent();
+    if (editorContext !== "new") {
+      setEditorContext("new");
+      setDisplayName("");
+      setLegalName("");
+      setBaseline({ displayName: "", legalName: "" });
+      setFieldError({});
+      setRequestErrorMessage(null);
+      setIsDeletePending(false);
     }
-    setEditorContext("new");
-    setDisplayName("");
-    setLegalName("");
-    setBaseline({ displayName: "", legalName: "" });
-    setFieldError({});
-    setRequestErrorMessage(null);
-    setIsDeletePending(false);
-  }, [editorContext, isSaving, tenant.can_edit]);
+  }, [bumpNewIntent, editorContext, isSaving, tenant.can_edit]);
 
   const handleSave = useCallback(async () => {
     if (editorContext === "none") {

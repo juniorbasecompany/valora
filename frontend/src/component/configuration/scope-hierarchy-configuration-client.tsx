@@ -23,6 +23,7 @@ import {
 } from "@/component/configuration/directory-filter-panel";
 import { TrashIconButton } from "@/component/ui/trash-icon-button";
 import { useEditorPanelFlash } from "@/component/configuration/use-editor-panel-flash";
+import { useEditorNewIntentGeneration } from "@/component/configuration/use-editor-new-intent-generation";
 import { useFocusFirstEditorFieldAfterFlash } from "@/component/configuration/use-focus-first-editor-field-after-flash";
 import { useReplaceConfigurationPath } from "@/component/configuration/use-replace-configuration-path";
 import type {
@@ -296,6 +297,7 @@ export function ScopeHierarchyConfigurationClient<
   const [filterQuery, setFilterQuery] = useState("");
   const didMountFilterRef = useRef(false);
   const editorPanelElementRef = useRef<HTMLDivElement | null>(null);
+  const { newIntentGeneration, bumpNewIntent } = useEditorNewIntentGeneration();
   const itemList = useMemo(() => directory?.item_list ?? [], [directory]);
   const childrenByParent = useMemo(() => {
     const next = new Map<number | null, TItem[]>();
@@ -351,7 +353,7 @@ export function ScopeHierarchyConfigurationClient<
     }
 
     if (isCreateMode) {
-      return `new:${String(parentId ?? "root")}`;
+      return `new:${String(parentId ?? "root")}:${String(newIntentGeneration)}`;
     }
 
     if (!selectedItem) {
@@ -359,7 +361,7 @@ export function ScopeHierarchyConfigurationClient<
     }
 
     return `id:${String(selectedItem.id)}:name:${selectedItem.name}:display:${selectedItem.display_name}:parent:${String(getParentId(selectedItem) ?? "root")}`;
-  }, [directory, getParentId, isCreateMode, parentId, selectedItem]);
+  }, [directory, getParentId, isCreateMode, newIntentGeneration, parentId, selectedItem]);
 
   const isEditorFlashActive = useEditorPanelFlash(editorPanelElementRef, editorFlashKey);
   useFocusFirstEditorFieldAfterFlash(
@@ -485,9 +487,10 @@ export function ScopeHierarchyConfigurationClient<
       if (!canCreateTarget) {
         return;
       }
+      bumpNewIntent();
       syncEditor(null, true, draftParentId);
     },
-    [directory?.can_create, itemList, syncEditor]
+    [bumpNewIntent, directory?.can_create, itemList, syncEditor]
   );
 
   const handleSelectItem = useCallback(

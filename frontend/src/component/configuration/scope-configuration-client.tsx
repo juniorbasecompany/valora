@@ -18,6 +18,7 @@ import {
 } from "@/component/configuration/directory-filter-panel";
 import { TrashIconButton } from "@/component/ui/trash-icon-button";
 import { useEditorPanelFlash } from "@/component/configuration/use-editor-panel-flash";
+import { useEditorNewIntentGeneration } from "@/component/configuration/use-editor-new-intent-generation";
 import { useFocusFirstEditorFieldAfterFlash } from "@/component/configuration/use-focus-first-editor-field-after-flash";
 import { useReplaceConfigurationPath } from "@/component/configuration/use-replace-configuration-path";
 import type {
@@ -161,6 +162,7 @@ export function ScopeConfigurationClient({
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
   const [filterQuery, setFilterQuery] = useState("");
   const editorPanelElementRef = useRef<HTMLDivElement | null>(null);
+  const { newIntentGeneration, bumpNewIntent } = useEditorNewIntentGeneration();
   const initialSearchScopeKeyRef = useRef<ScopeSelectionKey>(initialSearchScopeKey);
   const selectedScopeKeyRef = useRef<ScopeSelectionKey>(initialSelectedScopeKey);
   const didResolveInitialUrlRef = useRef(false);
@@ -190,7 +192,7 @@ export function ScopeConfigurationClient({
 
   const editorFlashKey = useMemo(() => {
     if (isCreateMode) {
-      return "new";
+      return `new:${String(newIntentGeneration)}`;
     }
 
     if (!selectedScope) {
@@ -198,9 +200,10 @@ export function ScopeConfigurationClient({
     }
 
     return `id:${String(selectedScope.id)}:name:${selectedScope.name}:display:${selectedScope.display_name}`;
-  }, [isCreateMode, selectedScope]);
+  }, [isCreateMode, newIntentGeneration, selectedScope]);
 
   const isEditorFlashActive = useEditorPanelFlash(editorPanelElementRef, editorFlashKey);
+  /* Diretório de escopo está sempre carregado neste cliente; não há estado `directory === null`. */
   useFocusFirstEditorFieldAfterFlash(
     editorPanelElementRef,
     isEditorFlashActive,
@@ -314,12 +317,11 @@ export function ScopeConfigurationClient({
       return;
     }
 
-    if (isCreateMode) {
-      return;
+    bumpNewIntent();
+    if (!isCreateMode) {
+      syncFromDirectory(directory, "new");
     }
-
-    syncFromDirectory(directory, "new");
-  }, [directory, isCreateMode, isSaving, syncFromDirectory]);
+  }, [bumpNewIntent, directory, isCreateMode, isSaving, syncFromDirectory]);
 
   const handleSelectScope = useCallback(
     (scope: TenantScopeRecord) => {

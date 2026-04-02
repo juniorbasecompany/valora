@@ -21,6 +21,7 @@ import {
 } from "@/component/configuration/directory-filter-panel";
 import { TrashIconButton } from "@/component/ui/trash-icon-button";
 import { useEditorPanelFlash } from "@/component/configuration/use-editor-panel-flash";
+import { useEditorNewIntentGeneration } from "@/component/configuration/use-editor-new-intent-generation";
 import { useFocusFirstEditorFieldAfterFlash } from "@/component/configuration/use-focus-first-editor-field-after-flash";
 import { useReplaceConfigurationPath } from "@/component/configuration/use-replace-configuration-path";
 import type { ConfigurationSelectionKey } from "@/lib/navigation/configuration-path";
@@ -277,6 +278,7 @@ export function MemberConfigurationClient({
   const [filterStatusAllIsSelected, setFilterStatusAllIsSelected] = useState(true);
   const [filterStatusValueList, setFilterStatusValueList] = useState<string[]>([]);
   const editorPanelElementRef = useRef<HTMLDivElement | null>(null);
+  const { newIntentGeneration, bumpNewIntent } = useEditorNewIntentGeneration();
   const initialSearchMemberKeyRef = useRef<ConfigurationSelectionKey>(initialSearchMemberKey);
   const selectedMemberKeyRef = useRef<ConfigurationSelectionKey>(
     initialSelection.isCreateMode
@@ -321,7 +323,7 @@ export function MemberConfigurationClient({
 
   const editorFlashKey = useMemo(() => {
     if (isCreateMode) {
-      return "new";
+      return `new:${String(newIntentGeneration)}`;
     }
 
     if (!selectedMember) {
@@ -329,7 +331,7 @@ export function MemberConfigurationClient({
     }
 
     return `id:${String(selectedMember.id)}:email:${selectedMember.email}:name:${selectedMember.name}:display:${selectedMember.display_name}`;
-  }, [isCreateMode, selectedMember]);
+  }, [isCreateMode, newIntentGeneration, selectedMember]);
 
   const isEditorFlashActive = useEditorPanelFlash(editorPanelElementRef, editorFlashKey);
   useFocusFirstEditorFieldAfterFlash(
@@ -539,14 +541,13 @@ export function MemberConfigurationClient({
       return;
     }
 
-    if (isCreateMode) {
-      return;
+    bumpNewIntent();
+    if (!isCreateMode) {
+      setFooterNoticeMessage(null);
+      setRequestErrorMessage(null);
+      syncFromDirectory(directory, "new");
     }
-
-    setFooterNoticeMessage(null);
-    setRequestErrorMessage(null);
-    syncFromDirectory(directory, "new");
-  }, [directory, isCreateMode, isSaving, syncFromDirectory]);
+  }, [bumpNewIntent, directory, isCreateMode, isSaving, syncFromDirectory]);
 
   const handleSendMemberInvite = useCallback(
     async (item: TenantMemberRecord) => {
@@ -927,63 +928,62 @@ export function MemberConfigurationClient({
             </div>
           ) : null}
 
-          {isCreateMode ? (
+          {isCreateMode || selectedMember ? (
             <section className="ui-card ui-form-section ui-border-accent">
               <EditorPanelFlashOverlay active={isEditorFlashActive} />
               <div className="ui-editor-content">
                 <div className="ui-field">
-                  <label className="ui-field-label" htmlFor="member-invite-email">
-                    {copy.emailLabel}
-                  </label>
-                  <input
-                    id="member-invite-email"
-                    type="email"
-                    className="ui-input"
-                    value={inviteEmail}
-                    onChange={(event) => {
-                      setInviteEmail(event.target.value);
-                      setInviteEmailError(undefined);
-                      setRequestErrorMessage(null);
-                    }}
-                    disabled={isSaving || !canEditForm}
-                    autoComplete="email"
-                    aria-invalid={Boolean(inviteEmailError)}
-                  />
-                  <p className="ui-field-hint">{copy.inviteEmailHint}</p>
-                  {inviteEmailError ? (
-                    <p className="ui-field-error">{inviteEmailError}</p>
-                  ) : null}
-                </div>
-              </div>
-            </section>
-          ) : null}
-
-          {!isCreateMode && selectedMember ? (
-            <section className="ui-card ui-form-section ui-border-accent">
-              <EditorPanelFlashOverlay active={isEditorFlashActive} />
-              <div className="ui-editor-content">
-                <div className="ui-field">
-                  <label className="ui-field-label" htmlFor="member-email">
-                    {copy.emailLabel}
-                  </label>
-                  <input
-                    id="member-email"
-                    type="email"
-                    className="ui-input"
-                    value={memberEmail}
-                    onChange={(event) => {
-                      setMemberEmail(event.target.value);
-                      setMemberEmailError(undefined);
-                      setRequestErrorMessage(null);
-                    }}
-                    disabled={isDeletePending || !canEditForm}
-                    autoComplete="email"
-                    aria-invalid={Boolean(memberEmailError)}
-                  />
-                  <p className="ui-field-hint">{copy.memberEmailHint}</p>
-                  {memberEmailError ? (
-                    <p className="ui-field-error">{memberEmailError}</p>
-                  ) : null}
+                  {isCreateMode ? (
+                    <>
+                      <label className="ui-field-label" htmlFor="member-invite-email">
+                        {copy.emailLabel}
+                      </label>
+                      <input
+                        id="member-invite-email"
+                        type="email"
+                        className="ui-input"
+                        data-editor-primary-field="true"
+                        value={inviteEmail}
+                        onChange={(event) => {
+                          setInviteEmail(event.target.value);
+                          setInviteEmailError(undefined);
+                          setRequestErrorMessage(null);
+                        }}
+                        disabled={isSaving || !canEditForm}
+                        autoComplete="email"
+                        aria-invalid={Boolean(inviteEmailError)}
+                      />
+                      <p className="ui-field-hint">{copy.inviteEmailHint}</p>
+                      {inviteEmailError ? (
+                        <p className="ui-field-error">{inviteEmailError}</p>
+                      ) : null}
+                    </>
+                  ) : (
+                    <>
+                      <label className="ui-field-label" htmlFor="member-email">
+                        {copy.emailLabel}
+                      </label>
+                      <input
+                        id="member-email"
+                        type="email"
+                        className="ui-input"
+                        data-editor-primary-field="true"
+                        value={memberEmail}
+                        onChange={(event) => {
+                          setMemberEmail(event.target.value);
+                          setMemberEmailError(undefined);
+                          setRequestErrorMessage(null);
+                        }}
+                        disabled={isDeletePending || !canEditForm}
+                        autoComplete="email"
+                        aria-invalid={Boolean(memberEmailError)}
+                      />
+                      <p className="ui-field-hint">{copy.memberEmailHint}</p>
+                      {memberEmailError ? (
+                        <p className="ui-field-error">{memberEmailError}</p>
+                      ) : null}
+                    </>
+                  )}
                 </div>
               </div>
             </section>
@@ -1003,9 +1003,6 @@ export function MemberConfigurationClient({
             nameHint={copy.nameHint}
             displayNameLabel={copy.displayNameLabel}
             displayNameHint={copy.displayNameHint}
-            flashActive={
-              isEditorFlashActive && !isCreateMode && selectedMember == null
-            }
             onAfterFieldEdit={() => setRequestErrorMessage(null)}
           />
 

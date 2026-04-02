@@ -17,6 +17,7 @@ import { TrashIconButton } from "@/component/ui/trash-icon-button";
 import { TenantDateTimePicker } from "@/component/ui/tenant-date-time-picker";
 import { EditorPanelFlashOverlay } from "@/component/configuration/editor-panel-flash-overlay";
 import { useEditorPanelFlash } from "@/component/configuration/use-editor-panel-flash";
+import { useEditorNewIntentGeneration } from "@/component/configuration/use-editor-new-intent-generation";
 import { useFocusFirstEditorFieldAfterFlash } from "@/component/configuration/use-focus-first-editor-field-after-flash";
 import { useReplaceConfigurationPath } from "@/component/configuration/use-replace-configuration-path";
 import type {
@@ -458,6 +459,7 @@ export function EventConfigurationClient({
   const [actionInputLoading, setActionInputLoading] = useState(false);
   const [actionInputErrorMessage, setActionInputErrorMessage] = useState<string | null>(null);
   const editorPanelElementRef = useRef<HTMLDivElement | null>(null);
+  const { newIntentGeneration, bumpNewIntent } = useEditorNewIntentGeneration();
   const initialSearchEventKeyRef = useRef<EventSelectionKey>(initialSearchEventKey);
   const selectedEventKeyRef = useRef<EventSelectionKey>(initialSelectedEventKey);
   const didResolveInitialUrlRef = useRef(false);
@@ -490,13 +492,13 @@ export function EventConfigurationClient({
       return null;
     }
     if (isCreateMode) {
-      return "new";
+      return `new:${String(newIntentGeneration)}`;
     }
     if (!selectedEvent) {
       return null;
     }
-    return `id:${String(selectedEvent.id)}:moment:${selectedEvent.moment_utc}`;
-  }, [directory, isCreateMode, selectedEvent]);
+    return `id:${String(selectedEvent.id)}`;
+  }, [directory, isCreateMode, newIntentGeneration, selectedEvent]);
 
   const isEditorFlashActive = useEditorPanelFlash(editorPanelElementRef, editorFlashKey);
   useFocusFirstEditorFieldAfterFlash(
@@ -1030,11 +1032,11 @@ export function EventConfigurationClient({
     if (!directory?.can_edit || isSaving) {
       return;
     }
-    if (isCreateMode) {
-      return;
+    bumpNewIntent();
+    if (!isCreateMode) {
+      syncFromDirectory(directory, "new");
     }
-    syncFromDirectory(directory, "new");
-  }, [directory, isCreateMode, isSaving, syncFromDirectory]);
+  }, [bumpNewIntent, directory, isCreateMode, isSaving, syncFromDirectory]);
 
   const handleSelectEvent = useCallback(
     (item: TenantScopeEventRecord) => {

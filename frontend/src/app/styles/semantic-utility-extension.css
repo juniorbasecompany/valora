@@ -391,7 +391,7 @@
 }
 
 /* Cards de primeiro nível do diretório: fundo branco. */
-.ui-directory-list > .ui-directory-item {
+.ui-directory-list>.ui-directory-item {
   background: var(--color-surface);
 }
 

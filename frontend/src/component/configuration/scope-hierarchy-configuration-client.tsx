@@ -416,7 +416,7 @@ export function ScopeHierarchyConfigurationClient<
       }
 
       const nextSelectedItem = nextDirectory.item_list.find(
-        (item) => item.id === selectedItem?.id
+        (item) => item.id === selectedItemId
       );
       if (nextSelectedItem) {
         syncEditor(nextSelectedItem, false, null);
@@ -432,7 +432,7 @@ export function ScopeHierarchyConfigurationClient<
     filterQuery,
     isCreateMode,
     scopeId,
-    selectedItem,
+    selectedItemId,
     syncEditor
   ]);
 

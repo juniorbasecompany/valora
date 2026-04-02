@@ -199,6 +199,31 @@
     linear-gradient(90deg, hsla(var(--base-background-color), 100%, 100%, 0.72) 1px, transparent 1px);
   --gradient-surface-default: linear-gradient(180deg, var(--color-surface), var(--color-surface-muted));
   --gradient-surface-card: var(--gradient-surface-default);
+  /* Casca dos painéis de configuração: meio-termo entre card e .ui-panel (leve profundidade + matiz discreta na borda). */
+  --gradient-surface-panel-shell-directory:
+    radial-gradient(circle at top right, hsla(var(--base-accent-color), 72%, 52%, 0.05), transparent 56%),
+    radial-gradient(circle at left center, hsla(var(--base-accent-color), 65%, 44%, 0.022), transparent 66%),
+    linear-gradient(
+      180deg,
+      hsla(var(--base-background-color), 48%, 96.2%, 1) 0%,
+      hsla(var(--base-background-color), 34%, 93.8%, 1) 100%
+    );
+  --gradient-surface-panel-shell-filter:
+    radial-gradient(circle at top right, hsla(var(--base-filter-color), 70%, 54%, 0.048), transparent 56%),
+    radial-gradient(circle at left center, hsla(var(--base-filter-color), 62%, 46%, 0.02), transparent 66%),
+    linear-gradient(
+      180deg,
+      hsla(var(--base-background-color), 48%, 96.2%, 1) 0%,
+      hsla(var(--base-background-color), 34%, 93.8%, 1) 100%
+    );
+  --gradient-surface-panel-shell-editor:
+    radial-gradient(circle at top right, hsla(var(--base-editor-color), 42%, 46%, 0.042), transparent 56%),
+    radial-gradient(circle at left center, hsla(var(--base-editor-color), 38%, 40%, 0.02), transparent 66%),
+    linear-gradient(
+      180deg,
+      hsla(var(--base-background-color), 48%, 96.2%, 1) 0%,
+      hsla(var(--base-background-color), 34%, 93.8%, 1) 100%
+    );
   --gradient-surface-construction: linear-gradient(180deg, var(--color-surface), var(--color-construction-surface));
   --gradient-surface-sidebar-glow:
     linear-gradient(180deg, hsla(var(--base-accent-color), 70%, 50%, 0.06), transparent 22%),

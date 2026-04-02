@@ -23,7 +23,7 @@
   --color-background-muted: hsla(var(--base-background-color), 45%, 97%, 1);
   --color-surface: hsla(var(--base-background-color), 100%, 100%, 0.96);
   --color-surface-muted: hsla(var(--base-background-color), 55%, 98%, 1);
-  --color-surface-strong: hsla(var(--base-background-color), 36%, 92%, 1);
+  --color-surface-strong: var(--color-surface-muted);
   --color-surface-overlay: hsla(var(--base-background-color), 100%, 100%, 0.8);
   --color-border: hsla(var(--base-color), 35%, 88%, 1);
   --color-border-strong: hsla(var(--base-color), 33%, 77%, 1);
@@ -31,21 +31,21 @@
   --color-text-muted: hsla(var(--base-color), 31%, 29%, 1);
   --color-text-subtle: hsla(var(--base-color), 18%, 48%, 1);
   --color-primary: hsla(var(--base-accent-color), 71%, 24%, 1);
-  --color-primary-hover: hsla(var(--base-accent-color), 71%, 21%, 1);
+  --color-primary-hover: var(--color-primary);
   --color-primary-foreground: hsla(var(--base-background-color), 100%, 100%, 1);
-  --color-secondary-action: hsla(var(--base-color), 14%, 52%, 1);
-  --color-secondary-action-hover: hsla(var(--base-color), 12%, 45%, 1);
+  --color-secondary-action: var(--color-text-muted);
+  --color-secondary-action-hover: var(--color-text);
   --color-secondary-action-foreground: hsla(var(--base-background-color), 100%, 100%, 1);
   --color-accent: hsla(var(--base-accent-color), 70%, 50%, 1);
   --color-accent-strong: hsla(var(--base-accent-color), 82%, 34%, 1);
   --color-accent-soft: hsla(var(--base-accent-color), 100%, 95%, 1);
-  --color-accent-vertical-border: hsla(var(--base-background-color), 50%, 50%, 0.5);
+  --color-accent-vertical-border: hsla(var(--base-accent-color), 70%, 50%, 0.5);
   --color-filter-vertical-border: hsla(var(--base-filter-color), 100%, 50%, 0.75);
   --color-editor-vertical-border: hsla(var(--base-editor-color), 39%, 48%, 0.75);
-  --color-location-nest-start: lch(94.55% 8.75 290.86);
-  --color-location-nest-end: hsla(var(--base-background-color), 100%, 90%, 1);
-  --color-location-nest-border-start: hsla(var(--base-accent-color), 60%, 60%, 0.18);
-  --color-location-nest-border-end: hsla(var(--base-accent-color), 53%, 46%, 0.34);
+  --color-location-nest-start: hsla(var(--base-background-color), 62%, 97%, 1);
+  --color-location-nest-end: hsla(var(--base-background-color), 58%, 90%, 1);
+  --color-location-nest-border-start: hsla(var(--base-color), 30%, 84%, 0.35);
+  --color-location-nest-border-end: hsla(var(--base-color), 36%, 62%, 0.45);
   --color-focus-ring: hsla(var(--base-accent-color), 70%, 50%, 1);
   --shadow-focus-ring: 0 0 0 4px hsla(var(--base-accent-color), 70%, 50%, 0.14);
 
@@ -56,25 +56,16 @@
   --color-positive-border: hsla(var(--base-positive-color), 43%, 68%, 1);
   --color-positive-text: hsla(var(--base-positive-color), 59%, 26%, 1);
   --color-danger-action: hsla(var(--base-danger-color), 56%, 57%, 1);
-  --color-danger-action-hover: hsla(var(--base-danger-color), 47%, 50%, 1);
+  --color-danger-action-hover: var(--color-danger-action);
   --color-danger-action-foreground: hsla(var(--base-background-color), 100%, 100%, 1);
   --color-danger-surface: hsla(var(--base-danger-color), 63%, 86%, 1);
-  --color-danger-surface-hover: hsla(var(--base-danger-color), 100%, 94%, 1);
+  --color-danger-surface-hover: var(--color-danger-surface);
   --color-danger-border: hsla(var(--base-danger-color), 67%, 81%, 1);
-  --color-danger-border-strong: hsla(var(--base-danger-color), 61%, 54%, 1);
+  --color-danger-border-strong: var(--color-danger-border);
   --color-danger-text: hsla(var(--base-danger-color), 57%, 40%, 1);
   --color-construction-surface: hsla(var(--base-construction-color), 100%, 96%, 1);
   --color-construction-border: hsla(var(--base-construction-color), 73%, 66%, 1);
   --color-construction-text: hsla(var(--base-construction-color), 80%, 31%, 1);
-  --color-formula-handle-border: hsla(var(--base-color), 18%, 90%, 1);
-  --color-formula-handle-surface: hsla(var(--base-background-color), 20%, 97%, 1);
-  --color-trash-neutral-border: hsla(var(--base-color), 12%, 87%, 1);
-  --color-trash-neutral-surface: hsla(var(--base-background-color), 24%, 93%, 1);
-  --color-trash-neutral-text: hsla(var(--base-color), 8%, 39%, 1);
-  --color-trash-neutral-hover-border: hsla(var(--base-color), 14%, 80%, 1);
-  --color-trash-neutral-hover-surface: hsla(var(--base-background-color), 16%, 90%, 1);
-  --color-surface-inset-line: hsla(var(--base-background-color), 100%, 100%, 0.42);
-
   --radius-control: 4px;
   --radius-card: 6px;
   --radius-badge: 4px;
@@ -145,43 +136,43 @@
   --z-drawer: 120;
 
   --color-selection-surface: hsla(var(--base-accent-color), 70%, 50%, 0.16);
-  --color-accent-border-subtle: hsla(var(--base-accent-color), 70%, 50%, 0.12);
-  --color-accent-border-soft: hsla(var(--base-accent-color), 70%, 50%, 0.14);
-  --color-accent-border-default: hsla(var(--base-accent-color), 70%, 50%, 0.16);
-  --color-accent-border-strong: hsla(var(--base-accent-color), 70%, 50%, 0.18);
-  --color-accent-border-active: hsla(var(--base-accent-color), 70%, 50%, 0.22);
-  --color-accent-border-focus: hsla(var(--base-accent-color), 70%, 50%, 0.38);
-  --color-accent-border-flash: hsla(var(--base-accent-color), 70%, 50%, 0.46);
-  --color-accent-surface-soft: hsla(var(--base-accent-color), 100%, 92%, 0.62);
-  --color-accent-surface-muted: hsla(var(--base-accent-color), 100%, 95%, 0.55);
-  --color-accent-surface-default: hsla(var(--base-accent-color), 100%, 95%, 0.65);
-  --color-accent-surface-strong: hsla(var(--base-accent-color), 100%, 89%, 0.88);
+  --color-accent-border-subtle: var(--color-selection-surface);
+  --color-accent-border-soft: var(--color-selection-surface);
+  --color-accent-border-default: var(--color-selection-surface);
+  --color-accent-border-strong: var(--color-selection-surface);
+  --color-accent-border-active: var(--color-selection-surface);
+  --color-accent-border-focus: hsla(var(--base-accent-color), 70%, 50%, 0.32);
+  --color-accent-border-flash: var(--color-accent-border-focus);
+  --color-accent-surface-soft: hsla(var(--base-accent-color), 100%, 95%, 0.62);
+  --color-accent-surface-muted: var(--color-accent-surface-soft);
+  --color-accent-surface-default: var(--color-accent-surface-soft);
+  --color-accent-surface-strong: var(--color-accent-surface-soft);
   --color-accent-drop-slot: rgb(from var(--color-accent) r g b / 0.7);
   --color-accent-hover-border: rgb(from var(--color-accent) r g b / 0.28);
   --color-accent-hover-surface: rgb(from var(--color-accent-soft) r g b / 0.45);
-  --color-construction-border-strong: hsla(var(--base-construction-color), 73%, 66%, 0.72);
-  --color-danger-focus-ring-soft: hsla(var(--base-danger-color), 61%, 54%, 0.08);
-  --color-surface-glass-soft: hsla(var(--base-background-color), 100%, 100%, 0.72);
-  --color-surface-glass-strong: hsla(var(--base-background-color), 100%, 100%, 0.8);
-  --color-surface-glass-stronger: hsla(var(--base-background-color), 100%, 100%, 0.82);
-  --color-shell-topbar-surface: hsla(var(--base-background-color), 45%, 97%, 0.72);
-  --color-shell-footer-surface: hsla(var(--base-background-color), 45%, 97%, 0.78);
+  --color-construction-border-strong: var(--color-construction-border);
+  --color-danger-focus-ring-soft: hsla(var(--base-danger-color), 56%, 57%, 0.12);
+  --color-surface-glass-soft: var(--color-surface-overlay);
+  --color-surface-glass-strong: var(--color-surface-overlay);
+  --color-surface-glass-stronger: var(--color-surface-overlay);
+  --color-shell-topbar-surface: var(--color-background-muted);
+  --color-shell-footer-surface: var(--color-background-muted);
   --color-auth-google-skeleton: rgb(from var(--color-border) r g b / 0.25);
   --color-auth-remember-surface: rgb(from var(--color-background-muted) r g b / 0.7);
   --color-auth-hero-radial: rgb(from var(--color-accent) r g b / 0.13);
-  --color-shadow-outline: hsla(var(--base-color), 46%, 14%, 0.03);
-  --color-accent-border-emphasis: hsla(var(--base-accent-color), 70%, 50%, 0.2);
-  --color-construction-border-default: hsla(var(--base-construction-color), 73%, 66%, 0.6);
-  --color-construction-border-soft: hsla(var(--base-construction-color), 73%, 66%, 0.45);
-  --color-danger-border-soft: hsla(var(--base-danger-color), 61%, 54%, 0.2);
+  --color-shadow-outline: hsla(var(--base-color), 46%, 14%, 0.06);
+  --color-accent-border-emphasis: var(--color-accent-border-focus);
+  --color-construction-border-default: var(--color-construction-border);
+  --color-construction-border-soft: var(--color-construction-border);
+  --color-danger-border-soft: var(--color-danger-border);
   --color-editor-flash-shadow: hsla(var(--base-color), 47%, 11%, 0.12);
-  --color-hover-border: hsla(var(--base-color), 33%, 77%, 0.7);
-  --color-overlay-scrim: hsla(var(--base-color), 46%, 14%, 0.38);
-  --color-positive-border-soft: hsla(var(--base-positive-color), 50%, 68%, 0.5);
-  --color-surface-glass: hsla(var(--base-background-color), 100%, 100%, 0.7);
-  --color-surface-glass-frame: hsla(var(--base-background-color), 100%, 100%, 0.85);
-  --color-surface-glass-muted: hsla(var(--base-background-color), 100%, 100%, 0.75);
-  --color-surface-glass-panel: hsla(var(--base-background-color), 100%, 100%, 0.88);
+  --color-hover-border: var(--color-border-strong);
+  --color-overlay-scrim: hsla(var(--base-color), 46%, 14%, 0.32);
+  --color-positive-border-soft: var(--color-positive-border);
+  --color-surface-glass: var(--color-surface-overlay);
+  --color-surface-glass-frame: var(--color-surface-overlay);
+  --color-surface-glass-muted: var(--color-surface-overlay);
+  --color-surface-glass-panel: var(--color-surface-overlay);
 
   --shadow-surface-inset: inset 0 1px 0 hsla(var(--base-background-color), 100%, 100%, 0.75);
   --shadow-shell-topbar:
@@ -206,9 +197,9 @@
   --gradient-app-grid:
     linear-gradient(hsla(var(--base-background-color), 100%, 100%, 0.72) 1px, transparent 1px),
     linear-gradient(90deg, hsla(var(--base-background-color), 100%, 100%, 0.72) 1px, transparent 1px);
-  --gradient-surface-default: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 97%, 0.9), hsla(var(--base-background-color), 100%, 99%, 0.9));
-  --gradient-surface-card: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 99%, 0.9), hsla(var(--base-background-color), 100%, 97%, 0.9));
-  --gradient-surface-construction: linear-gradient(180deg, hsla(var(--base-construction-color), 100%, 95%, 0.95), hsla(var(--base-construction-color), 100%, 92%, 0.9));
+  --gradient-surface-default: linear-gradient(180deg, var(--color-surface), var(--color-surface-muted));
+  --gradient-surface-card: var(--gradient-surface-default);
+  --gradient-surface-construction: linear-gradient(180deg, var(--color-surface), var(--color-construction-surface));
   --gradient-surface-sidebar-glow:
     linear-gradient(180deg, hsla(var(--base-accent-color), 70%, 50%, 0.06), transparent 22%),
     radial-gradient(circle at left top, hsla(var(--base-construction-color), 73%, 66%, 0.12), transparent 18rem);
@@ -217,47 +208,47 @@
       hsla(var(--base-accent-color), 70%, 50%, 0.18),
       hsla(var(--base-background-color), 100%, 100%, 0.7),
       hsla(var(--base-editor-color), 64%, 32%, 0.08));
-  --gradient-surface-card-soon: linear-gradient(180deg, hsla(var(--base-construction-color), 100%, 95%, 0.92), hsla(var(--base-background-color), 100%, 100%, 0.98));
+  --gradient-surface-card-soon: var(--gradient-surface-construction);
   --gradient-surface-card-stripe:
     repeating-linear-gradient(135deg,
       hsla(var(--base-construction-color), 73%, 66%, 0.12),
       hsla(var(--base-construction-color), 73%, 66%, 0.12) 12px,
       transparent 12px,
       transparent 24px);
-  --gradient-surface-topbar-chip: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.96), hsla(var(--base-background-color), 42%, 95%, 0.94));
-  --gradient-surface-menu-trigger-active: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 1), hsla(var(--base-background-color), 38%, 95%, 0.98));
-  --gradient-surface-nav-soon: linear-gradient(180deg, hsla(var(--base-construction-color), 100%, 95%, 0.84), hsla(var(--base-background-color), 100%, 100%, 0.96));
-  --gradient-surface-input: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 1), hsla(var(--base-background-color), 100%, 99%, 0.98));
-  --gradient-surface-input-disabled: linear-gradient(180deg, hsla(var(--base-background-color), 32%, 97%, 0.98), hsla(var(--base-background-color), 30%, 95%, 0.96));
-  --gradient-tone-neutral: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.94), hsla(var(--base-background-color), 42%, 95%, 0.9));
-  --gradient-tone-attention: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.94), var(--color-attention-surface));
-  --gradient-tone-positive: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.94), var(--color-positive-surface));
-  --gradient-tone-danger: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.94), var(--color-danger-surface));
-  --gradient-tone-construction: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.94), var(--color-construction-surface));
-  --gradient-surface-attention-soft: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-attention-color), 100%, 95%, 0.96));
-  --gradient-surface-positive-soft: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-positive-color), 52%, 94%, 0.96));
-  --gradient-surface-construction-soft: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-construction-color), 100%, 95%, 0.96));
-  --gradient-surface-avatar: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-accent-color), 100%, 95%, 0.98));
-  --gradient-surface-icon-badge: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-accent-color), 100%, 95%, 0.96));
-  --gradient-surface-muted: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.96), hsla(var(--base-background-color), 35%, 96%, 0.94));
-  --gradient-surface-accent: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 1), hsla(var(--base-accent-color), 100%, 95%, 0.98));
+  --gradient-surface-topbar-chip: var(--gradient-surface-default);
+  --gradient-surface-menu-trigger-active: var(--gradient-surface-default);
+  --gradient-surface-nav-soon: var(--gradient-surface-construction);
+  --gradient-surface-input: var(--gradient-surface-default);
+  --gradient-surface-input-disabled: var(--gradient-surface-default);
+  --gradient-tone-neutral: var(--gradient-surface-default);
+  --gradient-tone-attention: linear-gradient(180deg, var(--color-surface), var(--color-attention-surface));
+  --gradient-tone-positive: linear-gradient(180deg, var(--color-surface), var(--color-positive-surface));
+  --gradient-tone-danger: linear-gradient(180deg, var(--color-surface), var(--color-danger-surface));
+  --gradient-tone-construction: linear-gradient(180deg, var(--color-surface), var(--color-construction-surface));
+  --gradient-surface-attention-soft: var(--gradient-tone-attention);
+  --gradient-surface-positive-soft: var(--gradient-tone-positive);
+  --gradient-surface-construction-soft: var(--gradient-tone-construction);
+  --gradient-surface-avatar: var(--gradient-tone-neutral);
+  --gradient-surface-icon-badge: var(--gradient-tone-neutral);
+  --gradient-surface-muted: var(--gradient-tone-neutral);
+  --gradient-surface-accent: linear-gradient(180deg, var(--color-surface), var(--color-accent-soft));
   --gradient-accent-emphasis: linear-gradient(180deg, var(--color-accent), var(--color-accent-strong));
   --gradient-editor-flash-fill:
     linear-gradient(180deg,
       hsla(var(--base-accent-color), 70%, 50%, 0.18),
       hsla(var(--base-accent-color), 70%, 50%, 0.07) 45%,
       hsla(var(--base-accent-color), 70%, 50%, 0.01) 100%);
-  --gradient-surface-badge: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-background-color), 28%, 96%, 0.96));
+  --gradient-surface-badge: var(--gradient-tone-neutral);
   --gradient-surface-badge-neutral: var(--gradient-tone-neutral);
   --gradient-surface-brandmark: linear-gradient(180deg, hsla(var(--base-accent-color), 78%, 62%, 1) 0%, hsla(var(--base-accent-color), 62%, 45%, 1) 100%);
-  --gradient-surface-context: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.96), hsla(var(--base-background-color), 42%, 95%, 0.92));
-  --gradient-surface-delete-pending: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.96), hsla(var(--base-danger-color), 100%, 97%, 0.92));
+  --gradient-surface-context: var(--gradient-tone-neutral);
+  --gradient-surface-delete-pending: var(--gradient-tone-danger);
   --gradient-surface-header-glow: radial-gradient(circle, hsla(var(--base-accent-color), 70%, 50%, 0.22), transparent 68%);
-  --gradient-surface-menu-panel: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-background-color), 35%, 98%, 0.98));
-  --gradient-surface-menu-trigger-base: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-background-color), 35%, 97%, 0.96));
-  --gradient-surface-preview: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-background-color), 32%, 97%, 0.95));
+  --gradient-surface-menu-panel: var(--gradient-surface-default);
+  --gradient-surface-menu-trigger-base: var(--gradient-surface-default);
+  --gradient-surface-preview: var(--gradient-surface-default);
   --gradient-surface-preview-glow: radial-gradient(circle at top right, hsla(var(--base-accent-color), 70%, 50%, 0.18), transparent 70%);
-  --gradient-surface-sidebar: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.95), hsla(var(--base-background-color), 35%, 98%, 0.92));
+  --gradient-surface-sidebar: var(--gradient-surface-default);
   --gradient-surface-skeleton:
     linear-gradient(90deg, hsla(var(--base-background-color), 36%, 92%, 0.9), hsla(var(--base-background-color), 35%, 96%, 0.95), hsla(var(--base-background-color), 36%, 92%, 0.9));
 }

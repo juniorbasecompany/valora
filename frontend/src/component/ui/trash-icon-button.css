@@ -3,5 +3,5 @@
  * (painel editor, linha de fórmula, etc.). Uma única mistura 28% garante paridade visual.
  */
 :root {
-  --ui-delete-pending-surface: color-mix(in srgb, var(--color-danger-action) 28%, hsla(var(--base-background-color), 100%, 100%, 1));
+  --ui-delete-pending-surface: color-mix(in srgb, var(--color-danger-action) 28%, var(--color-surface));
 }

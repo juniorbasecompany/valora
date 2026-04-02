@@ -5,17 +5,17 @@
   --base-good-color: 141;
   --base-warn-color: 36;
   --base-bad-color: 1;
-  --base-purple-color: 262;
-  --base-teal-color: 180;
+  --base-purple-color: var(--base-brand-color);
+  --base-teal-color: var(--base-brand-color);
 
   --bg: hsla(var(--base-background-color), 25%, 96%, 1);
   --surface: hsla(var(--base-background-color), 100%, 100%, 1);
-  --surface-muted: hsla(var(--base-background-color), 38%, 98%, 1);
+  --surface-muted: var(--surface);
   --line: hsla(var(--base-color), 35%, 90%, 1);
-  --line-strong: hsla(var(--base-color), 32%, 84%, 1);
+  --line-strong: var(--line);
   --text: hsla(var(--base-color), 39%, 15%, 1);
   --text-muted: hsla(var(--base-color), 17%, 44%, 1);
-  --text-soft: hsla(var(--base-color), 14%, 54%, 1);
+  --text-soft: var(--text-muted);
   --brand: hsla(var(--base-brand-color), 70%, 49%, 1);
   --brand-soft: hsla(var(--base-brand-color), 100%, 95%, 1);
   --good: hsla(var(--base-good-color), 63%, 33%, 1);
@@ -24,10 +24,10 @@
   --warn-soft: hsla(var(--base-warn-color), 100%, 94%, 1);
   --bad: hsla(var(--base-bad-color), 54%, 49%, 1);
   --bad-soft: hsla(var(--base-bad-color), 74%, 95%, 1);
-  --purple: hsla(var(--base-purple-color), 63%, 57%, 1);
-  --purple-soft: hsla(var(--base-purple-color), 100%, 95%, 1);
-  --teal: hsla(var(--base-teal-color), 68%, 33%, 1);
-  --teal-soft: hsla(var(--base-teal-color), 57%, 93%, 1);
+  --purple: var(--brand);
+  --purple-soft: var(--brand-soft);
+  --teal: var(--brand);
+  --teal-soft: var(--brand-soft);
   --shadow: 0 10px 28px hsla(var(--base-color), 39%, 11%, 0.08);
   --radius-lg: 10px;
   --radius-md: 7px;

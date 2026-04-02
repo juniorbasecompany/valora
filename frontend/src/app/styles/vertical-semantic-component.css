@@ -473,7 +473,7 @@
       var(--color-location-nest-end) var(--ui-location-tone-dark-share));
   overflow: hidden;
   padding: 0.5rem;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.42), var(--shadow-xs);
+  box-shadow: inset 0 1px 0 var(--color-surface-inset-line), var(--shadow-xs);
   transition:
     border-color 0.16s ease,
     background 0.16s ease,
@@ -495,7 +495,7 @@
 .ui-location-nest-box[data-selected="true"] {
   border-color: var(--color-accent-border-emphasis);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.42),
+    inset 0 1px 0 var(--color-surface-inset-line),
     0 0 0 1px color-mix(in srgb, var(--color-accent-border-emphasis) 28%, transparent),
     var(--shadow-sm);
 }
@@ -591,7 +591,7 @@
       var(--color-location-nest-end) var(--ui-hierarchy-dropdown-tone-dark-share));
   overflow: hidden;
   padding: 0.4rem;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.42), var(--shadow-xs);
+  box-shadow: inset 0 1px 0 var(--color-surface-inset-line), var(--shadow-xs);
   transition:
     border-color 0.16s ease,
     background 0.16s ease,
@@ -602,7 +602,7 @@
 .ui-hierarchy-dropdown-nest-box[data-selected="true"] {
   border-color: var(--color-accent-border-emphasis);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.42),
+    inset 0 1px 0 var(--color-surface-inset-line),
     0 0 0 1px color-mix(in srgb, var(--color-accent-border-emphasis) 28%, transparent),
     var(--shadow-sm);
 }
@@ -2147,9 +2147,9 @@
   height: 5rem;
   margin: 0;
   padding: 0.25rem;
-  border: var(--border-width-default) solid #e6e8ec;
+  border: var(--border-width-default) solid var(--color-formula-handle-border);
   border-radius: 6px;
-  background-color: #f6f7f9;
+  background-color: var(--color-formula-handle-surface);
   box-sizing: border-box;
   cursor: grab;
 }
@@ -2175,10 +2175,10 @@
   min-height: 2.5rem;
   padding: 0.35rem;
   margin: 0;
-  border: var(--border-width-default) solid #dadce0;
+  border: var(--border-width-default) solid var(--color-trash-neutral-border);
   border-radius: 6px;
-  background: #eceef2;
-  color: #5f6368;
+  background: var(--color-trash-neutral-surface);
+  color: var(--color-trash-neutral-text);
   cursor: pointer;
   transition:
     border-color 0.16s ease,
@@ -2187,8 +2187,8 @@
 }
 
 .ui-trash-icon-button:hover:not(:disabled) {
-  background: #e2e5ea;
-  border-color: #c8ccd4;
+  background: var(--color-trash-neutral-hover-surface);
+  border-color: var(--color-trash-neutral-hover-border);
 }
 
 .ui-trash-icon-button--marked {

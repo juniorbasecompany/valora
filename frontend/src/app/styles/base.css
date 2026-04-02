@@ -5,58 +5,75 @@
 @import "../../component/ui/trash-icon-button.css";
 
 :root {
-  color-scheme: light;
+  --base-color: 214;
+  --base-background-color: 240;
+  --base-accent-color: 214;
+  --base-danger-color: 4;
+  --base-positive-color: 141;
+  --base-attention-color: 38;
+  --base-construction-color: 38;
+  --base-filter-color: 32;
+  --base-editor-color: 141;
+
   --font-sans: "Segoe UI Variable Text", "Aptos", "Segoe UI", sans-serif;
   --font-display: "Segoe UI Variable Display", "Aptos Display", "Segoe UI",
     sans-serif;
 
-  --color-background: hsl(240, 100%, 98%);
-  --color-background-muted: #f5f8fc;
-  --color-surface: rgba(255, 255, 255, 0.96);
-  --color-surface-muted: #f8fbfe;
-  --color-surface-strong: #dfe8f2;
-  --color-surface-overlay: rgba(255, 255, 255, 0.8);
-  --color-border: #d5e0eb;
-  --color-border-strong: #b2c4d7;
-  --color-text: #132033;
-  --color-text-muted: #324560;
-  --color-text-subtle: #67778e;
-  --color-primary: #123d69;
-  --color-primary-hover: #10385d;
-  --color-primary-foreground: #ffffff;
-  --color-secondary-action: #748292;
-  --color-secondary-action-hover: #647181;
-  --color-secondary-action-foreground: #ffffff;
-  --color-accent: #2575d8;
-  --color-accent-strong: #0f549f;
-  --color-accent-soft: #e8f1ff;
-  --color-accent-vertical-border: hsla(240, 50%, 50%, 50%);
-  --color-filter-vertical-border: hsla(32, 100%, 50%, 75%);
-  --color-editor-vertical-border: hsla(141, 39%, 48%, 0.75);
+  --color-background: hsla(var(--base-background-color), 100%, 98%, 0.572);
+  --color-background-muted: hsla(var(--base-background-color), 45%, 97%, 1);
+  --color-surface: hsla(var(--base-background-color), 100%, 100%, 0.96);
+  --color-surface-muted: hsla(var(--base-background-color), 55%, 98%, 1);
+  --color-surface-strong: hsla(var(--base-background-color), 36%, 92%, 1);
+  --color-surface-overlay: hsla(var(--base-background-color), 100%, 100%, 0.8);
+  --color-border: hsla(var(--base-color), 35%, 88%, 1);
+  --color-border-strong: hsla(var(--base-color), 33%, 77%, 1);
+  --color-text: hsla(var(--base-color), 46%, 14%, 1);
+  --color-text-muted: hsla(var(--base-color), 31%, 29%, 1);
+  --color-text-subtle: hsla(var(--base-color), 18%, 48%, 1);
+  --color-primary: hsla(var(--base-accent-color), 71%, 24%, 1);
+  --color-primary-hover: hsla(var(--base-accent-color), 71%, 21%, 1);
+  --color-primary-foreground: hsla(var(--base-background-color), 100%, 100%, 1);
+  --color-secondary-action: hsla(var(--base-color), 14%, 52%, 1);
+  --color-secondary-action-hover: hsla(var(--base-color), 12%, 45%, 1);
+  --color-secondary-action-foreground: hsla(var(--base-background-color), 100%, 100%, 1);
+  --color-accent: hsla(var(--base-accent-color), 70%, 50%, 1);
+  --color-accent-strong: hsla(var(--base-accent-color), 82%, 34%, 1);
+  --color-accent-soft: hsla(var(--base-accent-color), 100%, 95%, 1);
+  --color-accent-vertical-border: hsla(var(--base-background-color), 50%, 50%, 0.5);
+  --color-filter-vertical-border: hsla(var(--base-filter-color), 100%, 50%, 0.75);
+  --color-editor-vertical-border: hsla(var(--base-editor-color), 39%, 48%, 0.75);
   --color-location-nest-start: lch(94.55% 8.75 290.86);
-  --color-location-nest-end: #ccccff;
-  --color-location-nest-border-start: rgba(92, 142, 216, 0.18);
-  --color-location-nest-border-end: rgba(56, 95, 180, 0.34);
-  --color-focus-ring: #2575d8;
-  --shadow-focus-ring: 0 0 0 4px rgba(37, 117, 216, 0.14);
+  --color-location-nest-end: hsla(var(--base-background-color), 100%, 90%, 1);
+  --color-location-nest-border-start: hsla(var(--base-accent-color), 60%, 60%, 0.18);
+  --color-location-nest-border-end: hsla(var(--base-accent-color), 53%, 46%, 0.34);
+  --color-focus-ring: hsla(var(--base-accent-color), 70%, 50%, 1);
+  --shadow-focus-ring: 0 0 0 4px hsla(var(--base-accent-color), 70%, 50%, 0.14);
 
-  --color-attention-surface: #fff6e5;
-  --color-attention-border: #efc572;
-  --color-attention-text: #8b5a09;
-  --color-positive-surface: #afe6c5;
-  --color-positive-border: hsl(141, 43%, 68%);
-  --color-positive-text: #1b6a42;
-  --color-danger-action: #cf5b54;
-  --color-danger-action-hover: #bb4a43;
-  --color-danger-action-foreground: #ffffff;
-  --color-danger-surface: #f5c6c3;
-  --color-danger-surface-hover: #ffe4e2;
-  --color-danger-border: #f0b0ac;
-  --color-danger-border-strong: #d14b43;
-  --color-danger-text: #9f2f2b;
-  --color-construction-surface: #fff7ea;
-  --color-construction-border: #e8bd6a;
-  --color-construction-text: #8e5f10;
+  --color-attention-surface: hsla(var(--base-attention-color), 100%, 95%, 1);
+  --color-attention-border: hsla(var(--base-attention-color), 79%, 69%, 1);
+  --color-attention-text: hsla(var(--base-attention-color), 88%, 29%, 1);
+  --color-positive-surface: hsla(var(--base-positive-color), 52%, 79%, 1);
+  --color-positive-border: hsla(var(--base-positive-color), 43%, 68%, 1);
+  --color-positive-text: hsla(var(--base-positive-color), 59%, 26%, 1);
+  --color-danger-action: hsla(var(--base-danger-color), 56%, 57%, 1);
+  --color-danger-action-hover: hsla(var(--base-danger-color), 47%, 50%, 1);
+  --color-danger-action-foreground: hsla(var(--base-background-color), 100%, 100%, 1);
+  --color-danger-surface: hsla(var(--base-danger-color), 63%, 86%, 1);
+  --color-danger-surface-hover: hsla(var(--base-danger-color), 100%, 94%, 1);
+  --color-danger-border: hsla(var(--base-danger-color), 67%, 81%, 1);
+  --color-danger-border-strong: hsla(var(--base-danger-color), 61%, 54%, 1);
+  --color-danger-text: hsla(var(--base-danger-color), 57%, 40%, 1);
+  --color-construction-surface: hsla(var(--base-construction-color), 100%, 96%, 1);
+  --color-construction-border: hsla(var(--base-construction-color), 73%, 66%, 1);
+  --color-construction-text: hsla(var(--base-construction-color), 80%, 31%, 1);
+  --color-formula-handle-border: hsla(var(--base-color), 18%, 90%, 1);
+  --color-formula-handle-surface: hsla(var(--base-background-color), 20%, 97%, 1);
+  --color-trash-neutral-border: hsla(var(--base-color), 12%, 87%, 1);
+  --color-trash-neutral-surface: hsla(var(--base-background-color), 24%, 93%, 1);
+  --color-trash-neutral-text: hsla(var(--base-color), 8%, 39%, 1);
+  --color-trash-neutral-hover-border: hsla(var(--base-color), 14%, 80%, 1);
+  --color-trash-neutral-hover-surface: hsla(var(--base-background-color), 16%, 90%, 1);
+  --color-surface-inset-line: hsla(var(--base-background-color), 100%, 100%, 0.42);
 
   --radius-control: 4px;
   --radius-card: 6px;
@@ -78,10 +95,10 @@
   --icon-stroke-width: 1;
   --icon-size: 1.8rem;
 
-  --shadow-xs: 0 1px 2px rgba(19, 32, 51, 0.04), 0 10px 22px rgba(19, 32, 51, 0.04);
-  --shadow-sm: 0 18px 40px rgba(19, 32, 51, 0.08);
-  --shadow-md: 0 28px 64px rgba(19, 32, 51, 0.14);
-  --shadow-lg: 0 40px 90px rgba(19, 32, 51, 0.18);
+  --shadow-xs: 0 1px 2px hsla(var(--base-color), 46%, 14%, 0.04), 0 10px 22px hsla(var(--base-color), 46%, 14%, 0.04);
+  --shadow-sm: 0 18px 40px hsla(var(--base-color), 46%, 14%, 0.08);
+  --shadow-md: 0 28px 64px hsla(var(--base-color), 46%, 14%, 0.14);
+  --shadow-lg: 0 40px 90px hsla(var(--base-color), 46%, 14%, 0.18);
 
   --space-section: 1.75rem;
   --space-card: 1.35rem;
@@ -127,52 +144,52 @@
   --z-menu-panel: 100;
   --z-drawer: 120;
 
-  --color-selection-surface: rgba(37, 117, 216, 0.16);
-  --color-accent-border-subtle: rgba(37, 117, 216, 0.12);
-  --color-accent-border-soft: rgba(37, 117, 216, 0.14);
-  --color-accent-border-default: rgba(37, 117, 216, 0.16);
-  --color-accent-border-strong: rgba(37, 117, 216, 0.18);
-  --color-accent-border-active: rgba(37, 117, 216, 0.22);
-  --color-accent-border-focus: rgba(37, 117, 216, 0.38);
-  --color-accent-border-flash: rgba(37, 117, 216, 0.46);
-  --color-accent-surface-soft: rgba(216, 233, 255, 0.62);
-  --color-accent-surface-muted: rgba(232, 241, 255, 0.55);
-  --color-accent-surface-default: rgba(232, 241, 255, 0.65);
-  --color-accent-surface-strong: rgba(200, 224, 255, 0.88);
+  --color-selection-surface: hsla(var(--base-accent-color), 70%, 50%, 0.16);
+  --color-accent-border-subtle: hsla(var(--base-accent-color), 70%, 50%, 0.12);
+  --color-accent-border-soft: hsla(var(--base-accent-color), 70%, 50%, 0.14);
+  --color-accent-border-default: hsla(var(--base-accent-color), 70%, 50%, 0.16);
+  --color-accent-border-strong: hsla(var(--base-accent-color), 70%, 50%, 0.18);
+  --color-accent-border-active: hsla(var(--base-accent-color), 70%, 50%, 0.22);
+  --color-accent-border-focus: hsla(var(--base-accent-color), 70%, 50%, 0.38);
+  --color-accent-border-flash: hsla(var(--base-accent-color), 70%, 50%, 0.46);
+  --color-accent-surface-soft: hsla(var(--base-accent-color), 100%, 92%, 0.62);
+  --color-accent-surface-muted: hsla(var(--base-accent-color), 100%, 95%, 0.55);
+  --color-accent-surface-default: hsla(var(--base-accent-color), 100%, 95%, 0.65);
+  --color-accent-surface-strong: hsla(var(--base-accent-color), 100%, 89%, 0.88);
   --color-accent-drop-slot: rgb(from var(--color-accent) r g b / 0.7);
   --color-accent-hover-border: rgb(from var(--color-accent) r g b / 0.28);
   --color-accent-hover-surface: rgb(from var(--color-accent-soft) r g b / 0.45);
-  --color-construction-border-strong: rgba(232, 189, 106, 0.72);
-  --color-danger-focus-ring-soft: rgba(209, 75, 67, 0.08);
-  --color-surface-glass-soft: rgba(255, 255, 255, 0.72);
-  --color-surface-glass-strong: rgba(255, 255, 255, 0.8);
-  --color-surface-glass-stronger: rgba(255, 255, 255, 0.82);
-  --color-shell-topbar-surface: rgba(245, 248, 252, 0.72);
-  --color-shell-footer-surface: rgba(245, 248, 252, 0.78);
+  --color-construction-border-strong: hsla(var(--base-construction-color), 73%, 66%, 0.72);
+  --color-danger-focus-ring-soft: hsla(var(--base-danger-color), 61%, 54%, 0.08);
+  --color-surface-glass-soft: hsla(var(--base-background-color), 100%, 100%, 0.72);
+  --color-surface-glass-strong: hsla(var(--base-background-color), 100%, 100%, 0.8);
+  --color-surface-glass-stronger: hsla(var(--base-background-color), 100%, 100%, 0.82);
+  --color-shell-topbar-surface: hsla(var(--base-background-color), 45%, 97%, 0.72);
+  --color-shell-footer-surface: hsla(var(--base-background-color), 45%, 97%, 0.78);
   --color-auth-google-skeleton: rgb(from var(--color-border) r g b / 0.25);
   --color-auth-remember-surface: rgb(from var(--color-background-muted) r g b / 0.7);
   --color-auth-hero-radial: rgb(from var(--color-accent) r g b / 0.13);
-  --color-shadow-outline: rgba(19, 32, 51, 0.03);
-  --color-accent-border-emphasis: rgba(37, 117, 216, 0.2);
-  --color-construction-border-default: rgba(232, 189, 106, 0.6);
-  --color-construction-border-soft: rgba(232, 189, 106, 0.45);
-  --color-danger-border-soft: rgba(209, 75, 67, 0.2);
-  --color-editor-flash-shadow: rgba(15, 23, 42, 0.12);
-  --color-hover-border: rgba(178, 196, 215, 0.7);
-  --color-overlay-scrim: rgba(19, 32, 51, 0.38);
-  --color-positive-border-soft: rgba(138, 208, 162, 0.5);
-  --color-surface-glass: rgba(255, 255, 255, 0.7);
-  --color-surface-glass-frame: rgba(255, 255, 255, 0.85);
-  --color-surface-glass-muted: rgba(255, 255, 255, 0.75);
-  --color-surface-glass-panel: rgba(255, 255, 255, 0.88);
+  --color-shadow-outline: hsla(var(--base-color), 46%, 14%, 0.03);
+  --color-accent-border-emphasis: hsla(var(--base-accent-color), 70%, 50%, 0.2);
+  --color-construction-border-default: hsla(var(--base-construction-color), 73%, 66%, 0.6);
+  --color-construction-border-soft: hsla(var(--base-construction-color), 73%, 66%, 0.45);
+  --color-danger-border-soft: hsla(var(--base-danger-color), 61%, 54%, 0.2);
+  --color-editor-flash-shadow: hsla(var(--base-color), 47%, 11%, 0.12);
+  --color-hover-border: hsla(var(--base-color), 33%, 77%, 0.7);
+  --color-overlay-scrim: hsla(var(--base-color), 46%, 14%, 0.38);
+  --color-positive-border-soft: hsla(var(--base-positive-color), 50%, 68%, 0.5);
+  --color-surface-glass: hsla(var(--base-background-color), 100%, 100%, 0.7);
+  --color-surface-glass-frame: hsla(var(--base-background-color), 100%, 100%, 0.85);
+  --color-surface-glass-muted: hsla(var(--base-background-color), 100%, 100%, 0.75);
+  --color-surface-glass-panel: hsla(var(--base-background-color), 100%, 100%, 0.88);
 
-  --shadow-surface-inset: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  --shadow-surface-inset: inset 0 1px 0 hsla(var(--base-background-color), 100%, 100%, 0.75);
   --shadow-shell-topbar:
-    0 1px 0 rgba(255, 255, 255, 0.8),
-    0 16px 40px rgba(19, 32, 51, 0.06);
+    0 1px 0 hsla(var(--base-background-color), 100%, 100%, 0.8),
+    0 16px 40px hsla(var(--base-color), 46%, 14%, 0.06);
   --shadow-shell-footer:
-    0 -1px 0 rgba(255, 255, 255, 0.82),
-    0 -16px 40px rgba(19, 32, 51, 0.06);
+    0 -1px 0 hsla(var(--base-background-color), 100%, 100%, 0.82),
+    0 -16px 40px hsla(var(--base-color), 46%, 14%, 0.06);
   --shadow-focus-ring-danger: 0 0 0 4px var(--color-danger-focus-ring-soft);
   --shadow-status-dot-ring: 0 0 0 4px var(--color-accent-border-subtle);
   --shadow-editor-flash:
@@ -183,66 +200,66 @@
     0 0 0 1px var(--color-shadow-outline);
 
   --gradient-app-background:
-    radial-gradient(circle at top left, rgba(37, 117, 216, 0.14), transparent 28rem),
-    radial-gradient(circle at top right, rgba(30, 135, 120, 0.1), transparent 30rem),
-    linear-gradient(180deg, #f5f8fc 0%, #edf3f8 40%, #eef3f7 100%);
+    radial-gradient(circle at top left, hsla(var(--base-accent-color), 70%, 50%, 0.14), transparent 28rem),
+    radial-gradient(circle at top right, hsla(var(--base-editor-color), 64%, 32%, 0.1), transparent 30rem),
+    linear-gradient(180deg, hsla(var(--base-background-color), 45%, 97%, 1) 0%, hsla(var(--base-background-color), 40%, 95%, 1) 40%, hsla(var(--base-background-color), 36%, 95%, 1) 100%);
   --gradient-app-grid:
-    linear-gradient(rgba(255, 255, 255, 0.72) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.72) 1px, transparent 1px);
-  --gradient-surface-default: linear-gradient(180deg, hsla(240, 100%, 97%, 0.9), hsla(240, 100%, 99%, 0.9));
-  --gradient-surface-card: linear-gradient(180deg, hsla(240, 100%, 99%, 0.9), hsla(240, 100%, 97%, 0.9));
-  --gradient-surface-construction: linear-gradient(180deg, rgba(255, 247, 232, 0.95), rgba(255, 241, 213, 0.9));
+    linear-gradient(hsla(var(--base-background-color), 100%, 100%, 0.72) 1px, transparent 1px),
+    linear-gradient(90deg, hsla(var(--base-background-color), 100%, 100%, 0.72) 1px, transparent 1px);
+  --gradient-surface-default: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 97%, 0.9), hsla(var(--base-background-color), 100%, 99%, 0.9));
+  --gradient-surface-card: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 99%, 0.9), hsla(var(--base-background-color), 100%, 97%, 0.9));
+  --gradient-surface-construction: linear-gradient(180deg, hsla(var(--base-construction-color), 100%, 95%, 0.95), hsla(var(--base-construction-color), 100%, 92%, 0.9));
   --gradient-surface-sidebar-glow:
-    linear-gradient(180deg, rgba(37, 117, 216, 0.06), transparent 22%),
-    radial-gradient(circle at left top, rgba(232, 189, 106, 0.12), transparent 18rem);
+    linear-gradient(180deg, hsla(var(--base-accent-color), 70%, 50%, 0.06), transparent 22%),
+    radial-gradient(circle at left top, hsla(var(--base-construction-color), 73%, 66%, 0.12), transparent 18rem);
   --gradient-surface-panel-line:
     linear-gradient(90deg,
-      rgba(37, 117, 216, 0.18),
-      rgba(255, 255, 255, 0.7),
-      rgba(30, 135, 120, 0.08));
-  --gradient-surface-card-soon: linear-gradient(180deg, rgba(255, 247, 234, 0.92), rgba(255, 255, 255, 0.98));
+      hsla(var(--base-accent-color), 70%, 50%, 0.18),
+      hsla(var(--base-background-color), 100%, 100%, 0.7),
+      hsla(var(--base-editor-color), 64%, 32%, 0.08));
+  --gradient-surface-card-soon: linear-gradient(180deg, hsla(var(--base-construction-color), 100%, 95%, 0.92), hsla(var(--base-background-color), 100%, 100%, 0.98));
   --gradient-surface-card-stripe:
     repeating-linear-gradient(135deg,
-      rgba(232, 189, 106, 0.12),
-      rgba(232, 189, 106, 0.12) 12px,
+      hsla(var(--base-construction-color), 73%, 66%, 0.12),
+      hsla(var(--base-construction-color), 73%, 66%, 0.12) 12px,
       transparent 12px,
       transparent 24px);
-  --gradient-surface-topbar-chip: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(236, 243, 252, 0.94));
-  --gradient-surface-menu-trigger-active: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(239, 245, 251, 0.98));
-  --gradient-surface-nav-soon: linear-gradient(180deg, rgba(255, 247, 232, 0.84), rgba(255, 255, 255, 0.96));
-  --gradient-surface-input: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(248, 251, 255, 0.98));
-  --gradient-surface-input-disabled: linear-gradient(180deg, rgba(246, 248, 251, 0.98), rgba(239, 244, 249, 0.96));
-  --gradient-tone-neutral: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(237, 244, 252, 0.9));
-  --gradient-tone-attention: linear-gradient(180deg, rgba(255, 255, 255, 0.94), var(--color-attention-surface));
-  --gradient-tone-positive: linear-gradient(180deg, rgba(255, 255, 255, 0.94), var(--color-positive-surface));
-  --gradient-tone-danger: linear-gradient(180deg, rgba(255, 255, 255, 0.94), var(--color-danger-surface));
-  --gradient-tone-construction: linear-gradient(180deg, rgba(255, 255, 255, 0.94), var(--color-construction-surface));
-  --gradient-surface-attention-soft: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 246, 229, 0.96));
-  --gradient-surface-positive-soft: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(233, 248, 239, 0.96));
-  --gradient-surface-construction-soft: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 247, 234, 0.96));
-  --gradient-surface-avatar: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(232, 241, 255, 0.98));
-  --gradient-surface-icon-badge: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(232, 241, 255, 0.96));
-  --gradient-surface-muted: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(243, 247, 252, 0.94));
-  --gradient-surface-accent: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(232, 241, 255, 0.98));
+  --gradient-surface-topbar-chip: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.96), hsla(var(--base-background-color), 42%, 95%, 0.94));
+  --gradient-surface-menu-trigger-active: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 1), hsla(var(--base-background-color), 38%, 95%, 0.98));
+  --gradient-surface-nav-soon: linear-gradient(180deg, hsla(var(--base-construction-color), 100%, 95%, 0.84), hsla(var(--base-background-color), 100%, 100%, 0.96));
+  --gradient-surface-input: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 1), hsla(var(--base-background-color), 100%, 99%, 0.98));
+  --gradient-surface-input-disabled: linear-gradient(180deg, hsla(var(--base-background-color), 32%, 97%, 0.98), hsla(var(--base-background-color), 30%, 95%, 0.96));
+  --gradient-tone-neutral: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.94), hsla(var(--base-background-color), 42%, 95%, 0.9));
+  --gradient-tone-attention: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.94), var(--color-attention-surface));
+  --gradient-tone-positive: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.94), var(--color-positive-surface));
+  --gradient-tone-danger: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.94), var(--color-danger-surface));
+  --gradient-tone-construction: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.94), var(--color-construction-surface));
+  --gradient-surface-attention-soft: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-attention-color), 100%, 95%, 0.96));
+  --gradient-surface-positive-soft: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-positive-color), 52%, 94%, 0.96));
+  --gradient-surface-construction-soft: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-construction-color), 100%, 95%, 0.96));
+  --gradient-surface-avatar: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-accent-color), 100%, 95%, 0.98));
+  --gradient-surface-icon-badge: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-accent-color), 100%, 95%, 0.96));
+  --gradient-surface-muted: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.96), hsla(var(--base-background-color), 35%, 96%, 0.94));
+  --gradient-surface-accent: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 1), hsla(var(--base-accent-color), 100%, 95%, 0.98));
   --gradient-accent-emphasis: linear-gradient(180deg, var(--color-accent), var(--color-accent-strong));
   --gradient-editor-flash-fill:
     linear-gradient(180deg,
-      rgba(37, 117, 216, 0.18),
-      rgba(37, 117, 216, 0.07) 45%,
-      rgba(37, 117, 216, 0.01) 100%);
-  --gradient-surface-badge: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(243, 247, 251, 0.96));
+      hsla(var(--base-accent-color), 70%, 50%, 0.18),
+      hsla(var(--base-accent-color), 70%, 50%, 0.07) 45%,
+      hsla(var(--base-accent-color), 70%, 50%, 0.01) 100%);
+  --gradient-surface-badge: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-background-color), 28%, 96%, 0.96));
   --gradient-surface-badge-neutral: var(--gradient-tone-neutral);
-  --gradient-surface-brandmark: linear-gradient(180deg, #4f8eea 0%, #2b63bb 100%);
-  --gradient-surface-context: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(237, 244, 252, 0.92));
-  --gradient-surface-delete-pending: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 240, 239, 0.92));
-  --gradient-surface-header-glow: radial-gradient(circle, rgba(37, 117, 216, 0.22), transparent 68%);
-  --gradient-surface-menu-panel: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 250, 253, 0.98));
-  --gradient-surface-menu-trigger-base: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 249, 252, 0.96));
-  --gradient-surface-preview: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 249, 253, 0.95));
-  --gradient-surface-preview-glow: radial-gradient(circle at top right, rgba(37, 117, 216, 0.18), transparent 70%);
-  --gradient-surface-sidebar: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(247, 250, 253, 0.92));
+  --gradient-surface-brandmark: linear-gradient(180deg, hsla(var(--base-accent-color), 78%, 62%, 1) 0%, hsla(var(--base-accent-color), 62%, 45%, 1) 100%);
+  --gradient-surface-context: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.96), hsla(var(--base-background-color), 42%, 95%, 0.92));
+  --gradient-surface-delete-pending: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.96), hsla(var(--base-danger-color), 100%, 97%, 0.92));
+  --gradient-surface-header-glow: radial-gradient(circle, hsla(var(--base-accent-color), 70%, 50%, 0.22), transparent 68%);
+  --gradient-surface-menu-panel: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-background-color), 35%, 98%, 0.98));
+  --gradient-surface-menu-trigger-base: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-background-color), 35%, 97%, 0.96));
+  --gradient-surface-preview: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.98), hsla(var(--base-background-color), 32%, 97%, 0.95));
+  --gradient-surface-preview-glow: radial-gradient(circle at top right, hsla(var(--base-accent-color), 70%, 50%, 0.18), transparent 70%);
+  --gradient-surface-sidebar: linear-gradient(180deg, hsla(var(--base-background-color), 100%, 100%, 0.95), hsla(var(--base-background-color), 35%, 98%, 0.92));
   --gradient-surface-skeleton:
-    linear-gradient(90deg, rgba(223, 232, 242, 0.9), rgba(243, 247, 252, 0.95), rgba(223, 232, 242, 0.9));
+    linear-gradient(90deg, hsla(var(--base-background-color), 36%, 92%, 0.9), hsla(var(--base-background-color), 35%, 96%, 0.95), hsla(var(--base-background-color), 36%, 92%, 0.9));
 }
 
 *,

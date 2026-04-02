@@ -30,12 +30,12 @@
   --color-text: hsla(var(--base-color), 46%, 14%, 1);
   --color-text-muted: hsla(var(--base-color), 31%, 29%, 1);
   --color-text-subtle: hsla(var(--base-color), 18%, 48%, 1);
-  --color-primary: hsla(var(--base-accent-color), 71%, 24%, 1);
-  --color-primary-hover: hsla(var(--base-accent-color), 71%, 20%, 1);
+  --color-primary: hsla(var(--base-accent-color), 68%, 42%, 1);
+  --color-primary-hover: hsla(var(--base-accent-color), 68%, 38%, 1);
   --color-primary-foreground: hsla(var(--base-background-color), 100%, 100%, 1);
-  --color-secondary-action: var(--color-surface);
-  --color-secondary-action-hover: var(--color-surface-muted);
-  --color-secondary-action-foreground: var(--color-text);
+  --color-secondary-action: hsla(var(--base-accent-color), 100%, 95%, 1);
+  --color-secondary-action-hover: hsla(var(--base-accent-color), 100%, 92%, 1);
+  --color-secondary-action-foreground: var(--color-accent-strong);
   --color-accent: hsla(var(--base-accent-color), 70%, 50%, 1);
   --color-accent-strong: hsla(var(--base-accent-color), 82%, 34%, 1);
   --color-accent-soft: hsla(var(--base-accent-color), 100%, 95%, 1);

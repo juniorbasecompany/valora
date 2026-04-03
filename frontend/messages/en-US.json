@@ -532,7 +532,6 @@
         "orderPending": "-"
       }
     },
-    "dragDropHint": "Drag a handle to reorder before or after a sibling, or drop on a row to move under that location.",
     "dragHandleAria": "Drag to reorder or reparent",
     "dragSubtreeNote": "Includes {count} nested items below this one.",
     "dragDropDisabledWhileFilterHint": "Clear the search filter to drag and drop items in the tree.",
@@ -598,7 +597,6 @@
         "orderPending": "-"
       }
     },
-    "dragDropHint": "Drag a handle to reorder before or after a sibling, or drop on a row to move under that item.",
     "dragHandleAria": "Drag to reorder or reparent",
     "dragSubtreeNote": "Includes {count} nested items below this one.",
     "dragDropDisabledWhileFilterHint": "Clear the search filter to drag and drop items in the tree.",

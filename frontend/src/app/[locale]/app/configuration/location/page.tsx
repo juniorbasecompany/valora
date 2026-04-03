@@ -72,7 +72,6 @@ export default async function LocationConfigurationPage({
           nameHint: t("section.identity.nameHint"),
           displayNameLabel: t("section.identity.displayNameLabel"),
           displayNameHint: t("section.identity.displayNameHint"),
-          dragDropHint: t("dragDropHint"),
           dragHandleAria: t("dragHandleAria"),
           dragDropDisabledWhileFilterHint: t("dragDropDisabledWhileFilterHint"),
           cancel: t("action.cancel"),

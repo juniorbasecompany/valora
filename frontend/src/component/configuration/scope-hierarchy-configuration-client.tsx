@@ -844,14 +844,10 @@ export function ScopeHierarchyConfigurationClient<
             </div>
           ) : null}
 
-          {directory && directory.can_edit ? (
-            filterActive ? (
-              <p className="ui-location-nest-dnd-filter-note">
-                {copy.dragDropDisabledWhileFilterHint}
-              </p>
-            ) : (
-              <p className="ui-location-nest-dnd-filter-note">{copy.dragDropHint}</p>
-            )
+          {directory && directory.can_edit && filterActive ? (
+            <p className="ui-location-nest-dnd-filter-note">
+              {copy.dragDropDisabledWhileFilterHint}
+            </p>
           ) : null}
 
           {directory ? (

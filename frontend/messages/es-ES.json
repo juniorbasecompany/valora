@@ -530,7 +530,6 @@
         "orderPending": "-"
       }
     },
-    "dragDropHint": "Arrastra el asa para reordenar antes o después de un hermano, o suéltala sobre una fila para moverla debajo de esa ubicación.",
     "dragHandleAria": "Arrastrar para reordenar o cambiar de nivel",
     "dragSubtreeNote": "Incluye {count} elementos anidados debajo de este.",
     "dragDropDisabledWhileFilterHint": "Borra el filtro de búsqueda para arrastrar elementos en el árbol.",
@@ -594,7 +593,6 @@
         "orderPending": "-"
       }
     },
-    "dragDropHint": "Arrastra el asa para reordenar antes o después de un hermano, o suéltala sobre una fila para moverla debajo de ese ítem.",
     "dragHandleAria": "Arrastrar para reordenar o cambiar de nivel",
     "dragSubtreeNote": "Incluye {count} elementos anidados debajo de este.",
     "dragDropDisabledWhileFilterHint": "Borra el filtro de búsqueda para arrastrar elementos en el árbol.",

@@ -525,6 +525,9 @@
       }
     },
     "dragDropHint": "Drag a handle to reorder before or after a sibling, or drop on a row to move under that location.",
+    "dragHandleAria": "Drag to reorder or reparent",
+    "dragSubtreeNote": "Includes {count} nested items below this one.",
+    "dragDropDisabledWhileFilterHint": "Clear the search filter to drag and drop items in the tree.",
     "action": {
       "cancel": "Cancel",
       "new": "New",
@@ -540,7 +543,6 @@
     "readOnlyNotice": "You can review the location directory, but only master or admin members can create or edit hierarchical records.",
     "createdNotice": "Location created successfully.",
     "deletedNotice": "Location deleted successfully.",
-    "movedNotice": "Location moved successfully.",
     "error": {
       "load": "Could not load the location directory. Try again.",
       "save": "Could not save the location. Try again.",
@@ -589,6 +591,9 @@
       }
     },
     "dragDropHint": "Drag a handle to reorder before or after a sibling, or drop on a row to move under that item.",
+    "dragHandleAria": "Drag to reorder or reparent",
+    "dragSubtreeNote": "Includes {count} nested items below this one.",
+    "dragDropDisabledWhileFilterHint": "Clear the search filter to drag and drop items in the tree.",
     "action": {
       "cancel": "Cancel",
       "new": "New",
@@ -604,7 +609,6 @@
     "readOnlyNotice": "You can review productive units, but only master or admin members can create or edit hierarchical records.",
     "createdNotice": "Productive unit created successfully.",
     "deletedNotice": "Productive unit deleted successfully.",
-    "movedNotice": "Productive unit moved successfully.",
     "error": {
       "load": "Could not load the directory. Try again.",
       "save": "Could not save. Try again.",

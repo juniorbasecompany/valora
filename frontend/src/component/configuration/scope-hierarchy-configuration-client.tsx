@@ -4,9 +4,32 @@
  * Cliente partilhado para painéis de diretório hierárquico por escopo (locais, unidades produtivas).
  * O markup e o fluxo espelham um único padrão para evitar divergência de layout entre recursos.
  */
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  pointerWithin,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent
+} from "@dnd-kit/core";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
+
+import {
+  HierarchyDragHandle,
+  HierarchyDragHandleOverlayPreview,
+  HierarchyDropGap,
+  HierarchyIntoWrap
+} from "@/component/configuration/scope-hierarchy-dnd-ui";
+import {
+  buildMoveRequestBody,
+  computeHierarchyMove,
+  parseDragId,
+  parseDropId
+} from "@/component/configuration/scope-hierarchy-tree-dnd";
 
 import {
   directoryEditorCanSubmitForDirectoryEditor,
@@ -84,7 +107,107 @@ type HierarchyNestNodeProps<TItem extends TenantScopeHierarchyItemBase> = {
   resolveLabel: (item: TItem) => string;
   onSelect: (item: TItem) => void;
   onCreate: (parentId: number | null) => void;
+  dndEnabled: boolean;
+  dragHandleAriaLabel: string;
+  activeDragId: number | null;
 };
+
+type HierarchySiblingListProps<TItem extends TenantScopeHierarchyItemBase> = {
+  parentId: number | null;
+  siblingList: TItem[];
+  childrenByParent: Map<number | null, TItem[]>;
+  selectedItemId: number | null;
+  createParentId: number | null;
+  isCreateMode: boolean;
+  isBusy: boolean;
+  maxDepth: number;
+  createChildAriaLabel: string;
+  resolveLabel: (item: TItem) => string;
+  onSelect: (item: TItem) => void;
+  onCreate: (parentId: number | null) => void;
+  dndEnabled: boolean;
+  dragHandleAriaLabel: string;
+  activeDragId: number | null;
+};
+
+function HierarchySiblingList<TItem extends TenantScopeHierarchyItemBase>({
+  parentId,
+  siblingList,
+  childrenByParent,
+  selectedItemId,
+  createParentId,
+  isCreateMode,
+  isBusy,
+  maxDepth,
+  createChildAriaLabel,
+  resolveLabel,
+  onSelect,
+  onCreate,
+  dndEnabled,
+  dragHandleAriaLabel,
+  activeDragId
+}: HierarchySiblingListProps<TItem>) {
+  if (!dndEnabled) {
+    return (
+      <>
+        {siblingList.map((row) => (
+          <HierarchyNestNode
+            key={row.id}
+            item={row}
+            childrenByParent={childrenByParent}
+            selectedItemId={selectedItemId}
+            createParentId={createParentId}
+            isCreateMode={isCreateMode}
+            isBusy={isBusy}
+            maxDepth={maxDepth}
+            createChildAriaLabel={createChildAriaLabel}
+            resolveLabel={resolveLabel}
+            onSelect={onSelect}
+            onCreate={onCreate}
+            dndEnabled={false}
+            dragHandleAriaLabel={dragHandleAriaLabel}
+            activeDragId={activeDragId}
+          />
+        ))}
+      </>
+    );
+  }
+
+  return (
+    <div className="ui-location-nest-sibling-stack">
+      <HierarchyDropGap
+        parentId={parentId}
+        gapIndex={0}
+        disabled={isBusy}
+      />
+      {siblingList.map((row, idx) => (
+        <Fragment key={row.id}>
+          <HierarchyNestNode
+            item={row}
+            childrenByParent={childrenByParent}
+            selectedItemId={selectedItemId}
+            createParentId={createParentId}
+            isCreateMode={isCreateMode}
+            isBusy={isBusy}
+            maxDepth={maxDepth}
+            createChildAriaLabel={createChildAriaLabel}
+            resolveLabel={resolveLabel}
+            onSelect={onSelect}
+            onCreate={onCreate}
+            dndEnabled
+            dragHandleAriaLabel={dragHandleAriaLabel}
+            activeDragId={activeDragId}
+          />
+          <HierarchyDropGap
+            parentId={parentId}
+            gapIndex={idx + 1}
+            disabled={isBusy}
+          />
+        </Fragment>
+      ))}
+    </div>
+  );
+}
 
 function parseHierarchySelectionKey(raw: string | null): SelectedHierarchyKey {
   if (raw === "new") {
@@ -135,16 +258,39 @@ function HierarchyNestNode<TItem extends TenantScopeHierarchyItemBase>({
   createChildAriaLabel,
   resolveLabel,
   onSelect,
-  onCreate
+  onCreate,
+  dndEnabled,
+  dragHandleAriaLabel,
+  activeDragId
 }: HierarchyNestNodeProps<TItem>) {
   const childList = childrenByParent.get(item.id) ?? [];
   const label = resolveLabel(item);
   const description = item.display_name.trim();
   const isSelected = !isCreateMode && item.id === selectedItemId;
   const isCreateContext = isCreateMode && createParentId === item.id;
+  const showDndChrome = dndEnabled && item.can_move;
 
   const containerClassName =
     item.depth === 0 ? "ui-directory-item" : "ui-location-nest-box";
+
+  const bodyButton = (
+    <button
+      type="button"
+      className="ui-location-nest-body"
+      onClick={(event) => {
+        event.stopPropagation();
+        onSelect(item);
+      }}
+      disabled={isBusy}
+    >
+      <div className="ui-location-nest-copy">
+        <p className="ui-location-nest-label">{label}</p>
+        {description && description !== label ? (
+          <p className="ui-location-nest-description">{description}</p>
+        ) : null}
+      </div>
+    </button>
+  );
 
   return (
     <section
@@ -160,23 +306,29 @@ function HierarchyNestNode<TItem extends TenantScopeHierarchyItemBase>({
         onSelect(item);
       }}
     >
-      <div className="ui-location-nest-head">
-        <button
-          type="button"
-          className="ui-location-nest-body"
-          onClick={(event) => {
-            event.stopPropagation();
-            onSelect(item);
-          }}
-          disabled={isBusy}
-        >
-          <div className="ui-location-nest-copy">
-            <p className="ui-location-nest-label">{label}</p>
-            {description && description !== label ? (
-              <p className="ui-location-nest-description">{description}</p>
-            ) : null}
-          </div>
-        </button>
+      <div
+        className={
+          showDndChrome
+            ? "ui-location-nest-head ui-location-nest-head--dnd"
+            : "ui-location-nest-head"
+        }
+        data-has-create={showDndChrome && item.can_create_child ? "true" : undefined}
+      >
+        {showDndChrome ? (
+          <HierarchyIntoWrap itemId={item.id} disabled={isBusy}>
+            {bodyButton}
+          </HierarchyIntoWrap>
+        ) : (
+          bodyButton
+        )}
+
+        {showDndChrome ? (
+          <HierarchyDragHandle
+            itemId={item.id}
+            disabled={isBusy}
+            ariaLabel={dragHandleAriaLabel}
+          />
+        ) : null}
 
         {item.can_create_child ? (
           <button
@@ -197,22 +349,23 @@ function HierarchyNestNode<TItem extends TenantScopeHierarchyItemBase>({
 
       {childList.length > 0 ? (
         <div className="ui-location-nest-children">
-          {childList.map((child) => (
-            <HierarchyNestNode
-              key={child.id}
-              item={child}
-              childrenByParent={childrenByParent}
-              selectedItemId={selectedItemId}
-              createParentId={createParentId}
-              isCreateMode={isCreateMode}
-              isBusy={isBusy}
-              maxDepth={maxDepth}
-              createChildAriaLabel={createChildAriaLabel}
-              resolveLabel={resolveLabel}
-              onSelect={onSelect}
-              onCreate={onCreate}
-            />
-          ))}
+          <HierarchySiblingList
+            parentId={item.id}
+            siblingList={childList}
+            childrenByParent={childrenByParent}
+            selectedItemId={selectedItemId}
+            createParentId={createParentId}
+            isCreateMode={isCreateMode}
+            isBusy={isBusy}
+            maxDepth={maxDepth}
+            createChildAriaLabel={createChildAriaLabel}
+            resolveLabel={resolveLabel}
+            onSelect={onSelect}
+            onCreate={onCreate}
+            dndEnabled={dndEnabled}
+            dragHandleAriaLabel={dragHandleAriaLabel}
+            activeDragId={activeDragId}
+          />
         </div>
       ) : null}
     </section>
@@ -295,6 +448,8 @@ export function ScopeHierarchyConfigurationClient<
   const [isDeletePending, setIsDeletePending] = useState(false);
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
   const [filterQuery, setFilterQuery] = useState("");
+  const [activeDragId, setActiveDragId] = useState<number | null>(null);
+  const [isMoving, setIsMoving] = useState(false);
   const didMountFilterRef = useRef(false);
   const editorPanelElementRef = useRef<HTMLDivElement | null>(null);
   const { newIntentGeneration, bumpNewIntent } = useEditorNewIntentGeneration();
@@ -313,6 +468,19 @@ export function ScopeHierarchyConfigurationClient<
   const maxDepth = useMemo(
     () => itemList.reduce((max, item) => Math.max(max, item.depth), 0),
     [itemList]
+  );
+
+  const filterActive = Boolean(filterQuery.trim());
+  const dndEnabled =
+    Boolean(directory?.can_edit) && !filterActive && !isSaving && !isMoving;
+
+  const parentField =
+    apiSegment === "locations" ? "parent_location_id" : "parent_unity_id";
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 }
+    })
   );
 
   const selectedItem = useMemo(() => {
@@ -559,6 +727,87 @@ export function ScopeHierarchyConfigurationClient<
     validate
   ]);
 
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setRequestErrorMessage(null);
+    const id = parseDragId(String(event.active.id));
+    setActiveDragId(id);
+  }, []);
+
+  const handleDragCancel = useCallback(() => {
+    setActiveDragId(null);
+  }, []);
+
+  const handleDragEnd = useCallback(
+    async (event: DragEndEvent) => {
+      setActiveDragId(null);
+      const dragId = parseDragId(String(event.active.id));
+      const overRaw = event.over?.id;
+      const overId = overRaw != null ? String(overRaw) : null;
+      if (dragId == null || overId == null) {
+        return;
+      }
+      const drop = parseDropId(overId);
+      if (drop == null) {
+        return;
+      }
+      const payload = computeHierarchyMove(dragId, drop, childrenByParent);
+      if (payload == null || scopeId == null) {
+        return;
+      }
+
+      setIsMoving(true);
+      setRequestErrorMessage(null);
+      try {
+        const response = await fetch(
+          `/api/auth/tenant/current/scopes/${scopeId}/${apiSegment}/${dragId}/move`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(
+              buildMoveRequestBody(
+                payload.parentId,
+                payload.targetIndex,
+                parentField
+              )
+            )
+          }
+        );
+        const data: unknown = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          setRequestErrorMessage(
+            parseErrorDetail(data, copy.moveError) ?? copy.moveError
+          );
+          return;
+        }
+        const nextDirectory = data as TDirectory;
+        setDirectory(nextDirectory);
+        if (!isCreateMode) {
+          const nextItem = nextDirectory.item_list.find(
+            (row) => row.id === selectedItemId
+          );
+          if (nextItem) {
+            syncEditor(nextItem, false, null);
+          }
+        }
+        setHistoryRefreshKey((previous) => previous + 1);
+      } catch {
+        setRequestErrorMessage(copy.moveError);
+      } finally {
+        setIsMoving(false);
+      }
+    },
+    [
+      apiSegment,
+      childrenByParent,
+      copy.moveError,
+      isCreateMode,
+      parentField,
+      scopeId,
+      selectedItemId,
+      syncEditor
+    ]
+  );
+
   const resolveLabel = useCallback((item: TItem) => resolveHierarchyLabel(item), []);
   return (
     <ConfigurationDirectoryEditorShell
@@ -595,33 +844,57 @@ export function ScopeHierarchyConfigurationClient<
             </div>
           ) : null}
 
-          <div className="ui-directory-list ui-location-nest-list">
-            {directory?.can_create ? (
-              <ConfigurationDirectoryCreateButton
-                label={copy.directoryCreateLabel}
-                active={isCreateMode && parentId == null}
-                disabled={isSaving}
-                onClick={() => handleStartCreate(null)}
-              />
-            ) : null}
+          {directory && directory.can_edit ? (
+            filterActive ? (
+              <p className="ui-location-nest-dnd-filter-note">
+                {copy.dragDropDisabledWhileFilterHint}
+              </p>
+            ) : (
+              <p className="ui-location-nest-dnd-filter-note">{copy.dragDropHint}</p>
+            )
+          ) : null}
 
-            {rootItemList.map((item) => (
-              <HierarchyNestNode
-                key={item.id}
-                item={item}
-                childrenByParent={childrenByParent}
-                selectedItemId={selectedItem?.id ?? null}
-                createParentId={isCreateMode ? parentId : null}
-                isCreateMode={isCreateMode}
-                isBusy={isSaving}
-                maxDepth={maxDepth}
-                createChildAriaLabel={copy.newChild}
-                resolveLabel={resolveLabel}
-                onSelect={handleSelectItem}
-                onCreate={(draftParentId) => handleStartCreate(draftParentId)}
-              />
-            ))}
-          </div>
+          {directory ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={pointerWithin}
+              onDragStart={handleDragStart}
+              onDragEnd={(event) => void handleDragEnd(event)}
+              onDragCancel={handleDragCancel}
+            >
+              <div className="ui-directory-list ui-location-nest-list">
+                {directory.can_create ? (
+                  <ConfigurationDirectoryCreateButton
+                    label={copy.directoryCreateLabel}
+                    active={isCreateMode && parentId == null}
+                    disabled={isSaving || isMoving}
+                    onClick={() => handleStartCreate(null)}
+                  />
+                ) : null}
+
+                <HierarchySiblingList
+                  parentId={null}
+                  siblingList={rootItemList}
+                  childrenByParent={childrenByParent}
+                  selectedItemId={selectedItem?.id ?? null}
+                  createParentId={isCreateMode ? parentId : null}
+                  isCreateMode={isCreateMode}
+                  isBusy={isSaving || isMoving}
+                  maxDepth={maxDepth}
+                  createChildAriaLabel={copy.newChild}
+                  resolveLabel={resolveLabel}
+                  onSelect={handleSelectItem}
+                  onCreate={(draftParentId) => handleStartCreate(draftParentId)}
+                  dndEnabled={dndEnabled}
+                  dragHandleAriaLabel={copy.dragHandleAria}
+                  activeDragId={activeDragId}
+                />
+              </div>
+              <DragOverlay dropAnimation={null}>
+                {activeDragId != null ? <HierarchyDragHandleOverlayPreview /> : null}
+              </DragOverlay>
+            </DndContext>
+          ) : null}
         </>
       }
       editorForm={

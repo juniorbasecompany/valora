@@ -523,6 +523,9 @@
       }
     },
     "dragDropHint": "Arraste a alça para reordenar antes ou depois de um irmão, ou solte sobre uma linha para mover para baixo desse local.",
+    "dragHandleAria": "Arrastar para reordenar ou mudar o nível",
+    "dragSubtreeNote": "Inclui {count} itens aninhados abaixo deste.",
+    "dragDropDisabledWhileFilterHint": "Limpe o filtro de busca para arrastar itens na árvore.",
     "action": {
       "cancel": "Cancelar",
       "new": "Novo",
@@ -538,7 +541,6 @@
     "readOnlyNotice": "Você pode consultar o diretório de locais, mas só membros master ou administrador podem criar ou editar cadastros hierárquicos.",
     "createdNotice": "Local criado com sucesso.",
     "deletedNotice": "Local apagado com sucesso.",
-    "movedNotice": "Local movido com sucesso.",
     "error": {
       "load": "Não foi possível carregar o diretório de locais. Tente novamente.",
       "save": "Não foi possível salvar o local. Tente novamente.",
@@ -585,6 +587,9 @@
       }
     },
     "dragDropHint": "Arraste a alça para reordenar antes ou depois de um irmão, ou solte sobre uma linha para mover para baixo desse item.",
+    "dragHandleAria": "Arrastar para reordenar ou mudar o nível",
+    "dragSubtreeNote": "Inclui {count} itens aninhados abaixo deste.",
+    "dragDropDisabledWhileFilterHint": "Limpe o filtro de busca para arrastar itens na árvore.",
     "action": {
       "cancel": "Cancelar",
       "new": "Nova",
@@ -600,7 +605,6 @@
     "readOnlyNotice": "Você pode consultar as unidades produtivas, mas só membros master ou administrador podem criar ou editar cadastros hierárquicos.",
     "createdNotice": "Unidade produtiva criada com sucesso.",
     "deletedNotice": "Unidade produtiva apagada com sucesso.",
-    "movedNotice": "Unidade produtiva movida com sucesso.",
     "error": {
       "load": "Não foi possível carregar o diretório. Tente novamente.",
       "save": "Não foi possível salvar. Tente novamente.",

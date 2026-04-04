@@ -713,58 +713,20 @@ export function ScopeHierarchyConfigurationClient<
     }
 
     const nextDirectory = data as TDirectory;
-    const previousIdSet = new Set(directory.item_list.map((item) => item.id));
-
     setDirectory(nextDirectory);
-
-    if (isDeletePending) {
-      if (selectedItem) {
-        const parentIdAfterDelete = getParentId(selectedItem);
-        const parentRow =
-          parentIdAfterDelete != null
-            ? nextDirectory.item_list.find((row) => row.id === parentIdAfterDelete)
-            : null;
-        if (parentRow) {
-          syncEditor(parentRow, false, null);
-        } else if (nextDirectory.item_list.length > 0) {
-          syncEditor(nextDirectory.item_list[0], false, null);
-        } else {
-          syncEditor(null, true, null);
-        }
-      } else {
-        syncEditor(null, true, null);
-      }
-    } else if (isCreateMode) {
-      const created = nextDirectory.item_list.find((item) => !previousIdSet.has(item.id));
-      if (created) {
-        syncEditor(created, false, null);
-      } else {
-        syncEditor(null, true, null);
-      }
-    } else if (selectedItem) {
-      const updated = nextDirectory.item_list.find((item) => item.id === selectedItem.id);
-      if (updated) {
-        syncEditor(updated, false, null);
-      } else {
-        syncEditor(null, true, null);
-      }
-    } else {
-      syncEditor(null, true, null);
-    }
-
+    syncEditor(null, true, null);
     setHistoryRefreshKey((previous) => previous + 1);
   }, [
     apiSegment,
     buildSavePayload,
     directory,
     displayName,
-    getParentId,
     isCreateMode,
     isDeletePending,
     name,
     parentId,
     scopeId,
-    selectedItem,
+    selectedItem?.id,
     syncEditor,
     validate
   ]);
@@ -862,20 +824,20 @@ export function ScopeHierarchyConfigurationClient<
       filter={
         directory
           ? {
-              panel: (
-                <DirectoryFilterPanel>
-                  <DirectoryFilterCard>
-                    <DirectoryFilterTextField
-                      id={`${apiSegment}-filter-search`}
-                      label={copy.filterSearchLabel}
-                      value={filterQuery}
-                      onChange={setFilterQuery}
-                    />
-                  </DirectoryFilterCard>
-                </DirectoryFilterPanel>
-              ),
-              storageSegment: configurationSegment as DirectoryFilterStorageSegment
-            }
+            panel: (
+              <DirectoryFilterPanel>
+                <DirectoryFilterCard>
+                  <DirectoryFilterTextField
+                    id={`${apiSegment}-filter-search`}
+                    label={copy.filterSearchLabel}
+                    value={filterQuery}
+                    onChange={setFilterQuery}
+                  />
+                </DirectoryFilterCard>
+              </DirectoryFilterPanel>
+            ),
+            storageSegment: configurationSegment as DirectoryFilterStorageSegment
+          }
           : undefined
       }
       directoryAsideEditorGrowRatio="4-3"

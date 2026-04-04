@@ -498,7 +498,7 @@ export function ActionConfigurationClient({
         if (!response.ok) {
           setRequestErrorMessage(
             parseErrorDetail(data, tPage("directory.reorderError")) ??
-              tPage("directory.reorderError")
+            tPage("directory.reorderError")
           );
           setDirectory(snapshot);
           void loadActionDirectory(selectedActionKeyRef.current);
@@ -914,20 +914,20 @@ export function ActionConfigurationClient({
       filter={
         directory
           ? {
-              panel: (
-                <DirectoryFilterPanel>
-                  <DirectoryFilterCard>
-                    <DirectoryFilterTextField
-                      id="action-filter-search"
-                      label={copy.filterSearchLabel}
-                      value={filterQuery}
-                      onChange={setFilterQuery}
-                    />
-                  </DirectoryFilterCard>
-                </DirectoryFilterPanel>
-              ),
-              storageSegment: "action"
-            }
+            panel: (
+              <DirectoryFilterPanel>
+                <DirectoryFilterCard>
+                  <DirectoryFilterTextField
+                    id="action-filter-search"
+                    label={copy.filterSearchLabel}
+                    value={filterQuery}
+                    onChange={setFilterQuery}
+                  />
+                </DirectoryFilterCard>
+              </DirectoryFilterPanel>
+            ),
+            storageSegment: "action"
+          }
           : undefined
       }
       editorPanelRef={editorPanelElementRef}

@@ -1235,42 +1235,42 @@ export function EventConfigurationClient({
       filter={
         directory
           ? {
-              panel: (
-                <EventFilterPanel
-                  locale={locale}
-                  copy={{
-                    momentFromLabel: copy.filterMomentFromLabel,
-                    momentToLabel: copy.filterMomentToLabel,
-                    locationLabel: copy.filterLocationLabel,
-                    itemLabel: copy.filterItemLabel,
-                    actionLabel: copy.filterActionLabel,
-                    allLabel: copy.filterAll,
-                    allAriaLabel: copy.filterAllAria,
-                    confirmLabel: copy.filterConfirm
-                  }}
-                  filterMomentFromInput={filterMomentFromInput}
-                  filterMomentToInput={filterMomentToInput}
-                  filterLocationIdList={filterLocationIdList}
-                  filterItemIdList={filterItemIdList}
-                  filterActionId={filterActionId}
-                  locationItemList={initialLocationDirectory?.item_list ?? []}
-                  itemHierarchyList={initialItemDirectory?.item_list ?? []}
-                  actionOptionList={actionOptionList}
-                  onFilterMomentFromChange={(value) => {
-                    setFilterMomentFromInput(value ? toLocalMomentInputValue(value) : "");
-                  }}
-                  onFilterMomentToChange={(value) => {
-                    setFilterMomentToInput(value ? toLocalMomentInputValue(value) : "");
-                  }}
-                  onFilterLocationChange={setFilterLocationIdList}
-                  onFilterItemChange={setFilterItemIdList}
-                  onFilterActionChange={(value) => {
-                    setFilterActionId(parseNumericFilter(value));
-                  }}
-                />
-              ),
-              storageSegment: "event"
-            }
+            panel: (
+              <EventFilterPanel
+                locale={locale}
+                copy={{
+                  momentFromLabel: copy.filterMomentFromLabel,
+                  momentToLabel: copy.filterMomentToLabel,
+                  locationLabel: copy.filterLocationLabel,
+                  itemLabel: copy.filterItemLabel,
+                  actionLabel: copy.filterActionLabel,
+                  allLabel: copy.filterAll,
+                  allAriaLabel: copy.filterAllAria,
+                  confirmLabel: copy.filterConfirm
+                }}
+                filterMomentFromInput={filterMomentFromInput}
+                filterMomentToInput={filterMomentToInput}
+                filterLocationIdList={filterLocationIdList}
+                filterItemIdList={filterItemIdList}
+                filterActionId={filterActionId}
+                locationItemList={initialLocationDirectory?.item_list ?? []}
+                itemHierarchyList={initialItemDirectory?.item_list ?? []}
+                actionOptionList={actionOptionList}
+                onFilterMomentFromChange={(value) => {
+                  setFilterMomentFromInput(value ? toLocalMomentInputValue(value) : "");
+                }}
+                onFilterMomentToChange={(value) => {
+                  setFilterMomentToInput(value ? toLocalMomentInputValue(value) : "");
+                }}
+                onFilterLocationChange={setFilterLocationIdList}
+                onFilterItemChange={setFilterItemIdList}
+                onFilterActionChange={(value) => {
+                  setFilterActionId(parseNumericFilter(value));
+                }}
+              />
+            ),
+            storageSegment: "event"
+          }
           : undefined
       }
       editorPanelRef={editorPanelElementRef}

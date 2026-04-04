@@ -783,20 +783,20 @@ export function FieldConfigurationClient({
       filter={
         directory
           ? {
-              panel: (
-                <DirectoryFilterPanel>
-                  <DirectoryFilterCard>
-                    <DirectoryFilterTextField
-                      id="field-filter-search"
-                      label={copy.filterSearchLabel}
-                      value={filterQuery}
-                      onChange={setFilterQuery}
-                    />
-                  </DirectoryFilterCard>
-                </DirectoryFilterPanel>
-              ),
-              storageSegment: "field"
-            }
+            panel: (
+              <DirectoryFilterPanel>
+                <DirectoryFilterCard>
+                  <DirectoryFilterTextField
+                    id="field-filter-search"
+                    label={copy.filterSearchLabel}
+                    value={filterQuery}
+                    onChange={setFilterQuery}
+                  />
+                </DirectoryFilterCard>
+              </DirectoryFilterPanel>
+            ),
+            storageSegment: "field"
+          }
           : undefined
       }
       editorPanelRef={editorPanelElementRef}

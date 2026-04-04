@@ -1,0 +1,11 @@
+---
+description: Parametros Query em handlers FastAPI e chamadas internas entre rotas
+globs: backend/**/*.py
+alwaysApply: false
+---
+
+# FastAPI e `Query` em chamadas internas
+
+- Nao usar `param: T = Query(default=...)` como unico default quando o handler pode ser chamado de Python sem FastAPI; preferir `Annotated[..., Query(...)] = None` ou default primitivo.
+- Ao fazer `return outro_handler(...)` entre rotas, passar explicitamente os argumentos de query (incluindo `None`).
+- Detalhes e links: [skills/implementation/stack/fastapi-query-params.md](../../skills/implementation/stack/fastapi-query-params.md).

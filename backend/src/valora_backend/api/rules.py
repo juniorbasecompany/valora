@@ -524,10 +524,13 @@ class ScopeFieldPatchRequest(BaseModel):
 )
 def list_scope_fields(
     scope_id: int,
-    label_lang: Literal["pt-BR", "en", "es"] | None = Query(default=None),
+    label_lang: Annotated[
+        Literal["pt-BR", "en", "es"] | None,
+        Query(),
+    ] = None,
     member: Member = Depends(get_current_member),
     session: Session = Depends(get_session),
-    q: str | None = Query(default=None),
+    q: Annotated[str | None, Query()] = None,
 ):
     _get_tenant_scope(session, actor=member, scope_id=scope_id)
     field_query = select(Field).where(Field.scope_id == scope_id)
@@ -737,7 +740,10 @@ def reorder_scope_fields(
     body: ScopeFieldReorderRequest,
     member: Member = Depends(get_current_member),
     session: Session = Depends(get_session),
-    label_lang: Literal["pt-BR", "en", "es"] | None = Query(default=None),
+    label_lang: Annotated[
+        Literal["pt-BR", "en", "es"] | None,
+        Query(),
+    ] = None,
 ):
     _require_scope_rules_editor(member)
     _get_tenant_scope(session, actor=member, scope_id=scope_id)
@@ -807,10 +813,13 @@ class ScopeActionPatchRequest(BaseModel):
 )
 def list_scope_actions(
     scope_id: int,
-    label_lang: Literal["pt-BR", "en", "es"] | None = Query(default=None),
+    label_lang: Annotated[
+        Literal["pt-BR", "en", "es"] | None,
+        Query(),
+    ] = None,
     member: Member = Depends(get_current_member),
     session: Session = Depends(get_session),
-    q: str | None = Query(default=None),
+    q: Annotated[str | None, Query()] = None,
 ):
     _get_tenant_scope(session, actor=member, scope_id=scope_id)
     action_query = select(Action).where(Action.scope_id == scope_id)
@@ -997,7 +1006,10 @@ def reorder_scope_actions(
     body: ScopeActionReorderRequest,
     member: Member = Depends(get_current_member),
     session: Session = Depends(get_session),
-    label_lang: Literal["pt-BR", "en", "es"] | None = Query(default=None),
+    label_lang: Annotated[
+        Literal["pt-BR", "en", "es"] | None,
+        Query(),
+    ] = None,
 ):
     _require_scope_rules_editor(member)
     _get_tenant_scope(session, actor=member, scope_id=scope_id)
@@ -1236,8 +1248,8 @@ class ScopeLabelPatchRequest(BaseModel):
 )
 def list_scope_labels(
     scope_id: int,
-    field_id: int | None = Query(default=None),
-    action_id: int | None = Query(default=None),
+    field_id: Annotated[int | None, Query()] = None,
+    action_id: Annotated[int | None, Query()] = None,
     member: Member = Depends(get_current_member),
     session: Session = Depends(get_session),
 ):
@@ -1465,11 +1477,11 @@ class ScopeEventPatchRequest(BaseModel):
 )
 def list_scope_events(
     scope_id: int,
-    moment_from_utc: datetime | None = Query(default=None),
-    moment_to_utc: datetime | None = Query(default=None),
-    location_id: list[int] | None = Query(default=None),
-    item_id: list[int] | None = Query(default=None),
-    action_id: int | None = Query(default=None),
+    moment_from_utc: Annotated[datetime | None, Query()] = None,
+    moment_to_utc: Annotated[datetime | None, Query()] = None,
+    location_id: Annotated[list[int] | None, Query()] = None,
+    item_id: Annotated[list[int] | None, Query()] = None,
+    action_id: Annotated[int | None, Query()] = None,
     label_lang: Annotated[
         Literal["pt-BR", "en", "es"],
         Query(description="Idioma dos rotulos no resumo de inputs por evento."),

@@ -49,6 +49,7 @@ Aplicar o stack acordado em [architecture/technology-stack.md](../../../architec
 ### Backend
 
 - Usar **FastAPI**, **SQLAlchemy**, **Alembic**, **PostgreSQL**, **Pydantic** e **Uvicorn**.
+- Parâmetros `Query` em handlers que também são chamados de Python: seguir [fastapi-query-params.md](fastapi-query-params.md) (padrão `Annotated`, evitar objeto `Query` como default na chamada direta).
 - Respeitar o que já estiver declarado em [backend/pyproject.toml](../../../backend/pyproject.toml).
 - Para o modelo relacional exposto pelo backend, alinhar diagrama e metadados em [backend/erd.json](../../../backend/erd.json) com modelos e migrações; ver [backend/README.md](../../../backend/README.md) e [architecture/source-of-truth.md](../../../architecture/source-of-truth.md).
 - Não propor **SQLModel** como ORM principal nem substituir SQLAlchemy por outro ORM sem mudança explícita em [architecture/technology-stack.md](../../../architecture/technology-stack.md) e nesta skill.

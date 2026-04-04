@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from datetime import UTC, datetime
-from typing import Literal
+from typing import Annotated, Literal
 
 import requests
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -1470,10 +1470,18 @@ def list_scope_events(
     location_id: list[int] | None = Query(default=None),
     item_id: list[int] | None = Query(default=None),
     action_id: int | None = Query(default=None),
-    label_lang: Literal["pt-BR", "en", "es"] = Query(default="pt-BR"),
+    label_lang: Annotated[
+        Literal["pt-BR", "en", "es"],
+        Query(description="Idioma dos rotulos no resumo de inputs por evento."),
+    ] = "pt-BR",
     member: Member = Depends(get_current_member),
     session: Session = Depends(get_session),
 ):
+    # Chamadas diretas a esta funcao (ex.: apos POST/PATCH evento) nao passam por Depends;
+    # sem normalizar, `label_lang` pode ser o objeto Query() em vez da string.
+    if label_lang not in ("pt-BR", "en", "es"):
+        label_lang = "pt-BR"
+
     location_id_list = location_id or []
     item_id_list = item_id or []
 
@@ -1582,6 +1590,7 @@ def create_scope_event(
         location_id=None,
         item_id=None,
         action_id=None,
+        label_lang="pt-BR",
         member=member,
         session=session,
     )
@@ -1627,6 +1636,7 @@ def patch_scope_event(
         location_id=None,
         item_id=None,
         action_id=None,
+        label_lang="pt-BR",
         member=member,
         session=session,
     )
@@ -1660,6 +1670,7 @@ def delete_scope_event(
         location_id=None,
         item_id=None,
         action_id=None,
+        label_lang="pt-BR",
         member=member,
         session=session,
     )

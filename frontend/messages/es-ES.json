@@ -6,7 +6,7 @@
     "navigation": {
       "home": "Inicio",
       "location": "Ubicaciones",
-      "unity": "Unidades",
+      "item": "Ítems",
       "field": "Campos",
       "action": "Acciones",
       "event": "Eventos",
@@ -429,7 +429,7 @@
       "missingCurrentScope": "Define un alcance activo en el encabezado antes de registrar eventos.",
       "loadError": "No se pudieron cargar los eventos de este alcance. Inténtalo de nuevo.",
       "fallbackLocation": "Ubicación no disponible",
-      "fallbackUnity": "Unidad no disponible",
+      "fallbackItem": "Ítem no disponible",
       "fallbackAction": "Acción no disponible",
       "fallbackEvent": "Evento no disponible"
     },
@@ -446,9 +446,9 @@
         "label": "Ubicación",
         "hint": "Selecciona dónde ocurrió el evento."
       },
-      "unity": {
-        "label": "Unidad",
-        "hint": "Selecciona la unidad productiva relacionada con el evento."
+      "item": {
+        "label": "Ítem",
+        "hint": "Selecciona el ítem relacionado con el evento."
       },
       "action": {
         "label": "Acción",
@@ -477,7 +477,7 @@
       "momentFromLabel": "Período inicial",
       "momentToLabel": "Período final",
       "locationLabel": "Ubicación",
-      "unityLabel": "Unidad",
+      "itemLabel": "Ítem",
       "actionLabel": "Acción",
       "all": "",
       "allAria": "Sin filtro",
@@ -499,7 +499,7 @@
       "deleteBlockedDetail": "No es posible eliminar el evento mientras resultados aún lo referencian.",
       "momentRequired": "Indica la fecha y hora del evento.",
       "locationRequired": "Selecciona una ubicación.",
-      "unityRequired": "Selecciona una unidad.",
+      "itemRequired": "Selecciona un ítem.",
       "actionRequired": "Selecciona una acción."
     },
     "discardConfirm": "¿Descartar los cambios no guardados?"
@@ -568,7 +568,7 @@
     },
     "discardConfirm": "¿Descartar los cambios no guardados?"
   },
-  "UnityConfigurationPage": {
+  "ItemConfigurationPage": {
     "title": "Unidades productivas",
     "description": "En este panel ves el árbol de unidades productivas del alcance. A la izquierda está la jerarquía; al lado, el formulario para editar nombre y descripción, además del panel de historial. Selecciona un ítem en el árbol para editarlo o usa el botón Nueva para crear otro nivel bajo el ítem elegido.",
     "list": {

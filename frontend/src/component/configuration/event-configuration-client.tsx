@@ -30,7 +30,7 @@ import type {
   TenantScopeEventRecord,
   TenantScopeFieldDirectoryResponse,
   TenantScopeRecord,
-  TenantUnityDirectoryResponse
+  TenantItemDirectoryResponse
 } from "@/lib/auth/types";
 import { parseErrorDetail } from "@/lib/api/parse-error-detail";
 import type { LabelLang } from "@/lib/i18n/label-lang";
@@ -49,8 +49,8 @@ export type EventConfigurationCopy = {
   momentHint: string;
   locationLabel: string;
   locationHint: string;
-  unityLabel: string;
-  unityHint: string;
+  itemLabel: string;
+  itemHint: string;
   actionLabel: string;
   actionHint: string;
   actionInputSectionTitle: string;
@@ -65,7 +65,7 @@ export type EventConfigurationCopy = {
   filterMomentFromLabel: string;
   filterMomentToLabel: string;
   filterLocationLabel: string;
-  filterUnityLabel: string;
+  filterItemLabel: string;
   filterActionLabel: string;
   filterAll: string;
   filterAllAria: string;
@@ -76,7 +76,7 @@ export type EventConfigurationCopy = {
   infoCreateLead: string;
   infoCreateHint: string;
   fallbackLocation: string;
-  fallbackUnity: string;
+  fallbackItem: string;
   fallbackAction: string;
   fallbackEvent: string;
   cancel: string;
@@ -92,7 +92,7 @@ export type EventConfigurationCopy = {
   deleteBlockedDetail: string;
   momentRequired: string;
   locationRequired: string;
-  unityRequired: string;
+  itemRequired: string;
   actionRequired: string;
   discardConfirm: string;
 };
@@ -104,7 +104,7 @@ type EventConfigurationClientProps = {
   hasAnyScope: boolean;
   initialEventDirectory: TenantScopeEventDirectoryResponse | null;
   initialLocationDirectory: TenantLocationDirectoryResponse | null;
-  initialUnityDirectory: TenantUnityDirectoryResponse | null;
+  initialItemDirectory: TenantItemDirectoryResponse | null;
   initialActionDirectory: TenantScopeActionDirectoryResponse | null;
   copy: EventConfigurationCopy;
 };
@@ -334,7 +334,7 @@ export function EventConfigurationClient({
   hasAnyScope,
   initialEventDirectory,
   initialLocationDirectory,
-  initialUnityDirectory,
+  initialItemDirectory,
   initialActionDirectory,
   copy
 }: EventConfigurationClientProps) {
@@ -363,16 +363,16 @@ export function EventConfigurationClient({
     return map;
   }, [initialLocationDirectory?.item_list]);
 
-  const unityMap = useMemo(() => {
+  const itemLabelMap = useMemo(() => {
     const map = new Map<number, string>();
-    for (const item of initialUnityDirectory?.item_list ?? []) {
+    for (const item of initialItemDirectory?.item_list ?? []) {
       const label = item.path_labels.length > 0
         ? item.path_labels.join(UI_TEXT_SEPARATOR)
         : item.name.trim() || item.display_name.trim() || `#${item.id}`;
       map.set(item.id, label);
     }
     return map;
-  }, [initialUnityDirectory?.item_list]);
+  }, [initialItemDirectory?.item_list]);
 
   const actionMap = useMemo(() => {
     const map = new Map<number, string>();
@@ -420,8 +420,8 @@ export function EventConfigurationClient({
   const [locationId, setLocationId] = useState<number | null>(
     initialSelectedEvent?.location_id ?? null
   );
-  const [unityId, setUnityId] = useState<number | null>(
-    initialSelectedEvent?.unity_id ?? null
+  const [itemId, setItemId] = useState<number | null>(
+    initialSelectedEvent?.item_id ?? null
   );
   const [actionId, setActionId] = useState<number | null>(
     initialSelectedEvent?.action_id ?? null
@@ -431,13 +431,13 @@ export function EventConfigurationClient({
       ? toLocalMomentInputFromUtc(initialSelectedEvent.moment_utc)
       : nowLocalMomentInput(),
     locationId: initialSelectedEvent?.location_id ?? null,
-    unityId: initialSelectedEvent?.unity_id ?? null,
+    itemId: initialSelectedEvent?.item_id ?? null,
     actionId: initialSelectedEvent?.action_id ?? null
   });
   const [fieldError, setFieldError] = useState<{
     moment?: string;
     location?: string;
-    unity?: string;
+    item?: string;
     action?: string;
   }>({});
   const [requestErrorMessage, setRequestErrorMessage] = useState<string | null>(null);
@@ -447,7 +447,7 @@ export function EventConfigurationClient({
   const [filterMomentFromInput, setFilterMomentFromInput] = useState("");
   const [filterMomentToInput, setFilterMomentToInput] = useState("");
   const [filterLocationIdList, setFilterLocationIdList] = useState<number[]>([]);
-  const [filterUnityIdList, setFilterUnityIdList] = useState<number[]>([]);
+  const [filterItemIdList, setFilterItemIdList] = useState<number[]>([]);
   const [filterActionId, setFilterActionId] = useState<number | null>(null);
   const [scopeFieldOptionList, setScopeFieldOptionList] = useState<ScopeFieldOption[]>([]);
   const [eventActionInputDraftList, setEventActionInputDraftList] = useState<
@@ -526,12 +526,12 @@ export function EventConfigurationClient({
         const nextMomentInput = nowLocalMomentInput();
         setMomentInput(nextMomentInput);
         setLocationId(null);
-        setUnityId(null);
+        setItemId(null);
         setActionId(null);
         setBaseline({
           momentInput: nextMomentInput,
           locationId: null,
-          unityId: null,
+          itemId: null,
           actionId: null
         });
         setFieldError({});
@@ -559,7 +559,7 @@ export function EventConfigurationClient({
         ? toLocalMomentInputFromUtc(nextSelectedEvent.moment_utc)
         : nowLocalMomentInput();
       const nextLocationId = nextSelectedEvent?.location_id ?? null;
-      const nextUnityId = nextSelectedEvent?.unity_id ?? null;
+      const nextItemId = nextSelectedEvent?.item_id ?? null;
       const nextActionId = nextSelectedEvent?.action_id ?? null;
 
       setDirectory(directoryWithSortedList);
@@ -567,12 +567,12 @@ export function EventConfigurationClient({
       setSelectedEventId(typeof nextKey === "number" ? nextKey : null);
       setMomentInput(nextMomentInput);
       setLocationId(nextLocationId);
-      setUnityId(nextUnityId);
+      setItemId(nextItemId);
       setActionId(nextActionId);
       setBaseline({
         momentInput: nextMomentInput,
         locationId: nextLocationId,
-        unityId: nextUnityId,
+        itemId: nextItemId,
         actionId: nextActionId
       });
       setFieldError({});
@@ -641,8 +641,8 @@ export function EventConfigurationClient({
       for (const locationId of filterLocationIdList) {
         query.append("location_id", String(locationId));
       }
-      for (const unityId of filterUnityIdList) {
-        query.append("unity_id", String(unityId));
+      for (const itemId of filterItemIdList) {
+        query.append("item_id", String(itemId));
       }
       if (filterActionId != null) {
         query.set("action_id", String(filterActionId));
@@ -671,7 +671,7 @@ export function EventConfigurationClient({
       filterLocationIdList,
       filterMomentFromInput,
       filterMomentToInput,
-      filterUnityIdList,
+      filterItemIdList,
       scopeId,
       syncFromDirectory
     ]
@@ -804,9 +804,9 @@ export function EventConfigurationClient({
     [copy.fallbackLocation, locationMap]
   );
 
-  const resolveUnityLabel = useCallback(
-    (id: number | null) => (id == null ? "-" : (unityMap.get(id) ?? copy.fallbackUnity)),
-    [copy.fallbackUnity, unityMap]
+  const resolveItemLabel = useCallback(
+    (id: number | null) => (id == null ? "-" : (itemLabelMap.get(id) ?? copy.fallbackItem)),
+    [copy.fallbackItem, itemLabelMap]
   );
 
   const resolveActionLabel = useCallback(
@@ -818,10 +818,10 @@ export function EventConfigurationClient({
     (item: TenantScopeEventRecord, inputSummary?: string | null) => [
       resolveActionLabel(item.action_id),
       resolveLocationLabel(item.location_id),
-      resolveUnityLabel(item.unity_id),
+      resolveItemLabel(item.item_id),
       inputSummary ?? "-"
     ],
-    [resolveActionLabel, resolveLocationLabel, resolveUnityLabel]
+    [resolveActionLabel, resolveLocationLabel, resolveItemLabel]
   );
 
   const renderEventSummaryLineBlock = useCallback(
@@ -837,14 +837,14 @@ export function EventConfigurationClient({
 
   const renderEventAsideDetailLineBlock = useCallback(
     (item: TenantScopeEventRecord, inputSummary?: string | null) =>
-      [resolveLocationLabel(item.location_id), resolveUnityLabel(item.unity_id), inputSummary ?? "-"]
+      [resolveLocationLabel(item.location_id), resolveItemLabel(item.item_id), inputSummary ?? "-"]
         .map((line, index, lineList) => (
           <span key={`${item.id}-aside-detail-${index}`}>
             {line}
             {index < lineList.length - 1 ? <br /> : null}
           </span>
         )),
-    [resolveLocationLabel, resolveUnityLabel]
+    [resolveLocationLabel, resolveItemLabel]
   );
 
   const selectedEventInputSummary = useMemo(() => {
@@ -875,7 +875,7 @@ export function EventConfigurationClient({
     () =>
       momentInput.trim() !== baseline.momentInput.trim() ||
       locationId !== baseline.locationId ||
-      unityId !== baseline.unityId ||
+      itemId !== baseline.itemId ||
       actionId !== baseline.actionId ||
       eventActionInputDirty ||
       isDeletePending,
@@ -884,12 +884,12 @@ export function EventConfigurationClient({
       baseline.actionId,
       baseline.locationId,
       baseline.momentInput,
-      baseline.unityId,
+      baseline.itemId,
       eventActionInputDirty,
       isDeletePending,
       locationId,
       momentInput,
-      unityId
+      itemId
     ]
   );
 
@@ -897,7 +897,7 @@ export function EventConfigurationClient({
     const nextError: {
       moment?: string;
       location?: string;
-      unity?: string;
+      item?: string;
       action?: string;
     } = {};
 
@@ -907,8 +907,8 @@ export function EventConfigurationClient({
     if (locationId == null) {
       nextError.location = copy.locationRequired;
     }
-    if (unityId == null) {
-      nextError.unity = copy.unityRequired;
+    if (itemId == null) {
+      nextError.item = copy.itemRequired;
     }
     if (actionId == null) {
       nextError.action = copy.actionRequired;
@@ -921,10 +921,10 @@ export function EventConfigurationClient({
     copy.actionRequired,
     copy.locationRequired,
     copy.momentRequired,
-    copy.unityRequired,
+    copy.itemRequired,
     locationId,
     momentInput,
-    unityId
+    itemId
   ]);
 
   const handleChangeActionInputValue = useCallback((fieldId: number, value: string) => {
@@ -1086,7 +1086,7 @@ export function EventConfigurationClient({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             location_id: locationId,
-            unity_id: unityId,
+            item_id: itemId,
             action_id: actionId,
             moment_utc: momentUtc
           })
@@ -1122,7 +1122,7 @@ export function EventConfigurationClient({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               location_id: locationId,
-              unity_id: unityId,
+              item_id: itemId,
               action_id: actionId,
               moment_utc: momentUtc
             })
@@ -1182,7 +1182,7 @@ export function EventConfigurationClient({
     scopeId,
     selectedEvent,
     persistEventActionInputDraftList,
-    unityId,
+    itemId,
     validate
   ]);
 
@@ -1197,7 +1197,7 @@ export function EventConfigurationClient({
     requestErrorMessage ??
     fieldError.moment ??
     fieldError.location ??
-    fieldError.unity ??
+    fieldError.item ??
     fieldError.action ??
     null;
 
@@ -1221,7 +1221,7 @@ export function EventConfigurationClient({
                     momentFromLabel: copy.filterMomentFromLabel,
                     momentToLabel: copy.filterMomentToLabel,
                     locationLabel: copy.filterLocationLabel,
-                    unityLabel: copy.filterUnityLabel,
+                    itemLabel: copy.filterItemLabel,
                     actionLabel: copy.filterActionLabel,
                     allLabel: copy.filterAll,
                     allAriaLabel: copy.filterAllAria,
@@ -1230,10 +1230,10 @@ export function EventConfigurationClient({
                   filterMomentFromInput={filterMomentFromInput}
                   filterMomentToInput={filterMomentToInput}
                   filterLocationIdList={filterLocationIdList}
-                  filterUnityIdList={filterUnityIdList}
+                  filterItemIdList={filterItemIdList}
                   filterActionId={filterActionId}
                   locationItemList={initialLocationDirectory?.item_list ?? []}
-                  unityItemList={initialUnityDirectory?.item_list ?? []}
+                  itemHierarchyList={initialItemDirectory?.item_list ?? []}
                   actionOptionList={actionOptionList}
                   onFilterMomentFromChange={(value) => {
                     setFilterMomentFromInput(value ? toLocalMomentInputValue(value) : "");
@@ -1242,7 +1242,7 @@ export function EventConfigurationClient({
                     setFilterMomentToInput(value ? toLocalMomentInputValue(value) : "");
                   }}
                   onFilterLocationChange={setFilterLocationIdList}
-                  onFilterUnityChange={setFilterUnityIdList}
+                  onFilterItemChange={setFilterItemIdList}
                   onFilterActionChange={(value) => {
                     setFilterActionId(parseNumericFilter(value));
                   }}
@@ -1344,23 +1344,23 @@ export function EventConfigurationClient({
 
             <section className="ui-card ui-form-section ui-border-accent">
               <HierarchySingleSelectField
-                id="event-unity"
-                label={copy.unityLabel}
-                itemList={initialUnityDirectory?.item_list ?? []}
-                value={unityId}
+                id="event-item"
+                label={copy.itemLabel}
+                itemList={initialItemDirectory?.item_list ?? []}
+                value={itemId}
                 onChange={(nextValue) => {
-                  setUnityId(nextValue);
-                  setFieldError((previous) => ({ ...previous, unity: undefined }));
+                  setItemId(nextValue);
+                  setFieldError((previous) => ({ ...previous, item: undefined }));
                   setRequestErrorMessage(null);
                 }}
-                getParentId={(item) => item.parent_unity_id ?? null}
+                getParentId={(row) => row.parent_item_id ?? null}
                 allLabel={copy.filterAll}
                 disabled={isDeletePending || !canEditForm}
-                ariaInvalid={Boolean(fieldError.unity)}
+                ariaInvalid={Boolean(fieldError.item)}
               />
-              <p className="ui-field-hint">{copy.unityHint}</p>
-              {fieldError.unity ? (
-                <p className="ui-field-error">{fieldError.unity}</p>
+              <p className="ui-field-hint">{copy.itemHint}</p>
+              {fieldError.item ? (
+                <p className="ui-field-error">{fieldError.item}</p>
               ) : null}
             </section>
 

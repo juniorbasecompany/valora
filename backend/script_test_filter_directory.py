@@ -7,7 +7,7 @@ Uso:
 
 O script:
 - gera JWT de um member master/admin ativo via banco;
-- testa filtros de member, scope, location, unity, field, action e event;
+- testa filtros de member, scope, location, item, field, action e event;
 - valida a regra local do painel de tenant (filtro textual no item único).
 """
 from __future__ import annotations
@@ -88,14 +88,14 @@ def _expand_location_ids_with_descendants(
     return expanded
 
 
-def _expand_unity_ids_with_descendants(
-    unity_item_list: list[dict[str, Any]], seed_id_list: list[int]
+def _expand_item_ids_with_descendants(
+    hierarchy_item_list: list[dict[str, Any]], seed_id_list: list[int]
 ) -> set[int]:
     """Espelha a regra da API: cada id de semente mais descendentes na árvore do escopo."""
     children_by_parent: dict[int | None, list[int]] = {}
-    for item in unity_item_list:
-        uid = int(item["id"])
-        raw_parent = item.get("parent_unity_id")
+    for row in hierarchy_item_list:
+        uid = int(row["id"])
+        raw_parent = row.get("parent_item_id")
         parent_key: int | None = int(raw_parent) if raw_parent is not None else None
         children_by_parent.setdefault(parent_key, []).append(uid)
     expanded: set[int] = set()
@@ -285,11 +285,11 @@ def _assert_location_filters(ctx: TestContext, scope_id: int) -> None:
     _print_ok("location parent_location_id")
 
 
-def _assert_unity_filters(ctx: TestContext, scope_id: int) -> None:
-    path = f"/auth/tenant/current/scopes/{scope_id}/unities"
+def _assert_item_filters(ctx: TestContext, scope_id: int) -> None:
+    path = f"/auth/tenant/current/scopes/{scope_id}/items"
     item_list = _get_item_list(_request_json(ctx, path), path)
     if not item_list:
-        _print_skip("unity sem dados para testar")
+        _print_skip("item sem dados para testar")
         return
 
     sample = item_list[0]
@@ -301,21 +301,21 @@ def _assert_unity_filters(ctx: TestContext, scope_id: int) -> None:
             if not _contains_any(
                 [str(row.get("name") or ""), str(row.get("display_name") or "")], q_value
             ):
-                raise AssertionError("unity q retornou item fora do filtro textual")
-        _print_ok("unity q")
+                raise AssertionError("item q retornou item fora do filtro textual")
+        _print_ok("item q")
     else:
-        _print_skip("unity q sem fonte textual")
+        _print_skip("item q sem fonte textual")
 
-    non_root = next((row for row in item_list if row.get("parent_unity_id") is not None), None)
+    non_root = next((row for row in item_list if row.get("parent_item_id") is not None), None)
     if non_root is None:
-        _print_skip("unity parent_unity_id sem dados não-raiz")
+        _print_skip("item parent_item_id sem dados não-raiz")
         return
-    parent_unity_id = int(non_root["parent_unity_id"])
-    filtered = _get_item_list(_request_json(ctx, path, {"parent_unity_id": parent_unity_id}), path)
+    parent_item_id = int(non_root["parent_item_id"])
+    filtered = _get_item_list(_request_json(ctx, path, {"parent_item_id": parent_item_id}), path)
     for row in filtered:
-        if row.get("parent_unity_id") != parent_unity_id:
-            raise AssertionError("unity parent_unity_id retornou item fora do pai informado")
-    _print_ok("unity parent_unity_id")
+        if row.get("parent_item_id") != parent_item_id:
+            raise AssertionError("item parent_item_id retornou item fora do pai informado")
+    _print_ok("item parent_item_id")
 
 
 def _assert_field_filters(ctx: TestContext, scope_id: int) -> None:
@@ -374,7 +374,7 @@ def _assert_event_filters(ctx: TestContext, scope_id: int) -> None:
 
     sample = item_list[0]
     location_id = int(sample["location_id"])
-    unity_id = int(sample["unity_id"])
+    item_id = int(sample["item_id"])
     action_id = int(sample["action_id"])
     moment_utc = _to_datetime_utc(str(sample["moment_utc"]))
     moment_from_utc = (moment_utc - timedelta(seconds=1)).isoformat()
@@ -393,16 +393,16 @@ def _assert_event_filters(ctx: TestContext, scope_id: int) -> None:
             )
     _print_ok("event location_id")
 
-    unity_path = f"/auth/tenant/current/scopes/{scope_id}/unities"
-    unity_item_list = _get_item_list(_request_json(ctx, unity_path), unity_path)
-    allowed_for_unity = _expand_unity_ids_with_descendants(unity_item_list, [unity_id])
-    by_unity = _get_item_list(_request_json(ctx, path, {"unity_id": unity_id}), path)
-    for row in by_unity:
-        if int(row["unity_id"]) not in allowed_for_unity:
+    item_path = f"/auth/tenant/current/scopes/{scope_id}/items"
+    hierarchy_item_list = _get_item_list(_request_json(ctx, item_path), item_path)
+    allowed_for_item = _expand_item_ids_with_descendants(hierarchy_item_list, [item_id])
+    by_item = _get_item_list(_request_json(ctx, path, {"item_id": item_id}), path)
+    for row in by_item:
+        if int(row["item_id"]) not in allowed_for_item:
             raise AssertionError(
-                "event unity_id retornou item fora da unidade informada (nó + descendentes)"
+                "event item_id retornou item fora do item informado (nó + descendentes)"
             )
-    _print_ok("event unity_id")
+    _print_ok("event item_id")
 
     by_action = _get_item_list(_request_json(ctx, path, {"action_id": action_id}), path)
     for row in by_action:
@@ -484,7 +484,7 @@ def main() -> int:
     _assert_tenant_local_filter_rule(ctx)
 
     if scope_payload is None:
-        _print_skip("Sem scope para validar location/unity/field/action/event")
+        _print_skip("Sem scope para validar location/item/field/action/event")
         print("Teste concluído com skips.")
         return 0
 
@@ -498,7 +498,7 @@ def main() -> int:
         scope_id = int(item_list[0]["id"])
 
     _assert_location_filters(ctx, scope_id)
-    _assert_unity_filters(ctx, scope_id)
+    _assert_item_filters(ctx, scope_id)
     _assert_field_filters(ctx, scope_id)
     _assert_action_filters(ctx, scope_id)
     _assert_event_filters(ctx, scope_id)

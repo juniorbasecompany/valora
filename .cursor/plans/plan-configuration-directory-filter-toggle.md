@@ -5,7 +5,7 @@
 - **Objetivo:** lembrar se o painel de filtros está **aberto ou fechado** quando o utilizador volta à mesma tela de configuração.
 - **Onde:** `localStorage` no browser (sem backend).
 - **Granularidade:** **uma chave por tela** de configuração (não um único boolean global para todas as telas). Abrir filtros em «Campos» não altera o estado guardado de «Ações», etc.
-- **Convenção sugerida:** `valora.configuration.directoryFilterVisible.<segment>` com `segment` ∈ `scope` | `tenant` | `member` | `event` | `field` | `action` | `location` | `unity`.
+- **Convenção sugerida:** `valora.configuration.directoryFilterVisible.<segment>` com `segment` ∈ `scope` | `tenant` | `member` | `event` | `field` | `action` | `location` | `item`.
 - **Escopo da chave:** o segmento identifica a **rota / área** de configuração (ex.: todos os escopos na página de campos partilham o mesmo `field`), não o item selecionado na lista.
 - **Default:** se não existir valor para aquela chave, tratar como **oculto** (`false`).
 - **Escrita:** cada clique no switch persiste de imediato o boolean na chave da tela atual.
@@ -29,7 +29,7 @@
 | `field` | `field-configuration-client` |
 | `action` | `action-configuration-client` |
 | `location` | `location-configuration-client` |
-| `unity` | `unity-configuration-client` |
+| `item` | `item-configuration-client` |
 
 ## Implementação (resumo)
 

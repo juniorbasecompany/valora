@@ -6,7 +6,7 @@
     "navigation": {
       "home": "Início",
       "location": "Locais",
-      "unity": "Unidades",
+      "item": "Itens",
       "field": "Campos",
       "action": "Ações",
       "event": "Eventos",
@@ -429,7 +429,7 @@
       "missingCurrentScope": "Defina um escopo ativo no seletor do cabeçalho antes de registrar eventos.",
       "loadError": "Não foi possível carregar os eventos deste escopo. Tente novamente.",
       "fallbackLocation": "Local indisponível",
-      "fallbackUnity": "Unidade indisponível",
+      "fallbackItem": "Item indisponível",
       "fallbackAction": "Ação indisponível",
       "fallbackEvent": "Evento indisponível"
     },
@@ -446,9 +446,9 @@
         "label": "Local",
         "hint": "Selecione o local onde o evento aconteceu."
       },
-      "unity": {
-        "label": "Unidade",
-        "hint": "Selecione a unidade produtiva relacionada ao evento."
+      "item": {
+        "label": "Item",
+        "hint": "Selecione o item relacionado ao evento."
       },
       "action": {
         "label": "Ação",
@@ -477,7 +477,7 @@
       "momentFromLabel": "Período inicial",
       "momentToLabel": "Período final",
       "locationLabel": "Local",
-      "unityLabel": "Unidade",
+      "itemLabel": "Item",
       "actionLabel": "Ação",
       "all": "",
       "allAria": "Nenhum filtro",
@@ -499,7 +499,7 @@
       "deleteBlockedDetail": "Não é possível apagar o evento enquanto resultados ainda o referenciam.",
       "momentRequired": "Informe a data e hora do evento.",
       "locationRequired": "Selecione um local.",
-      "unityRequired": "Selecione uma unidade.",
+      "itemRequired": "Selecione um item.",
       "actionRequired": "Selecione uma ação."
     },
     "discardConfirm": "Descartar alterações não salvas?"
@@ -568,7 +568,7 @@
     },
     "discardConfirm": "Descartar alterações não salvas?"
   },
-  "UnityConfigurationPage": {
+  "ItemConfigurationPage": {
     "title": "Unidades produtivas",
     "description": "Neste painel você vê a árvore de unidades produtivas do escopo. À esquerda está a hierarquia; ao lado, o formulário para editar nome e descrição, além do painel de histórico. Selecione um item na árvore para editá-lo ou use o botão Nova para criar outro nível abaixo do item escolhido.",
     "list": {

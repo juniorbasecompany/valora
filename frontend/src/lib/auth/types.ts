@@ -107,17 +107,17 @@ export type TenantLocationDirectoryResponse = {
   item_list: TenantLocationRecord[];
 };
 
-export type TenantUnityRecord = TenantScopeHierarchyItemBase & {
-  parent_unity_id?: number | null;
+export type TenantItemRecord = TenantScopeHierarchyItemBase & {
+  parent_item_id?: number | null;
 };
 
-export type TenantUnityDirectoryResponse = {
+export type TenantItemDirectoryResponse = {
   scope_id: number;
   scope_name: string;
   scope_display_name: string;
   can_edit: boolean;
   can_create: boolean;
-  item_list: TenantUnityRecord[];
+  item_list: TenantItemRecord[];
 };
 
 export type TenantScopeFieldRecord = {
@@ -150,7 +150,7 @@ export type TenantScopeActionDirectoryResponse = {
 export type TenantScopeEventRecord = {
   id: number;
   location_id: number;
-  unity_id: number;
+  item_id: number;
   action_id: number;
   moment_utc: string;
 };
@@ -189,7 +189,7 @@ export type AuditLogTableName =
   | "member"
   | "scope"
   | "location"
-  | "unity"
+  | "item"
   | "field"
   | "action"
   | "event";

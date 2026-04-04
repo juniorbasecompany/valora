@@ -39,7 +39,7 @@ flowchart LR
 
    - **Reentrância:** usar `ContextVar` booleano `audit_processing` (ou flag na sessão `info`) para ignorar flushes recursivos disparados ao adicionar instâncias `Log`.
    - **Iteração:** trabalhar sobre cópias de `session.new`, `session.dirty`, `session.deleted` no início do handler, ou ignorar instâncias `isinstance(obj, Log)`.
-   - **Escopo de tabelas:** só auditar se `obj.__tablename__` estiver no conjunto permitido pelo ERD (`tenant`, `account`, `member`, `scope`, `location`, `unity`).
+   - **Escopo de tabelas:** só auditar se `obj.__tablename__` estiver no conjunto permitido pelo ERD (`tenant`, `account`, `member`, `scope`, `location`, `item`).
    - **Ações:**  
      - `new` e não era persistente antes → `action_type = 'I'`, `row_payload` = snapshot serializável da linha.  
      - `dirty` → `action_type = 'U'`, `row_payload` = snapshot **após** alterações em memória (estado que vai ser persistido).  

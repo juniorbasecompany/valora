@@ -45,11 +45,11 @@ from valora_backend.config import Settings
 from valora_backend.db import get_session
 from valora_backend.model.identity import (
     Account,
+    Item,
     Location,
     Member,
     Scope,
     Tenant,
-    Unity,
 )
 from valora_backend.model.rules import Action as ScopeAction, Field as ScopeField
 from valora_backend.model.log import Log
@@ -68,7 +68,7 @@ HISTORY_TABLE_NAME_SET = {
     "member",
     "scope",
     "location",
-    "unity",
+    "item",
     "field",
     "action",
     "event",
@@ -382,9 +382,9 @@ class TenantLocationMoveRequest(BaseModel):
         return value
 
 
-class TenantUnityRecord(BaseModel):
+class TenantItemRecord(BaseModel):
     id: int
-    parent_unity_id: int | None
+    parent_item_id: int | None
     name: str
     display_name: str
     sort_order: int
@@ -398,50 +398,50 @@ class TenantUnityRecord(BaseModel):
     can_move: bool
 
 
-class TenantUnityDirectoryResponse(BaseModel):
+class TenantItemDirectoryResponse(BaseModel):
     scope_id: int
     scope_name: str
     scope_display_name: str
     can_edit: bool
     can_create: bool
-    item_list: list[TenantUnityRecord] = Field(default_factory=list)
+    item_list: list[TenantItemRecord] = Field(default_factory=list)
 
 
-class TenantUnityUpsertRequest(BaseModel):
+class TenantItemUpsertRequest(BaseModel):
     name: str
     display_name: str
-    parent_unity_id: int | None = None
+    parent_item_id: int | None = None
 
     @field_validator("name", "display_name")
     @classmethod
-    def strip_non_empty_unity_value(cls, value: str) -> str:
+    def strip_non_empty_item_value(cls, value: str) -> str:
         cleaned = value.strip()
         if not cleaned:
             raise ValueError("must not be empty")
         return cleaned
 
-    @field_validator("parent_unity_id")
+    @field_validator("parent_item_id")
     @classmethod
-    def validate_parent_unity_id(cls, value: int | None) -> int | None:
+    def validate_parent_item_id(cls, value: int | None) -> int | None:
         if value is not None and value < 1:
-            raise ValueError("invalid parent unity id")
+            raise ValueError("invalid parent item id")
         return value
 
 
-class TenantUnityMoveRequest(BaseModel):
-    parent_unity_id: int | None = None
+class TenantItemMoveRequest(BaseModel):
+    parent_item_id: int | None = None
     target_index: int = 0
 
-    @field_validator("parent_unity_id")
+    @field_validator("parent_item_id")
     @classmethod
-    def validate_move_parent_unity_id(cls, value: int | None) -> int | None:
+    def validate_move_parent_item_id(cls, value: int | None) -> int | None:
         if value is not None and value < 1:
-            raise ValueError("invalid parent unity id")
+            raise ValueError("invalid parent item id")
         return value
 
     @field_validator("target_index")
     @classmethod
-    def validate_unity_target_index(cls, value: int) -> int:
+    def validate_item_target_index(cls, value: int) -> int:
         if value < 0:
             raise ValueError("target index must be non-negative")
         return value
@@ -1002,12 +1002,12 @@ def _member_can_delete_scope(member: Member) -> bool:
 
 
 def _member_can_edit_scope_hierarchy_directory(member: Member) -> bool:
-    """Permissão para editar árvores hierárquicas por escopo (ex.: location, unity)."""
+    """Permissão para editar árvores hierárquicas por escopo (ex.: location, item)."""
     return _member_can_edit_scope(member)
 
 
 def _member_can_delete_scope_hierarchy_directory(member: Member) -> bool:
-    """Permissão para apagar nós em árvores hierárquicas por escopo (ex.: location, unity)."""
+    """Permissão para apagar nós em árvores hierárquicas por escopo (ex.: location, item)."""
     return _member_can_delete_scope(member)
 
 
@@ -1269,20 +1269,20 @@ def _validate_location_parent_change(
     )
 
 
-def _validate_unity_parent_change(
-    unity_map: dict[int, Unity],
+def _validate_item_parent_change(
+    item_map: dict[int, Item],
     *,
-    parent_unity_id: int | None,
-    moving_unity_id: int | None,
+    parent_item_id: int | None,
+    moving_item_id: int | None,
 ) -> None:
     validate_scope_hierarchy_parent_change(
-        unity_map,
-        get_parent_id=lambda item: item.parent_unity_id,
-        parent_id=parent_unity_id,
-        moving_id=moving_unity_id,
-        not_found_detail="Parent unity not found for current scope",
-        self_parent_detail="Unity cannot be its own parent",
-        cycle_detail="Unity cannot move under one of its descendants",
+        item_map,
+        get_parent_id=lambda row: row.parent_item_id,
+        parent_id=parent_item_id,
+        moving_id=moving_item_id,
+        not_found_detail="Parent item not found for current scope",
+        self_parent_detail="Item cannot be its own parent",
+        cycle_detail="Item cannot move under one of its descendants",
     )
 
 
@@ -1398,117 +1398,117 @@ def _build_tenant_location_directory(
     )
 
 
-def _get_scope_unity_list(
+def _get_scope_item_list(
     session: Session,
     *,
     scope_id: int,
     q: str | None = None,
-    parent_unity_id: int | None = None,
-) -> list[Unity]:
-    query = select(Unity).where(Unity.scope_id == scope_id)
-    if parent_unity_id is not None:
-        query = query.where(Unity.parent_unity_id == parent_unity_id)
+    parent_item_id: int | None = None,
+) -> list[Item]:
+    query = select(Item).where(Item.scope_id == scope_id)
+    if parent_item_id is not None:
+        query = query.where(Item.parent_item_id == parent_item_id)
 
     query_term_expression = _query_term_expression_for_search(q)
     if query_term_expression is not None:
             query = query.where(
                 or_(
-                    _normalize_expression_for_search(Unity.name).contains(query_term_expression),
-                    _normalize_expression_for_search(Unity.display_name).contains(
+                    _normalize_expression_for_search(Item.name).contains(query_term_expression),
+                    _normalize_expression_for_search(Item.display_name).contains(
                         query_term_expression
                     ),
                 )
             )
 
     return list(
-        session.scalars(query.order_by(Unity.sort_order, Unity.name, Unity.id))
+        session.scalars(query.order_by(Item.sort_order, Item.name, Item.id))
     )
 
 
-def _get_scope_unity_or_404(session: Session, *, scope_id: int, unity_id: int) -> Unity:
-    target_unity = session.get(Unity, unity_id)
-    if not target_unity or target_unity.scope_id != scope_id:
+def _get_scope_item_or_404(session: Session, *, scope_id: int, item_id: int) -> Item:
+    target_item = session.get(Item, item_id)
+    if not target_item or target_item.scope_id != scope_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Unity not found for current scope",
+            detail="Item not found for current scope",
         )
 
-    return target_unity
+    return target_item
 
 
-def _move_unity_in_scope(
+def _move_item_in_scope(
     session: Session,
     *,
-    target_unity: Unity,
-    parent_unity_id: int | None,
+    target_item: Item,
+    parent_item_id: int | None,
     target_index: int | None,
 ) -> None:
-    unity_list = _get_scope_unity_list(session, scope_id=target_unity.scope_id)
+    item_row_list = _get_scope_item_list(session, scope_id=target_item.scope_id)
     move_hierarchy_node_in_scope(
         session,
-        item_list=unity_list,
-        target_item=target_unity,
-        get_parent_id=lambda item: item.parent_unity_id,
-        set_parent_id=lambda item, value: setattr(item, "parent_unity_id", value),
-        new_parent_id=parent_unity_id,
+        item_list=item_row_list,
+        target_item=target_item,
+        get_parent_id=lambda row: row.parent_item_id,
+        set_parent_id=lambda row, value: setattr(row, "parent_item_id", value),
+        new_parent_id=parent_item_id,
         target_index=target_index,
-        not_found_detail="Parent unity not found for current scope",
-        self_parent_detail="Unity cannot be its own parent",
-        cycle_detail="Unity cannot move under one of its descendants",
+        not_found_detail="Parent item not found for current scope",
+        self_parent_detail="Item cannot be its own parent",
+        cycle_detail="Item cannot move under one of its descendants",
     )
 
 
-def _normalize_scope_unity_order(session: Session, *, scope_id: int) -> None:
-    unity_list = _get_scope_unity_list(session, scope_id=scope_id)
+def _normalize_scope_item_order(session: Session, *, scope_id: int) -> None:
+    item_row_list = _get_scope_item_list(session, scope_id=scope_id)
     normalize_scope_hierarchy_order(
         session,
-        item_list=unity_list,
-        get_parent_id=lambda item: item.parent_unity_id,
+        item_list=item_row_list,
+        get_parent_id=lambda row: row.parent_item_id,
     )
 
 
-def _build_tenant_unity_directory(
+def _build_tenant_item_directory(
     session: Session,
     *,
     actor: Member,
     scope: Scope,
     q: str | None = None,
-    parent_unity_id: int | None = None,
-) -> TenantUnityDirectoryResponse:
-    unity_list = _get_scope_unity_list(
+    parent_item_id: int | None = None,
+) -> TenantItemDirectoryResponse:
+    item_row_list = _get_scope_item_list(
         session,
         scope_id=scope.id,
         q=q,
-        parent_unity_id=parent_unity_id,
+        parent_item_id=parent_item_id,
     )
     query_term_expression = _query_term_expression_for_search(q)
-    if query_term_expression is not None and parent_unity_id is None:
-        full_unity_list = _get_scope_unity_list(session, scope_id=scope.id)
-        unity_list = _include_hierarchy_ancestor_chain_for_filter(
-            filtered_item_list=unity_list,
-            full_item_list=full_unity_list,
-            get_id=lambda item: item.id,
-            get_parent_id=lambda item: item.parent_unity_id,
+    if query_term_expression is not None and parent_item_id is None:
+        full_item_list = _get_scope_item_list(session, scope_id=scope.id)
+        item_row_list = _include_hierarchy_ancestor_chain_for_filter(
+            filtered_item_list=item_row_list,
+            full_item_list=full_item_list,
+            get_id=lambda row: row.id,
+            get_parent_id=lambda row: row.parent_item_id,
         )
 
-    child_list_by_parent_id: defaultdict[int | None, list[Unity]] = defaultdict(list)
-    for item in sorted(unity_list, key=hierarchy_sort_key):
-        child_list_by_parent_id[item.parent_unity_id].append(item)
+    child_list_by_parent_id: defaultdict[int | None, list[Item]] = defaultdict(list)
+    for row in sorted(item_row_list, key=hierarchy_sort_key):
+        child_list_by_parent_id[row.parent_item_id].append(row)
 
-    item_list: list[TenantUnityRecord] = []
-    visited_unity_id_set: set[int] = set()
+    out_list: list[TenantItemRecord] = []
+    visited_item_id_set: set[int] = set()
     can_edit_hierarchy = _member_can_edit_scope_hierarchy_directory(actor)
 
-    def append_branch(unity_row: Unity, *, depth: int, path_prefix: list[str]) -> int:
-        visited_unity_id_set.add(unity_row.id)
-        path_labels = [*path_prefix, hierarchy_item_label(unity_row)]
-        child_list = child_list_by_parent_id.get(unity_row.id, [])
-        record = TenantUnityRecord(
-            id=unity_row.id,
-            parent_unity_id=unity_row.parent_unity_id,
-            name=unity_row.name,
-            display_name=unity_row.display_name,
-            sort_order=unity_row.sort_order,
+    def append_branch(item_row: Item, *, depth: int, path_prefix: list[str]) -> int:
+        visited_item_id_set.add(item_row.id)
+        path_labels = [*path_prefix, hierarchy_item_label(item_row)]
+        child_list = child_list_by_parent_id.get(item_row.id, [])
+        record = TenantItemRecord(
+            id=item_row.id,
+            parent_item_id=item_row.parent_item_id,
+            name=item_row.name,
+            display_name=item_row.display_name,
+            sort_order=item_row.sort_order,
             depth=depth,
             path_labels=path_labels,
             children_count=len(child_list),
@@ -1518,7 +1518,7 @@ def _build_tenant_unity_directory(
             can_create_child=can_edit_hierarchy,
             can_move=can_edit_hierarchy,
         )
-        item_list.append(record)
+        out_list.append(record)
 
         descendant_count = 0
         for child in child_list:
@@ -1531,20 +1531,20 @@ def _build_tenant_unity_directory(
         record.descendants_count = descendant_count
         return descendant_count
 
-    for root_unity in child_list_by_parent_id.get(None, []):
-        append_branch(root_unity, depth=0, path_prefix=[])
+    for root_item in child_list_by_parent_id.get(None, []):
+        append_branch(root_item, depth=0, path_prefix=[])
 
-    for dangling_unity in sorted(unity_list, key=hierarchy_sort_key):
-        if dangling_unity.id not in visited_unity_id_set:
-            append_branch(dangling_unity, depth=0, path_prefix=[])
+    for dangling_item in sorted(item_row_list, key=hierarchy_sort_key):
+        if dangling_item.id not in visited_item_id_set:
+            append_branch(dangling_item, depth=0, path_prefix=[])
 
-    return TenantUnityDirectoryResponse(
+    return TenantItemDirectoryResponse(
         scope_id=scope.id,
         scope_name=scope.name,
         scope_display_name=scope.display_name,
         can_edit=can_edit_hierarchy,
         can_create=can_edit_hierarchy,
-        item_list=item_list,
+        item_list=out_list,
     )
 
 
@@ -2275,13 +2275,13 @@ def delete_current_tenant_scope(
             detail="Cannot delete scope while it still has locations",
         )
 
-    has_unity = session.scalar(
-        select(Unity.id).where(Unity.scope_id == target_scope.id).limit(1)
+    has_item = session.scalar(
+        select(Item.id).where(Item.scope_id == target_scope.id).limit(1)
     )
-    if has_unity is not None:
+    if has_item is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot delete scope while it still has unities",
+            detail="Cannot delete scope while it still has items",
         )
 
     has_scope_field = session.scalar(
@@ -2514,13 +2514,13 @@ def delete_current_scope_location(
 
 
 @router.get(
-    "/tenant/current/scopes/{scope_id}/unities",
-    response_model=TenantUnityDirectoryResponse,
+    "/tenant/current/scopes/{scope_id}/items",
+    response_model=TenantItemDirectoryResponse,
 )
-def get_current_scope_unity_directory(
+def get_current_scope_item_directory(
     scope_id: int,
     q: str | None = Query(default=None),
-    parent_unity_id: int | None = Query(default=None),
+    parent_item_id: int | None = Query(default=None),
     current_member: Member = Depends(get_current_member),
     session: Session = Depends(get_session),
 ):
@@ -2529,22 +2529,22 @@ def get_current_scope_unity_directory(
         actor=current_member,
         scope_id=scope_id,
     )
-    return _build_tenant_unity_directory(
+    return _build_tenant_item_directory(
         session,
         actor=current_member,
         scope=target_scope,
         q=q,
-        parent_unity_id=parent_unity_id,
+        parent_item_id=parent_item_id,
     )
 
 
 @router.post(
-    "/tenant/current/scopes/{scope_id}/unities",
-    response_model=TenantUnityDirectoryResponse,
+    "/tenant/current/scopes/{scope_id}/items",
+    response_model=TenantItemDirectoryResponse,
 )
-def create_current_scope_unity(
+def create_current_scope_item(
     scope_id: int,
-    body: TenantUnityUpsertRequest,
+    body: TenantItemUpsertRequest,
     current_member: Member = Depends(get_current_member),
     session: Session = Depends(get_session),
 ):
@@ -2556,29 +2556,29 @@ def create_current_scope_unity(
     if not _member_can_edit_scope_hierarchy_directory(current_member):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to create unity",
+            detail="Insufficient permissions to create item",
         )
 
-    unity_list = _get_scope_unity_list(session, scope_id=target_scope.id)
-    _validate_unity_parent_change(
-        {item.id: item for item in unity_list},
-        parent_unity_id=body.parent_unity_id,
-        moving_unity_id=None,
+    item_row_list = _get_scope_item_list(session, scope_id=target_scope.id)
+    _validate_item_parent_change(
+        {row.id: row for row in item_row_list},
+        parent_item_id=body.parent_item_id,
+        moving_item_id=None,
     )
-    unity = Unity(
+    new_item = Item(
         name=body.name,
         display_name=body.display_name,
         scope_id=target_scope.id,
-        parent_unity_id=body.parent_unity_id,
+        parent_item_id=body.parent_item_id,
         sort_order=sum(
-            1 for item in unity_list if item.parent_unity_id == body.parent_unity_id
+            1 for row in item_row_list if row.parent_item_id == body.parent_item_id
         ),
     )
-    session.add(unity)
+    session.add(new_item)
     _apply_member_audit_context(session, current_member)
     commit_session_with_null_if_empty(session)
 
-    return _build_tenant_unity_directory(
+    return _build_tenant_item_directory(
         session,
         actor=current_member,
         scope=target_scope,
@@ -2586,13 +2586,13 @@ def create_current_scope_unity(
 
 
 @router.patch(
-    "/tenant/current/scopes/{scope_id}/unities/{unity_id}",
-    response_model=TenantUnityDirectoryResponse,
+    "/tenant/current/scopes/{scope_id}/items/{item_id}",
+    response_model=TenantItemDirectoryResponse,
 )
-def patch_current_scope_unity(
+def patch_current_scope_item(
     scope_id: int,
-    unity_id: int,
-    body: TenantUnityUpsertRequest,
+    item_id: int,
+    body: TenantItemUpsertRequest,
     current_member: Member = Depends(get_current_member),
     session: Session = Depends(get_session),
 ):
@@ -2601,32 +2601,32 @@ def patch_current_scope_unity(
         actor=current_member,
         scope_id=scope_id,
     )
-    target_unity = _get_scope_unity_or_404(
+    target_item = _get_scope_item_or_404(
         session,
         scope_id=target_scope.id,
-        unity_id=unity_id,
+        item_id=item_id,
     )
     if not _member_can_edit_scope_hierarchy_directory(current_member):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to update unity",
+            detail="Insufficient permissions to update item",
         )
 
-    if target_unity.parent_unity_id != body.parent_unity_id:
-        _move_unity_in_scope(
+    if target_item.parent_item_id != body.parent_item_id:
+        _move_item_in_scope(
             session,
-            target_unity=target_unity,
-            parent_unity_id=body.parent_unity_id,
+            target_item=target_item,
+            parent_item_id=body.parent_item_id,
             target_index=None,
         )
 
-    target_unity.name = body.name
-    target_unity.display_name = body.display_name
-    session.add(target_unity)
+    target_item.name = body.name
+    target_item.display_name = body.display_name
+    session.add(target_item)
     _apply_member_audit_context(session, current_member)
     commit_session_with_null_if_empty(session)
 
-    return _build_tenant_unity_directory(
+    return _build_tenant_item_directory(
         session,
         actor=current_member,
         scope=target_scope,
@@ -2634,13 +2634,13 @@ def patch_current_scope_unity(
 
 
 @router.post(
-    "/tenant/current/scopes/{scope_id}/unities/{unity_id}/move",
-    response_model=TenantUnityDirectoryResponse,
+    "/tenant/current/scopes/{scope_id}/items/{item_id}/move",
+    response_model=TenantItemDirectoryResponse,
 )
-def move_current_scope_unity(
+def move_current_scope_item(
     scope_id: int,
-    unity_id: int,
-    body: TenantUnityMoveRequest,
+    item_id: int,
+    body: TenantItemMoveRequest,
     current_member: Member = Depends(get_current_member),
     session: Session = Depends(get_session),
 ):
@@ -2649,27 +2649,27 @@ def move_current_scope_unity(
         actor=current_member,
         scope_id=scope_id,
     )
-    target_unity = _get_scope_unity_or_404(
+    target_item = _get_scope_item_or_404(
         session,
         scope_id=target_scope.id,
-        unity_id=unity_id,
+        item_id=item_id,
     )
     if not _member_can_edit_scope_hierarchy_directory(current_member):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to move unity",
+            detail="Insufficient permissions to move item",
         )
 
-    _move_unity_in_scope(
+    _move_item_in_scope(
         session,
-        target_unity=target_unity,
-        parent_unity_id=body.parent_unity_id,
+        target_item=target_item,
+        parent_item_id=body.parent_item_id,
         target_index=body.target_index,
     )
     _apply_member_audit_context(session, current_member)
     commit_session_with_null_if_empty(session)
 
-    return _build_tenant_unity_directory(
+    return _build_tenant_item_directory(
         session,
         actor=current_member,
         scope=target_scope,
@@ -2677,12 +2677,12 @@ def move_current_scope_unity(
 
 
 @router.delete(
-    "/tenant/current/scopes/{scope_id}/unities/{unity_id}",
-    response_model=TenantUnityDirectoryResponse,
+    "/tenant/current/scopes/{scope_id}/items/{item_id}",
+    response_model=TenantItemDirectoryResponse,
 )
-def delete_current_scope_unity(
+def delete_current_scope_item(
     scope_id: int,
-    unity_id: int,
+    item_id: int,
     current_member: Member = Depends(get_current_member),
     session: Session = Depends(get_session),
 ):
@@ -2691,24 +2691,24 @@ def delete_current_scope_unity(
         actor=current_member,
         scope_id=scope_id,
     )
-    target_unity = _get_scope_unity_or_404(
+    target_item = _get_scope_item_or_404(
         session,
         scope_id=target_scope.id,
-        unity_id=unity_id,
+        item_id=item_id,
     )
     if not _member_can_delete_scope_hierarchy_directory(current_member):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to delete unity",
+            detail="Insufficient permissions to delete item",
         )
 
     _apply_member_audit_context(session, current_member)
-    session.delete(target_unity)
+    session.delete(target_item)
     session.flush()
-    _normalize_scope_unity_order(session, scope_id=target_scope.id)
+    _normalize_scope_item_order(session, scope_id=target_scope.id)
     commit_session_with_null_if_empty(session)
 
-    return _build_tenant_unity_directory(
+    return _build_tenant_item_directory(
         session,
         actor=current_member,
         scope=target_scope,

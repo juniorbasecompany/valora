@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 from valora_backend.auth.dependencies import get_current_member
 from valora_backend.auth.service import ADMIN_ROLE, MASTER_ROLE
 from valora_backend.db import get_session
-from valora_backend.model.identity import Location, Member, Scope, Unity
+from valora_backend.model.identity import Item, Location, Member, Scope
 from valora_backend.model.rules import (
     Action,
     Event,
@@ -159,22 +159,22 @@ def _expand_scope_location_id_list_with_descendants(
     return list(expanded)
 
 
-def _expand_scope_unity_id_list_with_descendants(
-    session: Session, *, scope_id: int, unity_id_list: list[int]
+def _expand_scope_item_id_list_with_descendants(
+    session: Session, *, scope_id: int, item_id_list: list[int]
 ) -> list[int]:
-    """Cada id selecionado vira ele próprio mais todas as unidades descendentes no escopo."""
-    if not unity_id_list:
+    """Cada id selecionado vira ele próprio mais todos os itens descendentes no escopo."""
+    if not item_id_list:
         return []
     rows = list(
         session.execute(
-            select(Unity.id, Unity.parent_unity_id).where(Unity.scope_id == scope_id)
+            select(Item.id, Item.parent_item_id).where(Item.scope_id == scope_id)
         )
     )
     children_by_parent: defaultdict[int | None, list[int]] = defaultdict(list)
-    for unity_row_id, parent_id in rows:
-        children_by_parent[parent_id].append(unity_row_id)
+    for item_row_id, parent_id in rows:
+        children_by_parent[parent_id].append(item_row_id)
     expanded: set[int] = set()
-    stack = list(unity_id_list)
+    stack = list(item_id_list)
     while stack:
         current = stack.pop()
         if current in expanded:
@@ -184,14 +184,14 @@ def _expand_scope_unity_id_list_with_descendants(
     return list(expanded)
 
 
-def _unity_in_scope_or_404(
-    session: Session, *, scope_id: int, unity_id: int
-) -> Unity:
-    row = session.get(Unity, unity_id)
+def _item_in_scope_or_404(
+    session: Session, *, scope_id: int, item_id: int
+) -> Item:
+    row = session.get(Item, item_id)
     if not row or row.scope_id != scope_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Unity not found for current scope",
+            detail="Item not found for current scope",
         )
     return row
 
@@ -1380,7 +1380,7 @@ def delete_scope_label(
 class ScopeEventRecord(BaseModel):
     id: int
     location_id: int
-    unity_id: int
+    item_id: int
     action_id: int
     moment_utc: datetime
 
@@ -1392,14 +1392,14 @@ class ScopeEventListResponse(BaseModel):
 
 class ScopeEventCreateRequest(BaseModel):
     location_id: int
-    unity_id: int
+    item_id: int
     action_id: int
     moment_utc: datetime | None = None
 
 
 class ScopeEventPatchRequest(BaseModel):
     location_id: int | None = None
-    unity_id: int | None = None
+    item_id: int | None = None
     action_id: int | None = None
     moment_utc: datetime | None = None
 
@@ -1413,13 +1413,13 @@ def list_scope_events(
     moment_from_utc: datetime | None = Query(default=None),
     moment_to_utc: datetime | None = Query(default=None),
     location_id: list[int] | None = Query(default=None),
-    unity_id: list[int] | None = Query(default=None),
+    item_id: list[int] | None = Query(default=None),
     action_id: int | None = Query(default=None),
     member: Member = Depends(get_current_member),
     session: Session = Depends(get_session),
 ):
     location_id_list = location_id or []
-    unity_id_list = unity_id or []
+    item_id_list = item_id or []
 
     _get_tenant_scope(session, actor=member, scope_id=scope_id)
     if moment_from_utc is not None and moment_from_utc.tzinfo is not None:
@@ -1439,8 +1439,8 @@ def list_scope_events(
         _location_in_scope_or_404(
             session, scope_id=scope_id, location_id=location_id_item
         )
-    for unity_id_item in unity_id_list:
-        _unity_in_scope_or_404(session, scope_id=scope_id, unity_id=unity_id_item)
+    for item_id_item in item_id_list:
+        _item_in_scope_or_404(session, scope_id=scope_id, item_id=item_id_item)
     if action_id is not None:
         _action_in_scope_or_404(session, scope_id=scope_id, action_id=action_id)
     action_id_list = list(
@@ -1461,11 +1461,11 @@ def list_scope_events(
             session, scope_id=scope_id, location_id_list=location_id_list
         )
         query = query.where(Event.location_id.in_(expanded_location_id_list))
-    if unity_id_list:
-        expanded_unity_id_list = _expand_scope_unity_id_list_with_descendants(
-            session, scope_id=scope_id, unity_id_list=unity_id_list
+    if item_id_list:
+        expanded_item_id_list = _expand_scope_item_id_list_with_descendants(
+            session, scope_id=scope_id, item_id_list=item_id_list
         )
-        query = query.where(Event.unity_id.in_(expanded_unity_id_list))
+        query = query.where(Event.item_id.in_(expanded_item_id_list))
     if action_id is not None:
         query = query.where(Event.action_id == action_id)
     rows = list(session.scalars(query.order_by(Event.moment_utc.asc(), Event.id.asc())))
@@ -1475,7 +1475,7 @@ def list_scope_events(
             ScopeEventRecord(
                 id=r.id,
                 location_id=r.location_id,
-                unity_id=r.unity_id,
+                item_id=r.item_id,
                 action_id=r.action_id,
                 moment_utc=r.moment_utc,
             )
@@ -1497,7 +1497,7 @@ def create_scope_event(
     _require_scope_rules_editor(member)
     _get_tenant_scope(session, actor=member, scope_id=scope_id)
     _location_in_scope_or_404(session, scope_id=scope_id, location_id=body.location_id)
-    _unity_in_scope_or_404(session, scope_id=scope_id, unity_id=body.unity_id)
+    _item_in_scope_or_404(session, scope_id=scope_id, item_id=body.item_id)
     action = _action_in_scope_or_404(
         session, scope_id=scope_id, action_id=body.action_id
     )
@@ -1506,7 +1506,7 @@ def create_scope_event(
         moment = moment.astimezone(UTC).replace(tzinfo=None)
     row = Event(
         location_id=body.location_id,
-        unity_id=body.unity_id,
+        item_id=body.item_id,
         action_id=action.id,
         moment_utc=moment,
     )
@@ -1518,7 +1518,7 @@ def create_scope_event(
         moment_from_utc=None,
         moment_to_utc=None,
         location_id=None,
-        unity_id=None,
+        item_id=None,
         action_id=None,
         member=member,
         session=session,
@@ -1544,9 +1544,9 @@ def patch_scope_event(
             session, scope_id=scope_id, location_id=body.location_id
         )
         row.location_id = body.location_id
-    if body.unity_id is not None:
-        _unity_in_scope_or_404(session, scope_id=scope_id, unity_id=body.unity_id)
-        row.unity_id = body.unity_id
+    if body.item_id is not None:
+        _item_in_scope_or_404(session, scope_id=scope_id, item_id=body.item_id)
+        row.item_id = body.item_id
     if body.action_id is not None:
         _action_in_scope_or_404(session, scope_id=scope_id, action_id=body.action_id)
         row.action_id = body.action_id
@@ -1563,7 +1563,7 @@ def patch_scope_event(
         moment_from_utc=None,
         moment_to_utc=None,
         location_id=None,
-        unity_id=None,
+        item_id=None,
         action_id=None,
         member=member,
         session=session,
@@ -1596,7 +1596,7 @@ def delete_scope_event(
         moment_from_utc=None,
         moment_to_utc=None,
         location_id=None,
-        unity_id=None,
+        item_id=None,
         action_id=None,
         member=member,
         session=session,

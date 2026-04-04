@@ -6,7 +6,7 @@
     "navigation": {
       "home": "Home",
       "location": "Locations",
-      "unity": "Units",
+      "item": "Items",
       "field": "Fields",
       "action": "Actions",
       "event": "Events",
@@ -429,7 +429,7 @@
       "missingCurrentScope": "Select an active scope in the header before recording events.",
       "loadError": "Could not load events for this scope. Try again.",
       "fallbackLocation": "Unavailable location",
-      "fallbackUnity": "Unavailable unit",
+      "fallbackItem": "Unavailable item",
       "fallbackAction": "Unavailable action",
       "fallbackEvent": "Unavailable event"
     },
@@ -446,9 +446,9 @@
         "label": "Location",
         "hint": "Choose where the event happened."
       },
-      "unity": {
-        "label": "Unit",
-        "hint": "Choose the productive unit related to the event."
+      "item": {
+        "label": "Item",
+        "hint": "Choose the item related to the event."
       },
       "action": {
         "label": "Action",
@@ -477,7 +477,7 @@
       "momentFromLabel": "Start period",
       "momentToLabel": "End period",
       "locationLabel": "Location",
-      "unityLabel": "Unit",
+      "itemLabel": "Item",
       "actionLabel": "Action",
       "all": "",
       "allAria": "No filter",
@@ -499,7 +499,7 @@
       "deleteBlockedDetail": "The event cannot be deleted while results still reference it.",
       "momentRequired": "Enter the event date and time.",
       "locationRequired": "Select a location.",
-      "unityRequired": "Select a unit.",
+      "itemRequired": "Select an item.",
       "actionRequired": "Select an action."
     },
     "discardConfirm": "Discard unsaved changes?"
@@ -570,7 +570,7 @@
     },
     "discardConfirm": "Discard unsaved changes?"
   },
-  "UnityConfigurationPage": {
+  "ItemConfigurationPage": {
     "title": "Productive units",
     "description": "This panel shows the productive-unit tree for the scope. The hierarchy is on the left; beside it is the form to edit the name and description, plus the history panel. Select an item in the tree to edit it, or use the New button to add a child under the chosen item.",
     "list": {

@@ -5,7 +5,7 @@ type IconProps = {
 };
 
 type NavigationIconProps = IconProps & {
-    kind: "home" | "location" | "unity" | "field" | "action" | "event";
+    kind: "home" | "location" | "item" | "field" | "action" | "event";
 };
 
 function mergeClassName(className?: string, fallback = "ui-icon") {
@@ -83,7 +83,7 @@ export function LocationIcon({ className }: IconProps) {
     );
 }
 
-export function UnityIcon({ className }: IconProps) {
+export function ItemIcon({ className }: IconProps) {
     return (
         <svg
             className={mergeClassName(className)}
@@ -486,8 +486,8 @@ export function NavigationIcon({
             return <DashboardIcon className={className} />;
         case "location":
             return <LocationIcon className={className} />;
-        case "unity":
-            return <UnityIcon className={className} />;
+        case "item":
+            return <ItemIcon className={className} />;
         case "field":
             return <RulerIcon className={className} />;
         case "action":

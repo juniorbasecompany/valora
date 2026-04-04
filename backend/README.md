@@ -13,13 +13,13 @@ A fonte de verdade do diagrama entidade-relacionamento (JSON drawDB) é [`erd.js
 | `member`  | idem | Vínculo conta ↔ tenant; papel, status, `current_scope_id`. |
 | `scope`   | idem | Escopo operacional por tenant. |
 | `location`| idem | Hierarquia por escopo (`parent_location_id`, `sort_order`). |
-| `unity`   | idem | Hierarquia por escopo (`parent_unity_id`, `sort_order`). |
+| `item`    | idem | Hierarquia por escopo (`parent_item_id`, `sort_order`). |
 | `log`     | [`model/log.py`](src/valora_backend/model/log.py) | Auditoria (`table_name`, `action_type`, `row_id`, `row`, `moment_utc`). |
 | `field`   | [`model/rules.py`](src/valora_backend/model/rules.py) | Definição de campo por escopo; coluna SQL `type` (tipo lógico / SQL no modelo). |
 | `action`  | idem | Ação por escopo. |
 | `formula` | idem | Passos de fórmula por ação (`step`, `statement`). |
 | `label`   | idem | Rótulo i18n ligado a `field` **ou** `action`. |
-| `event`   | idem | Evento operacional (`location_id`, `unity_id`, `action_id`, `moment_utc`). |
+| `event`   | idem | Evento operacional (`location_id`, `item_id`, `action_id`, `moment_utc`). |
 | `input`   | idem | Entrada por evento e campo. |
 | `result`  | idem | Resultado por evento e campo; opcionalmente `parent_result_id`. |
 
@@ -56,7 +56,7 @@ Documentação interativa OpenAPI: ao subir o servidor, **`/docs`** (Swagger).
 - `POST /auth/tenant/current/members/{member_id}/invite`
 - `GET /auth/tenant/current/scopes`, `POST /auth/tenant/current/scopes`, `PATCH /auth/tenant/current/scopes/{scope_id}`, `DELETE /auth/tenant/current/scopes/{scope_id}`
 - `GET /auth/tenant/current/scopes/{scope_id}/locations` (+ `POST`, `PATCH`, `DELETE`, `POST .../move`)
-- `GET /auth/tenant/current/scopes/{scope_id}/unities` (+ `POST`, `PATCH`, `DELETE`, `POST .../move`)
+- `GET /auth/tenant/current/scopes/{scope_id}/items` (+ `POST`, `PATCH`, `DELETE`, `POST .../move`)
 - `GET /auth/tenant/current/logs/{table_name}` (histórico a partir de `log`)
 - `PATCH /auth/me/current-scope`
 - `POST /auth/invites/{member_id}/accept`, `POST /auth/invites/{member_id}/reject`
@@ -176,7 +176,7 @@ Se a URL atual não for PostgreSQL ou o banco estiver indisponível, os testes s
 
 Política atual de auditoria:
 
-- `member`, `scope`, `location` e `unity` exigem `tenant_id` e `account_id` no contexto da transação; sem isso, a trigger falha.
+- `member`, `scope`, `location` e `item` exigem `tenant_id` e `account_id` no contexto da transação; sem isso, a trigger falha.
 - `tenant` exige `account_id`; `tenant_id` em `INSERT` continua como exceção temporária.
 - `account` permite `tenant_id` ausente; `account_id` em `INSERT` continua como exceção temporária.
 - `log.account_id` e `log.tenant_id` preservam IDs históricos e não são mais reescritos por FK ao apagar `account` ou `tenant`.
@@ -191,7 +191,7 @@ Política atual de auditoria:
 
 - `pyproject.toml`: dependências e configuração do projeto Python.
 - `src/valora_backend/config.py`: configuração via `pydantic-settings`.
-- `src/valora_backend/model/`: metadados SQLAlchemy — [`identity.py`](src/valora_backend/model/identity.py) (`tenant`, `account`, `member`, `scope`, `location`, `unity`), [`log.py`](src/valora_backend/model/log.py) (`log`), [`rules.py`](src/valora_backend/model/rules.py) (`field`, `action`, `formula`, `label`, `event`, `input`, `result`); [`__init__.py`](src/valora_backend/model/__init__.py) importa tudo para o Alembic.
+- `src/valora_backend/model/`: metadados SQLAlchemy — [`identity.py`](src/valora_backend/model/identity.py) (`tenant`, `account`, `member`, `scope`, `location`, `item`), [`log.py`](src/valora_backend/model/log.py) (`log`), [`rules.py`](src/valora_backend/model/rules.py) (`field`, `action`, `formula`, `label`, `event`, `input`, `result`); [`__init__.py`](src/valora_backend/model/__init__.py) importa tudo para o Alembic.
 - `src/valora_backend/api/`: [`auth.py`](src/valora_backend/api/auth.py), [`rules.py`](src/valora_backend/api/rules.py).
 - `alembic/`: migrations; `env.py` usa `Base.metadata` e a mesma URL que o backend.
 - `erd.json`: ERD drawDB (fonte de verdade do diagrama).

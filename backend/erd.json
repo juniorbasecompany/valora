@@ -469,16 +469,16 @@
       "y": 131.98117626059718
     },
     {
-      "id": "unity",
-      "name": "unity",
-      "comment": "Use para cadastrar a unidade produtiva. Pode ser, por exemplo: galinha, fêmea, branca, vermelha.",
+      "id": "item",
+      "name": "item",
+      "comment": "Use para cadastrar o item. Pode ser, por exemplo: galinha, fêmea, branca, vermelha.",
       "color": "#ff0000",
       "indices": [],
       "fields": [
         {
           "id": "id",
           "name": "id",
-          "comment": "Identificação da unidade produtiva.",
+          "comment": "Identificação do item.",
           "type": "BIGINT",
           "default": "",
           "check": "",
@@ -492,7 +492,7 @@
         {
           "id": "name",
           "name": "name",
-          "comment": "Nome curto da unidade produtiva.",
+          "comment": "Nome curto do item.",
           "type": "TEXT",
           "default": "",
           "check": "",
@@ -506,7 +506,7 @@
         {
           "id": "display_name",
           "name": "display_name",
-          "comment": "Descrição da unidade produtiva.",
+          "comment": "Descrição do item.",
           "type": "TEXT",
           "default": "",
           "check": "",
@@ -518,9 +518,9 @@
           "values": []
         },
         {
-          "id": "parent_unity_id",
-          "name": "parent_unity_id",
-          "comment": "Em caso de hierarquia, é a unidade produtiva à qual esta pertence.",
+          "id": "parent_item_id",
+          "name": "parent_item_id",
+          "comment": "Em caso de hierarquia, é o item à qual esta pertence.",
           "type": "BIGINT",
           "default": "",
           "check": "",
@@ -534,7 +534,7 @@
         {
           "id": "scope_id",
           "name": "scope_id",
-          "comment": "Escopo desta unidade produtiva.",
+          "comment": "Escopo deste item.",
           "type": "BIGINT",
           "default": "",
           "check": "",
@@ -548,7 +548,7 @@
         {
           "id": "sort_order",
           "name": "sort_order",
-          "comment": "Ordem da unidade produtiva em relação às demais de mesmo nível.",
+          "comment": "Ordem do item em relação às demais de mesmo nível.",
           "type": "INTEGER",
           "default": "0",
           "check": "",
@@ -668,9 +668,9 @@
           "values": []
         },
         {
-          "id": "unity_id",
-          "name": "unity_id",
-          "comment": "Ligação à unidade produtiva.",
+          "id": "item_id",
+          "name": "item_id",
+          "comment": "Ligação ao item.",
           "type": "BIGINT",
           "default": "",
           "check": "",
@@ -1136,7 +1136,7 @@
           "comment": "Nome da tabela que foi modificada",
           "type": "TEXT",
           "default": "",
-          "check": "table_name IN ( 'account', 'action', 'event', 'field', 'formula', 'input', 'label', 'location', 'member', 'result', 'scope', 'tenant', 'unity' )",
+          "check": "table_name IN ( 'account', 'action', 'event', 'field', 'formula', 'input', 'label', 'location', 'member', 'result', 'scope', 'tenant', 'item' )",
           "primary": false,
           "unique": false,
           "notNull": true,
@@ -1284,34 +1284,34 @@
       "deleteConstraint": "Set null"
     },
     {
-      "id": "unity.scope_id",
-      "name": "unity.scope_id",
+      "id": "item.scope_id",
+      "name": "item.scope_id",
       "startTableId": "scope",
       "startFieldId": "id",
-      "endTableId": "unity",
+      "endTableId": "item",
       "endFieldId": "scope_id",
       "cardinality": "one_to_many",
       "updateConstraint": "Cascade",
       "deleteConstraint": "Restrict"
     },
     {
-      "id": "unity.parent_unity_id",
-      "name": "unity.parent_unity_id",
-      "startTableId": "unity",
+      "id": "item.parent_item_id",
+      "name": "item.parent_item_id",
+      "startTableId": "item",
       "startFieldId": "id",
-      "endTableId": "unity",
-      "endFieldId": "parent_unity_id",
+      "endTableId": "item",
+      "endFieldId": "parent_item_id",
       "cardinality": "one_to_many",
       "updateConstraint": "Cascade",
       "deleteConstraint": "Cascade"
     },
     {
-      "id": "event.unity_id",
-      "name": "event.unity_id",
-      "startTableId": "unity",
+      "id": "event.item_id",
+      "name": "event.item_id",
+      "startTableId": "item",
       "startFieldId": "id",
       "endTableId": "event",
-      "endFieldId": "unity_id",
+      "endFieldId": "item_id",
       "cardinality": "one_to_many",
       "updateConstraint": "Cascade",
       "deleteConstraint": "Restrict"

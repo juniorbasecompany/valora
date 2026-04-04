@@ -139,7 +139,7 @@ export function computeHierarchyMove<T extends TenantScopeHierarchyItemBase>(
 export function buildMoveRequestBody(
   parentId: number | null,
   targetIndex: number,
-  parentField: "parent_location_id" | "parent_unity_id"
+  parentField: "parent_location_id" | "parent_item_id"
 ): Record<string, unknown> {
   return {
     [parentField]: parentId,

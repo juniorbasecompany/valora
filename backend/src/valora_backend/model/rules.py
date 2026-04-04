@@ -196,7 +196,7 @@ class Label(Base):
 
 
 class Event(Base):
-    """Evento em que uma ação se aplica a local e unidade produtiva."""
+    """Evento em que uma ação se aplica a local e item."""
 
     __tablename__ = "event"
     __table_args__ = {
@@ -215,11 +215,11 @@ class Event(Base):
         nullable=False,
         comment="Ligação ao local.",
     )
-    unity_id: Mapped[int] = mapped_column(
+    item_id: Mapped[int] = mapped_column(
         BIGINT_COMPAT,
-        ForeignKey("unity.id", onupdate="CASCADE", ondelete="RESTRICT"),
+        ForeignKey("item.id", onupdate="CASCADE", ondelete="RESTRICT"),
         nullable=False,
-        comment="Ligação à unidade produtiva.",
+        comment="Ligação ao item.",
     )
     moment_utc: Mapped[datetime] = mapped_column(
         DateTime(timezone=False),

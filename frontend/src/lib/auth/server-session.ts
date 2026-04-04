@@ -14,7 +14,7 @@ import type {
   TenantScopeDirectoryResponse,
   TenantScopeEventDirectoryResponse,
   TenantScopeFieldDirectoryResponse,
-  TenantUnityDirectoryResponse
+  TenantItemDirectoryResponse
 } from "@/lib/auth/types";
 
 const apiUrl = getPublicApiUrl();
@@ -152,7 +152,7 @@ export async function getTenantLocationDirectory(scopeId: number) {
   }
 }
 
-export async function getTenantUnityDirectory(scopeId: number) {
+export async function getTenantItemDirectory(scopeId: number) {
   const cookieStore = await cookies();
   const token = cookieStore.get(authTokenCookieName)?.value;
   if (!hasAuthSession(token)) {
@@ -161,7 +161,7 @@ export async function getTenantUnityDirectory(scopeId: number) {
 
   try {
     const response = await fetch(
-      `${apiUrl}/auth/tenant/current/scopes/${scopeId}/unities`,
+      `${apiUrl}/auth/tenant/current/scopes/${scopeId}/items`,
       {
         method: "GET",
         headers: {
@@ -175,7 +175,7 @@ export async function getTenantUnityDirectory(scopeId: number) {
       return null;
     }
 
-    return (await response.json()) as TenantUnityDirectoryResponse;
+    return (await response.json()) as TenantItemDirectoryResponse;
   } catch {
     return null;
   }
@@ -255,7 +255,7 @@ export async function getTenantScopeEventDirectory(
     moment_from_utc?: string;
     moment_to_utc?: string;
     location_id?: number | number[];
-    unity_id?: number | number[];
+    item_id?: number | number[];
     action_id?: number;
   } = {}
 ) {
@@ -279,12 +279,12 @@ export async function getTenantScopeEventDirectory(
   } else if (filter.location_id != null) {
     query.set("location_id", String(filter.location_id));
   }
-  if (Array.isArray(filter.unity_id)) {
-    for (const unityId of filter.unity_id) {
-      query.append("unity_id", String(unityId));
+  if (Array.isArray(filter.item_id)) {
+    for (const itemId of filter.item_id) {
+      query.append("item_id", String(itemId));
     }
-  } else if (filter.unity_id != null) {
-    query.set("unity_id", String(filter.unity_id));
+  } else if (filter.item_id != null) {
+    query.set("item_id", String(filter.item_id));
   }
   if (filter.action_id != null) {
     query.set("action_id", String(filter.action_id));

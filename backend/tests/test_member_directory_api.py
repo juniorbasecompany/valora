@@ -25,7 +25,7 @@ from valora_backend.model.identity import (
     Member,
     Scope,
     Tenant,
-    Unity,
+    Item,
 )
 from valora_backend.model.log import Log
 
@@ -1099,57 +1099,57 @@ def test_member_cannot_select_scope_from_another_tenant() -> None:
     assert response.json()["detail"] == "Scope not found for current tenant"
 
 
-def test_admin_can_create_move_update_and_delete_unities() -> None:
+def test_admin_can_create_move_update_and_delete_items() -> None:
     with build_test_client(current_member_key="admin") as (client, session, _):
         scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
         assert scope_id is not None
 
-        list_response = client.get(f"/auth/tenant/current/scopes/{scope_id}/unities")
+        list_response = client.get(f"/auth/tenant/current/scopes/{scope_id}/items")
         root_response = client.post(
-            f"/auth/tenant/current/scopes/{scope_id}/unities",
+            f"/auth/tenant/current/scopes/{scope_id}/items",
             json={
                 "name": "Galinha",
                 "display_name": "Unidade avícola postura",
-                "parent_unity_id": None,
+                "parent_item_id": None,
             },
         )
         session.expire_all()
-        root_unity = session.scalar(select(Unity).where(Unity.name == "Galinha"))
-        assert root_unity is not None
+        root_item = session.scalar(select(Item).where(Item.name == "Galinha"))
+        assert root_item is not None
 
         child_response = client.post(
-            f"/auth/tenant/current/scopes/{scope_id}/unities",
+            f"/auth/tenant/current/scopes/{scope_id}/items",
             json={
                 "name": "Branca",
                 "display_name": "Linhagem branca",
-                "parent_unity_id": root_unity.id,
+                "parent_item_id": root_item.id,
             },
         )
         session.expire_all()
-        child_unity = session.scalar(select(Unity).where(Unity.name == "Branca"))
-        assert child_unity is not None
+        child_item = session.scalar(select(Item).where(Item.name == "Branca"))
+        assert child_item is not None
 
         move_response = client.post(
-            f"/auth/tenant/current/scopes/{scope_id}/unities/{child_unity.id}/move",
+            f"/auth/tenant/current/scopes/{scope_id}/items/{child_item.id}/move",
             json={
-                "parent_unity_id": None,
+                "parent_item_id": None,
                 "target_index": 0,
             },
         )
         update_response = client.patch(
-            f"/auth/tenant/current/scopes/{scope_id}/unities/{child_unity.id}",
+            f"/auth/tenant/current/scopes/{scope_id}/items/{child_item.id}",
             json={
                 "name": "Branca",
                 "display_name": "Linhagem branca leve",
-                "parent_unity_id": None,
+                "parent_item_id": None,
             },
         )
         delete_response = client.delete(
-            f"/auth/tenant/current/scopes/{scope_id}/unities/{root_unity.id}"
+            f"/auth/tenant/current/scopes/{scope_id}/items/{root_item.id}"
         )
         session.expire_all()
-        deleted_root = session.get(Unity, root_unity.id)
-        updated_child = session.get(Unity, child_unity.id)
+        deleted_root = session.get(Item, root_item.id)
+        updated_child = session.get(Item, child_item.id)
 
     assert list_response.status_code == 200
     assert list_response.json()["can_create"] is True
@@ -1164,16 +1164,16 @@ def test_admin_can_create_move_update_and_delete_unities() -> None:
     created_child = next(
         item for item in child_payload["item_list"] if item["name"] == "Branca"
     )
-    assert created_child["parent_unity_id"] == root_unity.id
+    assert created_child["parent_item_id"] == root_item.id
     assert created_child["path_labels"] == ["Galinha", "Branca"]
 
     assert move_response.status_code == 200
     moved_child = next(
         item
         for item in move_response.json()["item_list"]
-        if item["id"] == child_unity.id
+        if item["id"] == child_item.id
     )
-    assert moved_child["parent_unity_id"] is None
+    assert moved_child["parent_item_id"] is None
     assert moved_child["sort_order"] == 0
 
     assert update_response.status_code == 200
@@ -1184,35 +1184,35 @@ def test_admin_can_create_move_update_and_delete_unities() -> None:
     assert deleted_root is None
 
 
-def test_unity_directory_q_filter_matches_accent_and_partial_text() -> None:
+def test_item_directory_q_filter_matches_accent_and_partial_text() -> None:
     with build_test_client(current_member_key="admin") as (client, session, _):
         scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
         assert scope_id is not None
 
         create_response = client.post(
-            f"/auth/tenant/current/scopes/{scope_id}/unities",
+            f"/auth/tenant/current/scopes/{scope_id}/items",
             json={
                 "name": "União",
                 "display_name": "Núcleo União",
-                "parent_unity_id": None,
+                "parent_item_id": None,
             },
         )
         assert create_response.status_code == 200
 
         response_with_accent = client.get(
-            f"/auth/tenant/current/scopes/{scope_id}/unities",
+            f"/auth/tenant/current/scopes/{scope_id}/items",
             params={"q": "União"},
         )
         response_without_accent = client.get(
-            f"/auth/tenant/current/scopes/{scope_id}/unities",
+            f"/auth/tenant/current/scopes/{scope_id}/items",
             params={"q": "Uniao"},
         )
         response_partial = client.get(
-            f"/auth/tenant/current/scopes/{scope_id}/unities",
+            f"/auth/tenant/current/scopes/{scope_id}/items",
             params={"q": "nia"},
         )
         response_case = client.get(
-            f"/auth/tenant/current/scopes/{scope_id}/unities",
+            f"/auth/tenant/current/scopes/{scope_id}/items",
             params={"q": "uNIAO"},
         )
 
@@ -1234,36 +1234,36 @@ def test_unity_directory_q_filter_matches_accent_and_partial_text() -> None:
     assert "União" in name_list_case
 
 
-def test_unity_directory_q_filter_keeps_ancestor_context_for_child_match() -> None:
+def test_item_directory_q_filter_keeps_ancestor_context_for_child_match() -> None:
     with build_test_client(current_member_key="admin") as (client, session, _):
         scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
         assert scope_id is not None
 
         root_response = client.post(
-            f"/auth/tenant/current/scopes/{scope_id}/unities",
+            f"/auth/tenant/current/scopes/{scope_id}/items",
             json={
                 "name": "BR",
                 "display_name": "Brasil",
-                "parent_unity_id": None,
+                "parent_item_id": None,
             },
         )
         assert root_response.status_code == 200
         session.expire_all()
-        root_unity = session.scalar(select(Unity).where(Unity.name == "BR"))
-        assert root_unity is not None
+        root_item = session.scalar(select(Item).where(Item.name == "BR"))
+        assert root_item is not None
 
         child_response = client.post(
-            f"/auth/tenant/current/scopes/{scope_id}/unities",
+            f"/auth/tenant/current/scopes/{scope_id}/items",
             json={
                 "name": "União",
                 "display_name": "Núcleo União",
-                "parent_unity_id": root_unity.id,
+                "parent_item_id": root_item.id,
             },
         )
         assert child_response.status_code == 200
 
         response = client.get(
-            f"/auth/tenant/current/scopes/{scope_id}/unities",
+            f"/auth/tenant/current/scopes/{scope_id}/items",
             params={"q": "União"},
         )
 
@@ -1272,108 +1272,108 @@ def test_unity_directory_q_filter_keeps_ancestor_context_for_child_match() -> No
     item_by_name = {item["name"]: item for item in item_list}
     assert "BR" in item_by_name
     assert "União" in item_by_name
-    assert item_by_name["União"]["parent_unity_id"] == item_by_name["BR"]["id"]
+    assert item_by_name["União"]["parent_item_id"] == item_by_name["BR"]["id"]
     assert item_by_name["União"]["path_labels"] == ["BR", "União"]
 
 
-def test_unity_delete_cascades_to_descendant_list() -> None:
-    """Alinhado ao ERD: FK unity.parent_unity_id com delete Cascade."""
+def test_item_delete_cascades_to_descendant_list() -> None:
+    """Alinhado ao ERD: FK item.parent_item_id com delete Cascade."""
     with build_test_client(current_member_key="admin") as (client, session, _):
         scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
         assert scope_id is not None
 
         client.post(
-            f"/auth/tenant/current/scopes/{scope_id}/unities",
+            f"/auth/tenant/current/scopes/{scope_id}/items",
             json={
                 "name": "Matriz",
                 "display_name": "Matriz",
-                "parent_unity_id": None,
+                "parent_item_id": None,
             },
         )
         session.expire_all()
-        parent_unity = session.scalar(select(Unity).where(Unity.name == "Matriz"))
-        assert parent_unity is not None
+        parent_item = session.scalar(select(Item).where(Item.name == "Matriz"))
+        assert parent_item is not None
 
         client.post(
-            f"/auth/tenant/current/scopes/{scope_id}/unities",
+            f"/auth/tenant/current/scopes/{scope_id}/items",
             json={
                 "name": "Filial",
                 "display_name": "Filial",
-                "parent_unity_id": parent_unity.id,
+                "parent_item_id": parent_item.id,
             },
         )
         session.expire_all()
-        child_unity = session.scalar(select(Unity).where(Unity.name == "Filial"))
-        assert child_unity is not None
-        parent_unity_id = parent_unity.id
-        child_unity_id = child_unity.id
+        child_item = session.scalar(select(Item).where(Item.name == "Filial"))
+        assert child_item is not None
+        parent_item_id = parent_item.id
+        child_item_id = child_item.id
 
         response = client.delete(
-            f"/auth/tenant/current/scopes/{scope_id}/unities/{parent_unity_id}"
+            f"/auth/tenant/current/scopes/{scope_id}/items/{parent_item_id}"
         )
         session.expire_all()
-        deleted_parent = session.get(Unity, parent_unity_id)
-        deleted_child = session.get(Unity, child_unity_id)
+        deleted_parent = session.get(Item, parent_item_id)
+        deleted_child = session.get(Item, child_item_id)
 
     assert response.status_code == 200
     assert deleted_parent is None
     assert deleted_child is None
 
 
-def test_unity_move_cannot_create_cycle() -> None:
+def test_item_move_cannot_create_cycle() -> None:
     with build_test_client(current_member_key="admin") as (client, session, _):
         scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
         assert scope_id is not None
 
         client.post(
-            f"/auth/tenant/current/scopes/{scope_id}/unities",
+            f"/auth/tenant/current/scopes/{scope_id}/items",
             json={
                 "name": "Nivel A",
                 "display_name": "Nivel A",
-                "parent_unity_id": None,
+                "parent_item_id": None,
             },
         )
         session.expire_all()
-        parent_unity = session.scalar(select(Unity).where(Unity.name == "Nivel A"))
-        assert parent_unity is not None
+        parent_item = session.scalar(select(Item).where(Item.name == "Nivel A"))
+        assert parent_item is not None
 
         client.post(
-            f"/auth/tenant/current/scopes/{scope_id}/unities",
+            f"/auth/tenant/current/scopes/{scope_id}/items",
             json={
                 "name": "Nivel B",
                 "display_name": "Nivel B",
-                "parent_unity_id": parent_unity.id,
+                "parent_item_id": parent_item.id,
             },
         )
         session.expire_all()
-        child_unity = session.scalar(select(Unity).where(Unity.name == "Nivel B"))
-        assert child_unity is not None
+        child_item = session.scalar(select(Item).where(Item.name == "Nivel B"))
+        assert child_item is not None
 
         response = client.post(
-            f"/auth/tenant/current/scopes/{scope_id}/unities/{parent_unity.id}/move",
+            f"/auth/tenant/current/scopes/{scope_id}/items/{parent_item.id}/move",
             json={
-                "parent_unity_id": child_unity.id,
+                "parent_item_id": child_item.id,
                 "target_index": 0,
             },
         )
 
     assert response.status_code == 400
     assert response.json()["detail"] == (
-        "Unity cannot move under one of its descendants"
+        "Item cannot move under one of its descendants"
     )
 
 
-def test_scope_delete_is_blocked_when_scope_has_unities() -> None:
+def test_scope_delete_is_blocked_when_scope_has_items() -> None:
     with build_test_client(current_member_key="admin") as (client, session, _):
         scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
         assert scope_id is not None
 
         client.post(
-            f"/auth/tenant/current/scopes/{scope_id}/unities",
+            f"/auth/tenant/current/scopes/{scope_id}/items",
             json={
                 "name": "Tipo A",
                 "display_name": "Tipo A",
-                "parent_unity_id": None,
+                "parent_item_id": None,
             },
         )
 
@@ -1381,26 +1381,26 @@ def test_scope_delete_is_blocked_when_scope_has_unities() -> None:
 
     assert response.status_code == 400
     assert response.json()["detail"] == (
-        "Cannot delete scope while it still has unities"
+        "Cannot delete scope while it still has items"
     )
 
 
-def test_member_cannot_create_unity() -> None:
+def test_member_cannot_create_item() -> None:
     with build_test_client(current_member_key="member") as (client, session, _):
         scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
         assert scope_id is not None
 
         response = client.post(
-            f"/auth/tenant/current/scopes/{scope_id}/unities",
+            f"/auth/tenant/current/scopes/{scope_id}/items",
             json={
                 "name": "X",
                 "display_name": "X",
-                "parent_unity_id": None,
+                "parent_item_id": None,
             },
         )
 
     assert response.status_code == 403
-    assert response.json()["detail"] == "Insufficient permissions to create unity"
+    assert response.json()["detail"] == "Insufficient permissions to create item"
 
 
 def test_scope_field_and_action_q_filter_ignores_case_and_accent() -> None:

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import type { TenantUnityDirectoryResponse } from "@/lib/auth/types";
+import type { TenantItemDirectoryResponse } from "@/lib/auth/types";
 import { backendFetch, requireToken } from "@/lib/backend-fetch";
 
 export async function POST(
   request: NextRequest,
-  context: { params: Promise<{ scopeId: string; unityId: string }> }
+  context: { params: Promise<{ scopeId: string; itemId: string }> }
 ) {
   const authResult = requireToken(request);
   if (!authResult.ok) {
@@ -19,9 +19,9 @@ export async function POST(
     return NextResponse.json({ detail: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { scopeId, unityId } = await context.params;
-  const result = await backendFetch<TenantUnityDirectoryResponse>(
-    `/auth/tenant/current/scopes/${scopeId}/unities/${unityId}/move`,
+  const { scopeId, itemId } = await context.params;
+  const result = await backendFetch<TenantItemDirectoryResponse>(
+    `/auth/tenant/current/scopes/${scopeId}/items/${itemId}/move`,
     {
       method: "POST",
       token: authResult.token,

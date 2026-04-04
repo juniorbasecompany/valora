@@ -11,7 +11,7 @@ export type DirectoryFilterStorageSegment =
   | "field"
   | "action"
   | "location"
-  | "unity";
+  | "item";
 
 const STORAGE_KEY_PREFIX = "valora.configuration.directoryFilterVisible.";
 

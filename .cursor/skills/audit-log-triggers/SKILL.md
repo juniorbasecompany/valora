@@ -7,7 +7,7 @@ description: Triggers PostgreSQL que gravam em log e contrato SET LOCAL / set_co
 
 ## Objetivo
 
-As tabelas **`tenant`**, **`account`**, **`member`**, **`scope`**, **`location`** e **`unity`** têm triggers `AFTER INSERT OR UPDATE OR DELETE` que inserem uma linha na tabela **`log`**, alinhada ao modelo [`backend/src/valora_backend/model/log.py`](backend/src/valora_backend/model/log.py) e ao CHECK `log_table_name_chk`.
+As tabelas **`tenant`**, **`account`**, **`member`**, **`scope`**, **`location`** e **`item`** têm triggers `AFTER INSERT OR UPDATE OR DELETE` que inserem uma linha na tabela **`log`**, alinhada ao modelo [`backend/src/valora_backend/model/log.py`](backend/src/valora_backend/model/log.py) e ao CHECK `log_table_name_chk`.
 
 A função PL/pgSQL é **`valora_audit_row_to_log()`** (revisão Alembic que cria triggers: arquivo `*_audit_row_triggers.py` em [`backend/alembic/versions/`](backend/alembic/versions/); coluna `log.row_id` na revisão `d4c8b2a0e1f3_log_row_id_not_null.py`).
 

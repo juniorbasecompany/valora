@@ -1,4 +1,4 @@
-"""Operações compartilhadas entre diretórios hierárquicos por escopo (ex.: location, unity)."""
+"""Operações compartilhadas entre diretórios hierárquicos por escopo (ex.: location, item)."""
 
 from __future__ import annotations
 

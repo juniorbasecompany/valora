@@ -52,7 +52,7 @@ type HierarchyDropdownNodeProps<TItem extends HierarchyDropdownFieldItemBase> = 
 
 /**
  * Tom do filtro: varre do nível mais raso ao mais profundo da lista (sem “pular” o primeiro
- * nível aninhado, ao contrário do painel location/unity, onde o nível 1 é cartão branco).
+ * nível aninhado, ao contrário do painel location/item, onde o nível 1 é cartão branco).
  */
 function resolveFilterHierarchyToneRatio(depth: number, minDepth: number, maxDepth: number) {
   if (maxDepth <= minDepth) {

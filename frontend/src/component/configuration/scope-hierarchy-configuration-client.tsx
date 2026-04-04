@@ -225,7 +225,7 @@ function resolveHierarchyLabel(item: TenantScopeHierarchyItemBase) {
 }
 
 /**
- * Painel location/unity: o nível 0 é `ui-directory-item` (branco); os tons roxos começam no
+ * Painel location/item: o nível 0 é `ui-directory-item` (branco); os tons roxos começam no
  * primeiro `ui-location-nest-box` (depth ≥ 1). A normalização `depth - 1` faz a variação
  * ir do primeiro nest ao último, não do primeiro item da lista ao último (ver filtro).
  */
@@ -479,7 +479,7 @@ export function ScopeHierarchyConfigurationClient<
     Boolean(directory?.can_edit) && !filterActive && !isSaving && !isMoving;
 
   const parentField =
-    apiSegment === "locations" ? "parent_location_id" : "parent_unity_id";
+    apiSegment === "locations" ? "parent_location_id" : "parent_item_id";
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

@@ -7,7 +7,7 @@ from valora_backend.model.identity import (
     Member,
     Scope,
     Tenant,
-    Unity,
+    Item,
 )
 from valora_backend.model.log import Log
 from valora_backend.model.rules import (
@@ -35,5 +35,5 @@ __all__ = [
     "Member",
     "Scope",
     "Tenant",
-    "Unity",
+    "Item",
 ]

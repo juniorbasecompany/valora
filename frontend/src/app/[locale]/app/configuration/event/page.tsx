@@ -9,7 +9,7 @@ import {
   getTenantScopeActionDirectory,
   getTenantScopeDirectory,
   getTenantScopeEventDirectory,
-  getTenantUnityDirectory
+  getTenantItemDirectory
 } from "@/lib/auth/server-session";
 import { mapAppLocaleToLabelLang } from "@/lib/i18n/label-lang";
 
@@ -34,12 +34,12 @@ export default async function EventConfigurationPage({ params }: EventConfigurat
     ) ?? null;
   const labelLang = mapAppLocaleToLabelLang(locale);
 
-  const [eventDirectory, locationDirectory, unityDirectory, actionDirectory] =
+  const [eventDirectory, locationDirectory, itemDirectory, actionDirectory] =
     currentScope != null
       ? await Promise.all([
         getTenantScopeEventDirectory(currentScope.id),
         getTenantLocationDirectory(currentScope.id),
-        getTenantUnityDirectory(currentScope.id),
+        getTenantItemDirectory(currentScope.id),
         getTenantScopeActionDirectory(currentScope.id, labelLang)
       ])
       : [null, null, null, null];
@@ -62,7 +62,7 @@ export default async function EventConfigurationPage({ params }: EventConfigurat
         hasAnyScope={scopeDirectory.item_list.length > 0}
         initialEventDirectory={eventDirectory}
         initialLocationDirectory={locationDirectory}
-        initialUnityDirectory={unityDirectory}
+        initialItemDirectory={itemDirectory}
         initialActionDirectory={actionDirectory}
         copy={{
           title: t("title"),
@@ -76,8 +76,8 @@ export default async function EventConfigurationPage({ params }: EventConfigurat
           momentHint: t("section.moment.hint"),
           locationLabel: t("section.location.label"),
           locationHint: t("section.location.hint"),
-          unityLabel: t("section.unity.label"),
-          unityHint: t("section.unity.hint"),
+          itemLabel: t("section.item.label"),
+          itemHint: t("section.item.hint"),
           actionLabel: t("section.action.label"),
           actionHint: t("section.action.hint"),
           actionInputSectionTitle: t("section.actionInput.title"),
@@ -92,7 +92,7 @@ export default async function EventConfigurationPage({ params }: EventConfigurat
           filterMomentFromLabel: t("filter.momentFromLabel"),
           filterMomentToLabel: t("filter.momentToLabel"),
           filterLocationLabel: t("filter.locationLabel"),
-          filterUnityLabel: t("filter.unityLabel"),
+          filterItemLabel: t("filter.itemLabel"),
           filterActionLabel: t("filter.actionLabel"),
           filterAll: t("filter.all"),
           filterAllAria: t("filter.allAria"),
@@ -103,7 +103,7 @@ export default async function EventConfigurationPage({ params }: EventConfigurat
           infoCreateLead: t("section.info.createLead"),
           infoCreateHint: t("section.info.createHint"),
           fallbackLocation: t("list.fallbackLocation"),
-          fallbackUnity: t("list.fallbackUnity"),
+          fallbackItem: t("list.fallbackItem"),
           fallbackAction: t("list.fallbackAction"),
           fallbackEvent: t("list.fallbackEvent"),
           cancel: t("buttons.cancel"),
@@ -119,7 +119,7 @@ export default async function EventConfigurationPage({ params }: EventConfigurat
           deleteBlockedDetail: t("error.deleteBlockedDetail"),
           momentRequired: t("error.momentRequired"),
           locationRequired: t("error.locationRequired"),
-          unityRequired: t("error.unityRequired"),
+          itemRequired: t("error.itemRequired"),
           actionRequired: t("error.actionRequired"),
           discardConfirm: t("discardConfirm")
         }}

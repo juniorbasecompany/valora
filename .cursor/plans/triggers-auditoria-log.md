@@ -1,6 +1,6 @@
 ---
 name: Triggers auditoria log
-overview: Introduzir uma função PL/pgSQL reutilizável e triggers AFTER em `tenant`, `account`, `member`, `scope`, `location` e `unity` que inserem em `log` respeitando os CHECKs existentes; `tenant_id` e `account_id` no log vêm sempre de `SET LOCAL` (GUCs de sessão). Documentar o contrato numa skill dedicada e referenciar a partir da skill do drawDB quando o conjunto de tabelas monitorizadas mudar.
+overview: Introduzir uma função PL/pgSQL reutilizável e triggers AFTER em `tenant`, `account`, `member`, `scope`, `location` e `item` que inserem em `log` respeitando os CHECKs existentes; `tenant_id` e `account_id` no log vêm sempre de `SET LOCAL` (GUCs de sessão). Documentar o contrato numa skill dedicada e referenciar a partir da skill do drawDB quando o conjunto de tabelas monitorizadas mudar.
 todos:
   - id: migration-fn-triggers
     content: "Nova revisão Alembic: CREATE FUNCTION valora_audit_row_to_log + CREATE TRIGGER (x6) + downgrade limpo"
@@ -24,7 +24,7 @@ todos:
 ## Contexto (ERD e modelo)
 
 - Em [`backend/erd.json`](backend/erd.json), a tabela `log` tem `account_id`, `tenant_id` (nullable, FK com `Set null`), `table_name` (CHECK nas seis tabelas), `action_type` (`I`/`U`/`D`), `row` (JSONB, **NULL em delete**, alinhado a [`c7d9e1f3a2b4_log_row_null_on_delete.py`](backend/alembic/versions/c7d9e1f3a2b4_log_row_null_on_delete.py)) e `moment_utc`.
-- Tabelas cobertas pelo CHECK `log_table_name_chk`: **`tenant`**, **`account`**, **`member`**, **`scope`**, **`location`**, **`unity`** — são exatamente as que precisam de trigger (não colocar trigger em `log` para evitar recursão).
+- Tabelas cobertas pelo CHECK `log_table_name_chk`: **`tenant`**, **`account`**, **`member`**, **`scope`**, **`location`**, **`item`** — são exatamente as que precisam de trigger (não colocar trigger em `log` para evitar recursão).
 - **`tenant_id` e `account_id` no registo de log**: preenchidos **exclusivamente** a partir de variáveis de sessão definidas com **`SET LOCAL`** na transação corrente. O trigger **não** deriva `tenant_id` a partir de colunas da linha (`member.tenant_id`, `scope`, etc.) nem usa `member.account_id` como ator — evita divergência entre “contexto do pedido” e o JSON da linha e mantém um único contrato para todas as tabelas monitorizadas.
 
 ## Abordagem recomendada (uma função + seis triggers)
@@ -40,7 +40,7 @@ flowchart LR
     member
     scope
     location
-    unity
+    item
   end
   subgraph trigger [AFTER INSERT UPDATE DELETE]
     fn[funcao PLpgSQL unica]

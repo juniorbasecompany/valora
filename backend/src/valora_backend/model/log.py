@@ -44,7 +44,7 @@ class Log(Base):
     __table_args__ = (
         CheckConstraint(
             "table_name IN ("
-            "'account', 'action', 'event', 'field', 'formula', 'input', 'label', 'location', 'member', 'result', 'scope', 'tenant', 'unity')",
+            "'account', 'action', 'event', 'field', 'formula', 'input', 'label', 'location', 'member', 'result', 'scope', 'tenant', 'item')",
             name="log_table_name_chk",
         ),
         CheckConstraint(

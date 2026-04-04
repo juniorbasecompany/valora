@@ -2,20 +2,20 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
-import { UnityConfigurationClient } from "@/component/configuration/unity-configuration-client";
+import { ItemConfigurationClient } from "@/component/configuration/item-configuration-client";
 import {
   getAuthSession,
-  getTenantScopeDirectory,
-  getTenantUnityDirectory
+  getTenantItemDirectory,
+  getTenantScopeDirectory
 } from "@/lib/auth/server-session";
 
-type UnityConfigurationPageProps = {
+type ItemConfigurationPageProps = {
   params: Promise<{ locale: string }>;
 };
 
-export default async function UnityConfigurationPage({
+export default async function ItemConfigurationPage({
   params
-}: UnityConfigurationPageProps) {
+}: ItemConfigurationPageProps) {
   const { locale } = await params;
   const [authSession, scopeDirectory] = await Promise.all([
     getAuthSession(),
@@ -31,10 +31,10 @@ export default async function UnityConfigurationPage({
       (item) => item.id === authSession.member.current_scope_id
     ) ??
     null;
-  const unityDirectory =
-    currentScope != null ? await getTenantUnityDirectory(currentScope.id) : null;
+  const itemDirectory =
+    currentScope != null ? await getTenantItemDirectory(currentScope.id) : null;
 
-  const t = await getTranslations("UnityConfigurationPage");
+  const t = await getTranslations("ItemConfigurationPage");
   const tState = await getTranslations("State");
 
   return (
@@ -45,11 +45,11 @@ export default async function UnityConfigurationPage({
         </div>
       }
     >
-      <UnityConfigurationClient
+      <ItemConfigurationClient
         locale={locale}
         currentScope={currentScope}
         hasAnyScope={scopeDirectory.item_list.length > 0}
-        initialUnityDirectory={unityDirectory}
+        initialItemDirectory={itemDirectory}
         copy={{
           title: t("title"),
           description: t("description"),

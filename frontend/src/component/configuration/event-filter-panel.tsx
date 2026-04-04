@@ -7,7 +7,7 @@ import {
   DirectoryFilterPanel,
   DirectoryFilterSelectField
 } from "@/component/configuration/directory-filter-panel";
-import type { TenantLocationRecord, TenantUnityRecord } from "@/lib/auth/types";
+import type { TenantItemRecord, TenantLocationRecord } from "@/lib/auth/types";
 
 type EventFilterOption = {
   id: number;
@@ -18,7 +18,7 @@ type EventFilterPanelCopy = {
   momentFromLabel: string;
   momentToLabel: string;
   locationLabel: string;
-  unityLabel: string;
+  itemLabel: string;
   actionLabel: string;
   allLabel: string;
   allAriaLabel: string;
@@ -31,15 +31,15 @@ type EventFilterPanelProps = {
   filterMomentFromInput: string;
   filterMomentToInput: string;
   filterLocationIdList: number[];
-  filterUnityIdList: number[];
+  filterItemIdList: number[];
   filterActionId: number | null;
   locationItemList: TenantLocationRecord[];
-  unityItemList: TenantUnityRecord[];
+  itemHierarchyList: TenantItemRecord[];
   actionOptionList: EventFilterOption[];
   onFilterMomentFromChange: (value: Date | null) => void;
   onFilterMomentToChange: (value: Date | null) => void;
   onFilterLocationChange: (valueList: number[]) => void;
-  onFilterUnityChange: (valueList: number[]) => void;
+  onFilterItemChange: (valueList: number[]) => void;
   onFilterActionChange: (value: string) => void;
 };
 
@@ -49,15 +49,15 @@ export function EventFilterPanel({
   filterMomentFromInput,
   filterMomentToInput,
   filterLocationIdList,
-  filterUnityIdList,
+  filterItemIdList,
   filterActionId,
   locationItemList,
-  unityItemList,
+  itemHierarchyList,
   actionOptionList,
   onFilterMomentFromChange,
   onFilterMomentToChange,
   onFilterLocationChange,
-  onFilterUnityChange,
+  onFilterItemChange,
   onFilterActionChange
 }: EventFilterPanelProps) {
   return (
@@ -109,12 +109,12 @@ export function EventFilterPanel({
 
       <DirectoryFilterCard>
         <HierarchyDropdownField
-          id="event-filter-unity"
-          label={copy.unityLabel}
-          itemList={unityItemList}
-          selectedValueList={filterUnityIdList}
-          onChange={onFilterUnityChange}
-          getParentId={(item) => item.parent_unity_id ?? null}
+          id="event-filter-item"
+          label={copy.itemLabel}
+          itemList={itemHierarchyList}
+          selectedValueList={filterItemIdList}
+          onChange={onFilterItemChange}
+          getParentId={(row) => row.parent_item_id ?? null}
           allLabel={copy.allLabel}
           confirmLabel={copy.confirmLabel}
         />

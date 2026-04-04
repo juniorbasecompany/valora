@@ -154,7 +154,7 @@ def main() -> int:
     # Valida se PATCH de evento responde 200 (corrige regressão do 500).
     patch_payload = {
         "location_id": int(event["location_id"]),
-        "unity_id": int(event["unity_id"]),
+        "item_id": int(event["item_id"]),
         "action_id": int(event["action_id"]),
         "moment_utc": event["moment_utc"],
     }

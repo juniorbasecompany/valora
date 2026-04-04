@@ -47,9 +47,9 @@
 ### `event`
 
 - **Tabela:** momento em que uma fórmula/ação se aplica.
-- **Colunas:** `location_id`, `unity_id`, `moment_utc`, `action_id` (todos NOT NULL no ERD; `action_id` com comentário vazio no JSON mas obrigatório).
+- **Colunas:** `location_id`, `item_id`, `moment_utc`, `action_id` (todos NOT NULL no ERD; `action_id` com comentário vazio no JSON mas obrigatório).
 - **Default `moment_utc`:** `now() AT TIME ZONE 'UTC'` (traduzir para default PostgreSQL equivalente, ex. `timezone('utc', now())` ou `(now() AT TIME ZONE 'utc')` conforme tipo `TIMESTAMP`/`TIMESTAMPTZ` escolhido; alinhar com padrão já usado em `log` no projeto).
-- **FKs:** para `location`, `unity`, `action` com `Restrict` on delete (diagrama).
+- **FKs:** para `location`, `item`, `action` com `Restrict` on delete (diagrama).
 
 ### `input`
 
@@ -75,9 +75,9 @@
 
 ## Tabela `log` — deriva entre ERD e código
 
-No [`erd.json`](backend/erd.json), o `check` de `log.table_name` **já inclui** `'action', 'event', 'field', 'formula', 'input', 'label', 'result'` além de `account`, `location`, `member`, `scope`, `tenant`, `unity`.
+No [`erd.json`](backend/erd.json), o `check` de `log.table_name` **já inclui** `'action', 'event', 'field', 'formula', 'input', 'label', 'result'` além de `account`, `location`, `member`, `scope`, `tenant`, `item`.
 
-O modelo atual [`log.py`](backend/src/valora_backend/model/log.py) só lista seis nomes (`tenant` … `unity`). Ao implementar as novas tabelas:
+O modelo atual [`log.py`](backend/src/valora_backend/model/log.py) só lista seis nomes (`tenant` … `item`). Ao implementar as novas tabelas:
 
 1. Atualizar o `CheckConstraint` em `log.py` para **coincidir com o ERD** (lista completa e ordem canónica opcional).
 2. Migração: substituir o CHECK existente pelo novo conjunto de valores.
@@ -120,4 +120,4 @@ Em paralelo ou na mesma release: atualização de `log` (CHECK + triggers) para 
 ## Fora do DDL (aplicação)
 
 - Validação de tokens em `formula.statement`.
-- Regra opcional futura: `location`/`unity`/`action` no mesmo `scope` (não descrita como CHECK no ERD).
+- Regra opcional futura: `location`/`item`/`action` no mesmo `scope` (não descrita como CHECK no ERD).

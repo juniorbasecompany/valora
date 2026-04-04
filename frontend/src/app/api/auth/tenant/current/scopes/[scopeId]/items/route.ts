@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import type { TenantUnityDirectoryResponse } from "@/lib/auth/types";
+import type { TenantItemDirectoryResponse } from "@/lib/auth/types";
 import { backendFetch, requireToken } from "@/lib/backend-fetch";
 
 export async function GET(
@@ -14,8 +14,8 @@ export async function GET(
 
   const { scopeId } = await context.params;
   const search = request.nextUrl.search || "";
-  const result = await backendFetch<TenantUnityDirectoryResponse>(
-    `/auth/tenant/current/scopes/${scopeId}/unities${search}`,
+  const result = await backendFetch<TenantItemDirectoryResponse>(
+    `/auth/tenant/current/scopes/${scopeId}/items${search}`,
     {
       method: "GET",
       token: authResult.token
@@ -45,8 +45,8 @@ export async function POST(
   }
 
   const { scopeId } = await context.params;
-  const result = await backendFetch<TenantUnityDirectoryResponse>(
-    `/auth/tenant/current/scopes/${scopeId}/unities`,
+  const result = await backendFetch<TenantItemDirectoryResponse>(
+    `/auth/tenant/current/scopes/${scopeId}/items`,
     {
       method: "POST",
       token: authResult.token,

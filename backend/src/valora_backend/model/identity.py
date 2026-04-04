@@ -1,4 +1,4 @@
-# Modelos estruturais iniciais: tenant, account, member, scope, location e unity.
+# Modelos estruturais iniciais: tenant, account, member, scope, location e item.
 
 from __future__ import annotations
 
@@ -287,43 +287,43 @@ class Location(Base):
     )
 
 
-class Unity(Base):
-    """Unidade produtiva hierárquica configurada dentro de um escopo."""
+class Item(Base):
+    """Item hierárquico configurado dentro de um escopo."""
 
-    __tablename__ = "unity"
+    __tablename__ = "item"
     __table_args__ = (
         CheckConstraint(
-            "parent_unity_id IS NULL OR parent_unity_id <> id",
-            name="unity_parent_self_chk",
+            "parent_item_id IS NULL OR parent_item_id <> id",
+            name="item_parent_self_chk",
         ),
         UniqueConstraint(
             "scope_id",
             "id",
-            name="unity_scope_id_unique",
+            name="item_scope_id_unique",
         ),
         ForeignKeyConstraint(
-            ["scope_id", "parent_unity_id"],
-            ["unity.scope_id", "unity.id"],
-            name="unity_parent_same_scope_fk",
+            ["scope_id", "parent_item_id"],
+            ["item.scope_id", "item.id"],
+            name="item_parent_same_scope_fk",
             onupdate="CASCADE",
             ondelete="CASCADE",
         ),
         Index(
-            "unity_scope_parent_sort_idx",
+            "item_scope_parent_sort_idx",
             "scope_id",
-            "parent_unity_id",
+            "parent_item_id",
             "sort_order",
             "id",
         ),
         Index(
-            "unity_scope_parent_name_idx",
+            "item_scope_parent_name_idx",
             "scope_id",
-            "parent_unity_id",
+            "parent_item_id",
             "name",
         ),
         {
             "comment": (
-                "Unidade produtiva no escopo (ex.: galinha, fêmea, linhagem); "
+                "Item no escopo (ex.: galinha, fêmea, linhagem); "
                 "permite hierarquia opcional."
             )
         },
@@ -333,28 +333,28 @@ class Unity(Base):
         BIGINT_COMPAT,
         primary_key=True,
         autoincrement=True,
-        comment="Identificador da unidade produtiva.",
+        comment="Identificador do item.",
     )
     name: Mapped[str] = mapped_column(
         Text,
         nullable=False,
-        comment="Nome curto da unidade produtiva.",
+        comment="Nome curto do item.",
     )
     display_name: Mapped[str] = mapped_column(
         Text,
         nullable=False,
-        comment="Descrição da unidade produtiva.",
+        comment="Descrição do item.",
     )
     scope_id: Mapped[int] = mapped_column(
         BIGINT_COMPAT,
         ForeignKey("scope.id", onupdate="CASCADE", ondelete="RESTRICT"),
         nullable=False,
-        comment="Escopo desta unidade produtiva.",
+        comment="Escopo deste item.",
     )
-    parent_unity_id: Mapped[int | None] = mapped_column(
+    parent_item_id: Mapped[int | None] = mapped_column(
         BIGINT_COMPAT,
         nullable=True,
-        comment="Unidade produtiva pai na mesma hierarquia e escopo.",
+        comment="Item pai na mesma hierarquia e escopo.",
     )
     sort_order: Mapped[int] = mapped_column(
         Integer,

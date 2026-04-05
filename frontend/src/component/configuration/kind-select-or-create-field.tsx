@@ -65,6 +65,8 @@ export function KindSelectOrCreateField({
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [deletingKindId, setDeletingKindId] = useState<number | null>(null);
+  /** Abrir pelo chevron/espaço: mostrar todos os tipos (o texto do input filtraria só o selecionado). */
+  const [showAllSuggestions, setShowAllSuggestions] = useState(false);
 
   const rootRef = useRef<HTMLDivElement | null>(null);
   const listboxId = `${selectId}-kind-listbox`;
@@ -75,6 +77,7 @@ export function KindSelectOrCreateField({
     prevEditorSyncKeyRef.current = editorSyncKey;
 
     if (keyChanged) {
+      setShowAllSuggestions(false);
       if (kindId == null) {
         setInputValue("");
       } else {
@@ -93,6 +96,9 @@ export function KindSelectOrCreateField({
   }, [editorSyncKey, kindId, kindList]);
 
   const filteredSuggestionList = useMemo(() => {
+    if (showAllSuggestions) {
+      return kindList;
+    }
     const q = normalizeTextForSearch(inputValue);
     if (!q) {
       return kindList;
@@ -102,7 +108,7 @@ export function KindSelectOrCreateField({
       const displayName = normalizeTextForSearch(row.display_name);
       return name.includes(q) || displayName.includes(q);
     });
-  }, [inputValue, kindList]);
+  }, [inputValue, kindList, showAllSuggestions]);
 
   const matchesExistingKind = useMemo(() => {
     const q = normalizeTextForSearch(inputValue);
@@ -129,6 +135,7 @@ export function KindSelectOrCreateField({
       const node = event.target as Node;
       if (!rootRef.current?.contains(node)) {
         setListOpen(false);
+        setShowAllSuggestions(false);
         setActiveOptionIndex(-1);
       }
     }
@@ -143,6 +150,7 @@ export function KindSelectOrCreateField({
       onKindIdChange(row.id);
       setInputValue(resolveKindLabel(row));
       setListOpen(false);
+      setShowAllSuggestions(false);
       setActiveOptionIndex(-1);
       setCreateError(null);
       onAfterFieldEdit();
@@ -182,6 +190,7 @@ export function KindSelectOrCreateField({
         setInputValue(resolveKindLabel(created));
       }
       setListOpen(false);
+      setShowAllSuggestions(false);
       onAfterFieldEdit();
     } catch {
       setCreateError(copy.createError);
@@ -242,6 +251,7 @@ export function KindSelectOrCreateField({
       const next = event.target.value;
       setInputValue(next);
       setListOpen(true);
+      setShowAllSuggestions(false);
       setActiveOptionIndex(-1);
       setCreateError(null);
       if (kindId != null) {
@@ -262,11 +272,13 @@ export function KindSelectOrCreateField({
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === "Escape") {
         setListOpen(false);
+        setShowAllSuggestions(false);
         setActiveOptionIndex(-1);
         return;
       }
       if (!listOpen && event.key === " ") {
         setListOpen(true);
+        setShowAllSuggestions(true);
       }
       if (!listOpen) {
         return;
@@ -384,7 +396,12 @@ export function KindSelectOrCreateField({
                   event.preventDefault();
                 }}
                 onClick={() => {
-                  setListOpen((open) => !open);
+                  setListOpen((open) => {
+                    if (!open) {
+                      setShowAllSuggestions(true);
+                    }
+                    return !open;
+                  });
                   setActiveOptionIndex(-1);
                 }}
               >

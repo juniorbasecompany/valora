@@ -5,7 +5,7 @@ type IconProps = {
 };
 
 type NavigationIconProps = IconProps & {
-    kind: "home" | "location" | "item" | "field" | "action" | "event";
+    kind: "home" | "location" | "item" | "field" | "action" | "unity" | "event";
 };
 
 function mergeClassName(className?: string, fallback = "ui-icon") {
@@ -131,6 +131,31 @@ export function BuildingIcon({ className }: IconProps) {
             aria-hidden
         >
             <path d="M5 20V6.5a1.5 1.5 0 0 1 1.5-1.5h7A1.5 1.5 0 0 1 15 6.5V20M9 9h2M9 12.5h2M9 16h2M15 10h3.5a.5.5 0 0 1 .5.5V20M12 20v-3.5" />
+        </svg>
+    );
+}
+
+export function UnityIcon({ className }: IconProps) {
+    return (
+        <svg
+            className={mergeClassName(className)}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+        >
+            <path d="m12 2.8 3.7 2.2V9L12 11.2 8.3 9V5Z" />
+            <path d="m8.3 5 3.7 2.2L15.7 5" />
+            <path d="M12 7.2v4" />
+            <path d="m4.1 10.1 3.7 2.2v4L4.1 18.5.4 16.3v-4Z" />
+            <path d="m.4 12.3 3.7 2.2 3.7-2.2" />
+            <path d="M4.1 14.5v4" />
+            <path d="m19.9 10.1 3.7 2.2v4l-3.7 2.2-3.7-2.2v-4Z" />
+            <path d="m16.2 12.3 3.7 2.2 3.7-2.2" />
+            <path d="M19.9 14.5v4" />
         </svg>
     );
 }
@@ -528,6 +553,8 @@ export function NavigationIcon({
             return <RulerIcon className={className} />;
         case "action":
             return <ActionChecklistIcon className={className} />;
+        case "unity":
+            return <UnityIcon className={className} />;
         case "event":
             return <EventPathIcon className={className} />;
         default:

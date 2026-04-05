@@ -217,9 +217,7 @@ export function FieldConfigurationClient({
   const [isDirectoryReorderBusy, setIsDirectoryReorderBusy] = useState(false);
   const editorPanelElementRef = useRef<HTMLDivElement | null>(null);
   const { newIntentGeneration, bumpNewIntent } = useEditorNewIntentGeneration();
-  const initialSearchFieldKeyRef = useRef<FieldSelectionKey>(initialSearchFieldKey);
   const selectedFieldKeyRef = useRef<FieldSelectionKey>(initialSelectedFieldKey);
-  const didResolveInitialUrlRef = useRef(false);
   const didMountFilterRef = useRef(false);
 
   const parsedSqlType = useMemo(() => parseFieldSqlType(sqlType), [sqlType]);
@@ -320,10 +318,6 @@ export function FieldConfigurationClient({
     Boolean(directory)
   );
 
-  useEffect(() => {
-    selectedFieldKeyRef.current = isCreateMode ? "new" : selectedField?.id ?? null;
-  }, [isCreateMode, selectedField]);
-
   const syncFromDirectory = useCallback(
     (
       nextDirectory: TenantScopeFieldDirectoryResponse | null,
@@ -339,6 +333,7 @@ export function FieldConfigurationClient({
         setFieldError({});
         setRequestErrorMessage(null);
         setIsDeletePending(false);
+        selectedFieldKeyRef.current = null;
         return null;
       }
 
@@ -369,58 +364,58 @@ export function FieldConfigurationClient({
       setRequestErrorMessage(null);
       setIsDeletePending(false);
 
+      /* Mantém o ref alinhado ao nextKey para loadFieldDirectory e efeitos que leem antes do próximo render. */
+      selectedFieldKeyRef.current =
+        nextKey === "new" ? "new" : typeof nextKey === "number" ? nextKey : null;
+
       return nextKey;
     },
     []
   );
 
   useEffect(() => {
-    const preferredKey = didResolveInitialUrlRef.current
-      ? selectedFieldKeyRef.current
-      : initialSearchFieldKeyRef.current;
+    syncFromDirectory(initialFieldDirectory, initialSearchFieldKey);
+    // Uma sincronização na montagem com snapshot do servidor e query `field`; não repetir quando o RSC repassa a prop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- initialFieldDirectory e initialSearchFieldKey só na primeira montagem
+  }, [syncFromDirectory]);
 
-    didResolveInitialUrlRef.current = true;
-    syncFromDirectory(initialFieldDirectory, preferredKey);
-  }, [initialFieldDirectory, syncFromDirectory]);
-
-  const loadFieldDirectory = useCallback(
-    async (preferredKey?: FieldSelectionKey) => {
-      if (currentScope?.id == null) {
+  const loadFieldDirectory = useCallback(async () => {
+    if (currentScope?.id == null) {
+      return;
+    }
+    const query = new URLSearchParams({ label_lang: labelLang });
+    const normalizedQuery = filterQuery.trim();
+    if (normalizedQuery) {
+      query.set("q", normalizedQuery);
+    }
+    try {
+      const response = await fetch(
+        `/api/auth/tenant/current/scopes/${currentScope.id}/fields?${query.toString()}`
+      );
+      const data: unknown = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setRequestErrorMessage(
+          parseErrorDetail(data, copy.loadError) ?? copy.loadError
+        );
         return;
       }
-      const query = new URLSearchParams({ label_lang: labelLang });
-      const normalizedQuery = filterQuery.trim();
-      if (normalizedQuery) {
-        query.set("q", normalizedQuery);
-      }
-      try {
-        const response = await fetch(
-          `/api/auth/tenant/current/scopes/${currentScope.id}/fields?${query.toString()}`
-        );
-        const data: unknown = await response.json().catch(() => ({}));
-        if (!response.ok) {
-          setRequestErrorMessage(
-            parseErrorDetail(data, copy.loadError) ?? copy.loadError
-          );
-          return;
-        }
-        syncFromDirectory(
-          data as TenantScopeFieldDirectoryResponse,
-          preferredKey ?? selectedFieldKeyRef.current
-        );
-      } catch {
-        setRequestErrorMessage(copy.loadError);
-      }
-    },
-    [copy.loadError, currentScope, filterQuery, labelLang, syncFromDirectory]
-  );
+      /* Usa o ref no término do fetch: um preferredKey capturado na chamada ficaria stale
+         e podia reaplicar um id depois de um save que já pôs o painel em "new". */
+      syncFromDirectory(
+        data as TenantScopeFieldDirectoryResponse,
+        selectedFieldKeyRef.current
+      );
+    } catch {
+      setRequestErrorMessage(copy.loadError);
+    }
+  }, [copy.loadError, currentScope, filterQuery, labelLang, syncFromDirectory]);
 
   useEffect(() => {
     if (!didMountFilterRef.current) {
       didMountFilterRef.current = true;
       return;
     }
-    void loadFieldDirectory(selectedFieldKeyRef.current);
+    void loadFieldDirectory();
   }, [loadFieldDirectory]);
 
   const handleFieldDirectoryReorder = useCallback(
@@ -459,7 +454,7 @@ export function FieldConfigurationClient({
             parseErrorDetail(data, t("directory.reorderError")) ?? t("directory.reorderError")
           );
           setDirectory(snapshot);
-          void loadFieldDirectory(selectedFieldKeyRef.current);
+          void loadFieldDirectory();
           return;
         }
         setDirectory(data as TenantScopeFieldDirectoryResponse);
@@ -467,7 +462,7 @@ export function FieldConfigurationClient({
       } catch {
         setRequestErrorMessage(t("directory.reorderError"));
         setDirectory(snapshot);
-        void loadFieldDirectory(selectedFieldKeyRef.current);
+        void loadFieldDirectory();
       } finally {
         setIsDirectoryReorderBusy(false);
       }
@@ -607,11 +602,8 @@ export function FieldConfigurationClient({
         }
 
         const updatedDirectory = data as TenantScopeFieldDirectoryResponse;
-        const previousIdSet = new Set(directory.item_list.map((item) => item.id));
-        const created = updatedDirectory.item_list.find(
-          (item) => !previousIdSet.has(item.id)
-        );
-        syncFromDirectory(updatedDirectory, created?.id ?? "new");
+        bumpNewIntent();
+        syncFromDirectory(updatedDirectory, "new");
         setHistoryRefreshKey((previous) => previous + 1);
         return;
       }
@@ -650,10 +642,19 @@ export function FieldConfigurationClient({
       }
 
       const updatedDirectory = data as TenantScopeFieldDirectoryResponse;
-      const nextKeyAfterMutation: FieldSelectionKey = isDeletePending
-        ? (updatedDirectory.can_edit ? "new" : null)
-        : selectedField.id;
-      syncFromDirectory(updatedDirectory, nextKeyAfterMutation);
+      if (isDeletePending) {
+        const nextKeyAfterMutation: FieldSelectionKey = updatedDirectory.can_edit
+          ? "new"
+          : null;
+        syncFromDirectory(updatedDirectory, nextKeyAfterMutation);
+      } else {
+        /* Após editar, voltar ao formulário vazio (new), alinhado ao fluxo de criação. */
+        bumpNewIntent();
+        syncFromDirectory(
+          updatedDirectory,
+          updatedDirectory.can_edit ? "new" : selectedField.id
+        );
+      }
       setHistoryRefreshKey((previous) => previous + 1);
     } catch {
       setRequestErrorMessage(
@@ -667,6 +668,7 @@ export function FieldConfigurationClient({
       setIsSaving(false);
     }
   }, [
+    bumpNewIntent,
     copy.createError,
     copy.deleteBlockedDetail,
     copy.deleteError,

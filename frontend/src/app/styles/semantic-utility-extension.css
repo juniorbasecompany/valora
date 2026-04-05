@@ -517,6 +517,27 @@
   margin-top: 0.25rem;
 }
 
+.ui-directory-hierarchy {
+  margin-top: 0.25rem;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.ui-directory-hierarchy-row {
+  --ui-directory-hierarchy-depth: 0;
+  --ui-directory-hierarchy-indent-step: 1.6rem;
+  position: relative;
+  margin: 0;
+  min-height: 1.15rem;
+  padding-inline-start: calc(var(--ui-directory-hierarchy-depth) * var(--ui-directory-hierarchy-indent-step));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.15rem;
+}
+
 .ui-directory-date {
   flex: 0 0 auto;
   margin-inline-start: auto;

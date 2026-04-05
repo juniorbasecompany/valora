@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { ConfigurationDirectoryCreateButton } from "@/component/configuration/configuration-directory-create-button";
@@ -168,10 +169,16 @@ export function UnityConfigurationClient({
   const [isCreateMode, setIsCreateMode] = useState(initialSelectedUnityKey === "new");
 
   const itemById = useMemo(() => buildItemByIdMap(itemRecordList), [itemRecordList]);
-  const itemOrderById = useMemo(
-    () => new Map(itemRecordList.map((item, index) => [item.id, index])),
-    [itemRecordList]
-  );
+  const itemChildrenByParentId = useMemo(() => {
+    const next = new Map<number | null, TenantItemRecord[]>();
+    for (const item of itemRecordList) {
+      const parentId = item.parent_item_id ?? null;
+      const siblingList = next.get(parentId) ?? [];
+      siblingList.push(item);
+      next.set(parentId, siblingList);
+    }
+    return next;
+  }, [itemRecordList]);
   const locationPathById = useMemo(() => {
     const next = new Map<number, string>();
     for (const item of locationDirectory?.item_list ?? []) {
@@ -600,31 +607,45 @@ export function UnityConfigurationClient({
       locationPathById.get(item.location_id) ?? item.location_display_name,
     [locationPathById]
   );
-  const resolveUnityItemSummary = useCallback(
+  const resolveUnityItemHierarchyRows = useCallback(
     (item: TenantUnityRecord) => {
-      const seenKindIdSet = new Set<number>();
-      const labelList = item.item_id_list
-        .map((id) => itemById.get(id))
-        .filter((row): row is TenantItemRecord => row != null)
-        .sort(
-          (left, right) =>
-            left.depth - right.depth ||
-            (itemOrderById.get(left.id) ?? 0) - (itemOrderById.get(right.id) ?? 0)
-        )
-        .flatMap((row) => {
-          if (seenKindIdSet.has(row.kind_id)) {
-            return [];
-          }
-          seenKindIdSet.add(row.kind_id);
-          const label = row.name.trim() || row.display_name.trim() || `#${row.id}`;
-          return [label];
-        });
+      const selectedIdSet = new Set(item.item_id_list);
+      const visitedIdSet = new Set<number>();
+      const rows: Array<{ id: number; depth: number; label: string }> = [];
 
-      return labelList.length > 0
-        ? labelList.join(", ")
-        : item.item_display_label_list.join(", ");
+      function appendBranch(parentId: number | null) {
+        const childList = itemChildrenByParentId.get(parentId) ?? [];
+        for (const row of childList) {
+          if (!selectedIdSet.has(row.id) || visitedIdSet.has(row.id)) {
+            continue;
+          }
+          visitedIdSet.add(row.id);
+          rows.push({
+            id: row.id,
+            depth: row.depth,
+            label: row.name.trim() || row.display_name.trim() || `#${row.id}`
+          });
+          appendBranch(row.id);
+        }
+      }
+
+      appendBranch(null);
+
+      for (const id of item.item_id_list) {
+        const row = itemById.get(id);
+        if (!row || visitedIdSet.has(row.id)) {
+          continue;
+        }
+        rows.push({
+          id: row.id,
+          depth: row.depth,
+          label: row.name.trim() || row.display_name.trim() || `#${row.id}`
+        });
+      }
+
+      return rows;
     },
-    [itemById, itemOrderById]
+    [itemById, itemChildrenByParentId]
   );
 
   return (
@@ -696,9 +717,21 @@ export function UnityConfigurationClient({
                     <p className="ui-directory-title-wrap ui-directory-title-emphasis">
                       {resolveUnityLocationPath(item)}
                     </p>
-                    <p className="ui-directory-title-wrap ui-directory-title-emphasis">
-                      {resolveUnityItemSummary(item)}
-                    </p>
+                    <div className="ui-directory-hierarchy" aria-hidden>
+                      {resolveUnityItemHierarchyRows(item).map((row) => (
+                        <p
+                          key={`${item.id}:${row.id}`}
+                          className="ui-directory-hierarchy-row ui-directory-title-emphasis"
+                          style={
+                            {
+                              "--ui-directory-hierarchy-depth": String(row.depth)
+                            } as CSSProperties
+                          }
+                        >
+                          <span>{row.label}</span>
+                        </p>
+                      ))}
+                    </div>
                     <p className="ui-directory-caption">
                       {formatCreationDate(item.creation_utc)}
                     </p>

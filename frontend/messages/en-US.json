@@ -598,14 +598,13 @@
       },
       "kind": {
         "selectLabel": "Unit type",
-        "selectHint": "Choose an existing type or register a new one.",
-        "selectPlaceholder": "Select…",
-        "newKindButton": "New type",
-        "newNameLabel": "Short name for the type",
-        "newDisplayNameLabel": "Description for the type",
-        "createKind": "Save type",
-        "cancelNewKind": "Cancel",
-        "createError": "Could not save the type. Please try again."
+        "selectHint": "Type to filter, pick a suggestion, or add a new type from the last row of the menu (add icon).",
+        "selectPlaceholder": "Search or add a type…",
+        "openListAriaLabel": "Open or close the type list",
+        "addAriaLabel": "Add type with the text entered",
+        "createError": "Could not save the type. Please try again.",
+        "deleteAriaLabel": "Delete type",
+        "deleteError": "Could not delete the type. Please try again."
       },
       "structure": {
         "title": "Information",

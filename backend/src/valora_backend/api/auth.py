@@ -387,6 +387,7 @@ class TenantKindRecord(BaseModel):
     id: int
     name: str
     display_name: str
+    reference_count: int
 
 
 class TenantKindListResponse(BaseModel):
@@ -1502,18 +1503,21 @@ def _get_scope_kind_or_404(
 def _tenant_kind_record_list_for_scope(
     session: Session, *, scope_id: int
 ) -> list[TenantKindRecord]:
-    kind_row_list = list(
-        session.scalars(
-            select(Kind)
-            .where(Kind.scope_id == scope_id)
-            .order_by(Kind.name, Kind.id)
-        )
-    )
+    rows = session.execute(
+        select(Kind, func.count(Item.id))
+        .outerjoin(Item, Item.kind_id == Kind.id)
+        .where(Kind.scope_id == scope_id)
+        .group_by(Kind)
+        .order_by(Kind.name, Kind.id)
+    ).all()
     return [
         TenantKindRecord(
-            id=row.id, name=row.name, display_name=row.display_name
+            id=kind.id,
+            name=kind.name,
+            display_name=kind.display_name,
+            reference_count=int(ref_count),
         )
-        for row in kind_row_list
+        for kind, ref_count in rows
     ]
 
 
@@ -2688,6 +2692,49 @@ def patch_current_scope_kind(
             detail="No fields to update",
         )
     session.add(row)
+    _apply_member_audit_context(session, current_member)
+    commit_session_with_null_if_empty(session)
+    return TenantKindListResponse(
+        can_edit=True,
+        item_list=_tenant_kind_record_list_for_scope(
+            session, scope_id=target_scope.id
+        ),
+    )
+
+
+@router.delete(
+    "/tenant/current/scopes/{scope_id}/kind/{kind_id}",
+    response_model=TenantKindListResponse,
+)
+def delete_current_scope_kind(
+    scope_id: int,
+    kind_id: int,
+    current_member: Member = Depends(get_current_member),
+    session: Session = Depends(get_session),
+):
+    target_scope = _get_tenant_scope_for_location(
+        session,
+        actor=current_member,
+        scope_id=scope_id,
+    )
+    if not _member_can_edit_scope_hierarchy_directory(current_member):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions to delete kind",
+        )
+    row = _get_scope_kind_or_404(session, scope_id=target_scope.id, kind_id=kind_id)
+    in_use = (
+        session.scalar(
+            select(func.count()).select_from(Item).where(Item.kind_id == row.id)
+        )
+        or 0
+    )
+    if int(in_use) > 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete kind while items still reference it",
+        )
+    session.delete(row)
     _apply_member_audit_context(session, current_member)
     commit_session_with_null_if_empty(session)
     return TenantKindListResponse(

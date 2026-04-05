@@ -594,14 +594,13 @@
       },
       "kind": {
         "selectLabel": "Tipo de unidad",
-        "selectHint": "Elige un tipo ya registrado o registra uno nuevo.",
-        "selectPlaceholder": "Selecciona…",
-        "newKindButton": "Nuevo tipo",
-        "newNameLabel": "Nombre corto del tipo",
-        "newDisplayNameLabel": "Descripción del tipo",
-        "createKind": "Guardar tipo",
-        "cancelNewKind": "Cancelar",
-        "createError": "No se pudo guardar el tipo. Inténtalo de nuevo."
+        "selectHint": "Escribe para filtrar, elige una sugerencia o añade un tipo nuevo en la última fila del menú (icono de inclusión).",
+        "selectPlaceholder": "Buscar o registrar tipo…",
+        "openListAriaLabel": "Abrir o cerrar la lista de tipos",
+        "addAriaLabel": "Incluir tipo con el texto escrito",
+        "createError": "No se pudo guardar el tipo. Inténtalo de nuevo.",
+        "deleteAriaLabel": "Eliminar tipo",
+        "deleteError": "No se pudo eliminar el tipo. Inténtalo de nuevo."
       },
       "structure": {
         "title": "Información",

@@ -1463,6 +1463,70 @@ def test_member_cannot_create_item() -> None:
     assert response.json()["detail"] == "Insufficient permissions to create item"
 
 
+def test_kind_list_includes_reference_count() -> None:
+    with build_test_client(current_member_key="admin") as (client, session, _):
+        scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
+        assert scope_id is not None
+
+        kind_id = _create_kind_via_api(
+            client, scope_id, name="RefCnt", display_name="RefCnt"
+        )
+        list_before = client.get(f"/auth/tenant/current/scopes/{scope_id}/kind")
+        assert list_before.status_code == 200
+        row_before = next(r for r in list_before.json()["item_list"] if r["id"] == kind_id)
+        assert row_before["reference_count"] == 0
+
+        client.post(
+            f"/auth/tenant/current/scopes/{scope_id}/items",
+            json={"kind_id": kind_id, "parent_item_id": None},
+        )
+        list_after = client.get(f"/auth/tenant/current/scopes/{scope_id}/kind")
+        row_after = next(r for r in list_after.json()["item_list"] if r["id"] == kind_id)
+        assert row_after["reference_count"] == 1
+
+
+def test_delete_kind_blocked_when_referenced_by_item() -> None:
+    with build_test_client(current_member_key="admin") as (client, session, _):
+        scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
+        assert scope_id is not None
+
+        kind_id = _create_kind_via_api(
+            client, scope_id, name="InUse", display_name="InUse"
+        )
+        client.post(
+            f"/auth/tenant/current/scopes/{scope_id}/items",
+            json={"kind_id": kind_id, "parent_item_id": None},
+        )
+        response = client.delete(
+            f"/auth/tenant/current/scopes/{scope_id}/kind/{kind_id}"
+        )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == (
+        "Cannot delete kind while items still reference it"
+    )
+
+
+def test_delete_kind_succeeds_when_unused() -> None:
+    with build_test_client(current_member_key="admin") as (client, session, _):
+        scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
+        assert scope_id is not None
+
+        kind_id = _create_kind_via_api(
+            client, scope_id, name="Orphan", display_name="Orphan"
+        )
+        response = client.delete(
+            f"/auth/tenant/current/scopes/{scope_id}/kind/{kind_id}"
+        )
+        session.expire_all()
+        orphan = session.get(Kind, kind_id)
+
+    assert response.status_code == 200
+    assert orphan is None
+    id_list = [r["id"] for r in response.json()["item_list"]]
+    assert kind_id not in id_list
+
+
 def test_scope_field_and_action_q_filter_ignores_case_and_accent() -> None:
     with build_test_client(current_member_key="admin") as (client, session, _):
         scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))

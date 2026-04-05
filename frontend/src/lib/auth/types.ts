@@ -111,6 +111,8 @@ export type TenantKindRecord = {
   id: number;
   name: string;
   display_name: string;
+  /** Itens no escopo com `item.kind_id` igual a este tipo. */
+  reference_count: number;
 };
 
 export type TenantKindListResponse = {

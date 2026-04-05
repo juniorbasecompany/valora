@@ -1014,6 +1014,7 @@ export function ScopeHierarchyConfigurationClient<
             <KindSelectOrCreateField
               selectId={formIds.nameInput}
               scopeId={scopeId}
+              editorSyncKey={editorFlashKey ?? ""}
               kindList={kindList}
               kindId={kindId}
               onKindIdChange={setKindId}
@@ -1026,12 +1027,11 @@ export function ScopeHierarchyConfigurationClient<
                 selectLabel: copy.kindSelectLabel,
                 selectHint: copy.kindSelectHint,
                 selectPlaceholder: copy.kindSelectPlaceholder,
-                newKindButton: copy.kindNewButton,
-                newNameLabel: copy.kindNewNameLabel,
-                newDisplayNameLabel: copy.kindNewDisplayNameLabel,
-                createKind: copy.kindCreateSubmit,
-                cancelNewKind: copy.kindCreateCancel,
-                createError: copy.kindCreateError
+                openListAriaLabel: copy.kindOpenListAriaLabel,
+                addKindAriaLabel: copy.kindAddAriaLabel,
+                createError: copy.kindCreateError,
+                deleteKindAriaLabel: copy.kindDeleteAriaLabel,
+                deleteError: copy.kindDeleteError
               }}
             />
           ) : (

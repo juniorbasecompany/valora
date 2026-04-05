@@ -229,6 +229,197 @@
   color: var(--color-danger-text);
 }
 
+/* Combobox de tipo de item (kind): busca, sugestões com lixeira, última linha com inclusão. */
+.ui-kind-combobox {
+  position: relative;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.ui-kind-combobox-hint-below {
+  margin-top: 0.15rem;
+}
+
+.ui-kind-combobox-input-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.ui-kind-combobox-input-wrap .ui-input {
+  width: 100%;
+  padding-right: 2.65rem;
+}
+
+.ui-kind-combobox-dropdown-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.35rem;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color 0.16s ease, transform 0.16s ease;
+}
+
+.ui-kind-combobox-dropdown-toggle:hover:not(:disabled) {
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+}
+
+.ui-kind-combobox-dropdown-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.ui-kind-combobox-dropdown-toggle:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus-ring);
+}
+
+.ui-kind-combobox-dropdown-toggle-open .ui-kind-combobox-chevron {
+  transform: rotate(180deg);
+}
+
+.ui-kind-combobox-chevron {
+  width: 1.15rem;
+  height: 1.15rem;
+  transition: transform 0.16s ease;
+}
+
+.ui-kind-combobox-listbox {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  right: 0;
+  z-index: var(--z-menu-panel);
+  margin: 0;
+  padding: 0.25rem 0;
+  list-style: none;
+  max-height: 280px;
+  overflow-y: auto;
+  border: var(--border-width-default) solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.ui-kind-combobox-item {
+  margin: 0;
+  padding: 0;
+}
+
+.ui-kind-combobox-item-inner {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0.25rem;
+  padding: 0 0.35rem 0 0;
+  width: 100%;
+}
+
+.ui-kind-combobox-option {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  padding: 0.45rem 0.5rem 0.45rem 0.75rem;
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-control);
+}
+
+.ui-kind-combobox-option:hover,
+.ui-kind-combobox-option-active {
+  background: var(--color-surface-muted);
+}
+
+.ui-kind-combobox-trash.ui-trash-icon-button {
+  flex-shrink: 0;
+  align-self: center;
+  min-width: 2.15rem;
+  min-height: 2.15rem;
+  padding: 0.25rem;
+}
+
+.ui-kind-combobox-create-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0 0.35rem 0 0;
+  padding: 0.45rem 0.5rem 0.45rem 0.75rem;
+  border-top: var(--border-width-default) solid var(--color-border);
+  border-radius: 0 0 var(--radius-control) var(--radius-control);
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.ui-kind-combobox-create-row-active {
+  background: var(--color-surface-muted);
+}
+
+.ui-kind-combobox-create-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ui-kind-combobox-add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.15rem;
+  height: 2.15rem;
+  margin: 0;
+  padding: 0.25rem;
+  border: var(--border-width-default) solid var(--color-primary);
+  border-radius: 6px;
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease;
+}
+
+.ui-kind-combobox-add-button:hover:not(:disabled) {
+  border-color: var(--color-primary-hover);
+  background: var(--color-primary-hover);
+}
+
+.ui-kind-combobox-add-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.ui-kind-combobox-add-button:focus-visible {
+  outline: none;
+  border-color: var(--color-focus-ring);
+  box-shadow: var(--shadow-focus-ring);
+}
+
+.ui-kind-combobox-add-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
 .ui-preview-stack {
   display: grid;
   gap: 0.75rem;
@@ -1815,6 +2006,15 @@ button.ui-location-nest-create:disabled {
   background: var(--gradient-surface-panel-shell-editor);
 }
 
+/*
+ * O .ui-panel base usa overflow:hidden (bordas arredondadas / sombra).
+ * Menus posicionados à frente do fluxo (ex.: lista do combobox de kind) precisam
+ * ultrapassar a caixa do painel de edição.
+ */
+.ui-panel.ui-panel-editor {
+  overflow: visible;
+}
+
 /* Meio-termo em relação ao .ui-panel genérico: sombra e filete um pouco mais presentes que o mínimo. */
 .ui-panel.ui-panel-context-card,
 .ui-panel.ui-panel-filter,
@@ -1852,6 +2052,11 @@ button.ui-location-nest-create:disabled {
   border-radius: var(--radius-card);
   background: var(--gradient-surface-card);
   box-shadow: var(--shadow-xs);
+}
+
+/* Menu do combobox de kind: posição absoluta; o card padrão usa overflow:hidden e recortava a lista. */
+.ui-card.ui-kind-combobox-card {
+  overflow: visible;
 }
 
 .ui-panel::before,

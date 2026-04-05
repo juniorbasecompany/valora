@@ -23,6 +23,7 @@ import { useEditorNewIntentGeneration } from "@/component/configuration/use-edit
 import { useFocusFirstEditorFieldAfterFlash } from "@/component/configuration/use-focus-first-editor-field-after-flash";
 import type { TenantCurrentResponse } from "@/lib/auth/types";
 import { parseErrorDetail } from "@/lib/api/parse-error-detail";
+import { normalizeTextForSearch } from "@/lib/text/normalize-text-for-search";
 
 export type TenantConfigurationCopy = {
   title: string;
@@ -75,14 +76,6 @@ function resolveAsideTitle(displayName: string, legalName: string, tenantId: num
     return legal;
   }
   return `#${tenantId}`;
-}
-
-function normalizeTextForFilter(value: string) {
-  return value
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
 }
 
 export function TenantConfigurationClient({
@@ -320,11 +313,11 @@ export function TenantConfigurationClient({
   const asideTitle = resolveAsideTitle(tenant.display_name, tenant.name, tenant.id);
   const asideCaption = tenant.name.trim() || `#${tenant.id}`;
   const tenantMatchesFilter = useMemo(() => {
-    const normalizedQuery = normalizeTextForFilter(filterQuery);
+    const normalizedQuery = normalizeTextForSearch(filterQuery);
     if (!normalizedQuery) {
       return true;
     }
-    const candidateText = normalizeTextForFilter(
+    const candidateText = normalizeTextForSearch(
       `${tenant.display_name} ${tenant.name} ${String(tenant.id)}`
     );
     return candidateText.includes(normalizedQuery);

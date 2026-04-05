@@ -424,12 +424,14 @@ export function KindSelectOrCreateField({
                           {resolveKindLabel(row)}
                         </button>
                         {canDelete ? (
-                          <TrashIconButton
-                            className="ui-kind-combobox-trash"
-                            ariaLabel={copy.deleteKindAriaLabel}
-                            disabled={disabled || deletingKindId === row.id}
-                            onClick={() => void deleteKind(row.id)}
-                          />
+                          <div className="ui-kind-combobox-action-slot">
+                            <TrashIconButton
+                              className="ui-kind-combobox-trash"
+                              ariaLabel={copy.deleteKindAriaLabel}
+                              disabled={disabled || deletingKindId === row.id}
+                              onClick={() => void deleteKind(row.id)}
+                            />
+                          </div>
                         ) : null}
                       </div>
                     </li>
@@ -456,18 +458,20 @@ export function KindSelectOrCreateField({
                       >
                         {trimmedForCreate}
                       </span>
-                      <button
-                        type="button"
-                        className="ui-kind-combobox-add-button"
-                        aria-label={copy.addKindAriaLabel}
-                        disabled={disabled || isCreating}
-                        onMouseDown={(event) => {
-                          event.preventDefault();
-                        }}
-                        onClick={() => void createKind()}
-                      >
-                        <PlusIcon className="ui-kind-combobox-add-icon" />
-                      </button>
+                      <div className="ui-kind-combobox-action-slot">
+                        <button
+                          type="button"
+                          className="ui-kind-combobox-add-button"
+                          aria-label={copy.addKindAriaLabel}
+                          disabled={disabled || isCreating}
+                          onMouseDown={(event) => {
+                            event.preventDefault();
+                          }}
+                          onClick={() => void createKind()}
+                        >
+                          <PlusIcon className="ui-kind-combobox-add-icon" />
+                        </button>
+                      </div>
                     </div>
                   </li>
                 ) : null}

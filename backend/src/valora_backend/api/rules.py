@@ -10,7 +10,7 @@ from typing import Annotated, Literal
 import requests
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field as PydanticField, model_validator
-from sqlalchemy import func, or_, select, text
+from sqlalchemy import func, or_, select, text, true
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -504,6 +504,8 @@ class ScopeFieldRecord(BaseModel):
     scope_id: int
     sql_type: str
     sort_order: int
+    is_initial_age: bool
+    is_final_age: bool
     label_id: int | None = None
     label_name: str | None = None
 
@@ -515,6 +517,8 @@ class ScopeFieldListResponse(BaseModel):
 
 class ScopeFieldCreateRequest(BaseModel):
     sql_type: str = PydanticField(min_length=1, max_length=2048)
+    is_initial_age: bool = False
+    is_final_age: bool = False
     label_lang: Literal["pt-BR", "en", "es"] | None = None
     label_name: str | None = PydanticField(default=None, max_length=2048)
 
@@ -522,11 +526,15 @@ class ScopeFieldCreateRequest(BaseModel):
     def label_lang_when_name_sent(self) -> ScopeFieldCreateRequest:
         if self.label_name is not None and self.label_lang is None:
             raise ValueError("label_lang is required when label_name is provided")
+        if self.is_initial_age and self.is_final_age:
+            raise ValueError("field cannot be both initial_age and final_age")
         return self
 
 
 class ScopeFieldPatchRequest(BaseModel):
     sql_type: str | None = PydanticField(default=None, min_length=1, max_length=2048)
+    is_initial_age: bool | None = None
+    is_final_age: bool | None = None
     label_lang: Literal["pt-BR", "en", "es"] | None = None
     label_name: str | None = PydanticField(default=None, max_length=2048)
 
@@ -534,7 +542,50 @@ class ScopeFieldPatchRequest(BaseModel):
     def label_lang_when_name_sent_patch(self) -> ScopeFieldPatchRequest:
         if self.label_name is not None and self.label_lang is None:
             raise ValueError("label_lang is required when label_name is provided")
+        if self.is_initial_age is True and self.is_final_age is True:
+            raise ValueError("field cannot be both initial_age and final_age")
         return self
+
+
+def _ensure_field_age_flag_availability(
+    session: Session,
+    *,
+    scope_id: int,
+    field_id: int | None,
+    is_initial_age: bool,
+    is_final_age: bool,
+) -> None:
+    if is_initial_age:
+        initial_owner_id = session.scalar(
+            select(Field.id)
+            .where(
+                Field.scope_id == scope_id,
+                Field.is_initial_age.is_(True),
+                Field.id != field_id if field_id is not None else true(),
+            )
+            .limit(1)
+        )
+        if initial_owner_id is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Another field in this scope is already marked as initial age",
+            )
+
+    if is_final_age:
+        final_owner_id = session.scalar(
+            select(Field.id)
+            .where(
+                Field.scope_id == scope_id,
+                Field.is_final_age.is_(True),
+                Field.id != field_id if field_id is not None else true(),
+            )
+            .limit(1)
+        )
+        if final_owner_id is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Another field in this scope is already marked as final age",
+            )
 
 
 @router.get(
@@ -611,6 +662,8 @@ def list_scope_fields(
                 scope_id=r.scope_id,
                 sql_type=r.type,
                 sort_order=r.sort_order,
+                is_initial_age=r.is_initial_age,
+                is_final_age=r.is_final_age,
                 label_id=pair.id if pair is not None else None,
                 label_name=pair.name if pair is not None else None,
             )
@@ -639,6 +692,15 @@ def create_scope_field(
         scope_id=scope_id,
         type=body.sql_type.strip(),
         sort_order=_next_field_sort_order(session, scope_id=scope_id),
+        is_initial_age=body.is_initial_age,
+        is_final_age=body.is_final_age,
+    )
+    _ensure_field_age_flag_availability(
+        session,
+        scope_id=scope_id,
+        field_id=None,
+        is_initial_age=body.is_initial_age,
+        is_final_age=body.is_final_age,
     )
     session.add(row)
     session.flush()
@@ -677,6 +739,8 @@ def get_scope_field(
         scope_id=row.scope_id,
         sql_type=row.type,
         sort_order=row.sort_order,
+        is_initial_age=row.is_initial_age,
+        is_final_age=row.is_final_age,
     )
 
 
@@ -694,8 +758,34 @@ def patch_scope_field(
     _require_scope_rules_editor(member)
     _get_tenant_scope(session, actor=member, scope_id=scope_id)
     row = _field_in_scope_or_404(session, scope_id=scope_id, field_id=field_id)
+    next_is_initial_age = (
+        body.is_initial_age
+        if body.is_initial_age is not None
+        else row.is_initial_age
+    )
+    next_is_final_age = (
+        body.is_final_age
+        if body.is_final_age is not None
+        else row.is_final_age
+    )
+    if next_is_initial_age and next_is_final_age:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Field cannot be both initial age and final age",
+        )
+    _ensure_field_age_flag_availability(
+        session,
+        scope_id=scope_id,
+        field_id=row.id,
+        is_initial_age=next_is_initial_age,
+        is_final_age=next_is_final_age,
+    )
     if body.sql_type is not None:
         row.type = body.sql_type.strip()
+    if body.is_initial_age is not None:
+        row.is_initial_age = body.is_initial_age
+    if body.is_final_age is not None:
+        row.is_final_age = body.is_final_age
     session.add(row)
     if body.label_lang is not None and body.label_name is not None:
         _upsert_field_label_by_lang(

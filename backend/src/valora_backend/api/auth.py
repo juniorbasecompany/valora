@@ -7,7 +7,7 @@ from datetime import date, datetime, time, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import func, literal, or_, select, text
 from sqlalchemy.orm import Session, contains_eager, joinedload
 
@@ -497,8 +497,6 @@ class TenantUnityRecord(BaseModel):
     item_id_list: list[int]
     item_display_label_list: list[str]
     creation_utc: datetime
-    initial_age: int
-    final_age: int
     can_edit: bool
     can_delete: bool
 
@@ -515,8 +513,6 @@ class TenantUnityDirectoryResponse(BaseModel):
 class TenantUnityUpsertRequest(BaseModel):
     location_id: int
     item_id_list: list[int]
-    initial_age: int
-    final_age: int
 
     @field_validator("location_id")
     @classmethod
@@ -534,12 +530,6 @@ class TenantUnityUpsertRequest(BaseModel):
             if iid < 1:
                 raise ValueError("invalid item id")
         return value
-
-    @model_validator(mode="after")
-    def validate_unity_age_range(self) -> TenantUnityUpsertRequest:
-        if self.initial_age > self.final_age:
-            raise ValueError("initial_age must be less than or equal to final_age")
-        return self
 
 
 class AuthSessionResponse(BaseModel):
@@ -1785,8 +1775,6 @@ def _build_tenant_unity_directory(
                 item_id_list=iid_list,
                 item_display_label_list=labels,
                 creation_utc=unity_row.creation_utc,
-                initial_age=unity_row.initial_age,
-                final_age=unity_row.final_age,
                 can_edit=can_edit,
                 can_delete=can_delete,
             )
@@ -3171,8 +3159,6 @@ def create_current_scope_unity(
     unity_row = Unity(
         location_id=body.location_id,
         item_id_list=body.item_id_list,
-        initial_age=body.initial_age,
-        final_age=body.final_age,
     )
     session.add(unity_row)
     _apply_member_audit_context(session, current_member)
@@ -3219,8 +3205,6 @@ def patch_current_scope_unity(
 
     target_unity.location_id = body.location_id
     target_unity.item_id_list = body.item_id_list
-    target_unity.initial_age = body.initial_age
-    target_unity.final_age = body.final_age
     session.add(target_unity)
     _apply_member_audit_context(session, current_member)
     commit_session_with_null_if_empty(session)

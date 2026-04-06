@@ -58,12 +58,7 @@ export type UnityConfigurationCopy = {
   itemAllLabel: string;
   itemConfirmLabel: string;
   itemHint: string;
-  initialAgeLabel: string;
-  finalAgeLabel: string;
-  ageHint: string;
   validationItem: string;
-  validationAge: string;
-  validationAgeRequired: string;
   validationLocation: string;
   validationLocationSelect: string;
   cancel: string;
@@ -211,29 +206,18 @@ export function UnityConfigurationClient({
       ? sanitizeUnityItemIdListForScope(selectedUnity.item_id_list, buildItemByIdMap(itemRecordList))
       : []
   );
-  const [initialAge, setInitialAge] = useState<number | null>(
-    selectedUnity != null ? selectedUnity.initial_age : null
-  );
-  const [finalAge, setFinalAge] = useState<number | null>(
-    selectedUnity != null ? selectedUnity.final_age : null
-  );
 
   const [baseline, setBaseline] = useState<{
     locationId: number;
     itemIdList: number[];
-    initialAge: number | null;
-    finalAge: number | null;
   }>({
     locationId: selectedUnity?.location_id ?? 0,
-    itemIdList: selectedUnity ? [...selectedUnity.item_id_list] : [],
-    initialAge: selectedUnity != null ? selectedUnity.initial_age : null,
-    finalAge: selectedUnity != null ? selectedUnity.final_age : null
+    itemIdList: selectedUnity ? [...selectedUnity.item_id_list] : []
   });
 
   const [fieldError, setFieldError] = useState<{
     location?: string;
     item?: string;
-    age?: string;
   }>({});
   const [requestErrorMessage, setRequestErrorMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -267,13 +251,9 @@ export function UnityConfigurationClient({
         setSelectedUnityId(null);
         setLocationId(0);
         setPickedItemIdList([]);
-        setInitialAge(null);
-        setFinalAge(null);
         setBaseline({
           locationId: 0,
-          itemIdList: [],
-          initialAge: null,
-          finalAge: null
+          itemIdList: []
         });
         setFieldError({});
         setRequestErrorMessage(null);
@@ -295,21 +275,15 @@ export function UnityConfigurationClient({
       const nextLoc = nextRow != null ? nextRow.location_id : 0;
       const nextStoredList = nextRow ? [...nextRow.item_id_list] : [];
       const nextPickedList = sanitizeUnityItemIdListForScope(nextStoredList, itemById);
-      const nextInitial = nextRow != null ? nextRow.initial_age : null;
-      const nextFinal = nextRow != null ? nextRow.final_age : null;
 
       setDirectory(nextDirectory);
       setIsCreateMode(nextKey === "new");
       setSelectedUnityId(typeof nextKey === "number" ? nextKey : null);
       setLocationId(nextLoc);
       setPickedItemIdList(nextPickedList);
-      setInitialAge(nextInitial);
-      setFinalAge(nextFinal);
       setBaseline({
         locationId: nextLoc,
-        itemIdList: nextStoredList,
-        initialAge: nextInitial,
-        finalAge: nextFinal
+        itemIdList: nextStoredList
       });
       setFieldError({});
       setRequestErrorMessage(null);
@@ -414,18 +388,9 @@ export function UnityConfigurationClient({
     return (
       locationId !== baseline.locationId ||
       !itemEqual ||
-      initialAge !== baseline.initialAge ||
-      finalAge !== baseline.finalAge ||
       isDeletePending
     );
-  }, [
-    baseline,
-    expandedItemIdListForSave,
-    finalAge,
-    initialAge,
-    isDeletePending,
-    locationId
-  ]);
+  }, [baseline, expandedItemIdListForSave, isDeletePending, locationId]);
 
   const validate = useCallback(() => {
     if (locationId < 1) {
@@ -439,24 +404,12 @@ export function UnityConfigurationClient({
       setFieldError({ item: copy.validationItem });
       return false;
     }
-    if (initialAge === null || finalAge === null) {
-      setFieldError({ age: copy.validationAgeRequired });
-      return false;
-    }
-    if (initialAge > finalAge) {
-      setFieldError({ age: copy.validationAge });
-      return false;
-    }
     setFieldError({});
     return true;
   }, [
-    copy.validationAge,
-    copy.validationAgeRequired,
     copy.validationItem,
     copy.validationLocation,
     copy.validationLocationSelect,
-    finalAge,
-    initialAge,
     locationDirectory?.item_list.length,
     pickedItemIdList.length,
     locationId
@@ -480,9 +433,7 @@ export function UnityConfigurationClient({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             location_id: locationId,
-            item_id_list: expandedItemIdListForSave,
-            initial_age: initialAge as number,
-            final_age: finalAge as number
+            item_id_list: expandedItemIdListForSave
           })
         });
         const data: unknown = await response.json().catch(() => ({}));
@@ -512,9 +463,7 @@ export function UnityConfigurationClient({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               location_id: locationId,
-              item_id_list: expandedItemIdListForSave,
-              initial_age: initialAge as number,
-              final_age: finalAge as number
+              item_id_list: expandedItemIdListForSave
             })
           }
       );
@@ -553,8 +502,6 @@ export function UnityConfigurationClient({
     copy.deleteError,
     copy.saveError,
     directory,
-    finalAge,
-    initialAge,
     isCreateMode,
     isDeletePending,
     expandedItemIdListForSave,
@@ -580,7 +527,6 @@ export function UnityConfigurationClient({
     requestErrorMessage ??
     fieldError.location ??
     fieldError.item ??
-    fieldError.age ??
     null;
 
   const asideEmptyMessage = !currentScope
@@ -794,57 +740,6 @@ export function UnityConfigurationClient({
               />
               <p className="ui-field-hint">{copy.itemHint}</p>
               {fieldError.item ? <p className="ui-field-error">{fieldError.item}</p> : null}
-            </section>
-
-            <section className="ui-card ui-form-section ui-border-accent">
-              <div className="ui-field">
-                <label className="ui-field-label" htmlFor="unity-initial-age">
-                  {copy.initialAgeLabel}
-                </label>
-                <input
-                  id="unity-initial-age"
-                  type="number"
-                  className="ui-input"
-                  value={initialAge === null ? "" : String(initialAge)}
-                  disabled={isDeletePending || !canEditForm}
-                  onChange={(event) => {
-                    const raw = event.target.value.trim();
-                    if (raw === "") {
-                      setInitialAge(null);
-                    } else {
-                      const n = Number.parseInt(raw, 10);
-                      setInitialAge(Number.isNaN(n) ? null : n);
-                    }
-                    setFieldError((previous) => ({ ...previous, age: undefined }));
-                    setRequestErrorMessage(null);
-                  }}
-                />
-              </div>
-              <div className="ui-field">
-                <label className="ui-field-label" htmlFor="unity-final-age">
-                  {copy.finalAgeLabel}
-                </label>
-                <input
-                  id="unity-final-age"
-                  type="number"
-                  className="ui-input"
-                  value={finalAge === null ? "" : String(finalAge)}
-                  disabled={isDeletePending || !canEditForm}
-                  onChange={(event) => {
-                    const raw = event.target.value.trim();
-                    if (raw === "") {
-                      setFinalAge(null);
-                    } else {
-                      const n = Number.parseInt(raw, 10);
-                      setFinalAge(Number.isNaN(n) ? null : n);
-                    }
-                    setFieldError((previous) => ({ ...previous, age: undefined }));
-                    setRequestErrorMessage(null);
-                  }}
-                />
-                <p className="ui-field-hint">{copy.ageHint}</p>
-                {fieldError.age ? <p className="ui-field-error">{fieldError.age}</p> : null}
-              </div>
             </section>
           </>
         ) : (

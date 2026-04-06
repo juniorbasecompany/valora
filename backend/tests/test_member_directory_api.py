@@ -1679,6 +1679,64 @@ def test_scope_field_reorder_and_reject_invalid_list() -> None:
         assert [item["sort_order"] for item in items] == [0, 1, 2]
 
 
+def test_scope_field_age_flags_are_exposed_and_unique_per_scope() -> None:
+    with build_test_client(current_member_key="admin") as (client, session, _):
+        scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
+        assert scope_id is not None
+
+        create_initial = client.post(
+            f"/auth/tenant/current/scopes/{scope_id}/fields",
+            params={"label_lang": "pt-BR"},
+            json={
+                "sql_type": "INTEGER",
+                "label_lang": "pt-BR",
+                "label_name": "Idade inicial",
+                "is_initial_age": True,
+            },
+        )
+        assert create_initial.status_code == 200
+        created_initial = next(
+            item
+            for item in create_initial.json()["item_list"]
+            if item.get("label_name") == "Idade inicial"
+        )
+        assert created_initial["is_initial_age"] is True
+        assert created_initial["is_final_age"] is False
+
+        create_final = client.post(
+            f"/auth/tenant/current/scopes/{scope_id}/fields",
+            params={"label_lang": "pt-BR"},
+            json={
+                "sql_type": "INTEGER",
+                "label_lang": "pt-BR",
+                "label_name": "Idade final",
+                "is_final_age": True,
+            },
+        )
+        assert create_final.status_code == 200
+
+        duplicate_initial = client.post(
+            f"/auth/tenant/current/scopes/{scope_id}/fields",
+            json={
+                "sql_type": "INTEGER",
+                "label_lang": "pt-BR",
+                "label_name": "Outra idade inicial",
+                "is_initial_age": True,
+            },
+        )
+        assert duplicate_initial.status_code == 400
+        assert "initial age" in duplicate_initial.json()["detail"].lower()
+
+        invalid_both = client.patch(
+            f"/auth/tenant/current/scopes/{scope_id}/fields/{created_initial['id']}",
+            json={
+                "is_initial_age": True,
+                "is_final_age": True,
+            },
+        )
+        assert invalid_both.status_code == 422
+
+
 def test_scope_action_reorder_and_reject_invalid_list() -> None:
     with build_test_client(current_member_key="admin") as (client, session, _):
         scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))

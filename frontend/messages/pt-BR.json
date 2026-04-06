@@ -304,6 +304,19 @@
         "scaleRange": "Use um número de casas decimais entre 0 e 10."
       }
     },
+    "ageFlags": {
+      "initial": {
+        "label": "Campo de idade inicial",
+        "hint": "Marque quando este campo registrar a idade inicial, em dias, da unidade ou do lote."
+      },
+      "final": {
+        "label": "Campo de idade final",
+        "hint": "Marque quando este campo registrar a idade final, em dias, da unidade ou do lote."
+      },
+      "error": {
+        "both": "O mesmo campo não pode ser marcado como idade inicial e idade final."
+      }
+    },
     "discardConfirm": "Descartar alterações não salvas?"
   },
   "ActionConfigurationPage": {
@@ -377,7 +390,7 @@
   },
   "UnityConfigurationPage": {
     "title": "Unidades",
-    "description": "Cadastre unidades alocadas (lotes) no escopo ativo: escolha o local, os itens do catálogo que a compõem e a faixa de idade. Use a lista à esquerda para localizar registros e o painel ao lado para editar ou criar.",
+    "description": "Cadastre unidades alocadas (lotes) no escopo ativo: escolha o local e os itens do catálogo que a compõem. Use a lista à esquerda para localizar registros e o painel ao lado para editar ou criar.",
     "list": {
       "emptyScope": "Crie um escopo antes de editar unidades.",
       "missingCurrentScope": "Defina um escopo ativo no seletor do cabeçalho antes de editar unidades.",
@@ -402,11 +415,6 @@
       "item": {
         "label": "Item",
         "hint": "Abra o seletor, marque um ou mais itens na árvore e confirme com Ok. Ao salvar, cada item escolhido e seus ancestrais na hierarquia são gravados."
-      },
-      "age": {
-        "initialLabel": "Idade inicial",
-        "finalLabel": "Idade final",
-        "hint": "A idade inicial não pode ser maior que a idade final."
       }
     },
     "action": {
@@ -423,8 +431,6 @@
       "create": "Não foi possível criar a unidade. Tente novamente.",
       "delete": "Não foi possível apagar a unidade. Tente novamente.",
       "validationItem": "Selecione pelo menos um item do catálogo.",
-      "validationAge": "A idade inicial não pode ser maior que a idade final.",
-      "validationAgeRequired": "Informe a idade inicial e a idade final.",
       "validationLocation": "Cadastre um local no escopo antes de criar uma unidade.",
       "validationLocationSelect": "Selecione um local."
     },

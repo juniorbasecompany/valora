@@ -412,13 +412,7 @@ class Unity(Base):
     """Unidade alocada (lote) vinculada a um local."""
 
     __tablename__ = "unity"
-    __table_args__ = (
-        CheckConstraint(
-            "initial_age <= final_age",
-            name="unity_age_range_chk",
-        ),
-        {"comment": "Unidade alocada (lote)."},
-    )
+    __table_args__ = ({"comment": "Unidade alocada (lote)."},)
 
     id: Mapped[int] = mapped_column(
         BIGINT_COMPAT,
@@ -442,14 +436,4 @@ class Unity(Base):
         nullable=False,
         default=lambda: datetime.now(UTC).replace(tzinfo=None),
         comment="Momento de criação da unidade.",
-    )
-    initial_age: Mapped[int] = mapped_column(
-        Integer,
-        nullable=False,
-        comment="Idade inicial.",
-    )
-    final_age: Mapped[int] = mapped_column(
-        Integer,
-        nullable=False,
-        comment="Idade final.",
     )

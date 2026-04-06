@@ -142,8 +142,6 @@ export type TenantUnityRecord = {
   item_id_list: number[];
   item_display_label_list: string[];
   creation_utc: string;
-  initial_age: number;
-  final_age: number;
   can_edit: boolean;
   can_delete: boolean;
 };
@@ -162,6 +160,8 @@ export type TenantScopeFieldRecord = {
   scope_id: number;
   sql_type: string;
   sort_order: number;
+  is_initial_age: boolean;
+  is_final_age: boolean;
   label_id?: number | null;
   label_name?: string | null;
 };

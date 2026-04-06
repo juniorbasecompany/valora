@@ -194,6 +194,8 @@ export function FieldConfigurationClient({
     initialSelectedField?.sql_type ??
     (initialSelectedFieldKey === "new" ? defaultNewFieldSqlType : "");
   const initialFieldName = initialSelectedField?.label_name?.trim() ?? "";
+  const initialIsInitialAge = initialSelectedField?.is_initial_age ?? false;
+  const initialIsFinalAge = initialSelectedField?.is_final_age ?? false;
 
   const [selectedFieldId, setSelectedFieldId] = useState<number | null>(
     typeof initialSelectedFieldKey === "number" ? initialSelectedFieldKey : null
@@ -201,11 +203,19 @@ export function FieldConfigurationClient({
   const [isCreateMode, setIsCreateMode] = useState(initialSelectedFieldKey === "new");
   const [sqlType, setSqlType] = useState(initialSqlType);
   const [fieldName, setFieldName] = useState(initialFieldName);
+  const [isInitialAge, setIsInitialAge] = useState(initialIsInitialAge);
+  const [isFinalAge, setIsFinalAge] = useState(initialIsFinalAge);
   const [baseline, setBaseline] = useState({
     sqlType: initialSqlType,
-    fieldName: initialFieldName
+    fieldName: initialFieldName,
+    isInitialAge: initialIsInitialAge,
+    isFinalAge: initialIsFinalAge
   });
-  const [fieldError, setFieldError] = useState<{ form?: string; fieldName?: string }>({});
+  const [fieldError, setFieldError] = useState<{
+    form?: string;
+    fieldName?: string;
+    ageFlag?: string;
+  }>({});
   const [requestErrorMessage, setRequestErrorMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeletePending, setIsDeletePending] = useState(false);
@@ -312,7 +322,14 @@ export function FieldConfigurationClient({
         setSelectedFieldId(null);
         setSqlType("");
         setFieldName("");
-        setBaseline({ sqlType: "", fieldName: "" });
+        setIsInitialAge(false);
+        setIsFinalAge(false);
+        setBaseline({
+          sqlType: "",
+          fieldName: "",
+          isInitialAge: false,
+          isFinalAge: false
+        });
         setFieldError({});
         setRequestErrorMessage(null);
         setIsDeletePending(false);
@@ -333,15 +350,21 @@ export function FieldConfigurationClient({
       const nextSqlType =
         nextSelectedField?.sql_type ?? (nextKey === "new" ? defaultNewFieldSqlType : "");
       const nextFieldName = nextSelectedField?.label_name?.trim() ?? "";
+      const nextIsInitialAge = nextSelectedField?.is_initial_age ?? false;
+      const nextIsFinalAge = nextSelectedField?.is_final_age ?? false;
 
       setDirectory(nextDirectory);
       setIsCreateMode(nextKey === "new");
       setSelectedFieldId(typeof nextKey === "number" ? nextKey : null);
       setSqlType(nextSqlType);
       setFieldName(nextFieldName);
+      setIsInitialAge(nextIsInitialAge);
+      setIsFinalAge(nextIsFinalAge);
       setBaseline({
         sqlType: nextSqlType,
-        fieldName: nextFieldName
+        fieldName: nextFieldName,
+        isInitialAge: nextIsInitialAge,
+        isFinalAge: nextIsFinalAge
       });
       setFieldError({});
       setRequestErrorMessage(null);
@@ -469,9 +492,21 @@ export function FieldConfigurationClient({
     return (
       sqlType.trim() !== baseline.sqlType.trim() ||
       fieldName.trim() !== baseline.fieldName.trim() ||
+      isInitialAge !== baseline.isInitialAge ||
+      isFinalAge !== baseline.isFinalAge ||
       isDeletePending
     );
-  }, [baseline.fieldName, baseline.sqlType, fieldName, isDeletePending, sqlType]);
+  }, [
+    baseline.fieldName,
+    baseline.isFinalAge,
+    baseline.isInitialAge,
+    baseline.sqlType,
+    fieldName,
+    isDeletePending,
+    isFinalAge,
+    isInitialAge,
+    sqlType
+  ]);
 
   const validate = useCallback(() => {
     if (!fieldName.trim()) {
@@ -496,9 +531,14 @@ export function FieldConfigurationClient({
       }
     }
 
+    if (isInitialAge && isFinalAge) {
+      setFieldError({ ageFlag: t("ageFlags.error.both") });
+      return false;
+    }
+
     setFieldError({});
     return true;
-  }, [copy.fieldNameRequired, fieldName, sqlType, t]);
+  }, [copy.fieldNameRequired, fieldName, isFinalAge, isInitialAge, sqlType, t]);
 
   const handleKindChange = useCallback(
     (nextKind: FieldSqlKind | "legacy") => {
@@ -598,6 +638,8 @@ export function FieldConfigurationClient({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             sql_type: sqlType.trim(),
+            is_initial_age: isInitialAge,
+            is_final_age: isFinalAge,
             label_lang: labelLang,
             label_name: fieldName.trim()
           })
@@ -634,6 +676,8 @@ export function FieldConfigurationClient({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               sql_type: sqlType.trim(),
+              is_initial_age: isInitialAge,
+              is_final_age: isFinalAge,
               label_lang: labelLang,
               label_name: fieldName.trim()
             })
@@ -689,6 +733,8 @@ export function FieldConfigurationClient({
     copy.saveError,
     directory,
     fieldName,
+    isFinalAge,
+    isInitialAge,
     isCreateMode,
     isDeletePending,
     labelLang,
@@ -707,7 +753,7 @@ export function FieldConfigurationClient({
     canEdit: directory?.can_edit ?? false
   });
   const footerErrorMessage =
-    requestErrorMessage ?? fieldError.form ?? fieldError.fieldName ?? null;
+    requestErrorMessage ?? fieldError.form ?? fieldError.fieldName ?? fieldError.ageFlag ?? null;
 
   const asideEmptyMessage = !currentScope
     ? hasAnyScope
@@ -967,6 +1013,55 @@ export function FieldConfigurationClient({
                   <pre className="ui-history-json">{sqlType.trim()}</pre>
                 </div>
               ) : null}
+            </section>
+
+            <section className="ui-card ui-form-section ui-border-accent">
+              <div className="ui-field">
+                <label
+                  className="ui-field-label"
+                  htmlFor="field-is-initial-age"
+                  style={{ display: "flex", gap: "0.6rem", alignItems: "center" }}
+                >
+                  <input
+                    id="field-is-initial-age"
+                    type="checkbox"
+                    checked={isInitialAge}
+                    disabled={isDeletePending || !canEditForm}
+                    onChange={(event) => {
+                      setIsInitialAge(event.target.checked);
+                      setFieldError((previous) => ({ ...previous, ageFlag: undefined }));
+                      setRequestErrorMessage(null);
+                    }}
+                  />
+                  <span>{t("ageFlags.initial.label")}</span>
+                </label>
+                <p className="ui-field-hint">{t("ageFlags.initial.hint")}</p>
+              </div>
+
+              <div className="ui-field">
+                <label
+                  className="ui-field-label"
+                  htmlFor="field-is-final-age"
+                  style={{ display: "flex", gap: "0.6rem", alignItems: "center" }}
+                >
+                  <input
+                    id="field-is-final-age"
+                    type="checkbox"
+                    checked={isFinalAge}
+                    disabled={isDeletePending || !canEditForm}
+                    onChange={(event) => {
+                      setIsFinalAge(event.target.checked);
+                      setFieldError((previous) => ({ ...previous, ageFlag: undefined }));
+                      setRequestErrorMessage(null);
+                    }}
+                  />
+                  <span>{t("ageFlags.final.label")}</span>
+                </label>
+                <p className="ui-field-hint">{t("ageFlags.final.hint")}</p>
+                {fieldError.ageFlag ? (
+                  <p className="ui-field-error">{fieldError.ageFlag}</p>
+                ) : null}
+              </div>
             </section>
 
           </>

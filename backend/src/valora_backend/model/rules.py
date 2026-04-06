@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 
 from sqlalchemy import (
     BigInteger,
+    Boolean,
     CheckConstraint,
     DateTime,
     ForeignKey,
@@ -26,9 +27,29 @@ class Field(Base):
     """Definição de campo configurável (ex.: quantidade, mortes, valor)."""
 
     __tablename__ = "field"
-    __table_args__ = {
-        "comment": "Definição do campo. Ex: quantidade, mortes, valor",
-    }
+    __table_args__ = (
+        CheckConstraint(
+            "NOT (is_initial_age AND is_final_age)",
+            name="field_age_flags_not_both_chk",
+        ),
+        Index(
+            "field_scope_initial_age_unique",
+            "scope_id",
+            unique=True,
+            sqlite_where=text("is_initial_age = 1"),
+            postgresql_where=text("is_initial_age IS TRUE"),
+        ),
+        Index(
+            "field_scope_final_age_unique",
+            "scope_id",
+            unique=True,
+            sqlite_where=text("is_final_age = 1"),
+            postgresql_where=text("is_final_age IS TRUE"),
+        ),
+        {
+            "comment": "Definição do campo. Ex: quantidade, mortes, valor",
+        },
+    )
 
     id: Mapped[int] = mapped_column(
         BIGINT_COMPAT,
@@ -54,6 +75,26 @@ class Field(Base):
         Integer,
         nullable=False,
         comment="Ordem do campo em relação às demais no mesmo escopo.",
+    )
+    is_initial_age: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("false"),
+        comment=(
+            "Indica que este campo contém a idade inicial em dias, da unidade, "
+            "do lote. O motor começa o cálculo no dia do evento que registrar este campo."
+        ),
+    )
+    is_final_age: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("false"),
+        comment=(
+            "Indica que este campo contém a idade final em dias, da unidade, "
+            "do lote. O motor pára de calcular no dia do evento que registrar este campo."
+        ),
     )
 
 

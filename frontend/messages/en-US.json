@@ -340,6 +340,19 @@
         "scaleRange": "Use a decimal place count between 0 and 10."
       }
     },
+    "ageFlags": {
+      "initial": {
+        "label": "Initial age field",
+        "hint": "Enable when this field records the initial age, in days, of the unit or lot."
+      },
+      "final": {
+        "label": "Final age field",
+        "hint": "Enable when this field records the final age, in days, of the unit or lot."
+      },
+      "error": {
+        "both": "The same field cannot be marked as both initial age and final age."
+      }
+    },
     "discardConfirm": "Discard unsaved changes?"
   },
   "ActionConfigurationPage": {
@@ -420,7 +433,7 @@
   },
   "UnityConfigurationPage": {
     "title": "Units",
-    "description": "Register allocated units (lots) for the active scope: pick the location, catalog items that make up the unit, and the age range. Use the list on the left to find records and the panel beside it to edit or create.",
+    "description": "Register allocated units (lots) for the active scope: pick the location and catalog items that make up the unit. Use the list on the left to find records and the panel beside it to edit or create.",
     "list": {
       "emptyScope": "Create a scope before editing units.",
       "missingCurrentScope": "Choose an active scope in the header selector before editing units.",
@@ -445,11 +458,6 @@
       "item": {
         "label": "Item",
         "hint": "Open the picker, check one or more items in the tree, and tap Ok. On save, each selected item and its ancestors in the hierarchy are stored."
-      },
-      "age": {
-        "initialLabel": "Initial age",
-        "finalLabel": "Final age",
-        "hint": "Initial age cannot be greater than final age."
       }
     },
     "action": {
@@ -466,8 +474,6 @@
       "create": "Could not create the unit. Try again.",
       "delete": "Could not delete the unit. Try again.",
       "validationItem": "Select at least one catalog item.",
-      "validationAge": "Initial age cannot be greater than final age.",
-      "validationAgeRequired": "Enter initial age and final age.",
       "validationLocation": "Add a location to the scope before creating a unit.",
       "validationLocationSelect": "Select a location."
     },

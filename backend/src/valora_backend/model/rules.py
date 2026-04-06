@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from decimal import Decimal
 from datetime import UTC, datetime
 
 from sqlalchemy import (
@@ -12,6 +13,7 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
+    Numeric,
     Text,
     UniqueConstraint,
     text,
@@ -346,15 +348,6 @@ class Result(Base):
         nullable=False,
         comment="Ligação com o evento onde o resultado da fórmula foi aplicado.",
     )
-    value: Mapped[str] = mapped_column(
-        Text,
-        nullable=False,
-        comment=(
-            "Este é o valor resultado da aplicação da fórmula em determinado evento. "
-            "É gravado no formato 'text'. Este valor, submetido field.type, volta ao tipo "
-            'nativo do postgres. Ex: "123" será convertido para inteiro se field.type for "INTEGER"'
-        ),
-    )
     parent_result_id: Mapped[int | None] = mapped_column(
         BIGINT_COMPAT,
         ForeignKey("result.id", onupdate="CASCADE", ondelete="CASCADE"),
@@ -377,5 +370,20 @@ class Result(Base):
             "Ligação com a definição do campo. Este campo é o resultado da aplicação da "
             "fórmula em determinado evento."
         ),
+    )
+    text_value: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+        comment="Este é resultado da fórmula, no formato texto.",
+    )
+    boolean_value: Mapped[bool | None] = mapped_column(
+        Boolean,
+        nullable=True,
+        comment="Este é resultado da fórmula, no formato booleano.",
+    )
+    numeric_value: Mapped[Decimal | None] = mapped_column(
+        Numeric(15, 10),
+        nullable=True,
+        comment="Este é resultado da fórmula, no formato numérico.",
     )
 

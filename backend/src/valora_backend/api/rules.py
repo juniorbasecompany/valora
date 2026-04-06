@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from collections import defaultdict
+from decimal import Decimal
 from datetime import UTC, datetime
 from typing import Annotated, Literal
 
@@ -46,6 +47,13 @@ from valora_backend.services.deepl_label_translation import (
 )
 
 router = APIRouter(prefix="/auth/tenant/current", tags=["scope-rules"])
+
+
+def _normalize_optional_result_text(value: str | None) -> str | None:
+    if value is None:
+        return None
+    normalized = value.strip()
+    return normalized or None
 
 
 def _member_can_edit_scope_rules(member: Member) -> bool:
@@ -1942,7 +1950,9 @@ class ScopeResultRecord(BaseModel):
     id: int
     event_id: int
     field_id: int
-    value: str
+    text_value: str | None
+    boolean_value: bool | None
+    numeric_value: Decimal | None
     parent_result_id: int | None
     moment_utc: datetime
 
@@ -1954,13 +1964,17 @@ class ScopeResultListResponse(BaseModel):
 
 class ScopeResultCreateRequest(BaseModel):
     field_id: int
-    value: str = PydanticField(min_length=1, max_length=65535)
+    text_value: str | None = PydanticField(default=None, max_length=65535)
+    boolean_value: bool | None = None
+    numeric_value: Decimal | None = None
     parent_result_id: int | None = None
     moment_utc: datetime | None = None
 
 
 class ScopeResultPatchRequest(BaseModel):
-    value: str | None = PydanticField(default=None, min_length=1, max_length=65535)
+    text_value: str | None = PydanticField(default=None, max_length=65535)
+    boolean_value: bool | None = None
+    numeric_value: Decimal | None = None
     parent_result_id: int | None = None
     moment_utc: datetime | None = None
 
@@ -1988,7 +2002,9 @@ def list_scope_event_results(
                 id=r.id,
                 event_id=r.event_id,
                 field_id=r.field_id,
-                value=r.value,
+                text_value=r.text_value,
+                boolean_value=r.boolean_value,
+                numeric_value=r.numeric_value,
                 parent_result_id=r.parent_result_id,
                 moment_utc=r.moment_utc,
             )
@@ -2021,7 +2037,9 @@ def create_scope_event_result(
     row = Result(
         event_id=event_id,
         field_id=body.field_id,
-        value=body.value.strip(),
+        text_value=_normalize_optional_result_text(body.text_value),
+        boolean_value=body.boolean_value,
+        numeric_value=body.numeric_value,
         parent_result_id=body.parent_result_id,
         moment_utc=moment,
     )
@@ -2046,17 +2064,22 @@ def patch_scope_event_result(
     _require_scope_rules_editor(member)
     _event_in_scope_or_404(session, scope_id=scope_id, event_id=event_id)
     row = _result_in_event_or_404(session, event_id=event_id, result_id=result_id)
-    if body.value is not None:
-        row.value = body.value.strip()
-    if body.parent_result_id is not None:
+    if "text_value" in body.model_fields_set:
+        row.text_value = _normalize_optional_result_text(body.text_value)
+    if "boolean_value" in body.model_fields_set:
+        row.boolean_value = body.boolean_value
+    if "numeric_value" in body.model_fields_set:
+        row.numeric_value = body.numeric_value
+    if "parent_result_id" in body.model_fields_set:
         if body.parent_result_id == row.id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Result cannot be its own parent",
             )
-        _result_in_event_or_404(
-            session, event_id=event_id, result_id=body.parent_result_id
-        )
+        if body.parent_result_id is not None:
+            _result_in_event_or_404(
+                session, event_id=event_id, result_id=body.parent_result_id
+            )
         row.parent_result_id = body.parent_result_id
     if body.moment_utc is not None:
         m = body.moment_utc

@@ -3,7 +3,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from sqlalchemy import inspect
+
 from valora_backend.model import Base
+from valora_backend.model.rules import Result
 
 ERD_PATH = Path(__file__).resolve().parents[1] / "erd.json"
 
@@ -48,3 +51,16 @@ def test_erd_null_if_empty_matches_orm_metadata_for_mapped_table() -> None:
         for table_name in comparable_erd_map
     }
     assert missing_model_table_set == set()
+
+
+def test_result_columns_match_erd() -> None:
+    erd_dict = json.loads(ERD_PATH.read_text(encoding="utf-8"))
+    result_table = next(
+        table_dict
+        for table_dict in erd_dict.get("tables", [])
+        if table_dict.get("name") == "result"
+    )
+
+    assert [field_dict["name"] for field_dict in result_table["fields"]] == [
+        column.key for column in inspect(Result).columns
+    ]

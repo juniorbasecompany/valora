@@ -14,7 +14,13 @@ from sqlalchemy import create_engine, event, select
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from valora_backend.api.rules import delete_scope_field
+from valora_backend.api.rules import (
+    ScopeResultCreateRequest,
+    ScopeResultPatchRequest,
+    create_scope_event_result,
+    delete_scope_field,
+    patch_scope_event_result,
+)
 from valora_backend.auth.dependencies import (
     get_current_account,
     get_current_member,
@@ -33,6 +39,7 @@ from valora_backend.model.identity import (
     Item,
 )
 from valora_backend.model.log import Log
+from valora_backend.model.rules import Result
 
 
 def _create_kind_via_api(client, scope_id: int, *, name: str, display_name: str) -> int:
@@ -1972,3 +1979,99 @@ def test_tenant_history_endpoint_supports_actor_filter_and_pagination() -> None:
     assert payload["item_list"][0]["action_type"] == "U"
     assert payload["has_more"] is True
     assert payload["next_offset"] == 1
+
+
+def test_create_scope_event_result_supports_typed_values_from_erd() -> None:
+    session = MagicMock()
+    member = SimpleNamespace(role=2, tenant_id=1)
+    body = ScopeResultCreateRequest(
+        field_id=7,
+        numeric_value="12.5000000000",
+        parent_result_id=3,
+    )
+
+    with (
+        patch("valora_backend.api.rules._require_scope_rules_editor"),
+        patch("valora_backend.api.rules._event_in_scope_or_404"),
+        patch("valora_backend.api.rules._field_in_scope_or_404"),
+        patch("valora_backend.api.rules._result_in_event_or_404"),
+        patch("valora_backend.api.rules._apply_member_audit_context"),
+        patch("valora_backend.api.rules.commit_session_with_null_if_empty"),
+        patch(
+            "valora_backend.api.rules.list_scope_event_results",
+            return_value={"ok": True},
+        ) as list_results,
+    ):
+        response = create_scope_event_result(
+            scope_id=5,
+            event_id=9,
+            body=body,
+            member=member,
+            session=session,
+        )
+
+    assert response == {"ok": True}
+    created_row = session.add.call_args.args[0]
+    assert isinstance(created_row, Result)
+    assert created_row.event_id == 9
+    assert created_row.field_id == 7
+    assert created_row.text_value is None
+    assert created_row.boolean_value is None
+    assert str(created_row.numeric_value) == "12.5000000000"
+    assert created_row.parent_result_id == 3
+    assert created_row.moment_utc.tzinfo is None
+    list_results.assert_called_once_with(5, 9, member, session)
+
+
+def test_patch_scope_event_result_can_replace_and_clear_typed_values() -> None:
+    session = MagicMock()
+    member = SimpleNamespace(role=2, tenant_id=1)
+    existing_row = Result(
+        event_id=9,
+        field_id=7,
+        text_value=None,
+        boolean_value=True,
+        numeric_value=None,
+        parent_result_id=3,
+        moment_utc=datetime(2026, 4, 6, 12, 0, 0),
+    )
+    existing_row.id = 11
+
+    body = ScopeResultPatchRequest(
+        text_value="  consolidado  ",
+        boolean_value=None,
+        numeric_value=None,
+        parent_result_id=None,
+    )
+
+    with (
+        patch("valora_backend.api.rules._require_scope_rules_editor"),
+        patch("valora_backend.api.rules._event_in_scope_or_404"),
+        patch(
+            "valora_backend.api.rules._result_in_event_or_404",
+            return_value=existing_row,
+        ) as find_result,
+        patch("valora_backend.api.rules._apply_member_audit_context"),
+        patch("valora_backend.api.rules.commit_session_with_null_if_empty"),
+        patch(
+            "valora_backend.api.rules.list_scope_event_results",
+            return_value={"ok": True},
+        ) as list_results,
+    ):
+        response = patch_scope_event_result(
+            scope_id=5,
+            event_id=9,
+            result_id=11,
+            body=body,
+            member=member,
+            session=session,
+        )
+
+    assert response == {"ok": True}
+    assert existing_row.text_value == "consolidado"
+    assert existing_row.boolean_value is None
+    assert existing_row.numeric_value is None
+    assert existing_row.parent_result_id is None
+    session.add.assert_called_with(existing_row)
+    find_result.assert_called_once_with(session, event_id=9, result_id=11)
+    list_results.assert_called_once_with(5, 9, member, session)

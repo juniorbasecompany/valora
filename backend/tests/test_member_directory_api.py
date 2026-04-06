@@ -1709,6 +1709,7 @@ def test_scope_field_age_flags_are_exposed_and_unique_per_scope() -> None:
         )
         assert created_initial["is_initial_age"] is True
         assert created_initial["is_final_age"] is False
+        assert created_initial["is_current_age"] is False
 
         create_final = client.post(
             f"/auth/tenant/current/scopes/{scope_id}/fields",
@@ -1721,6 +1722,32 @@ def test_scope_field_age_flags_are_exposed_and_unique_per_scope() -> None:
             },
         )
         assert create_final.status_code == 200
+        created_final = next(
+            item
+            for item in create_final.json()["item_list"]
+            if item.get("label_name") == "Idade final"
+        )
+        assert created_final["is_current_age"] is False
+
+        create_current = client.post(
+            f"/auth/tenant/current/scopes/{scope_id}/fields",
+            params={"label_lang": "pt-BR"},
+            json={
+                "sql_type": "INTEGER",
+                "label_lang": "pt-BR",
+                "label_name": "Idade atual",
+                "is_current_age": True,
+            },
+        )
+        assert create_current.status_code == 200
+        created_current = next(
+            item
+            for item in create_current.json()["item_list"]
+            if item.get("label_name") == "Idade atual"
+        )
+        assert created_current["is_initial_age"] is False
+        assert created_current["is_final_age"] is False
+        assert created_current["is_current_age"] is True
 
         duplicate_initial = client.post(
             f"/auth/tenant/current/scopes/{scope_id}/fields",
@@ -1733,6 +1760,18 @@ def test_scope_field_age_flags_are_exposed_and_unique_per_scope() -> None:
         )
         assert duplicate_initial.status_code == 400
         assert "initial age" in duplicate_initial.json()["detail"].lower()
+
+        duplicate_current = client.post(
+            f"/auth/tenant/current/scopes/{scope_id}/fields",
+            json={
+                "sql_type": "INTEGER",
+                "label_lang": "pt-BR",
+                "label_name": "Outra idade atual",
+                "is_current_age": True,
+            },
+        )
+        assert duplicate_current.status_code == 400
+        assert "current age" in duplicate_current.json()["detail"].lower()
 
         invalid_both = client.patch(
             f"/auth/tenant/current/scopes/{scope_id}/fields/{created_initial['id']}",

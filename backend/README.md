@@ -16,7 +16,7 @@ A fonte de verdade do diagrama entidade-relacionamento (JSON drawDB) é [`erd.js
 | `item`    | idem | Hierarquia por escopo (`parent_item_id`, `sort_order`). |
 | `unity`   | idem | Unidade alocada (lote) por local; referencia `item_id_list` do catálogo no escopo. |
 | `log`     | [`model/log.py`](src/valora_backend/model/log.py) | Auditoria (`table_name`, `action_type`, `row_id`, `row`, `moment_utc`). |
-| `field`   | [`model/rules.py`](src/valora_backend/model/rules.py) | Definição de campo por escopo; coluna SQL `type` e flags `is_initial_age` / `is_final_age` para marcar os campos que delimitam idade do lote. |
+| `field`   | [`model/rules.py`](src/valora_backend/model/rules.py) | Definição de campo por escopo; coluna SQL `type` e flags `is_initial_age` / `is_current_age` / `is_final_age` para marcar os campos de idade do lote. |
 | `action`  | idem | Ação por escopo. |
 | `formula` | idem | Passos de fórmula por ação (`step`, `statement`). |
 | `label`   | idem | Rótulo i18n ligado a `field` **ou** `action`. |

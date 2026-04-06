@@ -48,6 +48,13 @@ class Field(Base):
             sqlite_where=text("is_final_age = 1"),
             postgresql_where=text("is_final_age IS TRUE"),
         ),
+        Index(
+            "field_scope_current_age_unique",
+            "scope_id",
+            unique=True,
+            sqlite_where=text("is_current_age = 1"),
+            postgresql_where=text("is_current_age IS TRUE"),
+        ),
         {
             "comment": "Definição do campo. Ex: quantidade, mortes, valor",
         },
@@ -96,6 +103,16 @@ class Field(Base):
         comment=(
             "Indica que este campo contém a idade final em dias, da unidade, "
             "do lote. O motor pára de calcular no dia do evento que registrar este campo."
+        ),
+    )
+    is_current_age: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("false"),
+        comment=(
+            "Indica que este campo contém a idade atual em dias, da unidade, "
+            "do lote."
         ),
     )
 

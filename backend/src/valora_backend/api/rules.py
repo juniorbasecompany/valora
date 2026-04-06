@@ -514,6 +514,7 @@ class ScopeFieldRecord(BaseModel):
     sort_order: int
     is_initial_age: bool
     is_final_age: bool
+    is_current_age: bool
     label_id: int | None = None
     label_name: str | None = None
 
@@ -527,6 +528,7 @@ class ScopeFieldCreateRequest(BaseModel):
     sql_type: str = PydanticField(min_length=1, max_length=2048)
     is_initial_age: bool = False
     is_final_age: bool = False
+    is_current_age: bool = False
     label_lang: Literal["pt-BR", "en", "es"] | None = None
     label_name: str | None = PydanticField(default=None, max_length=2048)
 
@@ -543,6 +545,7 @@ class ScopeFieldPatchRequest(BaseModel):
     sql_type: str | None = PydanticField(default=None, min_length=1, max_length=2048)
     is_initial_age: bool | None = None
     is_final_age: bool | None = None
+    is_current_age: bool | None = None
     label_lang: Literal["pt-BR", "en", "es"] | None = None
     label_name: str | None = PydanticField(default=None, max_length=2048)
 
@@ -562,6 +565,7 @@ def _ensure_field_age_flag_availability(
     field_id: int | None,
     is_initial_age: bool,
     is_final_age: bool,
+    is_current_age: bool,
 ) -> None:
     if is_initial_age:
         initial_owner_id = session.scalar(
@@ -593,6 +597,22 @@ def _ensure_field_age_flag_availability(
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Another field in this scope is already marked as final age",
+            )
+
+    if is_current_age:
+        current_owner_id = session.scalar(
+            select(Field.id)
+            .where(
+                Field.scope_id == scope_id,
+                Field.is_current_age.is_(True),
+                Field.id != field_id if field_id is not None else true(),
+            )
+            .limit(1)
+        )
+        if current_owner_id is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Another field in this scope is already marked as current age",
             )
 
 
@@ -672,6 +692,7 @@ def list_scope_fields(
                 sort_order=r.sort_order,
                 is_initial_age=r.is_initial_age,
                 is_final_age=r.is_final_age,
+                is_current_age=r.is_current_age,
                 label_id=pair.id if pair is not None else None,
                 label_name=pair.name if pair is not None else None,
             )
@@ -702,6 +723,7 @@ def create_scope_field(
         sort_order=_next_field_sort_order(session, scope_id=scope_id),
         is_initial_age=body.is_initial_age,
         is_final_age=body.is_final_age,
+        is_current_age=body.is_current_age,
     )
     _ensure_field_age_flag_availability(
         session,
@@ -709,6 +731,7 @@ def create_scope_field(
         field_id=None,
         is_initial_age=body.is_initial_age,
         is_final_age=body.is_final_age,
+        is_current_age=body.is_current_age,
     )
     session.add(row)
     session.flush()
@@ -749,6 +772,7 @@ def get_scope_field(
         sort_order=row.sort_order,
         is_initial_age=row.is_initial_age,
         is_final_age=row.is_final_age,
+        is_current_age=row.is_current_age,
     )
 
 
@@ -776,6 +800,11 @@ def patch_scope_field(
         if body.is_final_age is not None
         else row.is_final_age
     )
+    next_is_current_age = (
+        body.is_current_age
+        if body.is_current_age is not None
+        else row.is_current_age
+    )
     if next_is_initial_age and next_is_final_age:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -787,6 +816,7 @@ def patch_scope_field(
         field_id=row.id,
         is_initial_age=next_is_initial_age,
         is_final_age=next_is_final_age,
+        is_current_age=next_is_current_age,
     )
     if body.sql_type is not None:
         row.type = body.sql_type.strip()
@@ -794,6 +824,8 @@ def patch_scope_field(
         row.is_initial_age = body.is_initial_age
     if body.is_final_age is not None:
         row.is_final_age = body.is_final_age
+    if body.is_current_age is not None:
+        row.is_current_age = body.is_current_age
     session.add(row)
     if body.label_lang is not None and body.label_name is not None:
         _upsert_field_label_by_lang(

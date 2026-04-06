@@ -276,6 +276,7 @@
       "dragHandleAria": "Arrastrar para reordenar",
       "reorderError": "No se pudo guardar el orden. Inténtalo de nuevo.",
       "initialAgeBadge": "Edad inicial",
+      "currentAgeBadge": "Edad actual",
       "finalAgeBadge": "Edad final"
     },
     "section": {
@@ -348,6 +349,10 @@
       "initial": {
         "label": "Campo de edad inicial",
         "hint": "Márcalo cuando este campo registre la edad inicial, en días, de la unidad o del lote."
+      },
+      "current": {
+        "label": "Campo de edad actual",
+        "hint": "Márcalo cuando este campo registre la edad actual, en días, de la unidad o del lote."
       },
       "final": {
         "label": "Campo de edad final",

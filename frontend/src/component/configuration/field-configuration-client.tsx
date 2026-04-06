@@ -197,6 +197,7 @@ export function FieldConfigurationClient({
   const initialFieldName = initialSelectedField?.label_name?.trim() ?? "";
   const initialIsInitialAge = initialSelectedField?.is_initial_age ?? false;
   const initialIsFinalAge = initialSelectedField?.is_final_age ?? false;
+  const initialIsCurrentAge = initialSelectedField?.is_current_age ?? false;
 
   const [selectedFieldId, setSelectedFieldId] = useState<number | null>(
     typeof initialSelectedFieldKey === "number" ? initialSelectedFieldKey : null
@@ -206,11 +207,13 @@ export function FieldConfigurationClient({
   const [fieldName, setFieldName] = useState(initialFieldName);
   const [isInitialAge, setIsInitialAge] = useState(initialIsInitialAge);
   const [isFinalAge, setIsFinalAge] = useState(initialIsFinalAge);
+  const [isCurrentAge, setIsCurrentAge] = useState(initialIsCurrentAge);
   const [baseline, setBaseline] = useState({
     sqlType: initialSqlType,
     fieldName: initialFieldName,
     isInitialAge: initialIsInitialAge,
-    isFinalAge: initialIsFinalAge
+    isFinalAge: initialIsFinalAge,
+    isCurrentAge: initialIsCurrentAge
   });
   const [fieldError, setFieldError] = useState<{
     form?: string;
@@ -265,7 +268,7 @@ export function FieldConfigurationClient({
   );
 
   const renderFieldAgeBadges = useCallback((item: TenantScopeFieldRecord) => {
-    if (!item.is_initial_age && !item.is_final_age) {
+    if (!item.is_initial_age && !item.is_final_age && !item.is_current_age) {
       return null;
     }
 
@@ -276,6 +279,9 @@ export function FieldConfigurationClient({
         ) : null}
         {item.is_final_age ? (
           <Badge tone="positive">{t("directory.finalAgeBadge")}</Badge>
+        ) : null}
+        {item.is_current_age ? (
+          <Badge tone="attention">{t("directory.currentAgeBadge")}</Badge>
         ) : null}
       </div>
     );
@@ -350,11 +356,13 @@ export function FieldConfigurationClient({
         setFieldName("");
         setIsInitialAge(false);
         setIsFinalAge(false);
+        setIsCurrentAge(false);
         setBaseline({
           sqlType: "",
           fieldName: "",
           isInitialAge: false,
-          isFinalAge: false
+          isFinalAge: false,
+          isCurrentAge: false
         });
         setFieldError({});
         setRequestErrorMessage(null);
@@ -378,6 +386,7 @@ export function FieldConfigurationClient({
       const nextFieldName = nextSelectedField?.label_name?.trim() ?? "";
       const nextIsInitialAge = nextSelectedField?.is_initial_age ?? false;
       const nextIsFinalAge = nextSelectedField?.is_final_age ?? false;
+      const nextIsCurrentAge = nextSelectedField?.is_current_age ?? false;
 
       setDirectory(nextDirectory);
       setIsCreateMode(nextKey === "new");
@@ -386,11 +395,13 @@ export function FieldConfigurationClient({
       setFieldName(nextFieldName);
       setIsInitialAge(nextIsInitialAge);
       setIsFinalAge(nextIsFinalAge);
+      setIsCurrentAge(nextIsCurrentAge);
       setBaseline({
         sqlType: nextSqlType,
         fieldName: nextFieldName,
         isInitialAge: nextIsInitialAge,
-        isFinalAge: nextIsFinalAge
+        isFinalAge: nextIsFinalAge,
+        isCurrentAge: nextIsCurrentAge
       });
       setFieldError({});
       setRequestErrorMessage(null);
@@ -520,6 +531,7 @@ export function FieldConfigurationClient({
       fieldName.trim() !== baseline.fieldName.trim() ||
       isInitialAge !== baseline.isInitialAge ||
       isFinalAge !== baseline.isFinalAge ||
+      isCurrentAge !== baseline.isCurrentAge ||
       isDeletePending
     );
   }, [
@@ -531,6 +543,7 @@ export function FieldConfigurationClient({
     isDeletePending,
     isFinalAge,
     isInitialAge,
+    isCurrentAge,
     sqlType
   ]);
 
@@ -666,6 +679,7 @@ export function FieldConfigurationClient({
             sql_type: sqlType.trim(),
             is_initial_age: isInitialAge,
             is_final_age: isFinalAge,
+            is_current_age: isCurrentAge,
             label_lang: labelLang,
             label_name: fieldName.trim()
           })
@@ -704,6 +718,7 @@ export function FieldConfigurationClient({
               sql_type: sqlType.trim(),
               is_initial_age: isInitialAge,
               is_final_age: isFinalAge,
+              is_current_age: isCurrentAge,
               label_lang: labelLang,
               label_name: fieldName.trim()
             })
@@ -761,6 +776,7 @@ export function FieldConfigurationClient({
     fieldName,
     isFinalAge,
     isInitialAge,
+    isCurrentAge,
     isCreateMode,
     isDeletePending,
     labelLang,
@@ -1066,6 +1082,28 @@ export function FieldConfigurationClient({
                   <span>{t("ageFlags.initial.label")}</span>
                 </label>
                 <p className="ui-field-hint">{t("ageFlags.initial.hint")}</p>
+              </div>
+
+              <div className="ui-field">
+                <label
+                  className="ui-field-label"
+                  htmlFor="field-is-current-age"
+                  style={{ display: "flex", gap: "0.6rem", alignItems: "center" }}
+                >
+                  <input
+                    id="field-is-current-age"
+                    type="checkbox"
+                    checked={isCurrentAge}
+                    disabled={isDeletePending || !canEditForm}
+                    onChange={(event) => {
+                      setIsCurrentAge(event.target.checked);
+                      setFieldError((previous) => ({ ...previous, ageFlag: undefined }));
+                      setRequestErrorMessage(null);
+                    }}
+                  />
+                  <span>{t("ageFlags.current.label")}</span>
+                </label>
+                <p className="ui-field-hint">{t("ageFlags.current.hint")}</p>
               </div>
 
               <div className="ui-field">

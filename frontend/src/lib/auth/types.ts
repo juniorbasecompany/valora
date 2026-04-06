@@ -162,6 +162,7 @@ export type TenantScopeFieldRecord = {
   sort_order: number;
   is_initial_age: boolean;
   is_final_age: boolean;
+  is_current_age: boolean;
   label_id?: number | null;
   label_name?: string | null;
 };

@@ -276,6 +276,7 @@
       "dragHandleAria": "Drag to reorder",
       "reorderError": "Could not save order. Try again.",
       "initialAgeBadge": "Initial age",
+      "currentAgeBadge": "Current age",
       "finalAgeBadge": "Final age"
     },
     "section": {
@@ -348,6 +349,10 @@
       "initial": {
         "label": "Initial age field",
         "hint": "Enable when this field records the initial age, in days, of the unit or lot."
+      },
+      "current": {
+        "label": "Current age field",
+        "hint": "Enable when this field records the current age, in days, of the unit or lot."
       },
       "final": {
         "label": "Final age field",

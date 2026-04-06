@@ -1953,7 +1953,6 @@ class ScopeResultRecord(BaseModel):
     text_value: str | None
     boolean_value: bool | None
     numeric_value: Decimal | None
-    parent_result_id: int | None
     moment_utc: datetime
 
 
@@ -1967,7 +1966,6 @@ class ScopeResultCreateRequest(BaseModel):
     text_value: str | None = PydanticField(default=None, max_length=65535)
     boolean_value: bool | None = None
     numeric_value: Decimal | None = None
-    parent_result_id: int | None = None
     moment_utc: datetime | None = None
 
 
@@ -1975,7 +1973,6 @@ class ScopeResultPatchRequest(BaseModel):
     text_value: str | None = PydanticField(default=None, max_length=65535)
     boolean_value: bool | None = None
     numeric_value: Decimal | None = None
-    parent_result_id: int | None = None
     moment_utc: datetime | None = None
 
 
@@ -2005,7 +2002,6 @@ def list_scope_event_results(
                 text_value=r.text_value,
                 boolean_value=r.boolean_value,
                 numeric_value=r.numeric_value,
-                parent_result_id=r.parent_result_id,
                 moment_utc=r.moment_utc,
             )
             for r in rows
@@ -2027,10 +2023,6 @@ def create_scope_event_result(
     _require_scope_rules_editor(member)
     _event_in_scope_or_404(session, scope_id=scope_id, event_id=event_id)
     _field_in_scope_or_404(session, scope_id=scope_id, field_id=body.field_id)
-    if body.parent_result_id is not None:
-        _result_in_event_or_404(
-            session, event_id=event_id, result_id=body.parent_result_id
-        )
     moment = body.moment_utc or datetime.now(UTC)
     if moment.tzinfo is not None:
         moment = moment.astimezone(UTC).replace(tzinfo=None)
@@ -2040,7 +2032,6 @@ def create_scope_event_result(
         text_value=_normalize_optional_result_text(body.text_value),
         boolean_value=body.boolean_value,
         numeric_value=body.numeric_value,
-        parent_result_id=body.parent_result_id,
         moment_utc=moment,
     )
     session.add(row)
@@ -2070,17 +2061,6 @@ def patch_scope_event_result(
         row.boolean_value = body.boolean_value
     if "numeric_value" in body.model_fields_set:
         row.numeric_value = body.numeric_value
-    if "parent_result_id" in body.model_fields_set:
-        if body.parent_result_id == row.id:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Result cannot be its own parent",
-            )
-        if body.parent_result_id is not None:
-            _result_in_event_or_404(
-                session, event_id=event_id, result_id=body.parent_result_id
-            )
-        row.parent_result_id = body.parent_result_id
     if body.moment_utc is not None:
         m = body.moment_utc
         if m.tzinfo is not None:

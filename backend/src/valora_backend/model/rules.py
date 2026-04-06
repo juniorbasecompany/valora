@@ -348,15 +348,6 @@ class Result(Base):
         nullable=False,
         comment="Ligação com o evento onde o resultado da fórmula foi aplicado.",
     )
-    parent_result_id: Mapped[int | None] = mapped_column(
-        BIGINT_COMPAT,
-        ForeignKey("result.id", onupdate="CASCADE", ondelete="CASCADE"),
-        nullable=True,
-        comment=(
-            "Ligação com o result anterior. Se o result pai for apagado ou modificado, "
-            "todo os filhos devem ser apagados."
-        ),
-    )
     moment_utc: Mapped[datetime] = mapped_column(
         DateTime(timezone=False),
         nullable=False,

@@ -954,20 +954,6 @@
           "values": []
         },
         {
-          "id": "parent_result_id",
-          "name": "parent_result_id",
-          "comment": "Ligação com o result anterior. Se o result pai for apagado ou modificado, todo os filhos devem ser apagados.",
-          "type": "BIGINT",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": false,
-          "increment": false,
-          "size": "",
-          "values": []
-        },
-        {
           "id": "moment_utc",
           "name": "moment_utc",
           "comment": "Este é o momento em que o cálculo foi efetuado.",
@@ -1569,17 +1555,6 @@
       "cardinality": "one_to_many",
       "updateConstraint": "Cascade",
       "deleteConstraint": "Restrict"
-    },
-    {
-      "id": "result.parent_result_id",
-      "name": "result.parent_result_id",
-      "startTableId": "result",
-      "startFieldId": "id",
-      "endTableId": "result",
-      "endFieldId": "parent_result_id",
-      "cardinality": "one_to_many",
-      "updateConstraint": "Cascade",
-      "deleteConstraint": "Cascade"
     },
     {
       "id": "input.field_id",

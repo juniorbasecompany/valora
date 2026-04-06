@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from decimal import Decimal
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta
 from typing import Any, Annotated, Literal
 
 import requests
@@ -1854,6 +1854,7 @@ class ScopeCurrentAgeCalculationRecord(BaseModel):
     item_id: int
     action_id: int
     event_moment_utc: datetime
+    result_moment_utc: datetime
     text_value: str | None
     boolean_value: bool | None
     numeric_value: Decimal | None
@@ -1872,27 +1873,16 @@ class ScopeCurrentAgeCalculationResponse(BaseModel):
 def _build_current_age_response_from_result_rows(
     *,
     calculated_moment_utc: datetime,
-    result_row_list: list[tuple[Result, Event]],
-    status_by_result_key: dict[
-        tuple[int, int, int], Literal["created", "updated", "unchanged"]
-    ]
-    | None = None,
+    result_row_list: list[
+        tuple[Result, Event, Literal["created", "updated", "unchanged"] | None]
+    ],
 ) -> ScopeCurrentAgeCalculationResponse:
     created_count = 0
     updated_count = 0
     unchanged_count = 0
     item_list: list[ScopeCurrentAgeCalculationRecord] = []
-    for result_row, event_row in result_row_list:
-        result_key = (
-            result_row.event_id,
-            result_row.formula_id,
-            result_row.formula_order,
-        )
-        item_status = (
-            status_by_result_key[result_key]
-            if status_by_result_key is not None
-            else "unchanged"
-        )
+    for result_row, event_row, item_status_or_none in result_row_list:
+        item_status = item_status_or_none or "unchanged"
         if item_status == "created":
             created_count += 1
         elif item_status == "updated":
@@ -1910,6 +1900,7 @@ def _build_current_age_response_from_result_rows(
                 item_id=event_row.item_id,
                 action_id=event_row.action_id,
                 event_moment_utc=event_row.moment_utc,
+                result_moment_utc=result_row.moment_utc,
                 text_value=result_row.text_value,
                 boolean_value=result_row.boolean_value,
                 numeric_value=result_row.numeric_value,
@@ -1940,11 +1931,11 @@ def _list_scope_current_age_results(
             .join(Action, Event.action_id == Action.id)
             .where(
                 Action.scope_id == scope_id,
-                Event.moment_utc >= moment_from_utc,
-                Event.moment_utc <= moment_to_utc,
+                Result.moment_utc >= moment_from_utc,
+                Result.moment_utc <= moment_to_utc,
             )
             .order_by(
-                func.date(Event.moment_utc).asc(),
+                func.date(Result.moment_utc).asc(),
                 Action.sort_order.asc(),
                 Event.moment_utc.asc(),
                 Event.id.asc(),
@@ -1953,15 +1944,9 @@ def _list_scope_current_age_results(
             )
         )
     )
-    if result_row_list:
-        calculated_moment_utc = max(
-            result_row.moment_utc for result_row, _event_row in result_row_list
-        )
-    else:
-        calculated_moment_utc = datetime.now(UTC).replace(tzinfo=None)
     return _build_current_age_response_from_result_rows(
-        calculated_moment_utc=calculated_moment_utc,
-        result_row_list=result_row_list,
+        calculated_moment_utc=datetime.now(UTC).replace(tzinfo=None),
+        result_row_list=[(result_row, event_row, None) for result_row, event_row in result_row_list],
     )
 
 
@@ -2025,6 +2010,168 @@ def _event_execution_sort_key(
     event_id: int,
 ) -> tuple[datetime.date, int, datetime, int]:
     return (moment_utc.date(), action_sort_order, moment_utc, event_id)
+
+
+def _combine_day_with_source_moment(
+    *, execution_day: date, source_moment_utc: datetime
+) -> datetime:
+    return datetime(
+        execution_day.year,
+        execution_day.month,
+        execution_day.day,
+        source_moment_utc.hour,
+        source_moment_utc.minute,
+        source_moment_utc.second,
+        source_moment_utc.microsecond,
+    )
+
+
+def _build_window_meta_by_event_id(
+    *,
+    event_row_list: list[Event],
+    initial_age_by_event_id: dict[int, int],
+    final_age_by_event_id: dict[int, int],
+) -> dict[int, dict[str, int]]:
+    event_row_list_by_group: defaultdict[tuple[int, int], list[Event]] = defaultdict(list)
+    for row in event_row_list:
+        event_row_list_by_group[(row.location_id, row.item_id)].append(row)
+
+    window_meta_by_event_id: dict[int, dict[str, int]] = {}
+    for group_event_row_list in event_row_list_by_group.values():
+        active_initial_index: int | None = None
+        active_initial_event_id: int | None = None
+        active_initial_age: int | None = None
+        active_window: dict[str, int] | None = None
+
+        for index, row in enumerate(group_event_row_list):
+            next_initial_age = initial_age_by_event_id.get(row.id)
+            if next_initial_age is not None:
+                active_initial_index = index
+                active_initial_event_id = row.id
+                active_initial_age = next_initial_age
+                active_window = None
+
+            final_age = final_age_by_event_id.get(row.id)
+            if final_age is not None:
+                if (
+                    active_initial_index is not None
+                    and active_initial_event_id is not None
+                    and active_initial_age is not None
+                ):
+                    active_window = {
+                        "source_initial_event_id": active_initial_event_id,
+                        "source_initial_age": active_initial_age,
+                        "source_final_event_id": row.id,
+                        "source_final_age": final_age,
+                    }
+                    candidate_row_list = group_event_row_list[active_initial_index : index + 1]
+                    active_initial_index = None
+                    active_initial_event_id = None
+                    active_initial_age = None
+                elif active_window is not None:
+                    active_window = {
+                        **active_window,
+                        "source_final_event_id": row.id,
+                        "source_final_age": final_age,
+                    }
+                    candidate_row_list = [row]
+                else:
+                    candidate_row_list = []
+
+                for candidate in candidate_row_list:
+                    previous_assignment = window_meta_by_event_id.get(candidate.id)
+                    if previous_assignment is not None and previous_assignment != active_window:
+                        raise HTTPException(
+                            status_code=status.HTTP_400_BAD_REQUEST,
+                            detail=(
+                                f"Event {candidate.id} belongs to overlapping age windows with different bounds"
+                            ),
+                        )
+                    if active_window is not None:
+                        window_meta_by_event_id[candidate.id] = active_window
+                if active_window is not None:
+                    continue
+
+            if active_window is not None:
+                previous_assignment = window_meta_by_event_id.get(row.id)
+                if previous_assignment is not None and previous_assignment != active_window:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=(
+                            f"Event {row.id} belongs to overlapping age windows with different bounds"
+                        ),
+                    )
+                window_meta_by_event_id[row.id] = active_window
+
+    return window_meta_by_event_id
+
+
+def _build_execution_occurrence_list(
+    *,
+    event_row_list: list[Event],
+    action_by_id: dict[int, Action],
+    window_meta_by_event_id: dict[int, dict[str, int]],
+    moment_to_utc: datetime,
+) -> list[dict[str, Any]]:
+    occurrence_list: list[dict[str, Any]] = []
+    event_row_list_by_group: defaultdict[tuple[int, int], list[Event]] = defaultdict(list)
+    for row in event_row_list:
+        event_row_list_by_group[(row.location_id, row.item_id)].append(row)
+
+    next_same_action_day_by_event_id: dict[int, date | None] = {}
+    for group_event_row_list in event_row_list_by_group.values():
+        next_day_by_action_id: dict[int, date] = {}
+        for row in reversed(group_event_row_list):
+            row_day = row.moment_utc.date()
+            next_same_action_day_by_event_id[row.id] = next_day_by_action_id.get(row.action_id)
+            next_day_by_action_id[row.action_id] = row_day
+
+    period_end_day = moment_to_utc.date()
+    for row in event_row_list:
+        if row.id not in window_meta_by_event_id:
+            continue
+        action_row = action_by_id[row.action_id]
+        occurrence_list.append(
+            {
+                "source_event": row,
+                "execution_moment_utc": row.moment_utc,
+                "action_sort_order": action_row.sort_order,
+                "is_actual_event_day": True,
+            }
+        )
+        if not action_row.is_recurrent:
+            continue
+        next_same_action_day = next_same_action_day_by_event_id.get(row.id)
+        recurrence_last_day = period_end_day
+        if next_same_action_day is not None:
+            recurrence_last_day = min(
+                recurrence_last_day,
+                next_same_action_day - timedelta(days=1),
+            )
+        next_execution_day = row.moment_utc.date() + timedelta(days=1)
+        while next_execution_day <= recurrence_last_day:
+            occurrence_list.append(
+                {
+                    "source_event": row,
+                    "execution_moment_utc": _combine_day_with_source_moment(
+                        execution_day=next_execution_day,
+                        source_moment_utc=row.moment_utc,
+                    ),
+                    "action_sort_order": action_row.sort_order,
+                    "is_actual_event_day": False,
+                }
+            )
+            next_execution_day += timedelta(days=1)
+
+    occurrence_list.sort(
+        key=lambda item: (
+            item["execution_moment_utc"].date(),
+            item["action_sort_order"],
+            item["execution_moment_utc"],
+            item["source_event"].id,
+        )
+    )
+    return occurrence_list
 
 
 @router.get(
@@ -2320,7 +2467,6 @@ def calculate_scope_current_age(
                 .join(Action, Event.action_id == Action.id)
                 .where(
                     Action.scope_id == scope_id,
-                    Event.moment_utc >= moment_from_utc,
                     Event.moment_utc <= moment_to_utc,
                 )
             )
@@ -2343,7 +2489,6 @@ def calculate_scope_current_age(
         )
 
     event_id_list = [row.id for row in event_row_list]
-    group_key_set = {(row.location_id, row.item_id) for row in event_row_list}
     formula_row_list = list(
         session.scalars(
             select(Formula)
@@ -2420,6 +2565,7 @@ def calculate_scope_current_age(
         .where(Result.event_id.in_(event_id_list))
         .order_by(
             Result.event_id.asc(),
+            Result.moment_utc.asc(),
             Result.formula_order.asc(),
             Result.id.asc(),
         )
@@ -2450,77 +2596,11 @@ def calculate_scope_current_age(
                 )
             continue
 
-    event_row_list_by_group: defaultdict[tuple[int, int], list[Event]] = defaultdict(list)
-    for row in event_row_list:
-        event_row_list_by_group[(row.location_id, row.item_id)].append(row)
-
-    window_meta_by_event_id: dict[int, dict[str, int]] = {}
-
-    for group_event_row_list in event_row_list_by_group.values():
-        active_initial_index: int | None = None
-        active_initial_event_id: int | None = None
-        active_initial_age: int | None = None
-        active_window: dict[str, int] | None = None
-
-        for index, row in enumerate(group_event_row_list):
-            next_initial_age = initial_age_by_event_id.get(row.id)
-            if next_initial_age is not None:
-                active_initial_index = index
-                active_initial_event_id = row.id
-                active_initial_age = next_initial_age
-                active_window = None
-
-            final_age = final_age_by_event_id.get(row.id)
-            if final_age is not None:
-                if (
-                    active_initial_index is not None
-                    and active_initial_event_id is not None
-                    and active_initial_age is not None
-                ):
-                    active_window = {
-                        "source_initial_event_id": active_initial_event_id,
-                        "source_initial_age": active_initial_age,
-                        "source_final_event_id": row.id,
-                        "source_final_age": final_age,
-                    }
-                    candidate_row_list = group_event_row_list[active_initial_index : index + 1]
-                    active_initial_index = None
-                    active_initial_event_id = None
-                    active_initial_age = None
-                elif active_window is not None:
-                    active_window = {
-                        **active_window,
-                        "source_final_event_id": row.id,
-                        "source_final_age": final_age,
-                    }
-                    candidate_row_list = [row]
-                else:
-                    candidate_row_list = []
-
-                for candidate in candidate_row_list:
-                    previous_assignment = window_meta_by_event_id.get(candidate.id)
-                    if previous_assignment is not None and previous_assignment != active_window:
-                        raise HTTPException(
-                            status_code=status.HTTP_400_BAD_REQUEST,
-                            detail=(
-                                f"Event {candidate.id} belongs to overlapping age windows with different bounds"
-                            ),
-                        )
-                    if active_window is not None:
-                        window_meta_by_event_id[candidate.id] = active_window
-                if active_window is not None:
-                    continue
-
-            if active_window is not None:
-                previous_assignment = window_meta_by_event_id.get(row.id)
-                if previous_assignment is not None and previous_assignment != active_window:
-                    raise HTTPException(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        detail=(
-                            f"Event {row.id} belongs to overlapping age windows with different bounds"
-                        ),
-                    )
-                window_meta_by_event_id[row.id] = active_window
+    window_meta_by_event_id = _build_window_meta_by_event_id(
+        event_row_list=event_row_list,
+        initial_age_by_event_id=initial_age_by_event_id,
+        final_age_by_event_id=final_age_by_event_id,
+    )
 
     if not window_meta_by_event_id:
         return ScopeCurrentAgeCalculationResponse(
@@ -2532,79 +2612,63 @@ def calculate_scope_current_age(
             item_list=[],
         )
 
-    session.execute(delete(Result).where(Result.event_id.in_(event_id_list)))
-    existing_result_by_key = {}
+    _apply_member_audit_context(session, member)
+    deleted_result = session.execute(
+        delete(Result).where(
+            Result.moment_utc >= moment_from_utc,
+            Result.moment_utc <= moment_to_utc,
+            Result.event_id.in_(event_id_list),
+        )
+    )
+    deleted_result_count = deleted_result.rowcount or 0
+
+    occurrence_list = _build_execution_occurrence_list(
+        event_row_list=event_row_list,
+        action_by_id=action_by_id,
+        window_meta_by_event_id=window_meta_by_event_id,
+        moment_to_utc=moment_to_utc,
+    )
 
     state_by_group: defaultdict[
         tuple[int, int], dict[int, str | bool | int | float]
     ] = defaultdict(dict)
-    historical_result_row_list = list(
-        session.execute(
-            select(Result, Event)
-            .join(Event, Result.event_id == Event.id)
-            .join(Action, Event.action_id == Action.id)
-            .where(
-                Action.scope_id == scope_id,
-                Event.moment_utc < moment_from_utc,
-            )
-        )
-    )
-    historical_result_row_list.sort(
-        key=lambda pair: (
-            *_event_execution_sort_key(
-                moment_utc=pair[1].moment_utc,
-                action_sort_order=action_by_id[pair[1].action_id].sort_order,
-                event_id=pair[1].id,
-            ),
-            pair[0].formula_order,
-            pair[0].id,
-        )
-    )
-    for result_row, source_event in historical_result_row_list:
-        group_key = (source_event.location_id, source_event.item_id)
-        if group_key not in group_key_set:
-            continue
-        source_field = field_by_id.get(result_row.field_id)
-        if source_field is None:
-            continue
-        runtime_value = _extract_result_runtime_value_or_none(
-            result_row,
-            source_field,
-            event_id=source_event.id,
-        )
-        if runtime_value is not None:
-            state_by_group[group_key][source_field.id] = runtime_value
-
+    current_window_by_group: dict[tuple[int, int], dict[str, int]] = {}
+    closed_window_by_group: dict[tuple[int, int], dict[str, int]] = {}
     created_count = 0
     updated_count = 0
     unchanged_count = 0
-    executed_result_key_list: list[tuple[int, int, int]] = []
-    status_by_result_key: dict[
-        tuple[int, int, int], Literal["created", "updated", "unchanged"]
-    ] = {}
-    closed_window_final_event_id_by_group: dict[tuple[int, int], int] = {}
+    result_row_list: list[
+        tuple[Result, Event, Literal["created", "updated", "unchanged"] | None]
+    ] = []
 
-    for row in event_row_list:
+    for occurrence in occurrence_list:
+        row = occurrence["source_event"]
+        execution_moment_utc = occurrence["execution_moment_utc"]
         window_meta = window_meta_by_event_id.get(row.id)
         if window_meta is None:
             continue
 
         group_key = (row.location_id, row.item_id)
-        closed_window_final_event_id = closed_window_final_event_id_by_group.get(group_key)
-        if closed_window_final_event_id is not None:
-            if closed_window_final_event_id == window_meta["source_final_event_id"]:
-                continue
-            closed_window_final_event_id_by_group.pop(group_key, None)
+        if occurrence["is_actual_event_day"]:
+            closed_window = closed_window_by_group.get(group_key)
+            if closed_window is not None and closed_window != window_meta:
+                closed_window_by_group.pop(group_key, None)
+            if group_key not in closed_window_by_group:
+                current_window_by_group[group_key] = window_meta
+
+        active_window = current_window_by_group.get(group_key)
+        if active_window is None:
+            continue
+        if closed_window_by_group.get(group_key) == active_window:
+            continue
 
         group_state = state_by_group[group_key]
-        for field_id, runtime_value in age_source_runtime_by_event_id.get(
-            row.id, {}
-        ).items():
+        for field_id, runtime_value in age_source_runtime_by_event_id.get(row.id, {}).items():
             group_state[field_id] = runtime_value
 
-        if row.id == window_meta["source_initial_event_id"]:
-            group_state[initial_field.id] = window_meta["source_initial_age"]
-            group_state[current_field.id] = window_meta["source_initial_age"]
+        if occurrence["is_actual_event_day"] and row.id == active_window["source_initial_event_id"]:
+            group_state[initial_field.id] = active_window["source_initial_age"]
+            group_state[current_field.id] = active_window["source_initial_age"]
 
         formula_list = formula_row_list_by_action.get(row.action_id, [])
         event_input_runtime = input_runtime_by_event_id.get(row.id, {})
@@ -2654,9 +2718,7 @@ def calculate_scope_current_age(
             )
             group_state[target_field.id] = typed_payload["runtime_value"]
 
-            result_key = (row.id, formula_row.id, formula_row.sort_order)
-            current_result = existing_result_by_key.get(result_key)
-            if current_result is None:
+            if moment_from_utc <= execution_moment_utc <= moment_to_utc:
                 current_result = Result(
                     event_id=row.id,
                     field_id=target_field.id,
@@ -2665,37 +2727,11 @@ def calculate_scope_current_age(
                     text_value=typed_payload["text_value"],
                     boolean_value=typed_payload["boolean_value"],
                     numeric_value=typed_payload["numeric_value"],
-                    moment_utc=calculated_moment_utc,
+                    moment_utc=execution_moment_utc,
                 )
                 session.add(current_result)
-                existing_result_by_key[result_key] = current_result
-                status_by_result_key[result_key] = "created"
+                result_row_list.append((current_result, row, "created"))
                 created_count += 1
-            else:
-                should_update = (
-                    current_result.field_id != target_field.id
-                    or current_result.formula_id != formula_row.id
-                    or current_result.formula_order != formula_row.sort_order
-                    or current_result.text_value != typed_payload["text_value"]
-                    or current_result.boolean_value != typed_payload["boolean_value"]
-                    or current_result.numeric_value != typed_payload["numeric_value"]
-                )
-                if should_update:
-                    current_result.field_id = target_field.id
-                    current_result.formula_id = formula_row.id
-                    current_result.formula_order = formula_row.sort_order
-                    current_result.text_value = typed_payload["text_value"]
-                    current_result.boolean_value = typed_payload["boolean_value"]
-                    current_result.numeric_value = typed_payload["numeric_value"]
-                    current_result.moment_utc = calculated_moment_utc
-                    session.add(current_result)
-                    status_by_result_key[result_key] = "updated"
-                    updated_count += 1
-                else:
-                    status_by_result_key[result_key] = "unchanged"
-                    unchanged_count += 1
-
-            executed_result_key_list.append(result_key)
 
         current_age_state = group_state.get(current_field.id)
         if current_age_state is not None:
@@ -2703,20 +2739,19 @@ def calculate_scope_current_age(
                 current_age_state,
                 detail=f"Event {row.id} produced a non-integer current age",
             )
-            if normalized_current_age > window_meta["source_final_age"]:
+            if normalized_current_age > active_window["source_final_age"]:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=(
                         f"Event {row.id} produced current age {normalized_current_age}, "
-                        f"which exceeds final age {window_meta['source_final_age']}"
+                        f"which exceeds final age {active_window['source_final_age']}"
                     ),
                 )
-            if normalized_current_age >= window_meta["source_final_age"]:
-                closed_window_final_event_id_by_group[group_key] = window_meta[
-                    "source_final_event_id"
-                ]
+            if normalized_current_age >= active_window["source_final_age"]:
+                closed_window_by_group[group_key] = active_window
+                current_window_by_group.pop(group_key, None)
 
-    if not executed_result_key_list:
+    if not result_row_list and deleted_result_count == 0:
         return ScopeCurrentAgeCalculationResponse(
             can_edit=True,
             calculated_moment_utc=calculated_moment_utc,
@@ -2726,21 +2761,13 @@ def calculate_scope_current_age(
             item_list=[],
         )
 
-    if created_count > 0 or updated_count > 0:
+    if created_count > 0 or deleted_result_count > 0:
         _apply_member_audit_context(session, member)
         commit_session_with_null_if_empty(session)
-
-    event_row_by_id = {row.id: row for row in event_row_list}
-    result_row_list: list[tuple[Result, Event]] = []
-    for result_key in executed_result_key_list:
-        current_result = existing_result_by_key[result_key]
-        event_row = event_row_by_id[current_result.event_id]
-        result_row_list.append((current_result, event_row))
 
     return _build_current_age_response_from_result_rows(
         calculated_moment_utc=calculated_moment_utc,
         result_row_list=result_row_list,
-        status_by_result_key=status_by_result_key,
     )
 
 

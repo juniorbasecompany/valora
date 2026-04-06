@@ -216,6 +216,7 @@ export type ScopeCurrentAgeCalculationRecord = {
   item_id: number;
   action_id: number;
   event_moment_utc: string;
+  result_moment_utc: string;
   text_value?: string | null;
   boolean_value?: boolean | null;
   numeric_value?: number | string | null;

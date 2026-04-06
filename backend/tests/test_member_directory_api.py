@@ -3140,6 +3140,452 @@ def test_calculate_scope_current_age_opens_window_from_age_inputs_and_keeps_futu
         ]
 
 
+def test_calculate_scope_current_age_repeats_recurrent_event_on_following_days() -> None:
+    with build_rules_session() as (session, tenant_id):
+        scope = Scope(
+            name="Aves",
+            display_name="Aves para producao de ovos",
+            tenant_id=tenant_id,
+        )
+        session.add(scope)
+        session.flush()
+
+        location = Location(
+            name="Granja A",
+            display_name="Granja A",
+            scope_id=scope.id,
+            parent_location_id=None,
+            sort_order=0,
+        )
+        kind = Kind(scope_id=scope.id, name="lote", display_name="Lote")
+        anchor_action = Action(scope_id=scope.id, sort_order=0)
+        recurrent_age_action = Action(scope_id=scope.id, sort_order=1, is_recurrent=True)
+        initial_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=0,
+            is_initial_age=True,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        current_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=1,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=True,
+        )
+        final_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=2,
+            is_initial_age=False,
+            is_final_age=True,
+            is_current_age=False,
+        )
+        session.add_all(
+            [
+                location,
+                kind,
+                anchor_action,
+                recurrent_age_action,
+                initial_field,
+                current_field,
+                final_field,
+            ]
+        )
+        session.flush()
+
+        anchor_initial_formula = Formula(
+            action_id=anchor_action.id,
+            sort_order=0,
+            statement=f"${{field:{initial_field.id}}} = ${{input:{initial_field.id}}}",
+        )
+        anchor_current_formula = Formula(
+            action_id=anchor_action.id,
+            sort_order=1,
+            statement=f"${{field:{current_field.id}}} = ${{field:{initial_field.id}}}",
+        )
+        anchor_final_formula = Formula(
+            action_id=anchor_action.id,
+            sort_order=2,
+            statement=f"${{field:{final_field.id}}} = ${{input:{final_field.id}}}",
+        )
+        recurrent_increment_formula = Formula(
+            action_id=recurrent_age_action.id,
+            sort_order=0,
+            statement=f"${{field:{current_field.id}}} = ${{field:{current_field.id}}} + 1",
+        )
+        session.add_all(
+            [
+                anchor_initial_formula,
+                anchor_current_formula,
+                anchor_final_formula,
+                recurrent_increment_formula,
+            ]
+        )
+        session.flush()
+
+        item = Item(
+            scope_id=scope.id,
+            kind_id=kind.id,
+            parent_item_id=None,
+            sort_order=0,
+        )
+        session.add(item)
+        session.flush()
+
+        alojamento_event = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=anchor_action.id,
+            moment_utc=datetime(2026, 4, 4, 8, 0, 0),
+        )
+        idade_event = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=recurrent_age_action.id,
+            moment_utc=datetime(2026, 4, 4, 9, 0, 0),
+        )
+        session.add_all([alojamento_event, idade_event])
+        session.flush()
+
+        session.add_all(
+            [
+                Input(event_id=alojamento_event.id, field_id=initial_field.id, value="10"),
+                Input(event_id=alojamento_event.id, field_id=final_field.id, value="12"),
+            ]
+        )
+        session.commit()
+
+        response = calculate_scope_current_age(
+            scope_id=scope.id,
+            body=ScopeCurrentAgeCalculationRequest(
+                moment_from_utc="2026-04-04T00:00:00Z",
+                moment_to_utc="2026-04-10T23:59:00Z",
+            ),
+            member=SimpleNamespace(role=2, tenant_id=tenant_id, account_id=1),
+            session=session,
+        )
+
+        assert [
+            (
+                row.event_id,
+                row.formula_id,
+                int(row.numeric_value) if row.numeric_value is not None else None,
+                row.result_moment_utc.date().isoformat(),
+            )
+            for row in response.item_list
+        ] == [
+            (alojamento_event.id, anchor_initial_formula.id, 10, "2026-04-04"),
+            (alojamento_event.id, anchor_current_formula.id, 10, "2026-04-04"),
+            (alojamento_event.id, anchor_final_formula.id, 12, "2026-04-04"),
+            (idade_event.id, recurrent_increment_formula.id, 11, "2026-04-04"),
+            (idade_event.id, recurrent_increment_formula.id, 12, "2026-04-05"),
+        ]
+
+
+def test_calculate_scope_current_age_uses_later_final_age_input_to_close_window() -> None:
+    with build_rules_session() as (session, tenant_id):
+        scope = Scope(
+            name="Aves",
+            display_name="Aves para producao de ovos",
+            tenant_id=tenant_id,
+        )
+        session.add(scope)
+        session.flush()
+
+        location = Location(
+            name="Granja A",
+            display_name="Granja A",
+            scope_id=scope.id,
+            parent_location_id=None,
+            sort_order=0,
+        )
+        kind = Kind(scope_id=scope.id, name="lote", display_name="Lote")
+        anchor_action = Action(scope_id=scope.id, sort_order=0)
+        final_update_action = Action(scope_id=scope.id, sort_order=1, is_recurrent=False)
+        recurrent_age_action = Action(scope_id=scope.id, sort_order=2, is_recurrent=True)
+        initial_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=0,
+            is_initial_age=True,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        current_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=1,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=True,
+        )
+        final_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=2,
+            is_initial_age=False,
+            is_final_age=True,
+            is_current_age=False,
+        )
+        session.add_all(
+            [
+                location,
+                kind,
+                anchor_action,
+                final_update_action,
+                recurrent_age_action,
+                initial_field,
+                current_field,
+                final_field,
+            ]
+        )
+        session.flush()
+
+        anchor_initial_formula = Formula(
+            action_id=anchor_action.id,
+            sort_order=0,
+            statement=f"${{field:{initial_field.id}}} = ${{input:{initial_field.id}}}",
+        )
+        anchor_current_formula = Formula(
+            action_id=anchor_action.id,
+            sort_order=1,
+            statement=f"${{field:{current_field.id}}} = ${{field:{initial_field.id}}}",
+        )
+        anchor_final_formula = Formula(
+            action_id=anchor_action.id,
+            sort_order=2,
+            statement=f"${{field:{final_field.id}}} = ${{input:{final_field.id}}}",
+        )
+        recurrent_increment_formula = Formula(
+            action_id=recurrent_age_action.id,
+            sort_order=0,
+            statement=f"${{field:{current_field.id}}} = ${{field:{current_field.id}}} + 1",
+        )
+        session.add_all(
+            [
+                anchor_initial_formula,
+                anchor_current_formula,
+                anchor_final_formula,
+                recurrent_increment_formula,
+            ]
+        )
+        session.flush()
+
+        item = Item(
+            scope_id=scope.id,
+            kind_id=kind.id,
+            parent_item_id=None,
+            sort_order=0,
+        )
+        session.add(item)
+        session.flush()
+
+        alojamento_event = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=anchor_action.id,
+            moment_utc=datetime(2026, 4, 4, 8, 0, 0),
+        )
+        final_update_event = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=final_update_action.id,
+            moment_utc=datetime(2026, 4, 4, 10, 0, 0),
+        )
+        idade_event = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=recurrent_age_action.id,
+            moment_utc=datetime(2026, 4, 6, 9, 0, 0),
+        )
+        session.add_all([alojamento_event, final_update_event, idade_event])
+        session.flush()
+
+        session.add_all(
+            [
+                Input(event_id=alojamento_event.id, field_id=initial_field.id, value="10"),
+                Input(event_id=alojamento_event.id, field_id=final_field.id, value="20"),
+                Input(event_id=final_update_event.id, field_id=final_field.id, value="12"),
+            ]
+        )
+        session.commit()
+
+        response = calculate_scope_current_age(
+            scope_id=scope.id,
+            body=ScopeCurrentAgeCalculationRequest(
+                moment_from_utc="2026-04-04T00:00:00Z",
+                moment_to_utc="2026-04-10T23:59:00Z",
+            ),
+            member=SimpleNamespace(role=2, tenant_id=tenant_id, account_id=1),
+            session=session,
+        )
+
+        assert [
+            (
+                row.event_id,
+                row.formula_id,
+                int(row.numeric_value) if row.numeric_value is not None else None,
+                row.result_moment_utc.date().isoformat(),
+            )
+            for row in response.item_list
+        ] == [
+            (alojamento_event.id, anchor_initial_formula.id, 10, "2026-04-04"),
+            (alojamento_event.id, anchor_current_formula.id, 10, "2026-04-04"),
+            (alojamento_event.id, anchor_final_formula.id, 20, "2026-04-04"),
+            (idade_event.id, recurrent_increment_formula.id, 11, "2026-04-06"),
+            (idade_event.id, recurrent_increment_formula.id, 12, "2026-04-07"),
+        ]
+
+
+def test_calculate_scope_current_age_does_not_repeat_non_recurrent_event_on_following_days() -> None:
+    with build_rules_session() as (session, tenant_id):
+        scope = Scope(
+            name="Aves",
+            display_name="Aves para producao de ovos",
+            tenant_id=tenant_id,
+        )
+        session.add(scope)
+        session.flush()
+
+        location = Location(
+            name="Granja A",
+            display_name="Granja A",
+            scope_id=scope.id,
+            parent_location_id=None,
+            sort_order=0,
+        )
+        kind = Kind(scope_id=scope.id, name="lote", display_name="Lote")
+        anchor_action = Action(scope_id=scope.id, sort_order=0)
+        single_age_action = Action(scope_id=scope.id, sort_order=1, is_recurrent=False)
+        initial_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=0,
+            is_initial_age=True,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        current_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=1,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=True,
+        )
+        final_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=2,
+            is_initial_age=False,
+            is_final_age=True,
+            is_current_age=False,
+        )
+        session.add_all(
+            [
+                location,
+                kind,
+                anchor_action,
+                single_age_action,
+                initial_field,
+                current_field,
+                final_field,
+            ]
+        )
+        session.flush()
+
+        anchor_initial_formula = Formula(
+            action_id=anchor_action.id,
+            sort_order=0,
+            statement=f"${{field:{initial_field.id}}} = ${{input:{initial_field.id}}}",
+        )
+        anchor_current_formula = Formula(
+            action_id=anchor_action.id,
+            sort_order=1,
+            statement=f"${{field:{current_field.id}}} = ${{field:{initial_field.id}}}",
+        )
+        anchor_final_formula = Formula(
+            action_id=anchor_action.id,
+            sort_order=2,
+            statement=f"${{field:{final_field.id}}} = ${{input:{final_field.id}}}",
+        )
+        single_increment_formula = Formula(
+            action_id=single_age_action.id,
+            sort_order=0,
+            statement=f"${{field:{current_field.id}}} = ${{field:{current_field.id}}} + 1",
+        )
+        session.add_all(
+            [
+                anchor_initial_formula,
+                anchor_current_formula,
+                anchor_final_formula,
+                single_increment_formula,
+            ]
+        )
+        session.flush()
+
+        item = Item(
+            scope_id=scope.id,
+            kind_id=kind.id,
+            parent_item_id=None,
+            sort_order=0,
+        )
+        session.add(item)
+        session.flush()
+
+        alojamento_event = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=anchor_action.id,
+            moment_utc=datetime(2026, 4, 4, 8, 0, 0),
+        )
+        idade_event = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=single_age_action.id,
+            moment_utc=datetime(2026, 4, 4, 9, 0, 0),
+        )
+        session.add_all([alojamento_event, idade_event])
+        session.flush()
+
+        session.add_all(
+            [
+                Input(event_id=alojamento_event.id, field_id=initial_field.id, value="10"),
+                Input(event_id=alojamento_event.id, field_id=final_field.id, value="20"),
+            ]
+        )
+        session.commit()
+
+        response = calculate_scope_current_age(
+            scope_id=scope.id,
+            body=ScopeCurrentAgeCalculationRequest(
+                moment_from_utc="2026-04-04T00:00:00Z",
+                moment_to_utc="2026-04-10T23:59:00Z",
+            ),
+            member=SimpleNamespace(role=2, tenant_id=tenant_id, account_id=1),
+            session=session,
+        )
+
+        assert [
+            (
+                row.event_id,
+                row.formula_id,
+                int(row.numeric_value) if row.numeric_value is not None else None,
+                row.result_moment_utc.date().isoformat(),
+            )
+            for row in response.item_list
+        ] == [
+            (alojamento_event.id, anchor_initial_formula.id, 10, "2026-04-04"),
+            (alojamento_event.id, anchor_current_formula.id, 10, "2026-04-04"),
+            (alojamento_event.id, anchor_final_formula.id, 20, "2026-04-04"),
+            (idade_event.id, single_increment_formula.id, 11, "2026-04-04"),
+        ]
+
+
 def test_calculate_scope_current_age_does_not_mix_different_location_item_groups() -> None:
     with build_rules_session() as (session, tenant_id):
         scope = Scope(

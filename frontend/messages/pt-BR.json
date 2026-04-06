@@ -563,7 +563,7 @@
     },
     "result": {
       "title": "Resultados do período",
-      "description": "Cada linha abaixo representa um result persistido pela execução das fórmulas no período selecionado, com o campo de saída e a ordem da fórmula que gerou o valor.",
+      "description": "Cada linha abaixo representa um dia materializado do período selecionado, consolidando horizontalmente os campos calculados para o local e item.",
       "placeholder": "Selecione as datas e execute o cálculo para ver os resultados deste período.",
       "empty": "Nenhum evento elegível produziu resultados neste período.",
       "createdLabel": "Criados",

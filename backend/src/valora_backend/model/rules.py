@@ -378,7 +378,10 @@ class Result(Base):
     moment_utc: Mapped[datetime] = mapped_column(
         DateTime(timezone=False),
         nullable=False,
-        comment="Este é o momento em que o cálculo foi efetuado.",
+        comment=(
+            "Este é o dia materializado do resultado. Para ações recorrentes, o mesmo evento "
+            "pode gerar resultados em vários dias diferentes."
+        ),
     )
     field_id: Mapped[int] = mapped_column(
         BIGINT_COMPAT,

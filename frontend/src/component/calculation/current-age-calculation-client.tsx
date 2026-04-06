@@ -94,6 +94,18 @@ function formatMomentCompact(value: string) {
   }).format(parsed);
 }
 
+function formatDayCompact(value: string) {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+  return new Intl.DateTimeFormat(undefined, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  }).format(parsed);
+}
+
 function formatPersistedValue(
   item: ScopeCurrentAgeCalculationRecord,
   emptyValueLabel: string
@@ -109,6 +121,16 @@ function formatPersistedValue(
   }
   return emptyValueLabel;
 }
+
+type DailyResultGroup = {
+  dayKey: string;
+  dayLabel: string;
+  locationId: number;
+  itemId: number;
+  calculatedAt: string;
+  status: "created" | "updated" | "unchanged";
+  itemList: ScopeCurrentAgeCalculationRecord[];
+};
 
 function SummaryCard({
   label,
@@ -198,9 +220,53 @@ export function CurrentAgeCalculationClient({
     return map;
   }, [initialFieldDirectory?.item_list]);
 
+  const fieldSortOrderById = useMemo(() => {
+    const map = new Map<number, number>();
+    for (const [index, item] of (initialFieldDirectory?.item_list ?? []).entries()) {
+      map.set(item.id, index);
+    }
+    return map;
+  }, [initialFieldDirectory?.item_list]);
+
   const currentFieldLabel = currentField?.label_name?.trim() || (
     currentField ? `#${currentField.id}` : copy.missingLabel
   );
+
+  const dailyResultList = useMemo<DailyResultGroup[]>(() => {
+    if (!result) {
+      return [];
+    }
+    const groupMap = new Map<string, DailyResultGroup>();
+    for (const item of result.item_list) {
+      const dayKey = item.result_moment_utc.slice(0, 10);
+      const groupKey = `${dayKey}:${item.location_id}:${item.item_id}`;
+      const currentGroup = groupMap.get(groupKey);
+      const nextStatus = currentGroup?.status === "created" || item.status === "created"
+        ? "created"
+        : currentGroup?.status === "updated" || item.status === "updated"
+          ? "updated"
+          : "unchanged";
+      if (currentGroup) {
+        currentGroup.itemList.push(item);
+        currentGroup.status = nextStatus;
+        continue;
+      }
+      groupMap.set(groupKey, {
+        dayKey,
+        dayLabel: formatDayCompact(item.result_moment_utc),
+        locationId: item.location_id,
+        itemId: item.item_id,
+        calculatedAt: result.calculated_moment_utc,
+        status: nextStatus,
+        itemList: [item]
+      });
+    }
+    return Array.from(groupMap.values()).sort((left, right) => (
+      left.dayKey.localeCompare(right.dayKey)
+      || left.locationId - right.locationId
+      || left.itemId - right.itemId
+    ));
+  }, [result]);
 
   const asideEmptyMessage = !currentScope
     ? hasAnyScope
@@ -440,53 +506,68 @@ export function CurrentAgeCalculationClient({
               <div className="ui-panel ui-empty-panel">{copy.resultEmpty}</div>
             ) : (
               <div className="ui-grid-list-md">
-                {result.item_list.map((item) => (
-                  <article key={item.result_id} className="ui-panel ui-panel-body-compact">
+                {dailyResultList.map((group) => (
+                  <article
+                    key={`${group.dayKey}-${group.locationId}-${group.itemId}`}
+                    className="ui-panel ui-panel-body-compact"
+                  >
                     <div className="ui-stack-md">
                       <div className="ui-row-between">
                         <div className="ui-section-copy">
-                          <h3 className="ui-header-title ui-title-section">
-                            {formatPersistedValue(item, copy.emptyValue)}
-                          </h3>
-                          <p className="ui-copy-body">{formatMomentCompact(item.event_moment_utc)}</p>
+                          <h3 className="ui-header-title ui-title-section">{group.dayLabel}</h3>
+                          <p className="ui-copy-body">
+                            {copy.locationLabel}: {locationLabelById.get(group.locationId) ?? copy.fallbackLocation}
+                            {UI_TEXT_SEPARATOR}
+                            {copy.itemLabel}: {itemLabelById.get(group.itemId) ?? copy.fallbackItem}
+                          </p>
+                          <p className="ui-text-caption-wrap">
+                            {copy.actionLabel}: {Array.from(new Set(
+                              group.itemList.map((item) => (
+                                actionLabelById.get(item.action_id) ?? copy.fallbackAction
+                              ))
+                            )).join(UI_TEXT_SEPARATOR)}
+                          </p>
                         </div>
                         <Badge
                           tone={
-                            item.status === "created"
+                            group.status === "created"
                               ? "positive"
-                              : item.status === "updated"
+                              : group.status === "updated"
                                 ? "attention"
                                 : "neutral"
                           }
                         >
-                          {item.status === "created"
+                          {group.status === "created"
                             ? copy.statusCreated
-                            : item.status === "updated"
+                            : group.status === "updated"
                               ? copy.statusUpdated
                               : copy.statusUnchanged}
                         </Badge>
                       </div>
 
                       <div className="ui-badge-row">
-                        <Badge tone="neutral">
-                          {copy.fieldLabel}: {fieldLabelById.get(item.field_id) ?? `#${item.field_id}`}
-                        </Badge>
-                        <Badge tone="neutral">
-                          {copy.locationLabel}: {locationLabelById.get(item.location_id) ?? copy.fallbackLocation}
-                        </Badge>
-                        <Badge tone="neutral">
-                          {copy.itemLabel}: {itemLabelById.get(item.item_id) ?? copy.fallbackItem}
-                        </Badge>
-                        <Badge tone="neutral">
-                          {copy.actionLabel}: {actionLabelById.get(item.action_id) ?? copy.fallbackAction}
-                        </Badge>
+                        {Array.from((() => {
+                          const latestItemByFieldId = new Map<number, ScopeCurrentAgeCalculationRecord>();
+                          for (const item of group.itemList) {
+                            latestItemByFieldId.set(item.field_id, item);
+                          }
+                          return latestItemByFieldId.values();
+                        })())
+                          .sort((left, right) => (
+                            (fieldSortOrderById.get(left.field_id) ?? Number.MAX_SAFE_INTEGER)
+                            - (fieldSortOrderById.get(right.field_id) ?? Number.MAX_SAFE_INTEGER)
+                            || left.field_id - right.field_id
+                          ))
+                          .map((item) => (
+                            <Badge key={item.result_id} tone="neutral">
+                              {fieldLabelById.get(item.field_id) ?? `#${item.field_id}`}:{" "}
+                              {formatPersistedValue(item, copy.emptyValue)}
+                            </Badge>
+                          ))}
                       </div>
 
                       <p className="ui-text-caption-wrap">
-                        {copy.formulaLabel}: #{item.formula_id} {UI_TEXT_SEPARATOR} {copy.formulaOrderLabel}: {item.formula_order}
-                      </p>
-                      <p className="ui-text-caption-wrap">
-                        {copy.calculatedAtLabel}: {formatMomentCompact(result.calculated_moment_utc)}
+                        {copy.calculatedAtLabel}: {formatMomentCompact(group.calculatedAt)}
                       </p>
                     </div>
                   </article>

@@ -613,7 +613,7 @@
     },
     "result": {
       "title": "Results in the period",
-      "description": "Each line below represents a persisted result produced by formula execution in the selected period, including the output field and the formula order that generated the value.",
+      "description": "Each line below represents one materialized day in the selected period, consolidating the calculated fields horizontally for the location and item.",
       "placeholder": "Select the dates and run the calculation to see the results for this period.",
       "empty": "No eligible event produced results in this period.",
       "createdLabel": "Created",

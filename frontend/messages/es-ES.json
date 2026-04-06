@@ -274,7 +274,9 @@
     },
     "directory": {
       "dragHandleAria": "Arrastrar para reordenar",
-      "reorderError": "No se pudo guardar el orden. Inténtalo de nuevo."
+      "reorderError": "No se pudo guardar el orden. Inténtalo de nuevo.",
+      "initialAgeBadge": "Edad inicial",
+      "finalAgeBadge": "Edad final"
     },
     "section": {
       "fieldName": {
@@ -329,7 +331,9 @@
       "scaleHint": "Indica cuántas cifras, después del separador decimal, debe tener el número. Indica de 0 a 10 decimales.",
       "legacyHelp": "Este registro usa un tipo fuera de la lista. Elige un tipo estándar para reemplazarlo al guardar o mantén esta opción.",
       "caption": {
-        "number": "Número ({scale} dec.)",
+        "integer": "Número entero",
+        "numberSingular": "Número con {scale} decimal",
+        "numberPlural": "Número con {scale} decimales",
         "text": "Texto",
         "boolean": "Sí o no",
         "timestamp": "Fecha",

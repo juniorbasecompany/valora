@@ -274,7 +274,9 @@
     },
     "directory": {
       "dragHandleAria": "Drag to reorder",
-      "reorderError": "Could not save order. Try again."
+      "reorderError": "Could not save order. Try again.",
+      "initialAgeBadge": "Initial age",
+      "finalAgeBadge": "Final age"
     },
     "section": {
       "fieldName": {
@@ -329,7 +331,9 @@
       "scaleHint": "Enter how many digits after the decimal separator the number should have. Use 0 to 10 decimal places.",
       "legacyHelp": "This record uses a type outside the list. Pick a standard type to replace it on save, or keep this option.",
       "caption": {
-        "number": "Number ({scale} dp)",
+        "integer": "Whole number",
+        "numberSingular": "Number with {scale} decimal place",
+        "numberPlural": "Number with {scale} decimal places",
         "text": "Text",
         "boolean": "Yes or no",
         "timestamp": "Date",

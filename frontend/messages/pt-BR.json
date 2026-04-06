@@ -254,7 +254,9 @@
     },
     "directory": {
       "dragHandleAria": "Arrastar para reordenar",
-      "reorderError": "Não foi possível salvar a ordem. Tente novamente."
+      "reorderError": "Não foi possível salvar a ordem. Tente novamente.",
+      "initialAgeBadge": "Idade inicial",
+      "finalAgeBadge": "Idade final"
     },
     "section": {
       "fieldName": {
@@ -293,7 +295,9 @@
       "scaleHint": "Informe quantas casas, depois da vírgula, deve ter o número. Informe de 0 a 10 decimais.",
       "legacyHelp": "Este registro usa um tipo fora da lista. Escolha um tipo padrão para substituir ao salvar ou mantenha esta opção.",
       "caption": {
-        "number": "Número ({scale} dec.)",
+        "integer": "Número inteiro",
+        "numberSingular": "Número com {scale} casa decimal",
+        "numberPlural": "Número com {scale} casas decimais",
         "text": "Texto",
         "boolean": "Sim ou não",
         "timestamp": "Data",

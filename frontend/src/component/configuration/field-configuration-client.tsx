@@ -25,6 +25,7 @@ import {
   DirectoryFilterPanel,
   DirectoryFilterTextField
 } from "@/component/configuration/directory-filter-panel";
+import { Badge } from "@/component/ui/badge";
 import { TrashIconButton } from "@/component/ui/trash-icon-button";
 import { EditorPanelFlashOverlay } from "@/component/configuration/editor-panel-flash-overlay";
 import { useEditorPanelFlash } from "@/component/configuration/use-editor-panel-flash";
@@ -238,8 +239,16 @@ export function FieldConfigurationClient({
     (raw: string) => {
       const p = parseFieldSqlType(raw);
       switch (p.kind) {
-        case "number":
-          return t("fieldType.caption.number", { scale: p.scale ?? 0 });
+        case "number": {
+          const scale = p.scale ?? 0;
+          if (scale === 0) {
+            return t("fieldType.caption.integer");
+          }
+          return t(
+            scale === 1 ? "fieldType.caption.numberSingular" : "fieldType.caption.numberPlural",
+            { scale }
+          );
+        }
         case "text":
           return t("fieldType.caption.text");
         case "boolean":
@@ -254,6 +263,23 @@ export function FieldConfigurationClient({
     },
     [t]
   );
+
+  const renderFieldAgeBadges = useCallback((item: TenantScopeFieldRecord) => {
+    if (!item.is_initial_age && !item.is_final_age) {
+      return null;
+    }
+
+    return (
+      <div className="ui-badge-row">
+        {item.is_initial_age ? (
+          <Badge tone="active">{t("directory.initialAgeBadge")}</Badge>
+        ) : null}
+        {item.is_final_age ? (
+          <Badge tone="positive">{t("directory.finalAgeBadge")}</Badge>
+        ) : null}
+      </div>
+    );
+  }, [t]);
 
   const resolveDirectoryTitle = useCallback(
     (item: TenantScopeFieldRecord) => {
@@ -792,11 +818,13 @@ export function FieldConfigurationClient({
             {sqlTypeCaption(item.sql_type)}
           </p>
         ) : null}
+        {renderFieldAgeBadges(item)}
       </button>
     ),
     [
       handleSelectField,
       isDeletePending,
+      renderFieldAgeBadges,
       resolveDirectoryTitle,
       sqlTypeCaption,
       selectedField?.id
@@ -824,6 +852,7 @@ export function FieldConfigurationClient({
                 {sqlTypeCaption(item.sql_type)}
               </p>
             ) : null}
+            {renderFieldAgeBadges(item)}
           </button>
           {dragHandle}
         </div>
@@ -832,6 +861,7 @@ export function FieldConfigurationClient({
     [
       handleSelectField,
       isDeletePending,
+      renderFieldAgeBadges,
       resolveDirectoryTitle,
       sqlTypeCaption,
       selectedField?.id

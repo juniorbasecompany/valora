@@ -81,7 +81,8 @@ function formatDayCompact(value: string) {
 
 function formatPersistedValue(
   item: ScopeCurrentAgeCalculationRecord,
-  emptyValueLabel: string
+  emptyValueLabel: string,
+  fieldType?: string
 ) {
   if (item.text_value != null && item.text_value.trim()) {
     return item.text_value;
@@ -90,9 +91,60 @@ function formatPersistedValue(
     return item.boolean_value ? "true" : "false";
   }
   if (item.numeric_value != null) {
-    return String(item.numeric_value);
+    return formatNumericValueForFieldType(item.numeric_value, fieldType);
   }
   return emptyValueLabel;
+}
+
+function normalizeSqlType(sqlType?: string) {
+  return sqlType?.trim().toUpperCase().replace(/\s+/g, " ") ?? "";
+}
+
+function extractNumericScale(sqlType?: string) {
+  const normalized = normalizeSqlType(sqlType);
+  const match = normalized.match(/^(?:NUMERIC|DECIMAL)\(\s*\d+\s*,\s*(\d+)\s*\)$/);
+  if (!match) {
+    return null;
+  }
+  return Number(match[1]);
+}
+
+function isIntegerSqlType(sqlType?: string) {
+  const normalized = normalizeSqlType(sqlType);
+  return ["INTEGER", "INT", "BIGINT", "SMALLINT"].includes(normalized);
+}
+
+function formatDecimalString(valueText: string, scale: number) {
+  const normalized = valueText.trim();
+  if (!/^-?\d+(?:\.\d+)?$/.test(normalized)) {
+    return normalized;
+  }
+
+  const isNegative = normalized.startsWith("-");
+  const unsignedValue = isNegative ? normalized.slice(1) : normalized;
+  const [integerPart, decimalPart = ""] = unsignedValue.split(".");
+  const paddedDecimalPart = decimalPart.padEnd(scale, "0").slice(0, scale);
+  const signedIntegerPart = `${isNegative ? "-" : ""}${integerPart}`;
+
+  if (scale === 0) {
+    return signedIntegerPart;
+  }
+
+  return `${signedIntegerPart}.${paddedDecimalPart}`;
+}
+
+function formatNumericValueForFieldType(value: number | string, fieldType?: string) {
+  const valueText = String(value);
+  if (isIntegerSqlType(fieldType)) {
+    return formatDecimalString(valueText, 0);
+  }
+
+  const scale = extractNumericScale(fieldType);
+  if (scale != null) {
+    return formatDecimalString(valueText, scale);
+  }
+
+  return valueText;
 }
 
 const FORMULA_REFERENCE_TOKEN = /\$\{(field|input):(\d+)\}/g;
@@ -514,7 +566,7 @@ export function CurrentAgeCalculationClient({
                           {(initialFieldDirectory?.item_list ?? []).map((field) => (
                             <td key={`${item.result_id}-${field.id}`}>
                               {field.id === item.field_id
-                                ? formatPersistedValue(item, copy.emptyValue)
+                                ? formatPersistedValue(item, copy.emptyValue, field.type)
                                 : ""}
                             </td>
                           ))}

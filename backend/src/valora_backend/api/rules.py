@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import logging
+import re
 from collections import defaultdict
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from datetime import UTC, date, datetime, timedelta
 from typing import Any, Annotated, Literal
 
@@ -81,6 +82,22 @@ def _sql_type_family_or_400(sql_type: str) -> Literal["text", "boolean", "intege
         status_code=status.HTTP_400_BAD_REQUEST,
         detail=f"Unsupported field.type for formula execution: {sql_type}",
     )
+
+
+def _numeric_scale_from_sql_type(sql_type: str) -> int | None:
+    normalized = _normalize_sql_type(sql_type)
+    match = re.fullmatch(r"(?:NUMERIC|DECIMAL)\(\s*\d+\s*,\s*(\d+)\s*\)", normalized)
+    if not match:
+        return None
+    return int(match.group(1))
+
+
+def _quantize_numeric_value_for_field(value: Decimal, *, field: Field) -> Decimal:
+    scale = _numeric_scale_from_sql_type(field.type)
+    if scale is None:
+        return value
+    quantizer = Decimal("1").scaleb(-scale)
+    return value.quantize(quantizer, rounding=ROUND_HALF_UP)
 
 
 def _parse_boolean_value_or_400(value: Any, *, detail: str) -> bool:
@@ -246,7 +263,10 @@ def _coerce_formula_output_to_result_payload_or_400(
             "numeric_value": Decimal(integer_value),
             "runtime_value": integer_value,
         }
-    numeric_value = _parse_numeric_value_or_400(value, detail=detail_prefix)
+    numeric_value = _quantize_numeric_value_for_field(
+        _parse_numeric_value_or_400(value, detail=detail_prefix),
+        field=field,
+    )
     return {
         "text_value": None,
         "boolean_value": None,

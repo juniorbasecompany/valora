@@ -3,6 +3,7 @@ from __future__ import annotations
 import unicodedata
 from collections.abc import Generator
 from contextlib import contextmanager
+from decimal import Decimal
 from datetime import datetime
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
@@ -2903,6 +2904,203 @@ def test_calculate_scope_current_age_uses_action_sort_order_within_same_day() ->
             (initial_event.id, anchor_formula.id, 10),
             (plus_event_same_day.id, plus_formula.id, 11),
             (double_event_same_day.id, double_formula.id, 22),
+        ]
+
+
+def test_calculate_scope_current_age_rounds_numeric_result_to_field_scale_half_up() -> None:
+    with build_rules_session() as (session, tenant_id):
+        scope = Scope(
+            name="Aves",
+            display_name="Aves para producao de ovos",
+            tenant_id=tenant_id,
+        )
+        session.add(scope)
+        session.flush()
+
+        location = Location(
+            name="Granja A",
+            display_name="Granja A",
+            scope_id=scope.id,
+            parent_location_id=None,
+            sort_order=0,
+        )
+        kind = Kind(scope_id=scope.id, name="lote", display_name="Lote")
+        anchor_action = Action(scope_id=scope.id, sort_order=0)
+        calc_action = Action(scope_id=scope.id, sort_order=1)
+        session.add_all([location, kind, anchor_action, calc_action])
+        session.flush()
+
+        initial_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=0,
+            is_initial_age=True,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        current_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=1,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=True,
+        )
+        final_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=2,
+            is_initial_age=False,
+            is_final_age=True,
+            is_current_age=False,
+        )
+        source_field = Field(
+            scope_id=scope.id,
+            type="NUMERIC(15, 3)",
+            sort_order=3,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        rounded_field = Field(
+            scope_id=scope.id,
+            type="NUMERIC(15, 2)",
+            sort_order=4,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        mirrored_field = Field(
+            scope_id=scope.id,
+            type="NUMERIC(15, 2)",
+            sort_order=5,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        session.add_all(
+            [
+                initial_field,
+                current_field,
+                final_field,
+                source_field,
+                rounded_field,
+                mirrored_field,
+            ]
+        )
+        session.flush()
+
+        anchor_formula = Formula(
+            action_id=anchor_action.id,
+            sort_order=0,
+            statement=f"${{field:{current_field.id}}} = ${{field:{current_field.id}}}",
+        )
+        rounded_formula = Formula(
+            action_id=calc_action.id,
+            sort_order=0,
+            statement=f"${{field:{rounded_field.id}}} = ${{input:{source_field.id}}}",
+        )
+        mirrored_formula = Formula(
+            action_id=calc_action.id,
+            sort_order=1,
+            statement=f"${{field:{mirrored_field.id}}} = ${{field:{rounded_field.id}}}",
+        )
+        session.add_all([anchor_formula, rounded_formula, mirrored_formula])
+        session.flush()
+
+        item = Item(
+            scope_id=scope.id,
+            kind_id=kind.id,
+            parent_item_id=None,
+            sort_order=0,
+        )
+        session.add(item)
+        session.flush()
+
+        initial_event = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=anchor_action.id,
+            moment_utc=datetime(2026, 4, 1, 8, 0, 0),
+        )
+        calc_event = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=calc_action.id,
+            moment_utc=datetime(2026, 4, 2, 8, 0, 0),
+        )
+        final_event = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=anchor_action.id,
+            moment_utc=datetime(2026, 4, 3, 8, 0, 0),
+        )
+        session.add_all([initial_event, calc_event, final_event])
+        session.flush()
+
+        session.add_all(
+            [
+                Result(
+                    event_id=initial_event.id,
+                    field_id=initial_field.id,
+                    formula_id=anchor_formula.id,
+                    formula_order=anchor_formula.sort_order,
+                    text_value=None,
+                    boolean_value=None,
+                    numeric_value=10,
+                    moment_utc=datetime(2026, 4, 1, 8, 0, 0),
+                ),
+                Result(
+                    event_id=final_event.id,
+                    field_id=final_field.id,
+                    formula_id=anchor_formula.id,
+                    formula_order=anchor_formula.sort_order,
+                    text_value=None,
+                    boolean_value=None,
+                    numeric_value=12,
+                    moment_utc=datetime(2026, 4, 3, 8, 0, 0),
+                ),
+                Input(
+                    event_id=calc_event.id,
+                    field_id=source_field.id,
+                    value="1.235",
+                ),
+            ]
+        )
+        session.commit()
+
+        response = calculate_scope_current_age(
+            scope_id=scope.id,
+            body=ScopeCurrentAgeCalculationRequest(
+                moment_from_utc="2026-04-01T00:00:00Z",
+                moment_to_utc="2026-04-03T23:59:00Z",
+            ),
+            member=SimpleNamespace(role=2, tenant_id=tenant_id, account_id=1),
+            session=session,
+        )
+
+        assert [
+            (row.field_id, Decimal(str(row.numeric_value)))
+            for row in response.item_list
+            if row.event_id == calc_event.id
+        ] == [
+            (rounded_field.id, Decimal("1.24")),
+            (mirrored_field.id, Decimal("1.24")),
+        ]
+
+        persisted_result_list = list(
+            session.scalars(
+                select(Result)
+                .where(Result.event_id == calc_event.id)
+                .order_by(Result.formula_order.asc(), Result.id.asc())
+            )
+        )
+        assert [
+            (row.field_id, row.numeric_value)
+            for row in persisted_result_list
+        ] == [
+            (rounded_field.id, Decimal("1.24")),
+            (mirrored_field.id, Decimal("1.24")),
         ]
 
 

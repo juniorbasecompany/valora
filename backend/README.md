@@ -22,7 +22,7 @@ A fonte de verdade do diagrama entidade-relacionamento (JSON drawDB) é [`erd.js
 | `label`   | idem | Rótulo i18n ligado a `field` **ou** `action`. |
 | `event`   | idem | Evento operacional (`location_id`, `item_id`, `action_id`, `moment_utc`). |
 | `input`   | idem | Entrada por evento e campo. |
-| `result`  | idem | Resultado por evento e campo, com valor tipado em `text_value`, `boolean_value` ou `numeric_value`. |
+| `result`  | idem | Resultado por evento e campo, com valor tipado em `text_value`, `boolean_value` ou `numeric_value`, além de rastreio da fórmula via `formula_id` e `formula_order`. |
 
 Convenções e extensões do JSON (por exemplo `constraints`, `nullIfEmpty` em campos) estão descritas na skill [`.cursor/skills/export-erd-drawdb/SKILL.md`](../.cursor/skills/export-erd-drawdb/SKILL.md).
 
@@ -72,7 +72,7 @@ Documentação interativa OpenAPI: ao subir o servidor, **`/docs`** (Swagger).
 - `.../scopes/{scope_id}/events` e `.../events/{event_id}`
 - `POST .../scopes/{scope_id}/events/calculate-current-age` (recalcula `result.numeric_value` do campo marcado como `is_current_age` a partir dos eventos com idade inicial/final no período informado)
 - `.../events/{event_id}/inputs` e `.../inputs/{input_id}`
-- `.../events/{event_id}/results` e `.../results/{result_id}` (`result` segue o ERD atual: `text_value`, `boolean_value`, `numeric_value`, `moment_utc`)
+- `.../events/{event_id}/results` e `.../results/{result_id}` (`result` segue o ERD atual: `text_value`, `boolean_value`, `numeric_value`, `moment_utc`, `formula_id`, `formula_order`)
 
 Edição das regras por escopo exige papel **master** ou **admin** no `member`; leitura segue o acesso ao tenant.
 

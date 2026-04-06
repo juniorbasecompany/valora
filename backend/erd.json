@@ -553,8 +553,8 @@
       "id": "field",
       "name": "field",
       "comment": "Definição do campo. Ex: quantidade, mortes, valor",
-      "x": -325.7619705696507,
-      "y": 1480.9390174158823,
+      "x": -328.95207473631734,
+      "y": 1572.654512207549,
       "locked": false,
       "fields": [
         {
@@ -881,8 +881,8 @@
       "id": "input",
       "name": "input",
       "comment": "Aqui ficam registrados os valores dos parâmetros de entrada das ações aplicadas aos eventos em cada dia.",
-      "x": 550.3165415107001,
-      "y": 1376.6603700543296,
+      "x": 547.9239633857001,
+      "y": 1764.25802630433,
       "locked": false,
       "fields": [
         {
@@ -1010,6 +1010,20 @@
           "values": []
         },
         {
+          "id": "formula_id",
+          "name": "formula_id",
+          "comment": "Ligação com a formula.",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
           "id": "value",
           "name": "text_value",
           "comment": "Este é resultado da fórmula, no formato texto.",
@@ -1047,6 +1061,20 @@
           "primary": false,
           "unique": false,
           "notNull": false,
+          "increment": false,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "formula_order",
+          "name": "formula_order",
+          "comment": "Ordem do cálculo das fórmulas do mesmo evento.",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
           "increment": false,
           "size": "",
           "values": []
@@ -1671,6 +1699,17 @@
       "cardinality": "one_to_many",
       "updateConstraint": "Cascade",
       "deleteConstraint": "Restrict"
+    },
+    {
+      "id": "result.formula_id",
+      "name": "result.formula_id",
+      "startTableId": "formula",
+      "startFieldId": "id",
+      "endTableId": "result",
+      "endFieldId": "formula_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Cascade"
     }
   ],
   "notes": [

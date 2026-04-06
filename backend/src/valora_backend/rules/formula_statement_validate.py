@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import re
+from dataclasses import dataclass
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -22,6 +23,15 @@ ASSIGNMENT_OPERATOR_PATTERN = re.compile(r"(?<![<>=!])=(?!=)")
 # Lado esquerdo deve ser exclusivamente um token de campo.
 TARGET_LHS_PATTERN = re.compile(r"^\$\{field:(\d+)\}$")
 INPUT_TARGET_LHS_PATTERN = re.compile(r"^\$\{input:(\d+)\}$")
+
+
+@dataclass(frozen=True)
+class ParsedFormulaStatement:
+    target_field_id: int
+    rhs: str
+    transformed_rhs: str
+    field_id_in_rhs: set[int]
+    input_id_in_rhs: set[int]
 
 
 class FormulaStatementValidationError(Exception):
@@ -54,19 +64,7 @@ def _replace_rhs_tokens_with_eval_names(rhs: str) -> str:
     return RHS_REF_PATTERN.sub(_replacement, rhs)
 
 
-def validate_formula_statement_for_scope(
-    session: Session,
-    *,
-    scope_id: int,
-    statement: str,
-) -> None:
-    """
-    Garante:
-    - formato `alvo = expressão` (primeiro `=` como separador);
-    - alvo exatamente `${field:id}`;
-    - todos os ids referenciados existem no escopo;
-    - RHS avaliável por SimpleEval com valores stub (dry-run).
-    """
+def parse_formula_statement(statement: str) -> ParsedFormulaStatement:
     text = statement.strip()
     if not text:
         raise FormulaStatementValidationError(
@@ -101,10 +99,36 @@ def validate_formula_statement_for_scope(
             "formula_invalid_target",
             "Left side must be exactly one field reference: ${field:<id>}.",
         )
-    target_id = int(target_match.group(1))
 
     field_id_in_rhs = {int(x) for x in FIELD_REF_PATTERN.findall(rhs)}
     input_id_in_rhs = {int(x) for x in INPUT_REF_PATTERN.findall(rhs)}
+
+    return ParsedFormulaStatement(
+        target_field_id=int(target_match.group(1)),
+        rhs=rhs,
+        transformed_rhs=_replace_rhs_tokens_with_eval_names(rhs),
+        field_id_in_rhs=field_id_in_rhs,
+        input_id_in_rhs=input_id_in_rhs,
+    )
+
+
+def validate_formula_statement_for_scope(
+    session: Session,
+    *,
+    scope_id: int,
+    statement: str,
+) -> None:
+    """
+    Garante:
+    - formato `alvo = expressão` (primeiro `=` como separador);
+    - alvo exatamente `${field:id}`;
+    - todos os ids referenciados existem no escopo;
+    - RHS avaliável por SimpleEval com valores stub (dry-run).
+    """
+    parsed = parse_formula_statement(statement)
+    target_id = parsed.target_field_id
+    field_id_in_rhs = parsed.field_id_in_rhs
+    input_id_in_rhs = parsed.input_id_in_rhs
     all_referenced = {target_id} | field_id_in_rhs | input_id_in_rhs
 
     scope_field_ids = set(
@@ -117,7 +141,7 @@ def validate_formula_statement_for_scope(
             "One or more field references are not in this scope.",
         )
 
-    transformed_rhs = _replace_rhs_tokens_with_eval_names(rhs)
+    transformed_rhs = parsed.transformed_rhs
     # Só são necessários nomes para referências que aparecem na RHS.
     # Usar int 0: com Decimal("0") o dry-run falha em expressões com literais float
     # (ex.: f_1 + 0.20) porque Python não soma Decimal + float.

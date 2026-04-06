@@ -101,8 +101,11 @@ export default async function CalculationPage({ params }: CalculationPageProps) 
           locationLabel: t("result.locationLabel"),
           itemLabel: t("result.itemLabel"),
           actionLabel: t("result.actionLabel"),
-          sourceLabel: t("result.sourceLabel"),
+          fieldLabel: t("result.fieldLabel"),
+          formulaLabel: t("result.formulaLabel"),
+          formulaOrderLabel: t("result.formulaOrderLabel"),
           calculatedAtLabel: t("result.calculatedAtLabel"),
+          emptyValue: t("result.emptyValue"),
           fallbackLocation: t("result.fallbackLocation"),
           fallbackItem: t("result.fallbackItem"),
           fallbackAction: t("result.fallbackAction")

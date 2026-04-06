@@ -6,7 +6,7 @@ import logging
 from collections import defaultdict
 from decimal import Decimal
 from datetime import UTC, datetime
-from typing import Annotated, Literal
+from typing import Any, Annotated, Literal
 
 import requests
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -35,8 +35,10 @@ from valora_backend.api.auth import (
 )
 from valora_backend.config import Settings
 from valora_backend.model.null_if_empty import commit_session_with_null_if_empty
+from valora_backend.rules.formula_simple_eval import build_formula_simple_eval
 from valora_backend.rules.formula_statement_validate import (
     FormulaStatementValidationError,
+    parse_formula_statement,
     validate_formula_statement_for_scope,
 )
 from valora_backend.services.deepl_label_translation import (
@@ -54,6 +56,191 @@ def _normalize_optional_result_text(value: str | None) -> str | None:
         return None
     normalized = value.strip()
     return normalized or None
+
+
+def _normalize_sql_type(sql_type: str) -> str:
+    return " ".join(sql_type.strip().upper().split())
+
+
+def _sql_type_family_or_400(sql_type: str) -> Literal["text", "boolean", "integer", "numeric"]:
+    normalized = _normalize_sql_type(sql_type)
+    if normalized in {"TEXT", "CHAR", "VARCHAR"} or normalized.startswith(
+        ("CHAR(", "VARCHAR(")
+    ):
+        return "text"
+    if normalized == "BOOLEAN":
+        return "boolean"
+    if normalized in {"INTEGER", "INT", "BIGINT", "SMALLINT"}:
+        return "integer"
+    if normalized in {"NUMERIC", "DECIMAL", "FLOAT", "REAL", "DOUBLE", "DOUBLE PRECISION"}:
+        return "numeric"
+    if normalized.startswith(("NUMERIC(", "DECIMAL(")):
+        return "numeric"
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail=f"Unsupported field.type for formula execution: {sql_type}",
+    )
+
+
+def _parse_boolean_value_or_400(value: Any, *, detail: str) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float, Decimal)):
+        if value in (0, 0.0, Decimal("0")):
+            return False
+        if value in (1, 1.0, Decimal("1")):
+            return True
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"true", "t", "1", "yes", "y", "sim", "s"}:
+            return True
+        if normalized in {"false", "f", "0", "no", "n", "nao", "não"}:
+            return False
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail=detail,
+    )
+
+
+def _parse_integer_value_or_400(value: Any, *, detail: str) -> int:
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, int):
+        return value
+    if isinstance(value, Decimal):
+        whole_value = value.to_integral_value()
+        if value != whole_value:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=detail,
+            )
+        return int(whole_value)
+    if isinstance(value, float):
+        if not value.is_integer():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=detail,
+            )
+        return int(value)
+    if isinstance(value, str):
+        try:
+            return _parse_integer_value_or_400(Decimal(value.strip()), detail=detail)
+        except Exception as exc:  # noqa: BLE001
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=detail,
+            ) from exc
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail=detail,
+    )
+
+
+def _parse_numeric_value_or_400(value: Any, *, detail: str) -> Decimal:
+    if isinstance(value, bool):
+        return Decimal(int(value))
+    if isinstance(value, Decimal):
+        return value
+    if isinstance(value, int):
+        return Decimal(value)
+    if isinstance(value, float):
+        return Decimal(str(value))
+    if isinstance(value, str):
+        try:
+            return Decimal(value.strip())
+        except Exception as exc:  # noqa: BLE001
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=detail,
+            ) from exc
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail=detail,
+    )
+
+
+def _coerce_input_runtime_value_or_400(
+    field: Field, value: str, *, event_id: int
+) -> str | bool | int | float:
+    detail = f"Event {event_id} has an invalid input for field {field.id}"
+    family = _sql_type_family_or_400(field.type)
+    if family == "text":
+        return value.strip()
+    if family == "boolean":
+        return _parse_boolean_value_or_400(value, detail=detail)
+    if family == "integer":
+        return _parse_integer_value_or_400(value, detail=detail)
+    numeric_value = _parse_numeric_value_or_400(value, detail=detail)
+    return float(numeric_value)
+
+
+def _extract_result_runtime_value_or_none(
+    row: Result, field: Field, *, event_id: int
+) -> str | bool | int | float | None:
+    family = _sql_type_family_or_400(field.type)
+    if family == "text":
+        return row.text_value
+    if family == "boolean":
+        return row.boolean_value
+    if row.numeric_value is None:
+        return None
+    if family == "integer":
+        return _parse_integer_value_or_400(
+            row.numeric_value,
+            detail=f"Event {event_id} has a non-integer result for field {field.id}",
+        )
+    return float(
+        _parse_numeric_value_or_400(
+            row.numeric_value,
+            detail=f"Event {event_id} has an invalid numeric result for field {field.id}",
+        )
+    )
+
+
+def _coerce_formula_output_to_result_payload_or_400(
+    value: Any,
+    *,
+    field: Field,
+    event_id: int,
+    formula_id: int,
+    formula_order: int,
+) -> dict[str, Any]:
+    detail_prefix = (
+        f"Event {event_id} formula {formula_id} (sort_order {formula_order}) "
+        f"returned an invalid value for field {field.id}"
+    )
+    family = _sql_type_family_or_400(field.type)
+    if family == "text":
+        text_value = _normalize_optional_result_text(str(value))
+        return {
+            "text_value": text_value,
+            "boolean_value": None,
+            "numeric_value": None,
+            "runtime_value": text_value,
+        }
+    if family == "boolean":
+        boolean_value = _parse_boolean_value_or_400(value, detail=detail_prefix)
+        return {
+            "text_value": None,
+            "boolean_value": boolean_value,
+            "numeric_value": None,
+            "runtime_value": boolean_value,
+        }
+    if family == "integer":
+        integer_value = _parse_integer_value_or_400(value, detail=detail_prefix)
+        return {
+            "text_value": None,
+            "boolean_value": None,
+            "numeric_value": Decimal(integer_value),
+            "runtime_value": integer_value,
+        }
+    numeric_value = _parse_numeric_value_or_400(value, detail=detail_prefix)
+    return {
+        "text_value": None,
+        "boolean_value": None,
+        "numeric_value": numeric_value,
+        "runtime_value": float(numeric_value),
+    }
 
 
 def _member_can_edit_scope_rules(member: Member) -> bool:
@@ -1649,15 +1836,15 @@ class ScopeCurrentAgeCalculationRecord(BaseModel):
     event_id: int
     result_id: int
     field_id: int
+    formula_id: int
+    formula_order: int
     location_id: int
     item_id: int
     action_id: int
     event_moment_utc: datetime
-    numeric_value: int
-    source_initial_event_id: int
-    source_initial_age: int
-    source_final_event_id: int
-    source_final_age: int
+    text_value: str | None
+    boolean_value: bool | None
+    numeric_value: Decimal | None
     status: Literal["created", "updated", "unchanged"]
 
 
@@ -1707,6 +1894,15 @@ def _normalize_whole_age_or_400(
             ),
         )
     return int(whole_value)
+
+
+def _event_execution_sort_key(
+    *,
+    moment_utc: datetime,
+    action_sort_order: int,
+    event_id: int,
+) -> tuple[datetime.date, int, datetime, int]:
+    return (moment_utc.date(), action_sort_order, moment_utc, event_id)
 
 
 @router.get(
@@ -1954,18 +2150,32 @@ def calculate_scope_current_age(
     initial_field, final_field, current_field = _resolve_scope_age_fields_or_400(
         session, scope_id=scope_id
     )
+    action_row_list = list(
+        session.scalars(select(Action).where(Action.scope_id == scope_id).order_by(Action.id))
+    )
+    action_by_id = {row.id: row for row in action_row_list}
+    field_row_list = list(
+        session.scalars(select(Field).where(Field.scope_id == scope_id).order_by(Field.id))
+    )
+    field_by_id = {row.id: row for row in field_row_list}
 
-    event_row_list = list(
-        session.scalars(
-            select(Event)
-            .join(Action, Event.action_id == Action.id)
-            .where(
-                Action.scope_id == scope_id,
-                Event.moment_utc >= moment_from_utc,
-                Event.moment_utc <= moment_to_utc,
+    event_row_list = sorted(
+        list(
+            session.scalars(
+                select(Event)
+                .join(Action, Event.action_id == Action.id)
+                .where(
+                    Action.scope_id == scope_id,
+                    Event.moment_utc >= moment_from_utc,
+                    Event.moment_utc <= moment_to_utc,
+                )
             )
-            .order_by(Event.moment_utc.asc(), Event.id.asc())
-        )
+        ),
+        key=lambda row: _event_execution_sort_key(
+            moment_utc=row.moment_utc,
+            action_sort_order=action_by_id[row.action_id].sort_order,
+            event_id=row.id,
+        ),
     )
     calculated_moment_utc = datetime.now(UTC).replace(tzinfo=None)
     if not event_row_list:
@@ -1979,25 +2189,67 @@ def calculate_scope_current_age(
         )
 
     event_id_list = [row.id for row in event_row_list]
-    relevant_field_id_list = list(
-        {initial_field.id, final_field.id, current_field.id}
-    )
-    result_row_list = list(
+    group_key_set = {(row.location_id, row.item_id) for row in event_row_list}
+    formula_row_list = list(
         session.scalars(
-            select(Result)
-            .where(
-                Result.event_id.in_(event_id_list),
-                Result.field_id.in_(relevant_field_id_list),
-            )
-            .order_by(Result.event_id.asc(), Result.id.asc())
+            select(Formula)
+            .where(Formula.action_id.in_({row.action_id for row in event_row_list}))
+            .order_by(Formula.action_id.asc(), Formula.sort_order.asc(), Formula.id.asc())
         )
     )
+    formula_row_list_by_action: defaultdict[int, list[Formula]] = defaultdict(list)
+    parsed_formula_by_id = {}
+    for formula_row in formula_row_list:
+        try:
+            parsed_formula = parse_formula_statement(formula_row.statement)
+        except FormulaStatementValidationError as exc:
+            raise _formula_statement_validation_error(
+                exc, formula_sort_order=formula_row.sort_order
+            ) from exc
+        if parsed_formula.target_field_id not in field_by_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=(
+                    f"Formula {formula_row.id} targets field {parsed_formula.target_field_id} "
+                    "outside this scope"
+                ),
+            )
+        formula_row_list_by_action[formula_row.action_id].append(formula_row)
+        parsed_formula_by_id[formula_row.id] = parsed_formula
+
+    input_runtime_by_event_id: defaultdict[int, dict[int, str | bool | int | float]] = (
+        defaultdict(dict)
+    )
+    for input_row in session.scalars(
+        select(Input)
+        .where(Input.event_id.in_(event_id_list))
+        .order_by(Input.event_id.asc(), Input.id.asc())
+    ):
+        input_field = field_by_id.get(input_row.field_id)
+        if input_field is None:
+            continue
+        input_runtime_by_event_id[input_row.event_id][input_row.field_id] = (
+            _coerce_input_runtime_value_or_400(
+                input_field,
+                input_row.value,
+                event_id=input_row.event_id,
+            )
+        )
 
     initial_age_by_event_id: dict[int, int] = {}
     final_age_by_event_id: dict[int, int] = {}
-    current_result_by_event_id: dict[int, Result] = {}
+    age_source_runtime_by_event_id: defaultdict[int, dict[int, int]] = defaultdict(dict)
+    existing_result_by_key: dict[tuple[int, int, int], Result] = {}
 
-    for row in result_row_list:
+    for row in session.scalars(
+        select(Result)
+        .where(Result.event_id.in_(event_id_list))
+        .order_by(
+            Result.event_id.asc(),
+            Result.formula_order.asc(),
+            Result.id.asc(),
+        )
+    ):
         if row.field_id == initial_field.id and row.event_id not in initial_age_by_event_id:
             normalized_age = _normalize_whole_age_or_400(
                 row.numeric_value,
@@ -2006,8 +2258,9 @@ def calculate_scope_current_age(
             )
             if normalized_age is not None:
                 initial_age_by_event_id[row.event_id] = normalized_age
-            if current_field.id == row.field_id and row.event_id not in current_result_by_event_id:
-                current_result_by_event_id[row.event_id] = row
+                age_source_runtime_by_event_id[row.event_id][initial_field.id] = (
+                    normalized_age
+                )
             continue
 
         if row.field_id == final_field.id and row.event_id not in final_age_by_event_id:
@@ -2018,78 +2271,75 @@ def calculate_scope_current_age(
             )
             if normalized_age is not None:
                 final_age_by_event_id[row.event_id] = normalized_age
-            if current_field.id == row.field_id and row.event_id not in current_result_by_event_id:
-                current_result_by_event_id[row.event_id] = row
+                age_source_runtime_by_event_id[row.event_id][final_field.id] = (
+                    normalized_age
+                )
             continue
 
-        if row.field_id == current_field.id and row.event_id not in current_result_by_event_id:
-            current_result_by_event_id[row.event_id] = row
+        result_key = (
+            row.event_id,
+            row.formula_id,
+            row.formula_order,
+        )
+        if result_key in existing_result_by_key:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=(
+                    "Duplicate result rows for the same event/formula/order are not supported: "
+                    f"event {row.event_id}, formula {row.formula_id}, order {row.formula_order}"
+                ),
+            )
+        existing_result_by_key[result_key] = row
 
-    event_row_by_id = {row.id: row for row in event_row_list}
     event_row_list_by_group: defaultdict[tuple[int, int], list[Event]] = defaultdict(list)
     for row in event_row_list:
         event_row_list_by_group[(row.location_id, row.item_id)].append(row)
 
-    assignment_meta_by_event_id: dict[int, dict[str, int]] = {}
+    window_meta_by_event_id: dict[int, dict[str, int]] = {}
 
     for group_event_row_list in event_row_list_by_group.values():
-        active_initial_event: Event | None = None
+        active_initial_index: int | None = None
+        active_initial_event_id: int | None = None
         active_initial_age: int | None = None
 
-        for row in group_event_row_list:
+        for index, row in enumerate(group_event_row_list):
             next_initial_age = initial_age_by_event_id.get(row.id)
             if next_initial_age is not None:
-                active_initial_event = row
+                active_initial_index = index
+                active_initial_event_id = row.id
                 active_initial_age = next_initial_age
 
             final_age = final_age_by_event_id.get(row.id)
             if (
-                active_initial_event is None
+                active_initial_index is None
+                or active_initial_event_id is None
                 or active_initial_age is None
                 or final_age is None
             ):
                 continue
 
-            initial_day = active_initial_event.moment_utc.date()
-            final_day = row.moment_utc.date()
-            day_span = (final_day - initial_day).days
-            expected_final_age = active_initial_age + day_span
-            if final_age != expected_final_age:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=(
-                        "Initial and final age values do not match the day span "
-                        f"between events {active_initial_event.id} and {row.id}"
-                    ),
-                )
-
-            for candidate in group_event_row_list:
-                candidate_day = candidate.moment_utc.date()
-                if candidate_day < initial_day or candidate_day > final_day:
-                    continue
-
-                numeric_value = active_initial_age + (candidate_day - initial_day).days
-                previous_assignment = assignment_meta_by_event_id.get(candidate.id)
-                if previous_assignment is not None and previous_assignment["numeric_value"] != numeric_value:
-                    raise HTTPException(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        detail=(
-                            f"Overlapping current age ranges assign different values to event {candidate.id}"
-                        ),
-                    )
-
-                assignment_meta_by_event_id[candidate.id] = {
-                    "numeric_value": numeric_value,
-                    "source_initial_event_id": active_initial_event.id,
+            for candidate in group_event_row_list[active_initial_index : index + 1]:
+                previous_assignment = window_meta_by_event_id.get(candidate.id)
+                next_assignment = {
+                    "source_initial_event_id": active_initial_event_id,
                     "source_initial_age": active_initial_age,
                     "source_final_event_id": row.id,
                     "source_final_age": final_age,
                 }
+                if previous_assignment is not None and previous_assignment != next_assignment:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=(
+                            f"Event {candidate.id} belongs to overlapping age windows with different bounds"
+                        ),
+                    )
+                window_meta_by_event_id[candidate.id] = next_assignment
 
-            active_initial_event = None
+            active_initial_index = None
+            active_initial_event_id = None
             active_initial_age = None
 
-    if not assignment_meta_by_event_id:
+    if not window_meta_by_event_id:
         return ScopeCurrentAgeCalculationResponse(
             can_edit=True,
             calculated_moment_utc=calculated_moment_utc,
@@ -2099,77 +2349,227 @@ def calculate_scope_current_age(
             item_list=[],
         )
 
+    state_by_group: defaultdict[
+        tuple[int, int], dict[int, str | bool | int | float]
+    ] = defaultdict(dict)
+    historical_result_row_list = list(
+        session.execute(
+            select(Result, Event)
+            .join(Event, Result.event_id == Event.id)
+            .join(Action, Event.action_id == Action.id)
+            .where(
+                Action.scope_id == scope_id,
+                Event.moment_utc < moment_from_utc,
+            )
+        )
+    )
+    historical_result_row_list.sort(
+        key=lambda pair: (
+            *_event_execution_sort_key(
+                moment_utc=pair[1].moment_utc,
+                action_sort_order=action_by_id[pair[1].action_id].sort_order,
+                event_id=pair[1].id,
+            ),
+            pair[0].formula_order,
+            pair[0].id,
+        )
+    )
+    for result_row, source_event in historical_result_row_list:
+        group_key = (source_event.location_id, source_event.item_id)
+        if group_key not in group_key_set:
+            continue
+        source_field = field_by_id.get(result_row.field_id)
+        if source_field is None:
+            continue
+        runtime_value = _extract_result_runtime_value_or_none(
+            result_row,
+            source_field,
+            event_id=source_event.id,
+        )
+        if runtime_value is not None:
+            state_by_group[group_key][source_field.id] = runtime_value
+
     created_count = 0
     updated_count = 0
     unchanged_count = 0
-    status_by_event_id: dict[int, Literal["created", "updated", "unchanged"]] = {}
+    executed_result_key_list: list[tuple[int, int, int]] = []
+    status_by_result_key: dict[
+        tuple[int, int, int], Literal["created", "updated", "unchanged"]
+    ] = {}
+    closed_window_final_event_id_by_group: dict[tuple[int, int], int] = {}
 
     for row in event_row_list:
-        assignment_meta = assignment_meta_by_event_id.get(row.id)
-        if assignment_meta is None:
+        window_meta = window_meta_by_event_id.get(row.id)
+        if window_meta is None:
             continue
 
-        target_numeric_value = Decimal(assignment_meta["numeric_value"])
-        current_result = current_result_by_event_id.get(row.id)
-        if current_result is None:
-            current_result = Result(
+        group_key = (row.location_id, row.item_id)
+        closed_window_final_event_id = closed_window_final_event_id_by_group.get(group_key)
+        if closed_window_final_event_id is not None:
+            if closed_window_final_event_id == window_meta["source_final_event_id"]:
+                continue
+            closed_window_final_event_id_by_group.pop(group_key, None)
+
+        group_state = state_by_group[group_key]
+        for field_id, runtime_value in age_source_runtime_by_event_id.get(
+            row.id, {}
+        ).items():
+            group_state[field_id] = runtime_value
+
+        if row.id == window_meta["source_initial_event_id"]:
+            group_state[initial_field.id] = window_meta["source_initial_age"]
+            group_state[current_field.id] = window_meta["source_initial_age"]
+
+        formula_list = formula_row_list_by_action.get(row.action_id, [])
+        event_input_runtime = input_runtime_by_event_id.get(row.id, {})
+        for formula_row in formula_list:
+            parsed_formula = parsed_formula_by_id[formula_row.id]
+            evaluator_names: dict[str, Any] = {}
+
+            for field_id in parsed_formula.field_id_in_rhs:
+                runtime_value = group_state.get(field_id)
+                if runtime_value is None:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=(
+                            f"Event {row.id} formula {formula_row.id} "
+                            f"(sort_order {formula_row.sort_order}) requires a current result "
+                            f"for field {field_id}"
+                        ),
+                    )
+                evaluator_names[f"f_{field_id}"] = runtime_value
+
+            for field_id in parsed_formula.input_id_in_rhs:
+                if field_id not in event_input_runtime:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=(
+                            f"Event {row.id} formula {formula_row.id} "
+                            f"(sort_order {formula_row.sort_order}) requires input "
+                            f"for field {field_id}"
+                        ),
+                    )
+                evaluator_names[f"i_{field_id}"] = event_input_runtime[field_id]
+
+            try:
+                formula_value = build_formula_simple_eval(evaluator_names).eval(
+                    parsed_formula.transformed_rhs
+                )
+            except Exception as exc:  # noqa: BLE001
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=(
+                        f"Event {row.id} formula {formula_row.id} "
+                        f"(sort_order {formula_row.sort_order}) could not be evaluated: {exc}"
+                    ),
+                ) from exc
+
+            target_field = field_by_id[parsed_formula.target_field_id]
+            typed_payload = _coerce_formula_output_to_result_payload_or_400(
+                formula_value,
+                field=target_field,
                 event_id=row.id,
-                field_id=current_field.id,
-                text_value=None,
-                boolean_value=None,
-                numeric_value=target_numeric_value,
-                moment_utc=calculated_moment_utc,
+                formula_id=formula_row.id,
+                formula_order=formula_row.sort_order,
             )
-            session.add(current_result)
-            current_result_by_event_id[row.id] = current_result
-            status_by_event_id[row.id] = "created"
-            created_count += 1
-            continue
+            group_state[target_field.id] = typed_payload["runtime_value"]
 
-        should_update = (
-            current_result.numeric_value != target_numeric_value
-            or current_result.text_value is not None
-            or current_result.boolean_value is not None
+            result_key = (row.id, formula_row.id, formula_row.sort_order)
+            current_result = existing_result_by_key.get(result_key)
+            if current_result is None:
+                current_result = Result(
+                    event_id=row.id,
+                    field_id=target_field.id,
+                    formula_id=formula_row.id,
+                    formula_order=formula_row.sort_order,
+                    text_value=typed_payload["text_value"],
+                    boolean_value=typed_payload["boolean_value"],
+                    numeric_value=typed_payload["numeric_value"],
+                    moment_utc=calculated_moment_utc,
+                )
+                session.add(current_result)
+                existing_result_by_key[result_key] = current_result
+                status_by_result_key[result_key] = "created"
+                created_count += 1
+            else:
+                should_update = (
+                    current_result.field_id != target_field.id
+                    or current_result.formula_id != formula_row.id
+                    or current_result.formula_order != formula_row.sort_order
+                    or current_result.text_value != typed_payload["text_value"]
+                    or current_result.boolean_value != typed_payload["boolean_value"]
+                    or current_result.numeric_value != typed_payload["numeric_value"]
+                )
+                if should_update:
+                    current_result.field_id = target_field.id
+                    current_result.formula_id = formula_row.id
+                    current_result.formula_order = formula_row.sort_order
+                    current_result.text_value = typed_payload["text_value"]
+                    current_result.boolean_value = typed_payload["boolean_value"]
+                    current_result.numeric_value = typed_payload["numeric_value"]
+                    current_result.moment_utc = calculated_moment_utc
+                    session.add(current_result)
+                    status_by_result_key[result_key] = "updated"
+                    updated_count += 1
+                else:
+                    status_by_result_key[result_key] = "unchanged"
+                    unchanged_count += 1
+
+            executed_result_key_list.append(result_key)
+
+        current_age_state = group_state.get(current_field.id)
+        if current_age_state is not None:
+            normalized_current_age = _parse_integer_value_or_400(
+                current_age_state,
+                detail=f"Event {row.id} produced a non-integer current age",
+            )
+            if normalized_current_age > window_meta["source_final_age"]:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=(
+                        f"Event {row.id} produced current age {normalized_current_age}, "
+                        f"which exceeds final age {window_meta['source_final_age']}"
+                    ),
+                )
+            if normalized_current_age >= window_meta["source_final_age"]:
+                closed_window_final_event_id_by_group[group_key] = window_meta[
+                    "source_final_event_id"
+                ]
+
+    if not executed_result_key_list:
+        return ScopeCurrentAgeCalculationResponse(
+            can_edit=True,
+            calculated_moment_utc=calculated_moment_utc,
+            created_count=0,
+            updated_count=0,
+            unchanged_count=0,
+            item_list=[],
         )
-        if should_update:
-            current_result.numeric_value = target_numeric_value
-            current_result.text_value = None
-            current_result.boolean_value = None
-            current_result.moment_utc = calculated_moment_utc
-            session.add(current_result)
-            status_by_event_id[row.id] = "updated"
-            updated_count += 1
-            continue
-
-        status_by_event_id[row.id] = "unchanged"
-        unchanged_count += 1
 
     if created_count > 0 or updated_count > 0:
         _apply_member_audit_context(session, member)
         commit_session_with_null_if_empty(session)
 
+    event_row_by_id = {row.id: row for row in event_row_list}
     item_list: list[ScopeCurrentAgeCalculationRecord] = []
-    for event_id in event_id_list:
-        assignment_meta = assignment_meta_by_event_id.get(event_id)
-        if assignment_meta is None:
-            continue
-        event_row = event_row_by_id[event_id]
-        current_result = current_result_by_event_id[event_id]
+    for result_key in executed_result_key_list:
+        current_result = existing_result_by_key[result_key]
+        event_row = event_row_by_id[current_result.event_id]
         item_list.append(
             ScopeCurrentAgeCalculationRecord(
                 event_id=event_row.id,
                 result_id=current_result.id,
-                field_id=current_field.id,
+                field_id=current_result.field_id,
+                formula_id=current_result.formula_id,
+                formula_order=current_result.formula_order,
                 location_id=event_row.location_id,
                 item_id=event_row.item_id,
                 action_id=event_row.action_id,
                 event_moment_utc=event_row.moment_utc,
-                numeric_value=assignment_meta["numeric_value"],
-                source_initial_event_id=assignment_meta["source_initial_event_id"],
-                source_initial_age=assignment_meta["source_initial_age"],
-                source_final_event_id=assignment_meta["source_final_event_id"],
-                source_final_age=assignment_meta["source_final_age"],
-                status=status_by_event_id[event_id],
+                text_value=current_result.text_value,
+                boolean_value=current_result.boolean_value,
+                numeric_value=current_result.numeric_value,
+                status=status_by_result_key[result_key],
             )
         )
 
@@ -2316,6 +2716,8 @@ class ScopeResultRecord(BaseModel):
     id: int
     event_id: int
     field_id: int
+    formula_id: int
+    formula_order: int
     text_value: str | None
     boolean_value: bool | None
     numeric_value: Decimal | None
@@ -2329,6 +2731,8 @@ class ScopeResultListResponse(BaseModel):
 
 class ScopeResultCreateRequest(BaseModel):
     field_id: int
+    formula_id: int
+    formula_order: int | None = None
     text_value: str | None = PydanticField(default=None, max_length=65535)
     boolean_value: bool | None = None
     numeric_value: Decimal | None = None
@@ -2336,6 +2740,8 @@ class ScopeResultCreateRequest(BaseModel):
 
 
 class ScopeResultPatchRequest(BaseModel):
+    formula_id: int | None = None
+    formula_order: int | None = None
     text_value: str | None = PydanticField(default=None, max_length=65535)
     boolean_value: bool | None = None
     numeric_value: Decimal | None = None
@@ -2355,7 +2761,9 @@ def list_scope_event_results(
     _event_in_scope_or_404(session, scope_id=scope_id, event_id=event_id)
     rows = list(
         session.scalars(
-            select(Result).where(Result.event_id == event_id).order_by(Result.id)
+            select(Result)
+            .where(Result.event_id == event_id)
+            .order_by(Result.formula_order.asc(), Result.id.asc())
         )
     )
     return ScopeResultListResponse(
@@ -2365,6 +2773,8 @@ def list_scope_event_results(
                 id=r.id,
                 event_id=r.event_id,
                 field_id=r.field_id,
+                formula_id=r.formula_id,
+                formula_order=r.formula_order,
                 text_value=r.text_value,
                 boolean_value=r.boolean_value,
                 numeric_value=r.numeric_value,
@@ -2387,14 +2797,25 @@ def create_scope_event_result(
     session: Session = Depends(get_session),
 ):
     _require_scope_rules_editor(member)
-    _event_in_scope_or_404(session, scope_id=scope_id, event_id=event_id)
+    event_row = _event_in_scope_or_404(session, scope_id=scope_id, event_id=event_id)
     _field_in_scope_or_404(session, scope_id=scope_id, field_id=body.field_id)
+    formula_row = _formula_in_action_or_404(
+        session,
+        action_id=event_row.action_id,
+        formula_id=body.formula_id,
+    )
     moment = body.moment_utc or datetime.now(UTC)
     if moment.tzinfo is not None:
         moment = moment.astimezone(UTC).replace(tzinfo=None)
     row = Result(
         event_id=event_id,
         field_id=body.field_id,
+        formula_id=formula_row.id,
+        formula_order=(
+            body.formula_order
+            if body.formula_order is not None
+            else formula_row.sort_order
+        ),
         text_value=_normalize_optional_result_text(body.text_value),
         boolean_value=body.boolean_value,
         numeric_value=body.numeric_value,
@@ -2419,8 +2840,19 @@ def patch_scope_event_result(
     session: Session = Depends(get_session),
 ):
     _require_scope_rules_editor(member)
-    _event_in_scope_or_404(session, scope_id=scope_id, event_id=event_id)
+    event_row = _event_in_scope_or_404(session, scope_id=scope_id, event_id=event_id)
     row = _result_in_event_or_404(session, event_id=event_id, result_id=result_id)
+    if body.formula_id is not None:
+        formula_row = _formula_in_action_or_404(
+            session,
+            action_id=event_row.action_id,
+            formula_id=body.formula_id,
+        )
+        row.formula_id = formula_row.id
+        if body.formula_order is None:
+            row.formula_order = formula_row.sort_order
+    if body.formula_order is not None:
+        row.formula_order = body.formula_order
     if "text_value" in body.model_fields_set:
         row.text_value = _normalize_optional_result_text(body.text_value)
     if "boolean_value" in body.model_fields_set:

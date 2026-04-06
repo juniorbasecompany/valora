@@ -11,7 +11,7 @@
       "action": "Ações",
       "unity": "Unidades",
       "event": "Eventos",
-      "calculation": "C\u00e1lculo",
+      "calculation": "Cálculo",
       "configuration": "Configuração",
       "comingSoon": "em breve"
     },
@@ -527,32 +527,32 @@
     "discardConfirm": "Descartar alterações não salvas?"
   },
   "CalculationPage": {
-    "title": "C\u00e1lculo de idade atual",
-    "description": "Selecione um per\u00edodo para localizar eventos com idade inicial e final, recalcular o campo de idade atual e revisar os resultados gravados dentro do filtro escolhido.",
+    "title": "Cálculo de idade atual",
+    "description": "Selecione um período para localizar eventos com idade inicial e final, recalcular o campo de idade atual e revisar os resultados gravados dentro do filtro escolhido.",
     "status": {
       "readyTitle": "Campos de idade prontos",
-      "readyDescription": "O escopo ativo j\u00e1 possui um campo inicial, um atual e um final para suportar o rec\u00e1lculo di\u00e1rio.",
-      "missingTitle": "Configura\u00e7\u00e3o de idade pendente",
-      "missingDescription": "Antes de calcular, marque nos campos do escopo qual \u00e9 a idade inicial, a idade atual e a idade final."
+      "readyDescription": "O escopo ativo já possui um campo inicial, um atual e um final para suportar o recálculo diário.",
+      "missingTitle": "Configuração de idade pendente",
+      "missingDescription": "Antes de calcular, marque nos campos do escopo qual é a idade inicial, a idade atual e a idade final."
     },
     "state": {
       "emptyScope": "Crie um escopo antes de calcular a idade atual.",
-      "missingCurrentScope": "Defina um escopo ativo no seletor do cabe\u00e7alho antes de calcular a idade atual.",
-      "readOnlyNotice": "Voc\u00ea pode consultar este painel, mas s\u00f3 membros master ou administrador podem recalcular e gravar resultados."
+      "missingCurrentScope": "Defina um escopo ativo no seletor do cabeçalho antes de calcular a idade atual.",
+      "readOnlyNotice": "Você pode consultar este painel, mas só membros master ou administrador podem recalcular e gravar resultados."
     },
     "panel": {
       "startLabel": "Data inicial",
       "endLabel": "Data final",
-      "dateHint": "O c\u00e1lculo considera todo o intervalo do in\u00edcio do dia inicial at\u00e9 o fim do dia final.",
+      "dateHint": "O cálculo considera todo o intervalo do início do dia inicial até o fim do dia final.",
       "calculate": "Calcular",
       "calculating": "Calculando...",
       "validationRequired": "Selecione as duas datas para calcular.",
-      "validationOrder": "A data inicial deve ser menor ou igual \u00e0 data final.",
-      "error": "N\u00e3o foi poss\u00edvel calcular a idade atual. Tente novamente."
+      "validationOrder": "A data inicial deve ser menor ou igual à data final.",
+      "error": "Não foi possível calcular a idade atual. Tente novamente."
     },
     "fields": {
-      "title": "Campos usados no c\u00e1lculo",
-      "description": "As flags do escopo definem de onde vem a idade inicial e final e em qual campo o resultado ser\u00e1 persistido.",
+      "title": "Campos usados no cálculo",
+      "description": "As flags do escopo definem de onde vem a idade inicial e final e em qual campo o resultado será persistido.",
       "initialBadge": "Idade inicial",
       "currentBadge": "Idade atual",
       "finalBadge": "Idade final",
@@ -560,24 +560,27 @@
       "missingLabel": "Pendente"
     },
     "result": {
-      "title": "Resultados do per\u00edodo",
-      "description": "Cada linha abaixo representa o valor persistido em result.numeric_value para o campo marcado como idade atual.",
-      "placeholder": "Selecione as datas e execute o c\u00e1lculo para ver os resultados deste per\u00edodo.",
-      "empty": "Nenhum par de idade inicial e final foi encontrado neste per\u00edodo para gerar resultados.",
+      "title": "Resultados do período",
+      "description": "Cada linha abaixo representa um result persistido pela execução das fórmulas no período selecionado, com o campo de saída e a ordem da fórmula que gerou o valor.",
+      "placeholder": "Selecione as datas e execute o cálculo para ver os resultados deste período.",
+      "empty": "Nenhum evento elegível produziu resultados neste período.",
       "createdLabel": "Criados",
       "updatedLabel": "Atualizados",
       "unchangedLabel": "Mantidos",
       "statusCreated": "Criado",
       "statusUpdated": "Atualizado",
       "statusUnchanged": "Mantido",
+      "fieldLabel": "Campo",
       "locationLabel": "Local",
       "itemLabel": "Item",
-      "actionLabel": "A\u00e7\u00e3o",
-      "sourceLabel": "Faixa",
+      "actionLabel": "Ação",
+      "formulaLabel": "Fórmula",
+      "formulaOrderLabel": "Ordem",
       "calculatedAtLabel": "Calculado em",
-      "fallbackLocation": "Local indispon\u00edvel",
-      "fallbackItem": "Item indispon\u00edvel",
-      "fallbackAction": "A\u00e7\u00e3o indispon\u00edvel"
+      "emptyValue": "Sem valor",
+      "fallbackLocation": "Local indisponível",
+      "fallbackItem": "Item indisponível",
+      "fallbackAction": "Ação indisponível"
     }
   },
   "LocationConfigurationPage": {

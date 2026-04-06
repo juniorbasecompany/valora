@@ -210,15 +210,15 @@ export type ScopeCurrentAgeCalculationRecord = {
   event_id: number;
   result_id: number;
   field_id: number;
+  formula_id: number;
+  formula_order: number;
   location_id: number;
   item_id: number;
   action_id: number;
   event_moment_utc: string;
-  numeric_value: number;
-  source_initial_event_id: number;
-  source_initial_age: number;
-  source_final_event_id: number;
-  source_final_age: number;
+  text_value?: string | null;
+  boolean_value?: boolean | null;
+  numeric_value?: number | string | null;
   status: ScopeCurrentAgeCalculationStatus;
 };
 

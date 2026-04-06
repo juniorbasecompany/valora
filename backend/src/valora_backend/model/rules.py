@@ -389,6 +389,12 @@ class Result(Base):
             "fórmula em determinado evento."
         ),
     )
+    formula_id: Mapped[int] = mapped_column(
+        BIGINT_COMPAT,
+        ForeignKey("formula.id", onupdate="CASCADE", ondelete="CASCADE"),
+        nullable=False,
+        comment="Ligação com a formula.",
+    )
     text_value: Mapped[str | None] = mapped_column(
         Text,
         nullable=True,
@@ -403,5 +409,10 @@ class Result(Base):
         Numeric(15, 10),
         nullable=True,
         comment="Este é resultado da fórmula, no formato numérico.",
+    )
+    formula_order: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        comment="Ordem do cálculo das fórmulas do mesmo evento.",
     )
 

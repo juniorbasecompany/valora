@@ -11,7 +11,7 @@
       "action": "Acciones",
       "unity": "Unidades",
       "event": "Eventos",
-      "calculation": "C\u00e1lculo",
+      "calculation": "Cálculo",
       "configuration": "Configuración",
       "comingSoon": "próximamente"
     },
@@ -577,13 +577,13 @@
     "discardConfirm": "¿Descartar los cambios no guardados?"
   },
   "CalculationPage": {
-    "title": "C\u00e1lculo de edad actual",
-    "description": "Selecciona un per\u00edodo para localizar eventos con edad inicial y final, recalcular el campo de edad actual y revisar los resultados guardados dentro del filtro elegido.",
+    "title": "Cálculo de edad actual",
+    "description": "Selecciona un período para localizar eventos con edad inicial y final, recalcular el campo de edad actual y revisar los resultados guardados dentro del filtro elegido.",
     "status": {
       "readyTitle": "Campos de edad listos",
-      "readyDescription": "El alcance activo ya tiene un campo inicial, uno actual y uno final para soportar el rec\u00e1lculo diario.",
-      "missingTitle": "Configuraci\u00f3n de edad pendiente",
-      "missingDescription": "Antes de calcular, marca en los campos del alcance cu\u00e1l es la edad inicial, la edad actual y la edad final."
+      "readyDescription": "El alcance activo ya tiene un campo inicial, uno actual y uno final para soportar el recálculo diario.",
+      "missingTitle": "Configuración de edad pendiente",
+      "missingDescription": "Antes de calcular, marca en los campos del alcance cuál es la edad inicial, la edad actual y la edad final."
     },
     "state": {
       "emptyScope": "Crea un alcance antes de calcular la edad actual.",
@@ -593,16 +593,16 @@
     "panel": {
       "startLabel": "Fecha inicial",
       "endLabel": "Fecha final",
-      "dateHint": "El c\u00e1lculo cubre todo el intervalo desde el inicio del primer d\u00eda hasta el fin del \u00faltimo d\u00eda.",
+      "dateHint": "El cálculo cubre todo el intervalo desde el inicio del primer día hasta el fin del último día.",
       "calculate": "Calcular",
       "calculating": "Calculando...",
       "validationRequired": "Selecciona las dos fechas para calcular.",
       "validationOrder": "La fecha inicial debe ser menor o igual que la fecha final.",
-      "error": "No se pudo calcular la edad actual. Int\u00e9ntalo de nuevo."
+      "error": "No se pudo calcular la edad actual. Inténtalo de nuevo."
     },
     "fields": {
-      "title": "Campos usados en el c\u00e1lculo",
-      "description": "Las flags del alcance definen de d\u00f3nde salen la edad inicial y final y en qu\u00e9 campo se persiste el resultado.",
+      "title": "Campos usados en el cálculo",
+      "description": "Las flags del alcance definen de dónde salen la edad inicial y final y en qué campo se persiste el resultado.",
       "initialBadge": "Edad inicial",
       "currentBadge": "Edad actual",
       "finalBadge": "Edad final",
@@ -610,24 +610,27 @@
       "missingLabel": "Pendiente"
     },
     "result": {
-      "title": "Resultados del per\u00edodo",
-      "description": "Cada fila representa el valor persistido en result.numeric_value para el campo marcado como edad actual.",
-      "placeholder": "Selecciona las fechas y ejecuta el c\u00e1lculo para ver los resultados de este per\u00edodo.",
-      "empty": "No se encontr\u00f3 ning\u00fan par de edad inicial y final en este per\u00edodo para generar resultados.",
+      "title": "Resultados del período",
+      "description": "Cada fila representa un result persistido por la ejecución de las fórmulas en el período seleccionado, con el campo de salida y el orden de la fórmula que generó el valor.",
+      "placeholder": "Selecciona las fechas y ejecuta el cálculo para ver los resultados de este período.",
+      "empty": "Ningún evento elegible produjo resultados en este período.",
       "createdLabel": "Creados",
       "updatedLabel": "Actualizados",
       "unchangedLabel": "Mantenidos",
       "statusCreated": "Creado",
       "statusUpdated": "Actualizado",
       "statusUnchanged": "Mantenido",
-      "locationLabel": "Ubicaci\u00f3n",
-      "itemLabel": "\u00cdtem",
-      "actionLabel": "Acci\u00f3n",
-      "sourceLabel": "Rango",
+      "fieldLabel": "Campo",
+      "locationLabel": "Ubicación",
+      "itemLabel": "Ítem",
+      "actionLabel": "Acción",
+      "formulaLabel": "Fórmula",
+      "formulaOrderLabel": "Orden",
       "calculatedAtLabel": "Calculado en",
-      "fallbackLocation": "Ubicaci\u00f3n no disponible",
-      "fallbackItem": "\u00cdtem no disponible",
-      "fallbackAction": "Acci\u00f3n no disponible"
+      "emptyValue": "Sin valor",
+      "fallbackLocation": "Ubicación no disponible",
+      "fallbackItem": "Ítem no disponible",
+      "fallbackAction": "Acción no disponible"
     }
   },
   "LocationConfigurationPage": {

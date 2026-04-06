@@ -7,6 +7,7 @@ import { StatusPanel } from "@/component/app-shell/status-panel";
 import { Badge } from "@/component/ui/badge";
 import { TenantDateTimePicker } from "@/component/ui/tenant-date-time-picker";
 import type {
+  ScopeCurrentAgeCalculationRecord,
   ScopeCurrentAgeCalculationResponse,
   TenantLocationDirectoryResponse,
   TenantScopeActionDirectoryResponse,
@@ -54,8 +55,11 @@ type CurrentAgeCalculationCopy = {
   locationLabel: string;
   itemLabel: string;
   actionLabel: string;
-  sourceLabel: string;
+  fieldLabel: string;
+  formulaLabel: string;
+  formulaOrderLabel: string;
   calculatedAtLabel: string;
+  emptyValue: string;
   fallbackLocation: string;
   fallbackItem: string;
   fallbackAction: string;
@@ -86,6 +90,22 @@ function formatMomentCompact(value: string) {
     hour: "2-digit",
     minute: "2-digit"
   }).format(parsed);
+}
+
+function formatPersistedValue(
+  item: ScopeCurrentAgeCalculationRecord,
+  emptyValueLabel: string
+) {
+  if (item.text_value != null && item.text_value.trim()) {
+    return item.text_value;
+  }
+  if (item.boolean_value != null) {
+    return item.boolean_value ? "true" : "false";
+  }
+  if (item.numeric_value != null) {
+    return String(item.numeric_value);
+  }
+  return emptyValueLabel;
 }
 
 function SummaryCard({
@@ -166,6 +186,14 @@ export function CurrentAgeCalculationClient({
     }
     return map;
   }, [initialActionDirectory?.item_list]);
+
+  const fieldLabelById = useMemo(() => {
+    const map = new Map<number, string>();
+    for (const item of initialFieldDirectory?.item_list ?? []) {
+      map.set(item.id, item.label_name?.trim() || `#${item.id}`);
+    }
+    return map;
+  }, [initialFieldDirectory?.item_list]);
 
   const currentFieldLabel = currentField?.label_name?.trim() || (
     currentField ? `#${currentField.id}` : copy.missingLabel
@@ -351,7 +379,7 @@ export function CurrentAgeCalculationClient({
                       <div className="ui-row-between">
                         <div className="ui-section-copy">
                           <h3 className="ui-header-title ui-title-section">
-                            {item.numeric_value}
+                            {formatPersistedValue(item, copy.emptyValue)}
                           </h3>
                           <p className="ui-copy-body">{formatMomentCompact(item.event_moment_utc)}</p>
                         </div>
@@ -374,6 +402,9 @@ export function CurrentAgeCalculationClient({
 
                       <div className="ui-badge-row">
                         <Badge tone="neutral">
+                          {copy.fieldLabel}: {fieldLabelById.get(item.field_id) ?? `#${item.field_id}`}
+                        </Badge>
+                        <Badge tone="neutral">
                           {copy.locationLabel}: {locationLabelById.get(item.location_id) ?? copy.fallbackLocation}
                         </Badge>
                         <Badge tone="neutral">
@@ -385,7 +416,7 @@ export function CurrentAgeCalculationClient({
                       </div>
 
                       <p className="ui-text-caption-wrap">
-                        {copy.sourceLabel}: {item.source_initial_age} -&gt; {item.source_final_age}
+                        {copy.formulaLabel}: #{item.formula_id} {UI_TEXT_SEPARATOR} {copy.formulaOrderLabel}: {item.formula_order}
                       </p>
                       <p className="ui-text-caption-wrap">
                         {copy.calculatedAtLabel}: {formatMomentCompact(result.calculated_moment_utc)}

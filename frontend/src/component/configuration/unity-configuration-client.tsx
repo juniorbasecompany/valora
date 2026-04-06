@@ -34,8 +34,7 @@ import type {
 import {
   areItemIdSetsEqual,
   buildItemByIdMap,
-  expandPickedItemIdsToStoredList,
-  frontierPickedIdsFromStoredList
+  expandPickedItemIdsToStoredList
 } from "@/lib/configuration/item-id-ancestry";
 import { preferredSelectionKeyAfterEditSave } from "@/lib/navigation/configuration-path";
 
@@ -124,6 +123,13 @@ function resolveSelectedUnityKey(
   return canCreate ? "new" : null;
 }
 
+function sanitizeUnityItemIdListForScope(
+  itemIdList: number[],
+  itemById: Map<number, TenantItemRecord>
+): number[] {
+  return itemIdList.filter((id) => itemById.has(id));
+}
+
 export function UnityConfigurationClient({
   locale,
   currentScope,
@@ -202,10 +208,7 @@ export function UnityConfigurationClient({
   const [locationId, setLocationId] = useState(selectedUnity?.location_id ?? 0);
   const [pickedItemIdList, setPickedItemIdList] = useState<number[]>(() =>
     selectedUnity
-      ? frontierPickedIdsFromStoredList(
-        [...selectedUnity.item_id_list],
-        buildItemByIdMap(itemRecordList)
-      )
+      ? sanitizeUnityItemIdListForScope(selectedUnity.item_id_list, buildItemByIdMap(itemRecordList))
       : []
   );
   const [initialAge, setInitialAge] = useState<number | null>(
@@ -291,9 +294,7 @@ export function UnityConfigurationClient({
 
       const nextLoc = nextRow != null ? nextRow.location_id : 0;
       const nextStoredList = nextRow ? [...nextRow.item_id_list] : [];
-      const nextPickedList = nextRow
-        ? frontierPickedIdsFromStoredList(nextStoredList, itemById)
-        : [];
+      const nextPickedList = sanitizeUnityItemIdListForScope(nextStoredList, itemById);
       const nextInitial = nextRow != null ? nextRow.initial_age : null;
       const nextFinal = nextRow != null ? nextRow.final_age : null;
 

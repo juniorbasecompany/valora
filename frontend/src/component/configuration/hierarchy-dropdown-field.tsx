@@ -357,7 +357,6 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
       return currentItem ? getParentId(currentItem) : null;
     });
     const itemOrderById = new Map(itemList.map((item, index) => [item.id, index]));
-    const seenSummaryKeySet = new Set<string>();
     const selectedLabelList = itemList
       .filter((item) => selectedIdSet.has(item.id))
       .sort(
@@ -365,15 +364,7 @@ export function HierarchyDropdownField<TItem extends HierarchyDropdownFieldItemB
           left.depth - right.depth ||
           (itemOrderById.get(left.id) ?? 0) - (itemOrderById.get(right.id) ?? 0)
       )
-      .flatMap((item) => {
-        const summaryKey =
-          "kind_id" in item ? `kind:${String(item.kind_id)}` : `id:${String(item.id)}`;
-        if (seenSummaryKeySet.has(summaryKey)) {
-          return [];
-        }
-        seenSummaryKeySet.add(summaryKey);
-        return [resolveItemLabel(item)];
-      });
+      .map((item) => resolveItemLabel(item));
 
     return selectedLabelList.length > 0 ? selectedLabelList.join(", ") : allLabel;
   }, [allLabel, getParentId, itemById, itemList, multiToggleMode, selectedValueList]);

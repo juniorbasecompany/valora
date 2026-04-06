@@ -15,14 +15,50 @@ export function expandSelectedIdsWithAncestors(
   return expandedIdSet;
 }
 
+function hasStrictSelectedDescendant(
+  candidateId: number,
+  selectedIdSet: Set<number>,
+  getParentIdById: (id: number) => number | null | undefined
+): boolean {
+  for (const selectedId of selectedIdSet) {
+    if (selectedId === candidateId) {
+      continue;
+    }
+
+    let currentParentId = getParentIdById(selectedId);
+    while (currentParentId != null) {
+      if (currentParentId === candidateId) {
+        return true;
+      }
+      currentParentId = getParentIdById(currentParentId);
+    }
+  }
+
+  return false;
+}
+
+function normalizeIndependentHierarchySelection(
+  selectedPickIdList: number[],
+  getParentIdById: (id: number) => number | null | undefined
+): number[] {
+  const selectedIdSet = new Set(selectedPickIdList);
+  return selectedPickIdList.filter(
+    (id) => !hasStrictSelectedDescendant(id, selectedIdSet, getParentIdById)
+  );
+}
+
 export function toggleIndependentHierarchySelection(
   selectedPickIdList: number[],
   toggledId: number,
   getParentIdById: (id: number) => number | null | undefined,
   getChildrenIdsByParentId: (id: number) => number[]
 ): number[] {
-  const expandedSelectedIdSet = expandSelectedIdsWithAncestors(
+  const normalizedSelectedPickIdList = normalizeIndependentHierarchySelection(
     selectedPickIdList,
+    getParentIdById
+  );
+  const expandedSelectedIdSet = expandSelectedIdsWithAncestors(
+    normalizedSelectedPickIdList,
     getParentIdById
   );
 
@@ -34,7 +70,7 @@ export function toggleIndependentHierarchySelection(
       currentParentId = getParentIdById(currentParentId);
     }
 
-    const nextSelectedPickIdList = selectedPickIdList.filter(
+    const nextSelectedPickIdList = normalizedSelectedPickIdList.filter(
       (id) => !ancestorIdSet.has(id)
     );
     return nextSelectedPickIdList.includes(toggledId)
@@ -55,5 +91,5 @@ export function toggleIndependentHierarchySelection(
     pendingIdList.push(...getChildrenIdsByParentId(currentId));
   }
 
-  return selectedPickIdList.filter((id) => !removedIdSet.has(id));
+  return normalizedSelectedPickIdList.filter((id) => !removedIdSet.has(id));
 }

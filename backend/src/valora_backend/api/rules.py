@@ -197,6 +197,17 @@ def _extract_result_runtime_value_or_none(
     )
 
 
+def _default_runtime_value_for_field(field: Field) -> str | bool | int | float:
+    family = _sql_type_family_or_400(field.type)
+    if family == "text":
+        return ""
+    if family == "boolean":
+        return False
+    if family == "integer":
+        return 0
+    return 0.0
+
+
 def _coerce_formula_output_to_result_payload_or_400(
     value: Any,
     *,
@@ -1896,6 +1907,20 @@ def _normalize_whole_age_or_400(
     return int(whole_value)
 
 
+def _normalize_whole_age_runtime_or_400(
+    value: Any | None, *, event_id: int, age_role: str
+) -> int | None:
+    if value is None:
+        return None
+    return _parse_integer_value_or_400(
+        value,
+        detail=(
+            f"Event {event_id} has a non-integer {age_role} age value; "
+            "current age calculation only supports whole days"
+        ),
+    )
+
+
 def _event_execution_sort_key(
     *,
     moment_utc: datetime,
@@ -2241,6 +2266,26 @@ def calculate_scope_current_age(
     age_source_runtime_by_event_id: defaultdict[int, dict[int, int]] = defaultdict(dict)
     existing_result_by_key: dict[tuple[int, int, int], Result] = {}
 
+    for event_id, input_runtime in input_runtime_by_event_id.items():
+        if initial_field.id in input_runtime:
+            normalized_age = _normalize_whole_age_runtime_or_400(
+                input_runtime[initial_field.id],
+                event_id=event_id,
+                age_role="initial",
+            )
+            if normalized_age is not None:
+                initial_age_by_event_id[event_id] = normalized_age
+                age_source_runtime_by_event_id[event_id][initial_field.id] = normalized_age
+        if final_field.id in input_runtime:
+            normalized_age = _normalize_whole_age_runtime_or_400(
+                input_runtime[final_field.id],
+                event_id=event_id,
+                age_role="final",
+            )
+            if normalized_age is not None:
+                final_age_by_event_id[event_id] = normalized_age
+                age_source_runtime_by_event_id[event_id][final_field.id] = normalized_age
+
     for row in session.scalars(
         select(Result)
         .where(Result.event_id.in_(event_id_list))
@@ -2301,6 +2346,7 @@ def calculate_scope_current_age(
         active_initial_index: int | None = None
         active_initial_event_id: int | None = None
         active_initial_age: int | None = None
+        active_window: dict[str, int] | None = None
 
         for index, row in enumerate(group_event_row_list):
             next_initial_age = initial_age_by_event_id.get(row.id)
@@ -2308,36 +2354,59 @@ def calculate_scope_current_age(
                 active_initial_index = index
                 active_initial_event_id = row.id
                 active_initial_age = next_initial_age
+                active_window = None
 
             final_age = final_age_by_event_id.get(row.id)
-            if (
-                active_initial_index is None
-                or active_initial_event_id is None
-                or active_initial_age is None
-                or final_age is None
-            ):
-                continue
+            if final_age is not None:
+                if (
+                    active_initial_index is not None
+                    and active_initial_event_id is not None
+                    and active_initial_age is not None
+                ):
+                    active_window = {
+                        "source_initial_event_id": active_initial_event_id,
+                        "source_initial_age": active_initial_age,
+                        "source_final_event_id": row.id,
+                        "source_final_age": final_age,
+                    }
+                    candidate_row_list = group_event_row_list[active_initial_index : index + 1]
+                    active_initial_index = None
+                    active_initial_event_id = None
+                    active_initial_age = None
+                elif active_window is not None:
+                    active_window = {
+                        **active_window,
+                        "source_final_event_id": row.id,
+                        "source_final_age": final_age,
+                    }
+                    candidate_row_list = [row]
+                else:
+                    candidate_row_list = []
 
-            for candidate in group_event_row_list[active_initial_index : index + 1]:
-                previous_assignment = window_meta_by_event_id.get(candidate.id)
-                next_assignment = {
-                    "source_initial_event_id": active_initial_event_id,
-                    "source_initial_age": active_initial_age,
-                    "source_final_event_id": row.id,
-                    "source_final_age": final_age,
-                }
-                if previous_assignment is not None and previous_assignment != next_assignment:
+                for candidate in candidate_row_list:
+                    previous_assignment = window_meta_by_event_id.get(candidate.id)
+                    if previous_assignment is not None and previous_assignment != active_window:
+                        raise HTTPException(
+                            status_code=status.HTTP_400_BAD_REQUEST,
+                            detail=(
+                                f"Event {candidate.id} belongs to overlapping age windows with different bounds"
+                            ),
+                        )
+                    if active_window is not None:
+                        window_meta_by_event_id[candidate.id] = active_window
+                if active_window is not None:
+                    continue
+
+            if active_window is not None:
+                previous_assignment = window_meta_by_event_id.get(row.id)
+                if previous_assignment is not None and previous_assignment != active_window:
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
                         detail=(
-                            f"Event {candidate.id} belongs to overlapping age windows with different bounds"
+                            f"Event {row.id} belongs to overlapping age windows with different bounds"
                         ),
                     )
-                window_meta_by_event_id[candidate.id] = next_assignment
-
-            active_initial_index = None
-            active_initial_event_id = None
-            active_initial_age = None
+                window_meta_by_event_id[row.id] = active_window
 
     if not window_meta_by_event_id:
         return ScopeCurrentAgeCalculationResponse(
@@ -2429,14 +2498,8 @@ def calculate_scope_current_age(
             for field_id in parsed_formula.field_id_in_rhs:
                 runtime_value = group_state.get(field_id)
                 if runtime_value is None:
-                    raise HTTPException(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        detail=(
-                            f"Event {row.id} formula {formula_row.id} "
-                            f"(sort_order {formula_row.sort_order}) requires a current result "
-                            f"for field {field_id}"
-                        ),
-                    )
+                    runtime_value = _default_runtime_value_for_field(field_by_id[field_id])
+                    group_state[field_id] = runtime_value
                 evaluator_names[f"f_{field_id}"] = runtime_value
 
             for field_id in parsed_formula.input_id_in_rhs:

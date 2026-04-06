@@ -2424,6 +2424,75 @@ def read_scope_current_age(
 
 
 @router.post(
+    "/scopes/{scope_id}/events/delete-current-age",
+    response_model=ScopeCurrentAgeCalculationResponse,
+)
+def delete_scope_current_age(
+    scope_id: int,
+    body: ScopeCurrentAgeCalculationRequest,
+    member: Member = Depends(get_current_member),
+    session: Session = Depends(get_session),
+):
+    _require_scope_rules_editor(member)
+    _get_tenant_scope(session, actor=member, scope_id=scope_id)
+
+    moment_from_utc = body.moment_from_utc
+    moment_to_utc = body.moment_to_utc
+    if moment_from_utc.tzinfo is not None:
+        moment_from_utc = moment_from_utc.astimezone(UTC).replace(tzinfo=None)
+    if moment_to_utc.tzinfo is not None:
+        moment_to_utc = moment_to_utc.astimezone(UTC).replace(tzinfo=None)
+    if moment_from_utc > moment_to_utc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid event period",
+        )
+
+    event_id_list = list(
+        session.scalars(
+            select(Event.id)
+            .join(Action, Event.action_id == Action.id)
+            .where(
+                Action.scope_id == scope_id,
+                Event.moment_utc <= moment_to_utc,
+            )
+        )
+    )
+    calculated_moment_utc = datetime.now(UTC).replace(tzinfo=None)
+    if not event_id_list:
+        return ScopeCurrentAgeCalculationResponse(
+            can_edit=True,
+            calculated_moment_utc=calculated_moment_utc,
+            created_count=0,
+            updated_count=0,
+            unchanged_count=0,
+            item_list=[],
+        )
+
+    _apply_member_audit_context(session, member)
+    deleted_result = session.execute(
+        delete(Result).where(
+            Result.moment_utc >= moment_from_utc,
+            Result.moment_utc <= moment_to_utc,
+            Result.event_id.in_(event_id_list),
+        )
+    )
+
+    if (deleted_result.rowcount or 0) > 0:
+        _apply_member_audit_context(session, member)
+        commit_session_with_null_if_empty(session)
+
+    return ScopeCurrentAgeCalculationResponse(
+        can_edit=True,
+        calculated_moment_utc=calculated_moment_utc,
+        created_count=0,
+        updated_count=0,
+        unchanged_count=0,
+        item_list=[],
+    )
+
+
+@router.post(
     "/scopes/{scope_id}/events/calculate-current-age",
     response_model=ScopeCurrentAgeCalculationResponse,
 )

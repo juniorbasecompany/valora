@@ -548,9 +548,12 @@
       "reading": "Lendo...",
       "calculate": "Calcular",
       "calculating": "Calculando...",
+      "delete": "Apagar",
+      "deleting": "Apagando...",
       "validationRequired": "Selecione as duas datas para calcular.",
       "validationOrder": "A data inicial deve ser menor ou igual à data final.",
-      "error": "Não foi possível calcular a idade atual. Tente novamente."
+      "error": "Não foi possível calcular a idade atual. Tente novamente.",
+      "deleteError": "Não foi possível apagar os resultados do período. Tente novamente."
     },
     "fields": {
       "title": "Campos usados no cálculo",

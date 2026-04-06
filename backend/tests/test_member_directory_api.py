@@ -20,6 +20,7 @@ from valora_backend.api.rules import (
     ScopeResultPatchRequest,
     calculate_scope_current_age,
     create_scope_event_result,
+    delete_scope_current_age,
     delete_scope_field,
     patch_scope_event_result,
     read_scope_current_age,
@@ -2615,6 +2616,126 @@ def test_read_scope_current_age_reads_existing_results_without_recalculation() -
         ] == [
             (event.id, formula.id, 11, "unchanged"),
         ]
+
+
+def test_delete_scope_current_age_removes_results_in_selected_period() -> None:
+    with build_rules_session() as (session, tenant_id):
+        scope = Scope(
+            name="Aves",
+            display_name="Aves para producao de ovos",
+            tenant_id=tenant_id,
+        )
+        session.add(scope)
+        session.flush()
+
+        location = Location(
+            name="Granja A",
+            display_name="Granja A",
+            scope_id=scope.id,
+            parent_location_id=None,
+            sort_order=0,
+        )
+        kind = Kind(scope_id=scope.id, name="lote", display_name="Lote")
+        action = Action(scope_id=scope.id, sort_order=0)
+        field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=0,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=True,
+        )
+        initial_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=1,
+            is_initial_age=True,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        final_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=2,
+            is_initial_age=False,
+            is_final_age=True,
+            is_current_age=False,
+        )
+        session.add_all([location, kind, action, field, initial_field, final_field])
+        session.flush()
+
+        item = Item(
+            scope_id=scope.id,
+            kind_id=kind.id,
+            parent_item_id=None,
+            sort_order=0,
+        )
+        session.add(item)
+        session.flush()
+
+        formula = Formula(
+            action_id=action.id,
+            sort_order=0,
+            statement=f"${{field:{field.id}}} = ${{field:{field.id}}}",
+        )
+        session.add(formula)
+        session.flush()
+
+        kept_event = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=action.id,
+            moment_utc=datetime(2026, 4, 1, 8, 0, 0),
+        )
+        deleted_event = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=action.id,
+            moment_utc=datetime(2026, 4, 2, 12, 0, 0),
+        )
+        session.add_all([kept_event, deleted_event])
+        session.flush()
+
+        kept_result = Result(
+            event_id=kept_event.id,
+            field_id=field.id,
+            formula_id=formula.id,
+            formula_order=formula.sort_order,
+            text_value=None,
+            boolean_value=None,
+            numeric_value=10,
+            moment_utc=datetime(2026, 4, 1, 8, 5, 0),
+        )
+        deleted_result = Result(
+            event_id=deleted_event.id,
+            field_id=field.id,
+            formula_id=formula.id,
+            formula_order=formula.sort_order,
+            text_value=None,
+            boolean_value=None,
+            numeric_value=11,
+            moment_utc=datetime(2026, 4, 2, 12, 5, 0),
+        )
+        session.add_all([kept_result, deleted_result])
+        session.commit()
+
+        response = delete_scope_current_age(
+            scope_id=scope.id,
+            body=ScopeCurrentAgeCalculationRequest(
+                moment_from_utc="2026-04-02T00:00:00Z",
+                moment_to_utc="2026-04-02T23:59:00Z",
+            ),
+            member=SimpleNamespace(role=2, tenant_id=tenant_id, account_id=1),
+            session=session,
+        )
+
+        remaining_result_id_list = list(session.scalars(select(Result.id).order_by(Result.id)))
+
+        assert response.created_count == 0
+        assert response.updated_count == 0
+        assert response.unchanged_count == 0
+        assert response.item_list == []
+        assert remaining_result_id_list == [kept_result.id]
 
 
 def test_calculate_scope_current_age_uses_action_sort_order_within_same_day() -> None:

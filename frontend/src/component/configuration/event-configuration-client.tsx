@@ -128,9 +128,20 @@ function parseSelectedEventKey(raw: string | null): EventSelectionKey {
 
 /** Lista do diretório: mais antigo primeiro (mesma regra da API `list_scope_events`). */
 function sortEventDirectoryItemListOldestFirst(
-  itemList: TenantScopeEventRecord[]
+  itemList: TenantScopeEventRecord[],
+  actionSortOrderById: Map<number, number>
 ): TenantScopeEventRecord[] {
   return [...itemList].sort((left, right) => {
+    const byDay = left.moment_utc.slice(0, 10).localeCompare(right.moment_utc.slice(0, 10));
+    if (byDay !== 0) {
+      return byDay;
+    }
+    const byActionSortOrder =
+      (actionSortOrderById.get(left.action_id) ?? Number.MAX_SAFE_INTEGER)
+      - (actionSortOrderById.get(right.action_id) ?? Number.MAX_SAFE_INTEGER);
+    if (byActionSortOrder !== 0) {
+      return byActionSortOrder;
+    }
     const byMoment = left.moment_utc.localeCompare(right.moment_utc);
     if (byMoment !== 0) {
       return byMoment;
@@ -413,6 +424,14 @@ export function EventConfigurationClient({
     return map;
   }, [initialActionDirectory?.item_list]);
 
+  const actionSortOrderById = useMemo(() => {
+    const map = new Map<number, number>();
+    for (const item of initialActionDirectory?.item_list ?? []) {
+      map.set(item.id, item.sort_order);
+    }
+    return map;
+  }, [initialActionDirectory?.item_list]);
+
   const actionOptionList = useMemo(
     () =>
       (initialActionDirectory?.item_list ?? []).map((item) => ({
@@ -427,7 +446,10 @@ export function EventConfigurationClient({
       ? null
       : {
           ...initialEventDirectory,
-          item_list: sortEventDirectoryItemListOldestFirst(initialEventDirectory.item_list)
+          item_list: sortEventDirectoryItemListOldestFirst(
+            initialEventDirectory.item_list,
+            actionSortOrderById
+          )
         }
   );
 
@@ -578,7 +600,10 @@ export function EventConfigurationClient({
 
       const directoryWithSortedList: TenantScopeEventDirectoryResponse = {
         ...nextDirectory,
-        item_list: sortEventDirectoryItemListOldestFirst(nextDirectory.item_list)
+        item_list: sortEventDirectoryItemListOldestFirst(
+          nextDirectory.item_list,
+          actionSortOrderById
+        )
       };
 
       const nextKey = resolveSelectedEventKey(
@@ -620,7 +645,7 @@ export function EventConfigurationClient({
 
       return nextKey;
     },
-    []
+    [actionSortOrderById]
   );
 
   const applySyncFromHandlers = useCallback(

@@ -598,9 +598,12 @@
       "reading": "Reading...",
       "calculate": "Calculate",
       "calculating": "Calculating...",
+      "delete": "Delete",
+      "deleting": "Deleting...",
       "validationRequired": "Select both dates to calculate.",
       "validationOrder": "The start date must be earlier than or equal to the end date.",
-      "error": "Could not calculate the current age. Try again."
+      "error": "Could not calculate the current age. Try again.",
+      "deleteError": "Could not delete the results in this period. Try again."
     },
     "fields": {
       "title": "Fields used in the calculation",

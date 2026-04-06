@@ -34,9 +34,12 @@ type CurrentAgeCalculationCopy = {
   reading: string;
   calculate: string;
   calculating: string;
+  delete: string;
+  deleting: string;
   validationRequired: string;
   validationOrder: string;
   calculateError: string;
+  deleteError: string;
   resultPlaceholder: string;
   resultEmpty: string;
   resultDateLabel: string;
@@ -120,6 +123,7 @@ export function CurrentAgeCalculationClient({
   const [requestErrorMessage, setRequestErrorMessage] = useState<string | null>(null);
   const [isReading, setIsReading] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [result, setResult] = useState<ScopeCurrentAgeCalculationResponse | null>(null);
 
   const initialField = useMemo(
@@ -328,6 +332,50 @@ export function CurrentAgeCalculationClient({
     }
   }
 
+  async function handleDelete() {
+    if (!validateRequest() || !currentScope) {
+      return;
+    }
+    const currentMomentFrom = momentFrom;
+    const currentMomentTo = momentTo;
+    if (!currentMomentFrom || !currentMomentTo) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setRequestErrorMessage(null);
+
+    try {
+      const response = await fetch(
+        `/api/auth/tenant/current/scopes/${currentScope.id}/events/delete-current-age`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            moment_from_utc: currentMomentFrom.toISOString(),
+            moment_to_utc: currentMomentTo.toISOString()
+          })
+        }
+      );
+      const data: unknown = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setRequestErrorMessage(parseErrorDetail(data, copy.deleteError) ?? copy.deleteError);
+        return;
+      }
+
+      setResult(data as ScopeCurrentAgeCalculationResponse);
+    } catch (error) {
+      setRequestErrorMessage(
+        error instanceof Error && error.message.trim()
+          ? error.message
+          : copy.deleteError
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
   return (
     <section className="ui-page-stack">
       <PageHeader
@@ -363,7 +411,7 @@ export function CurrentAgeCalculationClient({
                     setMomentFrom(value);
                     setRequestErrorMessage(null);
                   }}
-                  disabled={!canEdit || !isReady || isCalculating || isReading}
+                  disabled={!canEdit || !isReady || isCalculating || isReading || isDeleting}
                   locale={locale}
                   hidePlaceholder
                   periodBoundary="start"
@@ -381,7 +429,7 @@ export function CurrentAgeCalculationClient({
                     setMomentTo(value);
                     setRequestErrorMessage(null);
                   }}
-                  disabled={!canEdit || !isReady || isCalculating || isReading}
+                  disabled={!canEdit || !isReady || isCalculating || isReading || isDeleting}
                   locale={locale}
                   hidePlaceholder
                   periodBoundary="end"
@@ -399,7 +447,7 @@ export function CurrentAgeCalculationClient({
                 type="button"
                 className="ui-button-secondary"
                 onClick={() => void handleRead()}
-                disabled={!canEdit || !isReady || isCalculating || isReading}
+                disabled={!canEdit || !isReady || isCalculating || isReading || isDeleting}
               >
                 {isReading ? copy.reading : copy.read}
               </button>
@@ -407,9 +455,17 @@ export function CurrentAgeCalculationClient({
                 type="button"
                 className="ui-button-primary"
                 onClick={() => void handleCalculate()}
-                disabled={!canEdit || !isReady || isCalculating || isReading}
+                disabled={!canEdit || !isReady || isCalculating || isReading || isDeleting}
               >
                 {isCalculating ? copy.calculating : copy.calculate}
+              </button>
+              <button
+                type="button"
+                className="ui-button-danger"
+                onClick={() => void handleDelete()}
+                disabled={!canEdit || !isReady || isCalculating || isReading || isDeleting}
+              >
+                {isDeleting ? copy.deleting : copy.delete}
               </button>
             </div>
           </section>

@@ -429,6 +429,11 @@ export function CurrentAgeCalculationClient({
   const emptyResultMessage = useMemo(() => (
     resolveEmptyResultMessage(result?.empty_reason, copy)
   ), [copy, result?.empty_reason]);
+  const footerNoticeMessage = useMemo(() => (
+    result != null && result.item_list.length === 0
+      ? emptyResultMessage
+      : null
+  ), [emptyResultMessage, result]);
 
   const asideEmptyMessage = !currentScope
     ? hasAnyScope
@@ -770,9 +775,7 @@ export function CurrentAgeCalculationClient({
           <section className="ui-page-stack">
             {requestErrorMessage ? (
               <div className="ui-panel ui-empty-panel">{requestErrorMessage}</div>
-            ) : result == null ? null : result.item_list.length === 0 ? (
-              <div className="ui-panel ui-empty-panel">{emptyResultMessage}</div>
-            ) : (
+            ) : result == null || result.item_list.length === 0 ? null : (
               <div className="ui-current-age-table-shell ui-panel">
                 <div className="ui-current-age-table-scroll">
                   <table className="ui-current-age-table">
@@ -874,6 +877,8 @@ export function CurrentAgeCalculationClient({
             discardConfirm=""
             isDirty={false}
             footerErrorMessage={footerErrorMessage}
+            footerNoticeMessage={footerNoticeMessage}
+            footerNoticeTone="attention"
             onSave={() => void handleRead()}
             saveDisabled={!canEdit || !isReady || isCalculating || isReading || isDeleting}
             saveLabel={copy.read}

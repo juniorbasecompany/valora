@@ -316,6 +316,7 @@ export function CurrentAgeCalculationClient({
   const [momentTo, setMomentTo] = useState<Date | null>(null);
   const [locationId, setLocationId] = useState<number | null>(null);
   const [itemId, setItemId] = useState<number | null>(null);
+  const [footerErrorMessage, setFooterErrorMessage] = useState<string | null>(null);
   const [requestErrorMessage, setRequestErrorMessage] = useState<ReactNode | null>(null);
   const [isReading, setIsReading] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
@@ -424,11 +425,11 @@ export function CurrentAgeCalculationClient({
       return false;
     }
     if (!momentFrom || !momentTo) {
-      setRequestErrorMessage(copy.validationRequired);
+      setFooterErrorMessage(copy.validationRequired);
       return false;
     }
     if (momentFrom.getTime() > momentTo.getTime()) {
-      setRequestErrorMessage(copy.validationOrder);
+      setFooterErrorMessage(copy.validationOrder);
       return false;
     }
     return true;
@@ -446,6 +447,7 @@ export function CurrentAgeCalculationClient({
 
     setIsReading(true);
     setRequestErrorMessage(null);
+    setFooterErrorMessage(null);
 
     try {
       const response = await fetch(
@@ -502,6 +504,7 @@ export function CurrentAgeCalculationClient({
 
     setIsCalculating(true);
     setRequestErrorMessage(null);
+    setFooterErrorMessage(null);
 
     try {
       const response = await fetch(
@@ -558,6 +561,7 @@ export function CurrentAgeCalculationClient({
 
     setIsDeleting(true);
     setRequestErrorMessage(null);
+    setFooterErrorMessage(null);
 
     try {
       const response = await fetch(
@@ -614,8 +618,9 @@ export function CurrentAgeCalculationClient({
             <div className="ui-notice-attention ui-notice-block">{copy.readOnlyNotice}</div>
           ) : null}
 
-          <DirectoryFilterPanel>
-            <DirectoryFilterCard>
+          <div className="ui-current-age-filter-panel">
+            <DirectoryFilterPanel>
+              <DirectoryFilterCard>
               <div className="ui-grid-cards-2">
                 <div className="ui-field">
                   <label className="ui-field-label" htmlFor="current-age-start">
@@ -627,6 +632,7 @@ export function CurrentAgeCalculationClient({
                     onChange={(value) => {
                       setMomentFrom(value);
                       setRequestErrorMessage(null);
+                      setFooterErrorMessage(null);
                     }}
                     disabled={!canEdit || !isReady || isCalculating || isReading || isDeleting}
                     locale={locale}
@@ -646,6 +652,7 @@ export function CurrentAgeCalculationClient({
                     onChange={(value) => {
                       setMomentTo(value);
                       setRequestErrorMessage(null);
+                      setFooterErrorMessage(null);
                     }}
                     disabled={!canEdit || !isReady || isCalculating || isReading || isDeleting}
                     locale={locale}
@@ -655,9 +662,9 @@ export function CurrentAgeCalculationClient({
                   <p className="ui-field-hint">{copy.endHint}</p>
                 </div>
               </div>
-            </DirectoryFilterCard>
+              </DirectoryFilterCard>
 
-            <DirectoryFilterCard>
+              <DirectoryFilterCard>
               <HierarchySingleSelectField
                 id="current-age-location"
                 label={copy.locationLabel}
@@ -666,15 +673,16 @@ export function CurrentAgeCalculationClient({
                 onChange={(nextValue) => {
                   setLocationId(nextValue);
                   setRequestErrorMessage(null);
+                  setFooterErrorMessage(null);
                 }}
                 getParentId={(item) => item.parent_location_id ?? null}
                 allLabel=""
                 disabled={!canEdit || !isReady || isCalculating || isReading || isDeleting}
               />
               <p className="ui-field-hint">{copy.locationHint}</p>
-            </DirectoryFilterCard>
+              </DirectoryFilterCard>
 
-            <DirectoryFilterCard>
+              <DirectoryFilterCard>
               <HierarchySingleSelectField
                 id="current-age-item"
                 label={copy.itemLabel}
@@ -683,21 +691,21 @@ export function CurrentAgeCalculationClient({
                 onChange={(nextValue) => {
                   setItemId(nextValue);
                   setRequestErrorMessage(null);
+                  setFooterErrorMessage(null);
                 }}
                 getParentId={(row) => row.parent_item_id ?? null}
                 allLabel=""
                 disabled={!canEdit || !isReady || isCalculating || isReading || isDeleting}
               />
               <p className="ui-field-hint">{copy.itemHint}</p>
-            </DirectoryFilterCard>
-          </DirectoryFilterPanel>
+              </DirectoryFilterCard>
+            </DirectoryFilterPanel>
+          </div>
 
           <section className="ui-page-stack">
             {requestErrorMessage ? (
               <div className="ui-panel ui-empty-panel">{requestErrorMessage}</div>
-            ) : !result ? (
-              <div className="ui-panel ui-empty-panel">{copy.resultPlaceholder}</div>
-            ) : result.item_list.length === 0 ? (
+            ) : result == null ? null : result.item_list.length === 0 ? (
               <div className="ui-panel ui-empty-panel">{emptyResultMessage}</div>
             ) : (
               <div className="ui-current-age-table-shell ui-panel">
@@ -747,36 +755,36 @@ export function CurrentAgeCalculationClient({
         </>
       )}
 
-      {footerPortalTarget
+      {footerPortalTarget && currentScope
         ? createPortal(
           <ConfigurationEditorFooter
             discardConfirm=""
             isDirty={false}
-            footerErrorMessage={null}
+            footerErrorMessage={footerErrorMessage}
             onSave={() => void handleRead()}
             saveDisabled={!canEdit || !isReady || isCalculating || isReading || isDeleting}
             saveLabel={copy.read}
             savingLabel={copy.reading}
             isSaving={isReading}
             startContent={(
-              <div className="ui-button-row">
-                <button
-                  type="button"
-                  className="ui-button-secondary"
-                  onClick={() => void handleCalculate()}
-                  disabled={!canEdit || !isReady || isCalculating || isReading || isDeleting}
-                >
-                  {isCalculating ? copy.calculating : copy.calculate}
-                </button>
-                <button
-                  type="button"
-                  className="ui-button-danger"
-                  onClick={() => void handleDelete()}
-                  disabled={!canEdit || !isReady || isCalculating || isReading || isDeleting}
-                >
-                  {isDeleting ? copy.deleting : copy.delete}
-                </button>
-              </div>
+              <button
+                type="button"
+                className="ui-button-danger"
+                onClick={() => void handleDelete()}
+                disabled={!canEdit || !isReady || isCalculating || isReading || isDeleting}
+              >
+                {isDeleting ? copy.deleting : copy.delete}
+              </button>
+            )}
+            endContent={(
+              <button
+                type="button"
+                className="ui-button-primary"
+                onClick={() => void handleCalculate()}
+                disabled={!canEdit || !isReady || isCalculating || isReading || isDeleting}
+              >
+                {isCalculating ? copy.calculating : copy.calculate}
+              </button>
             )}
           />,
           footerPortalTarget

@@ -1423,4 +1423,8 @@
   .ui-history-filter-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+
+  .ui-current-age-filter-panel .ui-history-filter-grid {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr);
+  }
 }

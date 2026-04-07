@@ -15,6 +15,7 @@ export type ConfigurationEditorFooterProps = {
     savingLabel: string;
     isSaving: boolean;
     startContent?: ReactNode;
+    endContent?: ReactNode;
     dangerAction?: ReactNode;
 };
 
@@ -30,6 +31,7 @@ export function ConfigurationEditorFooter({
     savingLabel,
     isSaving,
     startContent,
+    endContent,
     dangerAction
 }: ConfigurationEditorFooterProps) {
     return (
@@ -67,6 +69,7 @@ export function ConfigurationEditorFooter({
                 ) : null}
             </div>
             <div className="ui-action-footer-end">
+                {endContent}
                 {dangerAction}
                 <button
                     type="button"

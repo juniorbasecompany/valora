@@ -76,30 +76,41 @@
 
 .ui-current-age-table-shell {
   padding: 0;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .ui-current-age-table-scroll {
   overflow-x: auto;
-  overflow-y: visible;
+  overflow-y: hidden;
   position: relative;
 }
 
 .ui-current-age-table {
   width: max-content;
-  border-collapse: collapse;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
   table-layout: auto;
+}
+
+.ui-current-age-table-column-date,
+.ui-current-age-table-column-value {
+  width: 1%;
+}
+
+.ui-current-age-table-column-detail {
+  width: auto;
 }
 
 .ui-current-age-table th,
 .ui-current-age-table td {
-  padding: 0.35rem 0.5rem;
+  padding: 0.5rem 0.75rem;
   border-right: var(--border-width-default) solid var(--color-border);
   border-bottom: var(--border-width-default) solid var(--color-border);
-  vertical-align: middle;
+  vertical-align: top;
   text-align: left;
   white-space: nowrap;
-  line-height: 1.2;
+  line-height: 1.45;
 }
 
 .ui-current-age-table td {
@@ -109,21 +120,13 @@
   background: white;
 }
 
-.ui-current-age-table td:nth-child(n+2) {
-  text-align: center;
-}
-
 .ui-current-age-table th:last-child,
 .ui-current-age-table td:last-child {
   border-right: none;
 }
 
 .ui-current-age-table thead th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
   background: color-mix(in srgb, white 16%, var(--color-accent-vertical-border) 84%);
-  backdrop-filter: none;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.03em;
@@ -133,40 +136,49 @@
   border-bottom-color: color-mix(in srgb, white 20%, var(--color-accent-vertical-border) 80%);
 }
 
+.ui-current-age-table thead th:first-child {
+  border-top-left-radius: calc(var(--radius-panel) - 1px);
+}
+
+.ui-current-age-table thead th:last-child {
+  border-top-right-radius: calc(var(--radius-panel) - 1px);
+}
+
 .ui-current-age-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.ui-current-age-table tbody tr {
-  background: var(--color-surface);
+.ui-current-age-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: calc(var(--radius-panel) - 1px);
 }
 
-.ui-current-age-table tbody tr.ui-current-age-table-day-band-even {
-  background: color-mix(in srgb, var(--color-surface) 92%, var(--color-accent-surface) 8%);
+.ui-current-age-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: calc(var(--radius-panel) - 1px);
 }
 
-.ui-current-age-table tbody tr.ui-current-age-table-day-band-odd {
-  background: color-mix(in srgb, var(--color-surface) 84%, var(--color-accent-surface) 16%);
+.ui-current-age-table-value-heading,
+.ui-current-age-table td.ui-current-age-table-value-cell {
+  text-align: center;
 }
 
-.ui-current-age-table-cell-stack {
-  display: grid;
-  gap: 0.125rem;
-  font-size: 0.8125rem;
-  font-weight: 400;
+.ui-current-age-table td.ui-current-age-table-value-cell {
+  padding: 0;
 }
 
 .ui-current-age-table-value-button {
-  display: inline-flex;
-  min-width: 100%;
+  display: flex;
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
   align-items: center;
   justify-content: center;
-  padding: 0.125rem;
+  padding: 0.5rem 0.75rem;
   border: none;
   background: transparent;
   color: inherit;
   font: inherit;
   text-align: center;
+  font-variant-numeric: tabular-nums;
   cursor: pointer;
 }
 
@@ -176,17 +188,21 @@
   border-radius: var(--radius-control);
 }
 
-.ui-current-age-table-value-cell {
-  position: static;
+.ui-current-age-table-value-dropdown {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.ui-current-age-table-value-dropdown {
-  display: flex;
-  justify-content: center;
+.ui-current-age-table-spacer-heading,
+.ui-current-age-table-spacer-cell {
+  min-width: 20rem;
 }
 
 .ui-current-age-table-dropdown-panel {
   position: fixed;
+  top: var(--ui-current-age-dropdown-top);
+  left: var(--ui-current-age-dropdown-left);
   z-index: calc(var(--z-menu-panel) + 1);
   width: max-content;
   min-width: 0;
@@ -203,6 +219,10 @@
 .ui-current-age-formula-box-row {
   display: grid;
   gap: 0.25rem;
+}
+
+.ui-current-age-formula-box-row + .ui-current-age-formula-box-row {
+  margin-top: 0.5rem;
 }
 
 .ui-current-age-formula-box-label {

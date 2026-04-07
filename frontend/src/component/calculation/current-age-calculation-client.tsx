@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
 import { PageHeader } from "@/component/app-shell/page-header";
@@ -391,6 +391,7 @@ export function CurrentAgeCalculationClient({
     }
     return map;
   }, [initialFieldDirectory?.item_list]);
+  const fieldList = initialFieldDirectory?.item_list ?? [];
 
   const resultRowList = useMemo<ScopeCurrentAgeCalculationRecord[]>(() => {
     if (!result) {
@@ -775,14 +776,27 @@ export function CurrentAgeCalculationClient({
               <div className="ui-current-age-table-shell ui-panel">
                 <div className="ui-current-age-table-scroll">
                   <table className="ui-current-age-table">
+                    <caption className="ui-sr-only">{copy.title}</caption>
+                    <colgroup>
+                      <col className="ui-current-age-table-column-date" />
+                      {fieldList.map((field) => (
+                        <col key={`col-${field.id}`} className="ui-current-age-table-column-value" />
+                      ))}
+                      <col className="ui-current-age-table-column-detail" />
+                    </colgroup>
                     <thead>
                       <tr>
-                        <th>{copy.resultDateLabel}</th>
-                        {initialFieldDirectory?.item_list.map((field) => (
-                          <th key={`header-${field.id}`}>
+                        <th scope="col">{copy.resultDateLabel}</th>
+                        {fieldList.map((field) => (
+                          <th
+                            key={`header-${field.id}`}
+                            scope="col"
+                            className="ui-current-age-table-value-heading"
+                          >
                             {field.label_name?.trim() || `#${field.id}`}
                           </th>
                         ))}
+                        <th aria-hidden="true" className="ui-current-age-table-spacer-heading"></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -790,58 +804,58 @@ export function CurrentAgeCalculationClient({
                         const isExpanded = activeDropdown?.resultId === item.result_id;
 
                         return (
-                          <Fragment key={item.result_id}>
-                            <tr
-                              className={dayBandIndex % 2 === 0
-                                ? "ui-current-age-table-day-band-even"
-                                : "ui-current-age-table-day-band-odd"}
-                            >
-                              <td>{formatDayCompact(item.result_moment_utc)}</td>
-                              {(initialFieldDirectory?.item_list ?? []).map((field) => {
-                                if (field.id !== item.field_id) {
-                                  return <td key={`${item.result_id}-${field.id}`}></td>;
-                                }
+                          <tr
+                            key={item.result_id}
+                            className={dayBandIndex % 2 === 0
+                              ? "ui-current-age-table-day-band-even"
+                              : "ui-current-age-table-day-band-odd"}
+                          >
+                            <td>{formatDayCompact(item.result_moment_utc)}</td>
+                            {fieldList.map((field) => {
+                              if (field.id !== item.field_id) {
+                                return <td key={`${item.result_id}-${field.id}`}></td>;
+                              }
 
-                                return (
-                                  <td
-                                    key={`${item.result_id}-${field.id}`}
-                                    className="ui-current-age-table-value-cell"
-                                  >
-                                    <div className="ui-current-age-table-value-dropdown">
-                                      <button
-                                        type="button"
-                                        className="ui-current-age-table-value-button"
-                                        data-current-age-dropdown-anchor
-                                        onClick={(event) => {
-                                          if (isExpanded) {
-                                            setActiveDropdown(null);
-                                            return;
-                                          }
+                              return (
+                                <td
+                                  key={`${item.result_id}-${field.id}`}
+                                  className="ui-current-age-table-value-cell"
+                                >
+                                  <div className="ui-current-age-table-value-dropdown">
+                                    <button
+                                      type="button"
+                                      className="ui-current-age-table-value-button"
+                                      data-current-age-dropdown-anchor
+                                      onClick={(event) => {
+                                        if (isExpanded) {
+                                          setActiveDropdown(null);
+                                          return;
+                                        }
 
-                                          const rect = event.currentTarget.getBoundingClientRect();
-                                          const dropdownWidth = 352;
-                                          const viewportPadding = 12;
-                                          const left = Math.min(
-                                            Math.max(viewportPadding, rect.left),
-                                            window.innerWidth - dropdownWidth - viewportPadding
-                                          );
+                                        const rect = event.currentTarget.getBoundingClientRect();
+                                        const dropdownWidth = 352;
+                                        const viewportPadding = 12;
+                                        const left = Math.min(
+                                          Math.max(viewportPadding, rect.left),
+                                          window.innerWidth - dropdownWidth - viewportPadding
+                                        );
 
-                                          setActiveDropdown({
-                                            resultId: item.result_id,
-                                            top: rect.bottom + 6,
-                                            left
-                                          });
-                                        }}
+                                        setActiveDropdown({
+                                          resultId: item.result_id,
+                                          top: rect.bottom + 6,
+                                          left
+                                        });
+                                      }}
                                       aria-expanded={isExpanded}
                                     >
-                                        {formatPersistedValue(item, copy.emptyValue, field.sql_type)}
-                                      </button>
-                                    </div>
-                                  </td>
-                                );
-                              })}
-                            </tr>
-                          </Fragment>
+                                      {formatPersistedValue(item, copy.emptyValue, field.sql_type)}
+                                    </button>
+                                  </div>
+                                </td>
+                              );
+                            })}
+                            <td aria-hidden="true" className="ui-current-age-table-spacer-cell"></td>
+                          </tr>
                         );
                       })}
                     </tbody>
@@ -898,11 +912,16 @@ export function CurrentAgeCalculationClient({
               return null;
             }
 
+            const dropdownStyle = {
+              "--ui-current-age-dropdown-top": `${activeDropdown.top}px`,
+              "--ui-current-age-dropdown-left": `${activeDropdown.left}px`
+            } as CSSProperties;
+
             return (
               <div
                 className="ui-current-age-table-dropdown-panel"
                 data-current-age-dropdown-panel
-                style={{ top: `${activeDropdown.top}px`, left: `${activeDropdown.left}px` }}
+                style={dropdownStyle}
               >
                 <div className="ui-current-age-formula-box-row">
                   <span>
@@ -923,6 +942,7 @@ export function CurrentAgeCalculationClient({
           document.body
         )
         : null}
+
     </section>
   );
 }

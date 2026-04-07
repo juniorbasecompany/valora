@@ -120,13 +120,15 @@
   position: sticky;
   top: 0;
   z-index: 1;
-  background: var(--color-surface);
+  background: color-mix(in srgb, white 16%, var(--color-accent-vertical-border) 84%);
   backdrop-filter: none;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: var(--color-text-muted);
+  color: white;
+  border-right-color: color-mix(in srgb, white 20%, var(--color-accent-vertical-border) 80%);
+  border-bottom-color: color-mix(in srgb, white 20%, var(--color-accent-vertical-border) 80%);
 }
 
 .ui-current-age-table tbody tr:last-child td {

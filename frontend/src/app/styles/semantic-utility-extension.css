@@ -221,7 +221,7 @@
   gap: 0.25rem;
 }
 
-.ui-current-age-formula-box-row + .ui-current-age-formula-box-row {
+.ui-current-age-formula-box-row+.ui-current-age-formula-box-row {
   margin-top: 0.5rem;
 }
 
@@ -677,7 +677,7 @@
   word-break: break-word;
 }
 
-.ui-directory-title-wrap + .ui-directory-title-wrap {
+.ui-directory-title-wrap+.ui-directory-title-wrap {
   margin-top: 0.25rem;
 }
 
@@ -762,6 +762,14 @@
   box-sizing: border-box;
   flex: 1 1 300px;
   min-width: min(300px, 100%);
+  max-width: 100%;
+}
+
+/* Cartão que deve ocupar a linha inteira do fluxo (ex.: secção de fórmulas na ação). */
+.ui-editor-card-flow>.ui-form-section.ui-editor-form-section-full-width {
+  flex: 1 1 100%;
+  width: 100%;
+  min-width: 0;
   max-width: 100%;
 }
 
@@ -897,11 +905,9 @@
   height: 1.25rem;
   border-radius: var(--radius-indicator);
   border: var(--border-width-default) solid var(--color-accent-vertical-border);
-  background: linear-gradient(
-    180deg,
-    hsla(var(--base-background-color), 55%, 96%, 0.98),
-    hsla(var(--base-accent-color), 85%, 94%, 0.2)
-  );
+  background: linear-gradient(180deg,
+      hsla(var(--base-background-color), 55%, 96%, 0.98),
+      hsla(var(--base-accent-color), 85%, 94%, 0.2));
   box-shadow: inset 0 1px 0 hsla(var(--base-background-color), 100%, 100%, 0.45);
   transition:
     border-color 0.16s ease,
@@ -910,11 +916,9 @@
 
 .ui-history-visibility-switch-track[data-on="true"] {
   border-color: hsla(var(--base-accent-color), 82%, 38%, 0.88);
-  background: linear-gradient(
-    180deg,
-    hsla(var(--base-accent-color), 88%, 58%, 0.28),
-    hsla(var(--base-accent-color), 74%, 48%, 0.18)
-  );
+  background: linear-gradient(180deg,
+      hsla(var(--base-accent-color), 88%, 58%, 0.28),
+      hsla(var(--base-accent-color), 74%, 48%, 0.18));
 }
 
 .ui-history-visibility-switch-thumb {

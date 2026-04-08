@@ -177,7 +177,7 @@ export function ActionFormulaSection({
   };
 
   return (
-    <section className="ui-card ui-form-section ui-border-accent">
+    <section className="ui-card ui-form-section ui-border-accent ui-editor-form-section-full-width">
       <h3 className="ui-field-label" style={{ marginBottom: "0.35rem" }}>
         {t("title")}
       </h3>

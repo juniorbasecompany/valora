@@ -2459,6 +2459,226 @@ def test_calculate_scope_current_age_executes_formulas_in_order_and_stops_at_fin
         ]
 
 
+def test_calculate_scope_current_age_filters_out_events_for_non_matching_unity() -> None:
+    with build_rules_session() as (session, tenant_id):
+        scope = Scope(
+            name="Aves",
+            tenant_id=tenant_id,
+        )
+        session.add(scope)
+        session.flush()
+
+        location = Location(
+            name="Granja A",
+            scope_id=scope.id,
+            parent_location_id=None,
+            sort_order=0,
+        )
+        kind = Kind(scope_id=scope.id, name="lote")
+        anchor_action = Action(scope_id=scope.id, sort_order=0)
+        current_action = Action(scope_id=scope.id, sort_order=1)
+        initial_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=0,
+            is_initial_age=True,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        current_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=1,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=True,
+        )
+        final_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=2,
+            is_initial_age=False,
+            is_final_age=True,
+            is_current_age=False,
+        )
+        mirror_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=3,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        step_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=4,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        session.add_all(
+            [
+                location,
+                kind,
+                anchor_action,
+                current_action,
+                initial_field,
+                current_field,
+                final_field,
+                mirror_field,
+                step_field,
+            ]
+        )
+        session.flush()
+
+        anchor_formula = Formula(
+            action_id=anchor_action.id,
+            sort_order=0,
+            statement=f"${{field:{current_field.id}}} = ${{field:{current_field.id}}}",
+        )
+        increment_formula = Formula(
+            action_id=current_action.id,
+            sort_order=0,
+            statement=(
+                f"${{field:{current_field.id}}} = "
+                f"${{field:{current_field.id}}} + ${{input:{step_field.id}}}"
+            ),
+        )
+        mirror_formula = Formula(
+            action_id=current_action.id,
+            sort_order=1,
+            statement=f"${{field:{mirror_field.id}}} = ${{field:{current_field.id}}}",
+        )
+        session.add_all([anchor_formula, increment_formula, mirror_formula])
+        session.flush()
+
+        item = Item(
+            scope_id=scope.id,
+            kind_id=kind.id,
+            parent_item_id=None,
+            sort_order=0,
+        )
+        session.add(item)
+        session.flush()
+
+        unity_match = Unity(
+            name="#match",
+            location_id=location.id,
+            item_id_list=[item.id],
+        )
+        unity_other = Unity(
+            name="#other",
+            location_id=location.id,
+            item_id_list=[item.id],
+        )
+        session.add_all([unity_match, unity_other])
+        session.flush()
+
+        initial_event = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=anchor_action.id,
+            moment_utc=datetime(2026, 4, 1, 12, 0, 0),
+            unity_id=unity_match.id,
+        )
+        current_event_day_2 = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=current_action.id,
+            moment_utc=datetime(2026, 4, 2, 12, 0, 0),
+            unity_id=unity_match.id,
+        )
+        current_event_day_3 = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=current_action.id,
+            moment_utc=datetime(2026, 4, 3, 12, 0, 0),
+            unity_id=unity_match.id,
+        )
+        final_event = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=anchor_action.id,
+            moment_utc=datetime(2026, 4, 4, 12, 0, 0),
+            unity_id=unity_match.id,
+        )
+        session.add_all(
+            [initial_event, current_event_day_2, current_event_day_3, final_event]
+        )
+        session.flush()
+
+        session.add_all(
+            [
+                Input(
+                    event_id=current_event_day_2.id,
+                    field_id=step_field.id,
+                    value="1",
+                ),
+                Input(
+                    event_id=current_event_day_3.id,
+                    field_id=step_field.id,
+                    value="1",
+                ),
+                Result(
+                    event_id=initial_event.id,
+                    field_id=initial_field.id,
+                    formula_id=anchor_formula.id,
+                    formula_order=anchor_formula.sort_order,
+                    text_value=None,
+                    boolean_value=None,
+                    numeric_value=10,
+                    moment_utc=datetime(2026, 4, 1, 12, 0, 0),
+                ),
+                Result(
+                    event_id=final_event.id,
+                    field_id=final_field.id,
+                    formula_id=anchor_formula.id,
+                    formula_order=anchor_formula.sort_order,
+                    text_value=None,
+                    boolean_value=None,
+                    numeric_value=12,
+                    moment_utc=datetime(2026, 4, 4, 12, 0, 0),
+                ),
+                Result(
+                    event_id=current_event_day_2.id,
+                    field_id=current_field.id,
+                    formula_id=increment_formula.id,
+                    formula_order=increment_formula.sort_order,
+                    text_value=None,
+                    boolean_value=None,
+                    numeric_value=999,
+                    moment_utc=datetime(2026, 4, 2, 12, 5, 0),
+                ),
+                Result(
+                    event_id=current_event_day_2.id,
+                    field_id=mirror_field.id,
+                    formula_id=mirror_formula.id,
+                    formula_order=mirror_formula.sort_order,
+                    text_value=None,
+                    boolean_value=None,
+                    numeric_value=11,
+                    moment_utc=datetime(2026, 4, 2, 12, 6, 0),
+                ),
+            ]
+        )
+        session.commit()
+
+        response = calculate_scope_current_age(
+            scope_id=scope.id,
+            body=ScopeCurrentAgeCalculationRequest(
+                moment_from_utc="2026-04-01T00:00:00Z",
+                moment_to_utc="2026-04-04T23:59:00Z",
+                unity_id=unity_other.id,
+            ),
+            member=SimpleNamespace(role=2, tenant_id=tenant_id, account_id=1),
+            session=session,
+        )
+
+        assert response.empty_reason == "no_events_before_period_end"
+        assert response.item_list == []
+
+
 def test_read_scope_current_age_reads_existing_results_without_recalculation() -> None:
     with build_rules_session() as (session, tenant_id):
         scope = Scope(
@@ -2566,6 +2786,147 @@ def test_read_scope_current_age_reads_existing_results_without_recalculation() -
         ] == [
             (event.id, formula.id, 11, "unchanged"),
         ]
+
+
+def test_read_scope_current_age_filters_by_unity_id() -> None:
+    with build_rules_session() as (session, tenant_id):
+        scope = Scope(
+            name="Aves",
+            tenant_id=tenant_id,
+        )
+        session.add(scope)
+        session.flush()
+
+        location = Location(
+            name="Granja A",
+            scope_id=scope.id,
+            parent_location_id=None,
+            sort_order=0,
+        )
+        kind = Kind(scope_id=scope.id, name="lote")
+        action = Action(scope_id=scope.id, sort_order=0)
+        field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=0,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=True,
+        )
+        initial_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=1,
+            is_initial_age=True,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        final_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=2,
+            is_initial_age=False,
+            is_final_age=True,
+            is_current_age=False,
+        )
+        session.add_all([location, kind, action, field, initial_field, final_field])
+        session.flush()
+
+        item = Item(
+            scope_id=scope.id,
+            kind_id=kind.id,
+            parent_item_id=None,
+            sort_order=0,
+        )
+        session.add(item)
+        session.flush()
+
+        unity_a = Unity(
+            name="#a",
+            location_id=location.id,
+            item_id_list=[item.id],
+        )
+        unity_b = Unity(
+            name="#b",
+            location_id=location.id,
+            item_id_list=[item.id],
+        )
+        session.add_all([unity_a, unity_b])
+        session.flush()
+
+        formula = Formula(
+            action_id=action.id,
+            sort_order=0,
+            statement=f"${{field:{field.id}}} = ${{field:{field.id}}}",
+        )
+        session.add(formula)
+        session.flush()
+
+        event_a = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=action.id,
+            moment_utc=datetime(2026, 4, 2, 12, 0, 0),
+            unity_id=unity_a.id,
+        )
+        event_b = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=action.id,
+            moment_utc=datetime(2026, 4, 2, 14, 0, 0),
+            unity_id=unity_b.id,
+        )
+        session.add_all([event_a, event_b])
+        session.flush()
+
+        result_a = Result(
+            event_id=event_a.id,
+            field_id=field.id,
+            formula_id=formula.id,
+            formula_order=formula.sort_order,
+            text_value=None,
+            boolean_value=None,
+            numeric_value=11,
+            moment_utc=datetime(2026, 4, 2, 12, 5, 0),
+        )
+        result_b = Result(
+            event_id=event_b.id,
+            field_id=field.id,
+            formula_id=formula.id,
+            formula_order=formula.sort_order,
+            text_value=None,
+            boolean_value=None,
+            numeric_value=22,
+            moment_utc=datetime(2026, 4, 2, 14, 5, 0),
+        )
+        session.add_all([result_a, result_b])
+        session.commit()
+
+        filtered = read_scope_current_age(
+            scope_id=scope.id,
+            body=ScopeCurrentAgeCalculationRequest(
+                moment_from_utc="2026-04-01T00:00:00Z",
+                moment_to_utc="2026-04-03T23:59:00Z",
+                unity_id=unity_a.id,
+            ),
+            member=SimpleNamespace(role=2, tenant_id=tenant_id, account_id=1),
+            session=session,
+        )
+        assert filtered.unchanged_count == 1
+        assert [(row.event_id, int(row.numeric_value or 0)) for row in filtered.item_list] == [
+            (event_a.id, 11),
+        ]
+
+        all_rows = read_scope_current_age(
+            scope_id=scope.id,
+            body=ScopeCurrentAgeCalculationRequest(
+                moment_from_utc="2026-04-01T00:00:00Z",
+                moment_to_utc="2026-04-03T23:59:00Z",
+            ),
+            member=SimpleNamespace(role=2, tenant_id=tenant_id, account_id=1),
+            session=session,
+        )
+        assert all_rows.unchanged_count == 2
 
 
 def test_delete_scope_current_age_removes_results_in_selected_period() -> None:
@@ -2684,6 +3045,135 @@ def test_delete_scope_current_age_removes_results_in_selected_period() -> None:
         assert response.unchanged_count == 0
         assert response.item_list == []
         assert remaining_result_id_list == [kept_result.id]
+
+
+def test_delete_scope_current_age_filters_by_unity_id() -> None:
+    with build_rules_session() as (session, tenant_id):
+        scope = Scope(
+            name="Aves",
+            tenant_id=tenant_id,
+        )
+        session.add(scope)
+        session.flush()
+
+        location = Location(
+            name="Granja A",
+            scope_id=scope.id,
+            parent_location_id=None,
+            sort_order=0,
+        )
+        kind = Kind(scope_id=scope.id, name="lote")
+        action = Action(scope_id=scope.id, sort_order=0)
+        field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=0,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=True,
+        )
+        initial_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=1,
+            is_initial_age=True,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        final_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=2,
+            is_initial_age=False,
+            is_final_age=True,
+            is_current_age=False,
+        )
+        session.add_all([location, kind, action, field, initial_field, final_field])
+        session.flush()
+
+        item = Item(
+            scope_id=scope.id,
+            kind_id=kind.id,
+            parent_item_id=None,
+            sort_order=0,
+        )
+        session.add(item)
+        session.flush()
+
+        unity_a = Unity(
+            name="#a",
+            location_id=location.id,
+            item_id_list=[item.id],
+        )
+        unity_b = Unity(
+            name="#b",
+            location_id=location.id,
+            item_id_list=[item.id],
+        )
+        session.add_all([unity_a, unity_b])
+        session.flush()
+
+        formula = Formula(
+            action_id=action.id,
+            sort_order=0,
+            statement=f"${{field:{field.id}}} = ${{field:{field.id}}}",
+        )
+        session.add(formula)
+        session.flush()
+
+        event_a = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=action.id,
+            moment_utc=datetime(2026, 4, 2, 10, 0, 0),
+            unity_id=unity_a.id,
+        )
+        event_b = Event(
+            location_id=location.id,
+            item_id=item.id,
+            action_id=action.id,
+            moment_utc=datetime(2026, 4, 2, 12, 0, 0),
+            unity_id=unity_b.id,
+        )
+        session.add_all([event_a, event_b])
+        session.flush()
+
+        result_a = Result(
+            event_id=event_a.id,
+            field_id=field.id,
+            formula_id=formula.id,
+            formula_order=formula.sort_order,
+            text_value=None,
+            boolean_value=None,
+            numeric_value=10,
+            moment_utc=datetime(2026, 4, 2, 10, 5, 0),
+        )
+        result_b = Result(
+            event_id=event_b.id,
+            field_id=field.id,
+            formula_id=formula.id,
+            formula_order=formula.sort_order,
+            text_value=None,
+            boolean_value=None,
+            numeric_value=11,
+            moment_utc=datetime(2026, 4, 2, 12, 5, 0),
+        )
+        session.add_all([result_a, result_b])
+        session.commit()
+
+        delete_scope_current_age(
+            scope_id=scope.id,
+            body=ScopeCurrentAgeCalculationRequest(
+                moment_from_utc="2026-04-02T00:00:00Z",
+                moment_to_utc="2026-04-02T23:59:00Z",
+                unity_id=unity_a.id,
+            ),
+            member=SimpleNamespace(role=2, tenant_id=tenant_id, account_id=1),
+            session=session,
+        )
+
+        remaining = list(session.scalars(select(Result.id).order_by(Result.id)))
+        assert remaining == [result_b.id]
 
 
 def test_calculate_scope_current_age_uses_action_sort_order_within_same_day() -> None:

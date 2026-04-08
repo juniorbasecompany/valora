@@ -37,6 +37,10 @@ import type {
 import { parseErrorDetail } from "@/lib/api/parse-error-detail";
 import type { LabelLang } from "@/lib/i18n/label-lang";
 import {
+  filterItemListByUnity,
+  filterLocationListByUnity
+} from "@/lib/configuration/unity-hierarchy-filter";
+import {
   applyConfigurationSelectionToWindowHistory,
   preferredSelectionKeyAfterEditSave
 } from "@/lib/navigation/configuration-path";
@@ -583,42 +587,20 @@ export function EventConfigurationClient({
     [unityId, unityRecordById]
   );
 
-  const filteredLocationItemList = useMemo(() => {
-    const fullList = initialLocationDirectory?.item_list ?? [];
-    if (selectedUnityRecord == null) {
-      return fullList;
-    }
-    const allowedId = selectedUnityRecord.location_id;
-    const ancestorIdSet = new Set<number>();
-    const byId = new Map(fullList.map((item) => [item.id, item]));
-    let current = byId.get(allowedId);
-    while (current) {
-      ancestorIdSet.add(current.id);
-      const parentId = current.parent_location_id ?? null;
-      current = parentId == null ? undefined : byId.get(parentId);
-    }
-    return fullList.filter((item) => ancestorIdSet.has(item.id));
-  }, [initialLocationDirectory?.item_list, selectedUnityRecord]);
+  const filteredLocationItemList = useMemo(
+    () =>
+      filterLocationListByUnity(
+        initialLocationDirectory?.item_list ?? [],
+        selectedUnityRecord
+      ),
+    [initialLocationDirectory?.item_list, selectedUnityRecord]
+  );
 
-  const filteredItemItemList = useMemo(() => {
-    const fullList = initialItemDirectory?.item_list ?? [];
-    if (selectedUnityRecord == null) {
-      return fullList;
-    }
-    const allowedIdSet = new Set(selectedUnityRecord.item_id_list);
-    const byId = new Map(fullList.map((item) => [item.id, item]));
-    const resultIdSet = new Set<number>();
-    for (const id of allowedIdSet) {
-      let current = byId.get(id);
-      while (current) {
-        if (resultIdSet.has(current.id)) break;
-        resultIdSet.add(current.id);
-        const parentId = current.parent_item_id ?? null;
-        current = parentId == null ? undefined : byId.get(parentId);
-      }
-    }
-    return fullList.filter((item) => resultIdSet.has(item.id));
-  }, [initialItemDirectory?.item_list, selectedUnityRecord]);
+  const filteredItemItemList = useMemo(
+    () =>
+      filterItemListByUnity(initialItemDirectory?.item_list ?? [], selectedUnityRecord),
+    [initialItemDirectory?.item_list, selectedUnityRecord]
+  );
 
   useReplaceConfigurationPath(
     eventPath,

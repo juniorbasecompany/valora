@@ -443,6 +443,34 @@ def _item_in_scope_or_404(
     return row
 
 
+def _current_age_event_filter_predicates_for_scope_event_query(
+    session: Session,
+    *,
+    scope_id: int,
+    unity_id: int | None,
+    location_id: int | None,
+    item_id: int | None,
+) -> list[Any]:
+    """Valida filtros opcionais e devolve predicados SQLAlchemy para restringir Event (idade atual)."""
+    predicates: list[Any] = []
+    if unity_id is not None:
+        _get_scope_unity_or_404(session, scope_id=scope_id, unity_id=unity_id)
+        predicates.append(Event.unity_id == unity_id)
+    if location_id is not None:
+        _location_in_scope_or_404(session, scope_id=scope_id, location_id=location_id)
+        expanded_location_id_list = _expand_scope_location_id_list_with_descendants(
+            session, scope_id=scope_id, location_id_list=[location_id]
+        )
+        predicates.append(Event.location_id.in_(expanded_location_id_list))
+    if item_id is not None:
+        _item_in_scope_or_404(session, scope_id=scope_id, item_id=item_id)
+        expanded_item_id_list = _expand_scope_item_id_list_with_descendants(
+            session, scope_id=scope_id, item_id_list=[item_id]
+        )
+        predicates.append(Event.item_id.in_(expanded_item_id_list))
+    return predicates
+
+
 def _event_in_scope_or_404(
     session: Session, *, scope_id: int, event_id: int
 ) -> Event:
@@ -1866,6 +1894,7 @@ class ScopeEventPatchRequest(BaseModel):
 class ScopeCurrentAgeCalculationRequest(BaseModel):
     moment_from_utc: datetime
     moment_to_utc: datetime
+    unity_id: int | None = None
     location_id: int | None = None
     item_id: int | None = None
 
@@ -1959,10 +1988,18 @@ def _list_scope_current_age_results(
     scope_id: int,
     moment_from_utc: datetime,
     moment_to_utc: datetime,
+    unity_id: int | None,
     location_id: int | None,
     item_id: int | None,
     session: Session,
 ) -> ScopeCurrentAgeCalculationResponse:
+    event_predicates = _current_age_event_filter_predicates_for_scope_event_query(
+        session,
+        scope_id=scope_id,
+        unity_id=unity_id,
+        location_id=location_id,
+        item_id=item_id,
+    )
     query = (
         select(Result, Event)
         .join(Event, Result.event_id == Event.id)
@@ -1971,20 +2008,9 @@ def _list_scope_current_age_results(
             Action.scope_id == scope_id,
             Result.moment_utc >= moment_from_utc,
             Result.moment_utc <= moment_to_utc,
+            *event_predicates,
         )
     )
-    if location_id is not None:
-        _location_in_scope_or_404(session, scope_id=scope_id, location_id=location_id)
-        expanded_location_id_list = _expand_scope_location_id_list_with_descendants(
-            session, scope_id=scope_id, location_id_list=[location_id]
-        )
-        query = query.where(Event.location_id.in_(expanded_location_id_list))
-    if item_id is not None:
-        _item_in_scope_or_404(session, scope_id=scope_id, item_id=item_id)
-        expanded_item_id_list = _expand_scope_item_id_list_with_descendants(
-            session, scope_id=scope_id, item_id_list=[item_id]
-        )
-        query = query.where(Event.item_id.in_(expanded_item_id_list))
     result_row_list = list(
         session.execute(
             query.order_by(
@@ -2488,6 +2514,7 @@ def read_scope_current_age(
         scope_id=scope_id,
         moment_from_utc=moment_from_utc,
         moment_to_utc=moment_to_utc,
+        unity_id=body.unity_id,
         location_id=body.location_id,
         item_id=body.item_id,
         session=session,
@@ -2519,11 +2546,13 @@ def delete_scope_current_age(
             detail="Invalid event period",
         )
 
-    if body.location_id is not None:
-        _location_in_scope_or_404(session, scope_id=scope_id, location_id=body.location_id)
-    if body.item_id is not None:
-        _item_in_scope_or_404(session, scope_id=scope_id, item_id=body.item_id)
-
+    event_predicates = _current_age_event_filter_predicates_for_scope_event_query(
+        session,
+        scope_id=scope_id,
+        unity_id=body.unity_id,
+        location_id=body.location_id,
+        item_id=body.item_id,
+    )
     event_id_list = list(
         session.scalars(
             select(Event.id)
@@ -2531,52 +2560,10 @@ def delete_scope_current_age(
             .where(
                 Action.scope_id == scope_id,
                 Event.moment_utc <= moment_to_utc,
+                *event_predicates,
             )
         )
     )
-    if body.location_id is not None:
-        expanded_location_id_list = _expand_scope_location_id_list_with_descendants(
-            session, scope_id=scope_id, location_id_list=[body.location_id]
-        )
-        event_id_list = list(
-            session.scalars(
-                select(Event.id)
-                .join(Action, Event.action_id == Action.id)
-                .where(
-                    Action.scope_id == scope_id,
-                    Event.moment_utc <= moment_to_utc,
-                    Event.location_id.in_(expanded_location_id_list),
-                    *(
-                        []
-                        if body.item_id is None
-                        else [
-                            Event.item_id.in_(
-                                _expand_scope_item_id_list_with_descendants(
-                                    session,
-                                    scope_id=scope_id,
-                                    item_id_list=[body.item_id],
-                                )
-                            )
-                        ]
-                    ),
-                )
-            )
-        )
-    elif body.item_id is not None:
-        expanded_item_id_list = _expand_scope_item_id_list_with_descendants(
-            session, scope_id=scope_id, item_id_list=[body.item_id]
-        )
-        event_id_list = list(
-            session.scalars(
-                select(Event.id)
-                .join(Action, Event.action_id == Action.id)
-                .where(
-                    Action.scope_id == scope_id,
-                    Event.moment_utc <= moment_to_utc,
-                    Event.item_id.in_(expanded_item_id_list),
-                )
-            )
-        )
     calculated_moment_utc = datetime.now(UTC).replace(tzinfo=None)
     if not event_id_list:
         return ScopeCurrentAgeCalculationResponse(
@@ -2638,21 +2625,13 @@ def calculate_scope_current_age(
             detail="Invalid event period",
         )
 
-    if body.location_id is not None:
-        _location_in_scope_or_404(session, scope_id=scope_id, location_id=body.location_id)
-    if body.item_id is not None:
-        _item_in_scope_or_404(session, scope_id=scope_id, item_id=body.item_id)
-
-    expanded_location_id_list: list[int] | None = None
-    expanded_item_id_list: list[int] | None = None
-    if body.location_id is not None:
-        expanded_location_id_list = _expand_scope_location_id_list_with_descendants(
-            session, scope_id=scope_id, location_id_list=[body.location_id]
-        )
-    if body.item_id is not None:
-        expanded_item_id_list = _expand_scope_item_id_list_with_descendants(
-            session, scope_id=scope_id, item_id_list=[body.item_id]
-        )
+    event_predicates = _current_age_event_filter_predicates_for_scope_event_query(
+        session,
+        scope_id=scope_id,
+        unity_id=body.unity_id,
+        location_id=body.location_id,
+        item_id=body.item_id,
+    )
 
     initial_field, final_field, current_field = _resolve_scope_age_fields_or_400(
         session, scope_id=scope_id
@@ -2674,8 +2653,7 @@ def calculate_scope_current_age(
                 .where(
                     Action.scope_id == scope_id,
                     Event.moment_utc <= moment_to_utc,
-                    *([] if expanded_location_id_list is None else [Event.location_id.in_(expanded_location_id_list)]),
-                    *([] if expanded_item_id_list is None else [Event.item_id.in_(expanded_item_id_list)]),
+                    *event_predicates,
                 )
             )
         ),

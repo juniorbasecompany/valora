@@ -17,13 +17,19 @@ import type {
   ScopeFormulaRecord,
   ScopeCurrentAgeCalculationRecord,
   ScopeCurrentAgeCalculationResponse,
+  TenantItemDirectoryResponse,
   TenantLocationDirectoryResponse,
   TenantScopeActionDirectoryResponse,
   TenantScopeFieldDirectoryResponse,
   TenantScopeRecord,
-  TenantItemDirectoryResponse
+  TenantUnityDirectoryResponse,
+  TenantUnityRecord
 } from "@/lib/auth/types";
 import { parseErrorDetail } from "@/lib/api/parse-error-detail";
+import {
+  filterItemListByUnity,
+  filterLocationListByUnity
+} from "@/lib/configuration/unity-hierarchy-filter";
 
 type CurrentAgeCalculationCopy = {
   title: string;
@@ -39,6 +45,9 @@ type CurrentAgeCalculationCopy = {
   endLabel: string;
   startHint: string;
   endHint: string;
+  unityLabel: string;
+  unityHint: string;
+  filterAllAria: string;
   locationLabel: string;
   locationHint: string;
   itemLabel: string;
@@ -74,6 +83,7 @@ type CurrentAgeCalculationClientProps = {
   initialFieldDirectory: TenantScopeFieldDirectoryResponse | null;
   initialLocationDirectory: TenantLocationDirectoryResponse | null;
   initialItemDirectory: TenantItemDirectoryResponse | null;
+  initialUnityDirectory: TenantUnityDirectoryResponse | null;
   initialActionDirectory: TenantScopeActionDirectoryResponse | null;
   initialFormulaList: ScopeFormulaRecord[];
   copy: CurrentAgeCalculationCopy;
@@ -299,6 +309,17 @@ function resolveCurrentAgeRequestErrorMessage(
   return parseErrorDetail(payload, fallback) ?? fallback;
 }
 
+function parsePositiveIntOrNull(raw: string): number | null {
+  if (!raw) {
+    return null;
+  }
+  const parsed = Number(raw);
+  if (!Number.isInteger(parsed) || parsed < 1) {
+    return null;
+  }
+  return parsed;
+}
+
 export function CurrentAgeCalculationClient({
   locale,
   currentScope,
@@ -306,6 +327,7 @@ export function CurrentAgeCalculationClient({
   initialFieldDirectory,
   initialLocationDirectory,
   initialItemDirectory,
+  initialUnityDirectory,
   initialActionDirectory,
   initialFormulaList,
   copy
@@ -313,6 +335,7 @@ export function CurrentAgeCalculationClient({
   const [footerPortalTarget, setFooterPortalTarget] = useState<HTMLElement | null>(null);
   const [momentFrom, setMomentFrom] = useState<Date | null>(null);
   const [momentTo, setMomentTo] = useState<Date | null>(null);
+  const [unityId, setUnityId] = useState<number | null>(null);
   const [locationId, setLocationId] = useState<number | null>(null);
   const [itemId, setItemId] = useState<number | null>(null);
   const [footerErrorMessage, setFooterErrorMessage] = useState<string | null>(null);
@@ -392,6 +415,43 @@ export function CurrentAgeCalculationClient({
   }, [initialFieldDirectory?.item_list]);
   const fieldList = initialFieldDirectory?.item_list ?? [];
 
+  const unityOptionList = useMemo(
+    () =>
+      (initialUnityDirectory?.item_list ?? []).map((row) => ({
+        id: row.id,
+        label: row.name.trim() || `#${row.id}`
+      })),
+    [initialUnityDirectory?.item_list]
+  );
+
+  const unityRecordById = useMemo(() => {
+    const map = new Map<number, TenantUnityRecord>();
+    for (const row of initialUnityDirectory?.item_list ?? []) {
+      map.set(row.id, row);
+    }
+    return map;
+  }, [initialUnityDirectory?.item_list]);
+
+  const selectedUnityRecord = useMemo(
+    () => (unityId == null ? null : unityRecordById.get(unityId) ?? null),
+    [unityId, unityRecordById]
+  );
+
+  const filteredLocationItemList = useMemo(
+    () =>
+      filterLocationListByUnity(
+        initialLocationDirectory?.item_list ?? [],
+        selectedUnityRecord
+      ),
+    [initialLocationDirectory?.item_list, selectedUnityRecord]
+  );
+
+  const filteredItemItemList = useMemo(
+    () =>
+      filterItemListByUnity(initialItemDirectory?.item_list ?? [], selectedUnityRecord),
+    [initialItemDirectory?.item_list, selectedUnityRecord]
+  );
+
   const resultRowList = useMemo<ScopeCurrentAgeCalculationRecord[]>(() => {
     if (!result) {
       return [];
@@ -446,7 +506,7 @@ export function CurrentAgeCalculationClient({
 
   useEffect(() => {
     setActiveDropdown(null);
-  }, [result, momentFrom, momentTo, locationId, itemId]);
+  }, [result, momentFrom, momentTo, unityId, locationId, itemId]);
 
   useEffect(() => {
     if (activeDropdown == null) {
@@ -527,6 +587,7 @@ export function CurrentAgeCalculationClient({
           body: JSON.stringify({
             moment_from_utc: currentMomentFrom.toISOString(),
             moment_to_utc: currentMomentTo.toISOString(),
+            unity_id: unityId,
             location_id: locationId,
             item_id: itemId
           })
@@ -584,6 +645,7 @@ export function CurrentAgeCalculationClient({
           body: JSON.stringify({
             moment_from_utc: currentMomentFrom.toISOString(),
             moment_to_utc: currentMomentTo.toISOString(),
+            unity_id: unityId,
             location_id: locationId,
             item_id: itemId
           })
@@ -641,6 +703,7 @@ export function CurrentAgeCalculationClient({
           body: JSON.stringify({
             moment_from_utc: currentMomentFrom.toISOString(),
             moment_to_utc: currentMomentTo.toISOString(),
+            unity_id: unityId,
             location_id: locationId,
             item_id: itemId
           })
@@ -734,10 +797,48 @@ export function CurrentAgeCalculationClient({
               </DirectoryFilterCard>
 
               <DirectoryFilterCard>
+                <div className="ui-field">
+                  <label className="ui-field-label" htmlFor="current-age-unity">
+                    {copy.unityLabel}
+                  </label>
+                  <select
+                    id="current-age-unity"
+                    className="ui-input ui-input-select"
+                    value={unityId == null ? "" : String(unityId)}
+                    onChange={(event) => {
+                      const raw = event.target.value;
+                      const nextUnityId = parsePositiveIntOrNull(raw);
+                      setUnityId(nextUnityId);
+                      if (nextUnityId != null) {
+                        const record = unityRecordById.get(nextUnityId);
+                        if (record) {
+                          setLocationId(record.location_id);
+                          if (itemId != null && !record.item_id_list.includes(itemId)) {
+                            setItemId(null);
+                          }
+                        }
+                      }
+                      setRequestErrorMessage(null);
+                      setFooterErrorMessage(null);
+                    }}
+                    disabled={!canEdit || !isReady || isCalculating || isReading || isDeleting}
+                  >
+                    <option value="" aria-label={copy.filterAllAria}></option>
+                    {unityOptionList.map((row) => (
+                      <option key={row.id} value={row.id}>
+                        {row.label}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="ui-field-hint">{copy.unityHint}</p>
+                </div>
+              </DirectoryFilterCard>
+
+              <DirectoryFilterCard>
               <HierarchySingleSelectField
                 id="current-age-location"
                 label={copy.locationLabel}
-                itemList={initialLocationDirectory?.item_list ?? []}
+                itemList={filteredLocationItemList}
                 value={locationId}
                 onChange={(nextValue) => {
                   setLocationId(nextValue);
@@ -746,7 +847,14 @@ export function CurrentAgeCalculationClient({
                 }}
                 getParentId={(item) => item.parent_location_id ?? null}
                 allLabel=""
-                disabled={!canEdit || !isReady || isCalculating || isReading || isDeleting}
+                disabled={
+                  !canEdit
+                  || !isReady
+                  || isCalculating
+                  || isReading
+                  || isDeleting
+                  || selectedUnityRecord != null
+                }
               />
               <p className="ui-field-hint">{copy.locationHint}</p>
               </DirectoryFilterCard>
@@ -755,7 +863,7 @@ export function CurrentAgeCalculationClient({
               <HierarchySingleSelectField
                 id="current-age-item"
                 label={copy.itemLabel}
-                itemList={initialItemDirectory?.item_list ?? []}
+                itemList={filteredItemItemList}
                 value={itemId}
                 onChange={(nextValue) => {
                   setItemId(nextValue);

@@ -10,7 +10,8 @@ import {
   getTenantScopeActionFormulaList,
   getTenantScopeActionDirectory,
   getTenantScopeDirectory,
-  getTenantScopeFieldDirectory
+  getTenantScopeFieldDirectory,
+  getTenantUnityDirectory
 } from "@/lib/auth/server-session";
 import { mapAppLocaleToLabelLang } from "@/lib/i18n/label-lang";
 
@@ -35,15 +36,16 @@ export default async function CalculationPage({ params }: CalculationPageProps) 
     ) ?? null;
   const labelLang = mapAppLocaleToLabelLang(locale);
 
-  const [fieldDirectory, locationDirectory, itemDirectory, actionDirectory] =
+  const [fieldDirectory, locationDirectory, itemDirectory, actionDirectory, unityDirectory] =
     currentScope != null
       ? await Promise.all([
         getTenantScopeFieldDirectory(currentScope.id, labelLang),
         getTenantLocationDirectory(currentScope.id),
         getTenantItemDirectory(currentScope.id),
-        getTenantScopeActionDirectory(currentScope.id, labelLang)
+        getTenantScopeActionDirectory(currentScope.id, labelLang),
+        getTenantUnityDirectory(currentScope.id)
       ])
-      : [null, null, null, null];
+      : [null, null, null, null, null];
 
   const initialFormulaList =
     currentScope != null && actionDirectory != null
@@ -75,6 +77,7 @@ export default async function CalculationPage({ params }: CalculationPageProps) 
         initialFieldDirectory={fieldDirectory}
         initialLocationDirectory={locationDirectory}
         initialItemDirectory={itemDirectory}
+        initialUnityDirectory={unityDirectory}
         initialActionDirectory={actionDirectory}
         initialFormulaList={initialFormulaList}
         copy={{
@@ -91,6 +94,9 @@ export default async function CalculationPage({ params }: CalculationPageProps) 
           endLabel: t("panel.endLabel"),
           startHint: t("panel.startHint"),
           endHint: t("panel.endHint"),
+          unityLabel: t("panel.unityLabel"),
+          unityHint: t("panel.unityHint"),
+          filterAllAria: t("panel.filterAllAria"),
           locationLabel: t("panel.locationLabel"),
           locationHint: t("panel.locationHint"),
           itemLabel: t("panel.itemLabel"),

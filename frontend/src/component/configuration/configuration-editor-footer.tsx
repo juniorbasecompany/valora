@@ -37,7 +37,6 @@ export function ConfigurationEditorFooter({
     return (
         <div className="ui-action-footer">
             <div className="ui-action-footer-start">
-                {startContent}
                 {configurationPath && cancelLabel ? (
                     <Link
                         href={configurationPath}
@@ -46,6 +45,7 @@ export function ConfigurationEditorFooter({
                         {cancelLabel}
                     </Link>
                 ) : null}
+                {startContent}
             </div>
             <div className="ui-action-footer-feedback">
                 {footerErrorMessage ? (

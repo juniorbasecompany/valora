@@ -536,7 +536,11 @@
       "formulaLabel": "Formula",
       "emptyValue": "No value",
       "fallbackAction": "Unavailable action"
-    }
+    },
+    "buttons": {
+      "cancel": "Cancel"
+    },
+    "discardConfirm": "Discard unsaved changes?"
   },
   "LocationConfigurationPage": {
     "title": "Locations",

@@ -122,7 +122,9 @@ export default async function CalculationPage({ params }: CalculationPageProps) 
           actionLabel: t("result.actionLabel"),
           formulaLabel: t("result.formulaLabel"),
           emptyValue: t("result.emptyValue"),
-          fallbackAction: t("result.fallbackAction")
+          fallbackAction: t("result.fallbackAction"),
+          cancel: t("buttons.cancel"),
+          discardConfirm: t("discardConfirm")
         }}
       />
     </Suspense>

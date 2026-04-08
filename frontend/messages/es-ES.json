@@ -536,7 +536,11 @@
       "formulaLabel": "Fórmula",
       "emptyValue": "Sin valor",
       "fallbackAction": "Acción no disponible"
-    }
+    },
+    "buttons": {
+      "cancel": "Cancelar"
+    },
+    "discardConfirm": "¿Descartar cambios no guardados?"
   },
   "LocationConfigurationPage": {
     "title": "Ubicaciones",

@@ -74,6 +74,8 @@ type CurrentAgeCalculationCopy = {
   formulaLabel: string;
   emptyValue: string;
   fallbackAction: string;
+  cancel: string;
+  discardConfirm: string;
 };
 
 type CurrentAgeCalculationClientProps = {
@@ -499,6 +501,8 @@ export function CurrentAgeCalculationClient({
       ? copy.missingCurrentScope
       : copy.emptyScope
     : null;
+
+  const configurationPath = `/${locale}/app`;
 
   useEffect(() => {
     setFooterPortalTarget(document.getElementById("app-shell-footer-slot"));
@@ -981,7 +985,9 @@ export function CurrentAgeCalculationClient({
       {footerPortalTarget && currentScope
         ? createPortal(
           <ConfigurationEditorFooter
-            discardConfirm=""
+            configurationPath={configurationPath}
+            cancelLabel={copy.cancel}
+            discardConfirm={copy.discardConfirm}
             isDirty={false}
             footerErrorMessage={footerErrorMessage}
             footerNoticeMessage={footerNoticeMessage}

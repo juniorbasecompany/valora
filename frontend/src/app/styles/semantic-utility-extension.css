@@ -823,7 +823,9 @@
 .ui-action-footer-start {
   display: flex;
   flex-shrink: 0;
+  flex-wrap: wrap;
   align-items: center;
+  gap: 0.5rem;
 }
 
 .ui-action-footer-end {

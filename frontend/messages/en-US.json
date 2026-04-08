@@ -1,8 +1,6 @@
 {
   "AppShell": {
     "productName": "Valora",
-    "productStage": "Phase 1 in progress",
-    "workspaceLabel": "Operational and auditable workspace",
     "navigation": {
       "home": "Home",
       "location": "Locations",
@@ -11,21 +9,15 @@
       "action": "Actions",
       "unity": "Units",
       "event": "Events",
-      "calculation": "Calculation",
-      "configuration": "Configuration",
-      "comingSoon": "coming soon"
+      "calculation": "Calculation"
     },
     "topbar": {
-      "tenantLabel": "Active tenant",
-      "accountLabel": "Account",
-      "localeLabel": "Language and region",
       "openNavigation": "Open navigation",
       "closeNavigation": "Close navigation",
       "signOut": "Sign out",
       "signOutPending": "Signing out..."
     },
     "menu": {
-      "tenantSectionLabel": "Tenant",
       "tenantTriggerAriaLabel": "Choose tenant",
       "tenantMenuAriaLabel": "Available tenants",
       "scopeTriggerAriaLabel": "Choose scope",
@@ -42,7 +34,6 @@
       "emptyScopeList": "No scope available.",
       "switchingScope": "Saving scope...",
       "switchingLocale": "Switching language...",
-      "activeLabel": "active",
       "noScopeLabel": "No scope"
     }
   },
@@ -84,8 +75,6 @@
     "openTenantEditor": "Edit tenant",
     "openMemberEditor": "Edit members",
     "openScopeEditor": "Edit scopes",
-    "openFieldEditor": "Edit fields",
-    "openActionEditor": "Edit actions",
     "cards": {
       "organization": {
         "title": "Tenant",
@@ -98,14 +87,6 @@
       "scope": {
         "title": "Scope",
         "description": "A scope is a context unit inside the tenant: where records, and later the locations hierarchy, stay separated instead of mixed together. Think branch, job site, venue, or project,  the label is yours, but the job is always to isolate data that should not appear in one pile. The scope selected in the header is what applies when you work on locations and anything that depends on it."
-      },
-      "field": {
-        "title": "Fields",
-        "description": "Fields define value types used by rules in the active scope (for example integers or decimals). The list and editor follow the scope you pick in the header, the same pattern as locations."
-      },
-      "action": {
-        "title": "Actions",
-        "description": "Actions are business event kinds in the active scope (for example housing or mortality). Each has a friendly name per language and may have formulas attached. The list follows the header scope, the same pattern as fields."
       }
     }
   },
@@ -123,7 +104,6 @@
       "toggleAriaLabel": "Show or hide the list filter panel",
       "toggleLabel": "Filter",
       "searchLabel": "Name or email",
-      "searchPlaceholder": "Name or email",
       "roleLabel": "Role",
       "statusLabel": "Status",
       "all": "All"
@@ -135,14 +115,6 @@
       },
       "invite": {
         "emailFieldHint": "Enter the email that will receive the invite. First sign-in uses a Google account with that same address."
-      },
-      "idle": {
-        "title": "Information",
-        "description": "How to use this panel: pick a member in the list on the left to edit their record, or use New to register an invite when you have permission.",
-        "selectLead": "No member selected",
-        "selectHint": "Click a member in the list or use the New button to register an email invite.",
-        "emptyLead": "No members found",
-        "emptyHint": "There are no members in this tenant and your current permission does not allow registering invites."
       },
       "access": {
         "title": "Access",
@@ -211,25 +183,12 @@
     "filter": {
       "toggleAriaLabel": "Show or hide the list filter panel",
       "toggleLabel": "Filter",
-      "searchLabel": "Name or description",
-      "searchPlaceholder": "Name or description"
+      "searchLabel": "Name or description"
     },
     "section": {
       "identity": {
         "nameLabel": "Scope name",
         "nameHint": "Identify the scope slice (for example Poultry, Soy, Milk) with the context your operation needs."
-      },
-      "info": {
-        "title": "Information",
-        "description": "Summary of the scope in focus: values saved on the server, and what this session may change.",
-        "nameRegisteredLabel": "Saved name",
-        "displayRegisteredLabel": "Saved description",
-        "canEditLabel": "Can edit",
-        "canDeleteLabel": "Can delete",
-        "yes": "Yes",
-        "no": "No",
-        "createLead": "New structural scope",
-        "createHint": "You are defining a new slice for the active tenant. Save to register it in the directory."
       }
     },
     "action": {
@@ -241,7 +200,6 @@
       "saving": "Saving..."
     },
     "readOnlyNotice": "You can review the scope directory, but only master or admin members can create or edit structural records.",
-    "selectPrompt": "Select a scope from the list to edit it, or use the New button to create one.",
     "error": {
       "save": "Could not save the scope. Try again.",
       "create": "Could not create the scope. Try again.",
@@ -266,8 +224,7 @@
     "filter": {
       "toggleAriaLabel": "Show or hide the list filter panel",
       "toggleLabel": "Filter",
-      "searchLabel": "Field name or type",
-      "searchPlaceholder": "Field name or type"
+      "searchLabel": "Field name or type"
     },
     "directory": {
       "dragHandleAria": "Drag to reorder",
@@ -280,22 +237,6 @@
       "fieldName": {
         "label": "Field name",
         "hint": "Field name. Enter a short, easy-to-understand name, for example: quantity, value, growth percentage. This name is used in formulas, charts, and reports."
-      },
-      "info": {
-        "title": "Information",
-        "description": "Summary of the field in focus: stable identifier and type saved on the server.",
-        "idLabel": "Identifier",
-        "fieldNameRegisteredLabel": "Name",
-        "friendlyTypeLabel": "Type",
-        "typeValueInteger": "Whole number",
-        "typeValueNumberOne": "Number with 1 decimal place",
-        "typeValueNumberMany": "Number with {scale} decimal places",
-        "sqlTypeRegisteredLabel": "PostgreSQL type",
-        "canEditLabel": "Can edit",
-        "yes": "Yes",
-        "no": "No",
-        "createLead": "New field",
-        "createHint": "You are defining a new field for the active scope. Save to register it in the directory."
       }
     },
     "action": {
@@ -312,7 +253,6 @@
       "create": "Could not create the field. Try again.",
       "delete": "Could not delete the field. Try again.",
       "deleteBlockedDetail": "This field cannot be deleted while formulas, event inputs, or results still reference it.",
-      "validation": "Choose a valid data type.",
       "fieldNameRequired": "Enter a field name."
     },
     "fieldType": {
@@ -378,8 +318,7 @@
     "filter": {
       "toggleAriaLabel": "Show or hide the list filter panel",
       "toggleLabel": "Filter",
-      "searchLabel": "Action name",
-      "searchPlaceholder": "Action name"
+      "searchLabel": "Action name"
     },
     "directory": {
       "dragHandleAria": "Drag to reorder",
@@ -393,13 +332,6 @@
       "recurrence": {
         "label": "Recurring action",
         "hint": "Enable this when the effect of the action should keep applying from the event date until the next event of the same action or until the final age."
-      },
-      "info": {
-        "title": "Information",
-        "description": "Summary of the action in focus on the server.",
-        "actionNameRegisteredLabel": "Name",
-        "createLead": "New action",
-        "createHint": "You are defining a new action for the active scope. Save to register it in the directory."
       }
     },
     "buttons": {
@@ -498,8 +430,7 @@
       "loadError": "Could not load events for this scope. Try again.",
       "fallbackLocation": "Unavailable location",
       "fallbackItem": "Unavailable item",
-      "fallbackAction": "Unavailable action",
-      "fallbackEvent": "Unavailable event"
+      "fallbackAction": "Unavailable action"
     },
     "history": {
       "title": "Change history",
@@ -529,13 +460,6 @@
         "loading": "Loading action input fields...",
         "loadError": "Could not load action input fields.",
         "saveError": "Could not save action input fields."
-      },
-      "info": {
-        "title": "Information",
-        "description": "Summary of the selected event on the server.",
-        "summaryLabel": "Summary",
-        "createLead": "New event",
-        "createHint": "You are recording a new event for the active scope. Save to register it in the directory."
       }
     },
     "filter": {
@@ -607,18 +531,7 @@
       "errorMissingFormulaInput": "Provide {fieldLabel} in formula {formulaLabel} for the event {eventLabel}.",
       "deleteError": "Could not delete the results in this period. Try again."
     },
-    "fields": {
-      "title": "Fields used in the calculation",
-      "description": "The scope flags define where the initial and final age come from and which field receives the persisted result.",
-      "initialBadge": "Initial age",
-      "currentBadge": "Current age",
-      "finalBadge": "Final age",
-      "targetLabel": "Target field",
-      "missingLabel": "Pending"
-    },
     "result": {
-      "title": "Results in the period",
-      "description": "Each line below represents one materialized day in the selected period, consolidating the calculated fields horizontally for the location and item.",
       "placeholder": "Select the dates and run the calculation to see the results for this period.",
       "empty": "No eligible event produced results in this period.",
       "emptyNoEventsBeforePeriodEnd": "There are no recorded events up to the end of the selected period.",
@@ -627,22 +540,9 @@
       "emptyNoPersistedResultsInPeriod": "There are no saved calculated results for this period.",
       "emptyNoResultsToDeleteInPeriod": "There were no calculated results to delete in this period.",
       "dateLabel": "Date",
-      "createdLabel": "Created",
-      "updatedLabel": "Updated",
-      "unchangedLabel": "Kept",
-      "statusCreated": "Created",
-      "statusUpdated": "Updated",
-      "statusUnchanged": "Kept",
-      "fieldLabel": "Field",
-      "locationLabel": "Location",
-      "itemLabel": "Item",
       "actionLabel": "Action",
       "formulaLabel": "Formula",
-      "formulaOrderLabel": "Order",
-      "calculatedAtLabel": "Calculated at",
       "emptyValue": "No value",
-      "fallbackLocation": "Unavailable location",
-      "fallbackItem": "Unavailable item",
       "fallbackAction": "Unavailable action"
     }
   },
@@ -660,31 +560,15 @@
     "filter": {
       "toggleAriaLabel": "Show or hide the list filter panel",
       "toggleLabel": "Filter",
-      "searchLabel": "Location name or description",
-      "searchPlaceholder": "Location name or description",
-      "parentLabel": "Parent location",
-      "all": "All"
+      "searchLabel": "Location name or description"
     },
     "section": {
       "identity": {
         "nameLabel": "Location name",
         "nameHint": "Identify this location in the hierarchy with the detail your operation needs (for example Willow Farm, Brookside Poultry, East Field)."
-      },
-      "structure": {
-        "title": "Information",
-        "description": "Summary of the location in focus, with the level in the hierarchy and the order among siblings of the same location.",
-        "levelLabel": "Hierarchy level",
-        "levelHint": "Counted from the scope root (1 = root).",
-        "parentLabel": "Parent location",
-        "parentRoot": "Scope root (no parent above)",
-        "orderLabel": "Order among siblings",
-        "orderHintEdit": "Used when listing locations at the same level.",
-        "orderHintCreate": "Assigned when you save the new location.",
-        "orderPending": "-"
       }
     },
     "dragHandleAria": "Drag to reorder or reparent",
-    "dragSubtreeNote": "Includes {count} nested items below this one.",
     "action": {
       "cancel": "Cancel",
       "new": "New",
@@ -698,13 +582,8 @@
       "moveDown": "Move down"
     },
     "readOnlyNotice": "You can review the location directory, but only master or admin members can create or edit hierarchical records.",
-    "createdNotice": "Location created successfully.",
-    "deletedNotice": "Location deleted successfully.",
     "error": {
       "load": "Could not load the location directory. Try again.",
-      "save": "Could not save the location. Try again.",
-      "create": "Could not create the location. Try again.",
-      "delete": "Could not delete the location. Try again.",
       "move": "Could not move the location. Try again.",
       "validation": "This field cannot be empty."
     },
@@ -724,10 +603,7 @@
     "filter": {
       "toggleAriaLabel": "Show or hide the list filter panel",
       "toggleLabel": "Filter",
-      "searchLabel": "Unit name or description",
-      "searchPlaceholder": "Unit name or description",
-      "parentLabel": "Parent unit",
-      "all": "All"
+      "searchLabel": "Unit name or description"
     },
     "section": {
       "identity": {
@@ -743,22 +619,9 @@
         "createError": "Could not save the type. Please try again.",
         "deleteAriaLabel": "Delete type",
         "deleteError": "Could not delete the type. Please try again."
-      },
-      "structure": {
-        "title": "Information",
-        "description": "Summary of the item in focus: level in the hierarchy, order among siblings, and parent link.",
-        "levelLabel": "Hierarchy level",
-        "levelHint": "Counted from the scope root (1 = root).",
-        "parentLabel": "Parent unit",
-        "parentRoot": "Scope root (no parent above)",
-        "orderLabel": "Order among siblings",
-        "orderHintEdit": "Used when listing items at the same level.",
-        "orderHintCreate": "Assigned when you save the new record.",
-        "orderPending": "-"
       }
     },
     "dragHandleAria": "Drag to reorder or reparent",
-    "dragSubtreeNote": "Includes {count} nested items below this one.",
     "action": {
       "cancel": "Cancel",
       "new": "New",
@@ -772,13 +635,8 @@
       "moveDown": "Move down"
     },
     "readOnlyNotice": "You can review productive units, but only master or admin members can create or edit hierarchical records.",
-    "createdNotice": "Productive unit created successfully.",
-    "deletedNotice": "Productive unit deleted successfully.",
     "error": {
       "load": "Could not load the directory. Try again.",
-      "save": "Could not save. Try again.",
-      "create": "Could not create. Try again.",
-      "delete": "Could not delete. Try again.",
       "move": "Could not move. Try again.",
       "validation": "This field cannot be empty.",
       "validationKind": "Select a unit type."
@@ -799,7 +657,6 @@
       "toggleAriaLabel": "Show or hide the list filter panel",
       "toggleLabel": "Filter",
       "searchLabel": "Name or identifier",
-      "searchPlaceholder": "Name or identifier",
       "empty": "No tenant matches the current filter."
     },
     "section": {
@@ -828,7 +685,6 @@
     "toggleAriaLabel": "Show or hide the panel history",
     "toggleLabel": "History",
     "loading": "Loading history...",
-    "empty": "No history records found.",
     "unknownUser": "Unknown user",
     "entryLabel": "Log #{id}",
     "metaLine": "{actor} on {moment}",
@@ -842,11 +698,7 @@
     "srDeletedValue": "Value before deletion: {value}.",
     "diffUnavailable": "This update could not be compared to the previous record.",
     "diffEmpty": "No differences were detected compared to the previous record.",
-    "deletedNote": "This entry represents a deletion. The log has no row payload in this case.",
     "action": {
-      "insert": "Insert",
-      "update": "Update",
-      "delete": "Delete",
       "loadMore": "Load more",
       "loadingMore": "Loading..."
     },

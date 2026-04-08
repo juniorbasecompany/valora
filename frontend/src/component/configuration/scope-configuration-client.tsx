@@ -507,7 +507,6 @@ export function ScopeConfigurationClient({
             hint={copy.nameHint}
             flashActive={isEditorFlashActive}
             onAfterFieldEdit={() => setRequestErrorMessage(null)}
-            multiline
           />
         </>
       }

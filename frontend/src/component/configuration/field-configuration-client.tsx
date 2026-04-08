@@ -27,7 +27,7 @@ import {
 } from "@/component/configuration/directory-filter-panel";
 import { Badge } from "@/component/ui/badge";
 import { TrashIconButton } from "@/component/ui/trash-icon-button";
-import { EditorPanelFlashOverlay } from "@/component/configuration/editor-panel-flash-overlay";
+import { ConfigurationPrimaryTextFieldSection } from "@/component/configuration/configuration-primary-text-field-section";
 import { useEditorPanelFlash } from "@/component/configuration/use-editor-panel-flash";
 import { useEditorNewIntentGeneration } from "@/component/configuration/use-editor-new-intent-generation";
 import { useFocusFirstEditorFieldAfterFlash } from "@/component/configuration/use-focus-first-editor-field-after-flash";
@@ -967,36 +967,23 @@ export function FieldConfigurationClient({
       editorForm={
         directory ? (
           <>
-            <section className="ui-card ui-form-section ui-border-accent">
-              <EditorPanelFlashOverlay active={isEditorFlashActive} />
-              <div className="ui-field">
-                <label className="ui-field-label" htmlFor="field-display-name">
-                  {copy.fieldNameLabel}
-                </label>
-                <input
-                  id="field-display-name"
-                  type="text"
-                  className="ui-input"
-                  data-editor-primary-field="true"
-                  value={fieldName}
-                  onChange={(event) => {
-                    setFieldName(event.target.value);
-                    setFieldError((previous) => ({
-                      ...previous,
-                      fieldName: undefined
-                    }));
-                    setRequestErrorMessage(null);
-                  }}
-                  disabled={isDeletePending || !canEditForm}
-                  autoComplete="off"
-                  aria-invalid={Boolean(fieldError.fieldName)}
-                />
-                <p className="ui-field-hint">{copy.fieldNameHint}</p>
-                {fieldError.fieldName ? (
-                  <p className="ui-field-error">{fieldError.fieldName}</p>
-                ) : null}
-              </div>
-            </section>
+            <ConfigurationPrimaryTextFieldSection
+              inputId="field-label-name"
+              value={fieldName}
+              onValueChange={(next) => {
+                setFieldName(next);
+                setFieldError((previous) => ({
+                  ...previous,
+                  fieldName: undefined
+                }));
+              }}
+              label={copy.fieldNameLabel}
+              hint={copy.fieldNameHint}
+              error={fieldError.fieldName}
+              disabled={isDeletePending || !canEditForm}
+              flashActive={isEditorFlashActive}
+              onAfterEdit={() => setRequestErrorMessage(null)}
+            />
 
             <section className="ui-card ui-form-section ui-border-accent">
               <div className="ui-field">

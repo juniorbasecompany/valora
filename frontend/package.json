@@ -9,6 +9,7 @@
     "start": "node ./node_modules/next/dist/bin/next start",
     "lint": "eslint . && node ./scripts/check-semantic-ui.mjs",
     "typecheck": "tsc --noEmit",
+    "check:i18n": "python script_audit_i18n_keys.py --strict",
     "check:semantic-ui": "node ./scripts/check-semantic-ui.mjs"
   },
   "dependencies": {

@@ -984,7 +984,6 @@ export function MemberConfigurationClient({
             label={copy.nameLabel}
             hint={copy.nameHint}
             onAfterFieldEdit={() => setRequestErrorMessage(null)}
-            multiline
           />
 
           {!isCreateMode && selectedMember ? (

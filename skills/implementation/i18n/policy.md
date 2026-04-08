@@ -12,7 +12,7 @@ Este ficheiro é a **fonte canónica** no repositório para a **política estáv
 - **Pontuação em copy de produto e mensagens:** não usar o travessão longo (U+2014, `—`); preferir vírgula ou reestruturação da frase. Para valor vazio em tabela ou detalhe, usar hífen ASCII (`-`) ou outro padrão acordado, não `—`.
 - **API REST:** corpo com **`code` estável** + detalhes estruturados para a UI mapear para chave i18n; não depender só de `message` em português para o browser.
 - **Canais com texto gerado no servidor** (e-mail, PDF, push): tradução no backend ou templates por idioma; alinhar chaves semânticas com produto para não divergir do front.
-- **Qualidade:** após adoptar a lib, considerar CI para paridade de chaves entre locales e heurística anti-string solta em JSX (com excepções para `aria-*`, testids).
+- **Qualidade:** no `frontend/`, antes de merge, `npm run check:i18n` deve passar (paridade estrita entre `messages/pt-BR.json`, `messages/en-US.json` e `messages/es-ES.json`, chaves usadas pelo código e sem órfãs; implementação em `frontend/script_audit_i18n_keys.py`). Considerar CI com o mesmo comando e heurística anti-string solta em JSX (com excepções para `aria-*`, testids).
 
 ---
 

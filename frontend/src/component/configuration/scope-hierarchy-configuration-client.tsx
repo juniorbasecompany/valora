@@ -1006,7 +1006,6 @@ export function ScopeHierarchyConfigurationClient<
               hint={copy.nameHint}
               flashActive={isEditorFlashActive}
               onAfterFieldEdit={() => setRequestErrorMessage(null)}
-              multiline
             />
           )}
 

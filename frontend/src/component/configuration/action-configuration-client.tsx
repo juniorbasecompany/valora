@@ -31,7 +31,7 @@ import {
 } from "@/component/configuration/directory-filter-panel";
 import type { FormulaFieldOption } from "@/component/configuration/formula-statement-editor";
 import { TrashIconButton } from "@/component/ui/trash-icon-button";
-import { EditorPanelFlashOverlay } from "@/component/configuration/editor-panel-flash-overlay";
+import { ConfigurationPrimaryTextFieldSection } from "@/component/configuration/configuration-primary-text-field-section";
 import { useEditorPanelFlash } from "@/component/configuration/use-editor-panel-flash";
 import { useEditorNewIntentGeneration } from "@/component/configuration/use-editor-new-intent-generation";
 import { useFocusFirstEditorFieldAfterFlash } from "@/component/configuration/use-focus-first-editor-field-after-flash";
@@ -1050,36 +1050,24 @@ export function ActionConfigurationClient({
       editorForm={
         directory ? (
           <>
-            <section className="ui-card ui-form-section ui-border-accent">
-              <EditorPanelFlashOverlay active={isEditorFlashActive} />
-              <div className="ui-field">
-                <label className="ui-field-label" htmlFor="action-display-name">
-                  {copy.actionNameLabel}
-                </label>
-                <input
-                  id="action-display-name"
-                  type="text"
-                  className="ui-input"
-                  data-editor-primary-field="true"
-                  value={actionName}
-                  onChange={(event) => {
-                    setActionName(event.target.value);
-                    setFieldError((previous) => ({
-                      ...previous,
-                      actionName: undefined
-                    }));
-                    setRequestErrorMessage(null);
-                  }}
-                  disabled={isDeletePending || !canEditForm}
-                  autoComplete="off"
-                  aria-invalid={Boolean(fieldError.actionName)}
-                />
-                <p className="ui-field-hint">{copy.actionNameHint}</p>
-                {fieldError.actionName ? (
-                  <p className="ui-field-error">{fieldError.actionName}</p>
-                ) : null}
-              </div>
-
+            <ConfigurationPrimaryTextFieldSection
+              inputId="action-label-name"
+              value={actionName}
+              onValueChange={(next) => {
+                setActionName(next);
+                setFieldError((previous) => ({
+                  ...previous,
+                  actionName: undefined
+                }));
+                setRequestErrorMessage(null);
+              }}
+              label={copy.actionNameLabel}
+              hint={copy.actionNameHint}
+              error={fieldError.actionName}
+              disabled={isDeletePending || !canEditForm}
+              flashActive={isEditorFlashActive}
+              onAfterEdit={() => setRequestErrorMessage(null)}
+            >
               <div className="ui-field">
                 <label
                   className="ui-field-label"
@@ -1100,7 +1088,7 @@ export function ActionConfigurationClient({
                 </label>
                 <p className="ui-field-hint">{copy.recurrenceHint}</p>
               </div>
-            </section>
+            </ConfigurationPrimaryTextFieldSection>
 
             {(isCreateMode && directory.can_edit) ||
               (!isCreateMode && selectedAction) ? (

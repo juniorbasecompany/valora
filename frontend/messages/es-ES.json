@@ -1,8 +1,6 @@
 {
   "AppShell": {
     "productName": "Valora",
-    "productStage": "Fase 1 en curso",
-    "workspaceLabel": "Espacio operativo y auditable",
     "navigation": {
       "home": "Inicio",
       "location": "Ubicaciones",
@@ -11,21 +9,15 @@
       "action": "Acciones",
       "unity": "Unidades",
       "event": "Eventos",
-      "calculation": "Cálculo",
-      "configuration": "Configuración",
-      "comingSoon": "próximamente"
+      "calculation": "Cálculo"
     },
     "topbar": {
-      "tenantLabel": "Licenciatario activo",
-      "accountLabel": "Cuenta",
-      "localeLabel": "Idioma y región",
       "openNavigation": "Abrir navegación",
       "closeNavigation": "Cerrar navegación",
       "signOut": "Cerrar sesión",
       "signOutPending": "Cerrando sesión..."
     },
     "menu": {
-      "tenantSectionLabel": "Licenciatario",
       "tenantTriggerAriaLabel": "Elegir licenciatario",
       "tenantMenuAriaLabel": "Licenciatarios disponibles",
       "scopeTriggerAriaLabel": "Elegir alcance",
@@ -42,7 +34,6 @@
       "emptyScopeList": "No hay ningún alcance disponible.",
       "switchingScope": "Guardando alcance...",
       "switchingLocale": "Cambiando idioma...",
-      "activeLabel": "activo",
       "noScopeLabel": "Sin alcance"
     }
   },
@@ -84,8 +75,6 @@
     "openTenantEditor": "Editar licenciatario",
     "openMemberEditor": "Editar miembros",
     "openScopeEditor": "Editar alcances",
-    "openFieldEditor": "Editar campos",
-    "openActionEditor": "Editar acciones",
     "cards": {
       "organization": {
         "title": "Licenciatario",
@@ -98,14 +87,6 @@
       "scope": {
         "title": "Alcance",
         "description": "Un alcance es una unidad de contexto dentro del licenciatario: donde los registros y, más adelante, la jerarquía de ubicaciones se separan sin mezclarse. Piensa en sucursal, obra, sede o proyecto, la etiqueta es tuya, pero la función es aislar datos que no deberían verse juntos. El alcance elegido en el encabezado es el que rige al trabajar en ubicaciones y en lo que dependa de él."
-      },
-      "field": {
-        "title": "Campos",
-        "description": "Los campos definen tipos de valor usados por las reglas del alcance activo (por ejemplo enteros o decimales). La lista y el editor siguen el alcance que eliges en el encabezado, con el mismo patrón que las ubicaciones."
-      },
-      "action": {
-        "title": "Acciones",
-        "description": "Las acciones son tipos de evento de negocio en el alcance activo, por ejemplo alojamiento o mortalidad. Cada una tiene un nombre claro por idioma y puede tener fórmulas asociadas. La lista sigue el alcance del encabezado, con el mismo patrón que los campos."
       }
     }
   },
@@ -123,7 +104,6 @@
       "toggleAriaLabel": "Mostrar u ocultar el panel de filtros de la lista",
       "toggleLabel": "Filtro",
       "searchLabel": "Nombre o correo",
-      "searchPlaceholder": "Nombre o correo",
       "roleLabel": "Rol",
       "statusLabel": "Estado",
       "all": "Todos"
@@ -135,14 +115,6 @@
       },
       "invite": {
         "emailFieldHint": "Indica el correo que recibirá la invitación. El primer acceso usa una cuenta de Google con esa misma dirección."
-      },
-      "idle": {
-        "title": "Información",
-        "description": "Cómo usar este panel: elige un miembro en la lista de la izquierda para editar su registro, o usa Nuevo para registrar una invitación cuando tengas permiso.",
-        "selectLead": "Ningún miembro seleccionado",
-        "selectHint": "Haz clic en un miembro de la lista o usa el botón Nuevo para registrar una invitación por correo.",
-        "emptyLead": "No se encontraron miembros",
-        "emptyHint": "No hay miembros en este licenciatario y tu permiso actual no permite registrar invitaciones."
       },
       "access": {
         "title": "Acceso",
@@ -211,25 +183,12 @@
     "filter": {
       "toggleAriaLabel": "Mostrar u ocultar el panel de filtros de la lista",
       "toggleLabel": "Filtro",
-      "searchLabel": "Nombre o descripción",
-      "searchPlaceholder": "Nombre o descripción"
+      "searchLabel": "Nombre o descripción"
     },
     "section": {
       "identity": {
         "nameLabel": "Nombre del alcance",
         "nameHint": "Identifica el recorte del alcance (por ejemplo Aves, Soja, Leche) con el contexto que necesite la operación."
-      },
-      "info": {
-        "title": "Información",
-        "description": "Resumen del alcance en foco: valores guardados en el servidor y qué puede cambiar esta sesión.",
-        "nameRegisteredLabel": "Nombre guardado",
-        "displayRegisteredLabel": "Descripción guardada",
-        "canEditLabel": "Puede editar",
-        "canDeleteLabel": "Puede eliminar",
-        "yes": "Sí",
-        "no": "No",
-        "createLead": "Nuevo alcance estructural",
-        "createHint": "Estás definiendo un nuevo recorte para el licenciatario activo. Guarda para registrarlo en el directorio."
       }
     },
     "action": {
@@ -241,7 +200,6 @@
       "saving": "Guardando..."
     },
     "readOnlyNotice": "Puedes revisar el directorio de alcances, pero solo los miembros master o administrador pueden crear o editar registros estructurales.",
-    "selectPrompt": "Selecciona un alcance de la lista para editarlo, o usa el botón Nuevo para dar de alta uno nuevo.",
     "error": {
       "save": "No se pudo guardar el alcance. Inténtalo de nuevo.",
       "create": "No se pudo crear el alcance. Inténtalo de nuevo.",
@@ -266,8 +224,7 @@
     "filter": {
       "toggleAriaLabel": "Mostrar u ocultar el panel de filtros de la lista",
       "toggleLabel": "Filtro",
-      "searchLabel": "Nombre del campo o tipo",
-      "searchPlaceholder": "Nombre del campo o tipo"
+      "searchLabel": "Nombre del campo o tipo"
     },
     "directory": {
       "dragHandleAria": "Arrastrar para reordenar",
@@ -280,22 +237,6 @@
       "fieldName": {
         "label": "Nombre del campo",
         "hint": "Nombre del campo. Indica un nombre breve y fácil de entender, por ejemplo: cantidad, valor, porcentaje de crecimiento. Este nombre se usa en fórmulas, gráficos e informes."
-      },
-      "info": {
-        "title": "Información",
-        "description": "Resumen del campo en foco: identificador estable y tipo guardado en el servidor.",
-        "idLabel": "Identificador",
-        "fieldNameRegisteredLabel": "Nombre",
-        "friendlyTypeLabel": "Tipo",
-        "typeValueInteger": "Número entero",
-        "typeValueNumberOne": "Número con 1 decimal",
-        "typeValueNumberMany": "Número con {scale} decimales",
-        "sqlTypeRegisteredLabel": "Tipo en PostgreSQL",
-        "canEditLabel": "Puede editar",
-        "yes": "Sí",
-        "no": "No",
-        "createLead": "Nuevo campo",
-        "createHint": "Estás definiendo un campo nuevo para el alcance activo. Guarda para registrarlo en el directorio."
       }
     },
     "action": {
@@ -312,7 +253,6 @@
       "create": "No se pudo crear el campo. Inténtalo de nuevo.",
       "delete": "No se pudo eliminar el campo. Inténtalo de nuevo.",
       "deleteBlockedDetail": "No se puede eliminar el campo mientras fórmulas, entradas o resultados de eventos sigan referenciándolo.",
-      "validation": "Elige un tipo de dato válido.",
       "fieldNameRequired": "Indica el nombre del campo."
     },
     "fieldType": {
@@ -378,8 +318,7 @@
     "filter": {
       "toggleAriaLabel": "Mostrar u ocultar el panel de filtros de la lista",
       "toggleLabel": "Filtro",
-      "searchLabel": "Nombre de la acción",
-      "searchPlaceholder": "Nombre de la acción"
+      "searchLabel": "Nombre de la acción"
     },
     "directory": {
       "dragHandleAria": "Arrastrar para reordenar",
@@ -393,13 +332,6 @@
       "recurrence": {
         "label": "Acción recurrente",
         "hint": "Actívala cuando el efecto de esta acción deba mantenerse desde la fecha del evento hasta el siguiente evento de la misma acción o hasta la edad final."
-      },
-      "info": {
-        "title": "Información",
-        "description": "Resumen de la acción en foco en el servidor.",
-        "actionNameRegisteredLabel": "Nombre",
-        "createLead": "Nueva acción",
-        "createHint": "Estás definiendo una nueva acción para el alcance activo. Guarda para registrarla en el directorio."
       }
     },
     "buttons": {
@@ -498,8 +430,7 @@
       "loadError": "No se pudieron cargar los eventos de este alcance. Inténtalo de nuevo.",
       "fallbackLocation": "Ubicación no disponible",
       "fallbackItem": "Ítem no disponible",
-      "fallbackAction": "Acción no disponible",
-      "fallbackEvent": "Evento no disponible"
+      "fallbackAction": "Acción no disponible"
     },
     "history": {
       "title": "Historial de cambios",
@@ -529,13 +460,6 @@
         "loading": "Cargando campos de entrada de la acción...",
         "loadError": "No se pudieron cargar los campos de entrada de la acción.",
         "saveError": "No se pudieron guardar los campos de entrada de la acción."
-      },
-      "info": {
-        "title": "Información",
-        "description": "Resumen del evento seleccionado en el servidor.",
-        "summaryLabel": "Resumen",
-        "createLead": "Nuevo evento",
-        "createHint": "Estás registrando un nuevo evento para el alcance activo. Guarda para registrarlo en el directorio."
       }
     },
     "filter": {
@@ -607,18 +531,7 @@
       "errorMissingFormulaInput": "Informa {fieldLabel} en la fórmula {formulaLabel} en el evento de {eventLabel}.",
       "deleteError": "No se pudieron eliminar los resultados del período. Inténtalo de nuevo."
     },
-    "fields": {
-      "title": "Campos usados en el cálculo",
-      "description": "Las flags del alcance definen de dónde salen la edad inicial y final y en qué campo se persiste el resultado.",
-      "initialBadge": "Edad inicial",
-      "currentBadge": "Edad actual",
-      "finalBadge": "Edad final",
-      "targetLabel": "Campo de destino",
-      "missingLabel": "Pendiente"
-    },
     "result": {
-      "title": "Resultados del período",
-      "description": "Cada fila representa un día materializado del período seleccionado, consolidando horizontalmente los campos calculados para la ubicación y el ítem.",
       "placeholder": "Selecciona las fechas y ejecuta el cálculo para ver los resultados de este período.",
       "empty": "Ningún evento elegible produjo resultados en este período.",
       "emptyNoEventsBeforePeriodEnd": "No hay eventos registrados hasta el final del período seleccionado.",
@@ -627,22 +540,9 @@
       "emptyNoPersistedResultsInPeriod": "No existen resultados calculados guardados para este período.",
       "emptyNoResultsToDeleteInPeriod": "No había resultados calculados para eliminar en este período.",
       "dateLabel": "Fecha",
-      "createdLabel": "Creados",
-      "updatedLabel": "Actualizados",
-      "unchangedLabel": "Mantenidos",
-      "statusCreated": "Creado",
-      "statusUpdated": "Actualizado",
-      "statusUnchanged": "Mantenido",
-      "fieldLabel": "Campo",
-      "locationLabel": "Ubicación",
-      "itemLabel": "Ítem",
       "actionLabel": "Acción",
       "formulaLabel": "Fórmula",
-      "formulaOrderLabel": "Orden",
-      "calculatedAtLabel": "Calculado en",
       "emptyValue": "Sin valor",
-      "fallbackLocation": "Ubicación no disponible",
-      "fallbackItem": "Ítem no disponible",
       "fallbackAction": "Acción no disponible"
     }
   },
@@ -660,29 +560,15 @@
     "filter": {
       "toggleAriaLabel": "Mostrar u ocultar el panel de filtros de la lista",
       "toggleLabel": "Filtro",
-      "searchLabel": "Nombre o descripción de la ubicación",
-      "searchPlaceholder": "Nombre o descripción de la ubicación"
+      "searchLabel": "Nombre o descripción de la ubicación"
     },
     "section": {
       "identity": {
         "nameLabel": "Nombre de la ubicación",
         "nameHint": "Identifica la ubicación en la jerarquía con el detalle que necesite la operación (por ejemplo Granja Rosal, Granja avícola Andevalo, Parcela Este)."
-      },
-      "structure": {
-        "title": "Información",
-        "description": "Resumen de la ubicación en foco, con el nivel en la jerarquía y el orden entre hermanos de la misma ubicación.",
-        "levelLabel": "Nivel jerárquico",
-        "levelHint": "Contado desde la raíz del alcance (1 = raíz).",
-        "parentLabel": "Ubicación padre",
-        "parentRoot": "Raíz del alcance (sin padre superior)",
-        "orderLabel": "Orden entre hermanos",
-        "orderHintEdit": "Se usa al listar ubicaciones en el mismo nivel.",
-        "orderHintCreate": "Se definirá al guardar la nueva ubicación.",
-        "orderPending": "-"
       }
     },
     "dragHandleAria": "Arrastrar para reordenar o cambiar de nivel",
-    "dragSubtreeNote": "Incluye {count} elementos anidados debajo de este.",
     "action": {
       "cancel": "Cancelar",
       "new": "Nueva",
@@ -696,13 +582,8 @@
       "moveDown": "Mover abajo"
     },
     "readOnlyNotice": "Puedes revisar el directorio de ubicaciones, pero solo los miembros master o administrador pueden crear o editar registros jerárquicos.",
-    "createdNotice": "Ubicación creada correctamente.",
-    "deletedNotice": "Ubicación eliminada correctamente.",
     "error": {
       "load": "No se pudo cargar el directorio de ubicaciones. Inténtalo de nuevo.",
-      "save": "No se pudo guardar la ubicación. Inténtalo de nuevo.",
-      "create": "No se pudo crear la ubicación. Inténtalo de nuevo.",
-      "delete": "No se pudo eliminar la ubicación. Inténtalo de nuevo.",
       "move": "No se pudo mover la ubicación. Inténtalo de nuevo.",
       "validation": "Este campo no puede quedar vacío."
     },
@@ -722,8 +603,7 @@
     "filter": {
       "toggleAriaLabel": "Mostrar u ocultar el panel de filtros de la lista",
       "toggleLabel": "Filtro",
-      "searchLabel": "Nombre o descripción de la unidad",
-      "searchPlaceholder": "Nombre o descripción de la unidad"
+      "searchLabel": "Nombre o descripción de la unidad"
     },
     "section": {
       "identity": {
@@ -739,22 +619,9 @@
         "createError": "No se pudo guardar el tipo. Inténtalo de nuevo.",
         "deleteAriaLabel": "Eliminar tipo",
         "deleteError": "No se pudo eliminar el tipo. Inténtalo de nuevo."
-      },
-      "structure": {
-        "title": "Información",
-        "description": "Resumen del ítem en foco: nivel en la jerarquía, orden entre hermanos y vínculo con el padre.",
-        "levelLabel": "Nivel jerárquico",
-        "levelHint": "Contado desde la raíz del alcance (1 = raíz).",
-        "parentLabel": "Unidad padre",
-        "parentRoot": "Raíz del alcance (sin padre superior)",
-        "orderLabel": "Orden entre hermanos",
-        "orderHintEdit": "Se usa al listar ítems en el mismo nivel.",
-        "orderHintCreate": "Se definirá al guardar el nuevo registro.",
-        "orderPending": "-"
       }
     },
     "dragHandleAria": "Arrastrar para reordenar o cambiar de nivel",
-    "dragSubtreeNote": "Incluye {count} elementos anidados debajo de este.",
     "action": {
       "cancel": "Cancelar",
       "new": "Nueva",
@@ -768,13 +635,8 @@
       "moveDown": "Mover abajo"
     },
     "readOnlyNotice": "Puedes consultar las unidades productivas, pero solo los miembros master o administrador pueden crear o editar registros jerárquicos.",
-    "createdNotice": "Unidad productiva creada correctamente.",
-    "deletedNotice": "Unidad productiva eliminada correctamente.",
     "error": {
       "load": "No se pudo cargar el directorio. Inténtalo de nuevo.",
-      "save": "No se pudo guardar. Inténtalo de nuevo.",
-      "create": "No se pudo crear. Inténtalo de nuevo.",
-      "delete": "No se pudo eliminar. Inténtalo de nuevo.",
       "move": "No se pudo mover. Inténtalo de nuevo.",
       "validation": "Este campo no puede quedar vacío.",
       "validationKind": "Selecciona un tipo de unidad."
@@ -795,7 +657,6 @@
       "toggleAriaLabel": "Mostrar u ocultar el panel de filtros de la lista",
       "toggleLabel": "Filtro",
       "searchLabel": "Nombre o identificador",
-      "searchPlaceholder": "Nombre o identificador",
       "empty": "Ningún licenciatario coincide con el filtro actual."
     },
     "section": {
@@ -824,7 +685,6 @@
     "toggleAriaLabel": "Mostrar u ocultar el historial del panel",
     "toggleLabel": "Historial",
     "loading": "Cargando historial...",
-    "empty": "No se encontraron registros de historial.",
     "unknownUser": "Usuario desconocido",
     "entryLabel": "Registro #{id}",
     "metaLine": "{actor} el {moment}",
@@ -838,11 +698,7 @@
     "srDeletedValue": "Valor antes de la eliminación: {value}.",
     "diffUnavailable": "No se pudo comparar esta actualización con el registro anterior.",
     "diffEmpty": "No se detectaron diferencias respecto al registro anterior.",
-    "deletedNote": "Esta entrada representa una eliminación. El registro no incluye los datos de la fila en este caso.",
     "action": {
-      "insert": "Alta",
-      "update": "Actualización",
-      "delete": "Baja",
       "loadMore": "Ver más",
       "loadingMore": "Cargando..."
     },

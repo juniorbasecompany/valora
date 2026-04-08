@@ -44,6 +44,10 @@ function referenceCountOf(row: TenantKindRecord) {
   return row.reference_count ?? 0;
 }
 
+/**
+ * Fluxo de item na hierarquia: o nome exibido vem do `kind` (tipo), não de texto livre na entidade `item`.
+ * Mantém o mesmo cartão de formulário que os outros painéis (`ui-card` + flash + `ui-editor-content`).
+ */
 export function KindSelectOrCreateField({
   selectId,
   scopeId,

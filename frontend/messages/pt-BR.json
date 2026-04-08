@@ -1,8 +1,6 @@
 {
   "AppShell": {
     "productName": "Valora",
-    "productStage": "Fase 1 em andamento",
-    "workspaceLabel": "Ambiente operacional e auditável",
     "navigation": {
       "home": "Início",
       "location": "Locais",
@@ -11,21 +9,15 @@
       "action": "Ações",
       "unity": "Unidades",
       "event": "Eventos",
-      "calculation": "Cálculo",
-      "configuration": "Configuração",
-      "comingSoon": "em breve"
+      "calculation": "Cálculo"
     },
     "topbar": {
-      "tenantLabel": "Licenciado ativo",
-      "accountLabel": "Conta",
-      "localeLabel": "Idioma e região",
       "openNavigation": "Abrir navegação",
       "closeNavigation": "Fechar navegação",
       "signOut": "Sair",
       "signOutPending": "Saindo..."
     },
     "menu": {
-      "tenantSectionLabel": "Licenciado",
       "tenantTriggerAriaLabel": "Escolher licenciado",
       "tenantMenuAriaLabel": "Licenciados disponíveis",
       "scopeTriggerAriaLabel": "Escolher escopo",
@@ -42,7 +34,6 @@
       "emptyScopeList": "Nenhum escopo disponível.",
       "switchingScope": "Salvando escopo...",
       "switchingLocale": "Trocando idioma...",
-      "activeLabel": "ativo",
       "noScopeLabel": "Sem escopo"
     }
   },
@@ -84,8 +75,6 @@
     "openTenantEditor": "Editar licenciado",
     "openMemberEditor": "Editar membros",
     "openScopeEditor": "Editar escopos",
-    "openFieldEditor": "Editar campos",
-    "openActionEditor": "Editar ações",
     "cards": {
       "organization": {
         "title": "Licenciado",
@@ -98,14 +87,6 @@
       "scope": {
         "title": "Escopo",
         "description": "Escopo é uma unidade de contexto dentro do licenciado: onde os cadastros e, na sequência, a hierarquia de locais se separam sem se misturar. Pense em filial, obra, sede ou projeto, o rótulo é seu, mas a função é sempre isolar dados que não devem aparecer juntos. O escopo selecionado no cabeçalho é o que vale ao trabalhar em locais e nos fluxos que dependem dele."
-      },
-      "field": {
-        "title": "Campos",
-        "description": "Campos definem tipos de valor usados nas regras do escopo ativo (por exemplo números inteiros ou decimais). A lista e o editor respeitam o escopo que você escolhe no cabeçalho, no mesmo padrão dos locais."
-      },
-      "action": {
-        "title": "Ações",
-        "description": "Ações são os tipos de evento de negócio no escopo ativo, por exemplo alojamento ou mortalidade. Cada uma tem um nome amigável por idioma e pode ter fórmulas associadas. A lista segue o escopo do cabeçalho, no mesmo padrão dos campos."
       }
     }
   },
@@ -123,7 +104,6 @@
       "toggleAriaLabel": "Mostrar ou ocultar o painel de filtros da lista",
       "toggleLabel": "Filtro",
       "searchLabel": "Nome ou e-mail",
-      "searchPlaceholder": "Nome ou e-mail",
       "roleLabel": "Papel",
       "statusLabel": "Situação",
       "all": "Todos"
@@ -203,8 +183,7 @@
     "filter": {
       "toggleAriaLabel": "Mostrar ou ocultar o painel de filtros da lista",
       "toggleLabel": "Filtro",
-      "searchLabel": "Nome ou descrição",
-      "searchPlaceholder": "Nome ou descrição"
+      "searchLabel": "Nome ou descrição"
     },
     "section": {
       "identity": {
@@ -221,7 +200,6 @@
       "saving": "Salvando..."
     },
     "readOnlyNotice": "Você pode consultar o diretório de escopos, mas só membros master ou administrador podem criar ou editar cadastros estruturais.",
-    "selectPrompt": "Selecione um escopo na lista para editar, ou use o botão Novo para cadastrar.",
     "error": {
       "save": "Não foi possível salvar o escopo. Tente novamente.",
       "create": "Não foi possível criar o escopo. Tente novamente.",
@@ -246,8 +224,7 @@
     "filter": {
       "toggleAriaLabel": "Mostrar ou ocultar o painel de filtros da lista",
       "toggleLabel": "Filtro",
-      "searchLabel": "Nome do campo ou tipo",
-      "searchPlaceholder": "Nome do campo ou tipo"
+      "searchLabel": "Nome do campo ou tipo"
     },
     "directory": {
       "dragHandleAria": "Arrastar para reordenar",
@@ -276,7 +253,6 @@
       "create": "Não foi possível criar o campo. Tente novamente.",
       "delete": "Não foi possível apagar o campo. Tente novamente.",
       "deleteBlockedDetail": "Não é possível apagar o campo enquanto fórmulas, entradas ou resultados de eventos ainda o referenciam.",
-      "validation": "Escolha um tipo de dado válido.",
       "fieldNameRequired": "Informe o nome do campo."
     },
     "fieldType": {
@@ -342,8 +318,7 @@
     "filter": {
       "toggleAriaLabel": "Mostrar ou ocultar o painel de filtros da lista",
       "toggleLabel": "Filtro",
-      "searchLabel": "Nome da ação",
-      "searchPlaceholder": "Nome da ação"
+      "searchLabel": "Nome da ação"
     },
     "directory": {
       "dragHandleAria": "Arrastar para reordenar",
@@ -455,8 +430,7 @@
       "loadError": "Não foi possível carregar os eventos deste escopo. Tente novamente.",
       "fallbackLocation": "Local indisponível",
       "fallbackItem": "Item indisponível",
-      "fallbackAction": "Ação indisponível",
-      "fallbackEvent": "Evento indisponível"
+      "fallbackAction": "Ação indisponível"
     },
     "history": {
       "title": "Histórico de alterações",
@@ -557,18 +531,7 @@
       "errorMissingFormulaInput": "Informe {fieldLabel} na fórmula {formulaLabel} no evento de {eventLabel}.",
       "deleteError": "Não foi possível apagar os resultados do período. Tente novamente."
     },
-    "fields": {
-      "title": "Campos usados no cálculo",
-      "description": "As flags do escopo definem de onde vem a idade inicial e final e em qual campo o resultado será persistido.",
-      "initialBadge": "Idade inicial",
-      "currentBadge": "Idade atual",
-      "finalBadge": "Idade final",
-      "targetLabel": "Campo de destino",
-      "missingLabel": "Pendente"
-    },
     "result": {
-      "title": "Resultados do período",
-      "description": "Cada linha abaixo representa um dia materializado do período selecionado, consolidando horizontalmente os campos calculados para o local e item.",
       "placeholder": "Selecione as datas e execute o cálculo para ver os resultados deste período.",
       "empty": "Nenhum evento elegível produziu resultados neste período.",
       "emptyNoEventsBeforePeriodEnd": "Não há eventos cadastrados até o fim do período selecionado.",
@@ -577,22 +540,9 @@
       "emptyNoPersistedResultsInPeriod": "Não existem resultados calculados salvos para este período.",
       "emptyNoResultsToDeleteInPeriod": "Não havia resultados calculados para excluir neste período.",
       "dateLabel": "Data",
-      "createdLabel": "Criados",
-      "updatedLabel": "Atualizados",
-      "unchangedLabel": "Mantidos",
-      "statusCreated": "Criado",
-      "statusUpdated": "Atualizado",
-      "statusUnchanged": "Mantido",
-      "fieldLabel": "Campo",
-      "locationLabel": "Local",
-      "itemLabel": "Item",
       "actionLabel": "Ação",
       "formulaLabel": "Fórmula",
-      "formulaOrderLabel": "Ordem",
-      "calculatedAtLabel": "Calculado em",
       "emptyValue": "Sem valor",
-      "fallbackLocation": "Local indisponível",
-      "fallbackItem": "Item indisponível",
       "fallbackAction": "Ação indisponível"
     }
   },
@@ -610,8 +560,7 @@
     "filter": {
       "toggleAriaLabel": "Mostrar ou ocultar o painel de filtros da lista",
       "toggleLabel": "Filtro",
-      "searchLabel": "Nome ou descrição do local",
-      "searchPlaceholder": "Nome ou descrição do local"
+      "searchLabel": "Nome ou descrição do local"
     },
     "section": {
       "identity": {
@@ -620,7 +569,6 @@
       }
     },
     "dragHandleAria": "Arrastar para reordenar ou mudar o nível",
-    "dragSubtreeNote": "Inclui {count} itens aninhados abaixo deste.",
     "action": {
       "cancel": "Cancelar",
       "new": "Novo",
@@ -634,13 +582,8 @@
       "moveDown": "Mover para baixo"
     },
     "readOnlyNotice": "Você pode consultar o diretório de locais, mas só membros master ou administrador podem criar ou editar cadastros hierárquicos.",
-    "createdNotice": "Local criado com sucesso.",
-    "deletedNotice": "Local apagado com sucesso.",
     "error": {
       "load": "Não foi possível carregar o diretório de locais. Tente novamente.",
-      "save": "Não foi possível salvar o local. Tente novamente.",
-      "create": "Não foi possível criar o local. Tente novamente.",
-      "delete": "Não foi possível apagar o local. Tente novamente.",
       "move": "Não foi possível mover o local. Tente novamente.",
       "validation": "Este campo não pode ficar vazio."
     },
@@ -660,8 +603,7 @@
     "filter": {
       "toggleAriaLabel": "Mostrar ou ocultar o painel de filtros da lista",
       "toggleLabel": "Filtro",
-      "searchLabel": "Nome ou descrição da unidade",
-      "searchPlaceholder": "Nome ou descrição da unidade"
+      "searchLabel": "Nome ou descrição da unidade"
     },
     "section": {
       "identity": {
@@ -680,7 +622,6 @@
       }
     },
     "dragHandleAria": "Arrastar para reordenar ou mudar o nível",
-    "dragSubtreeNote": "Inclui {count} itens aninhados abaixo deste.",
     "action": {
       "cancel": "Cancelar",
       "new": "Nova",
@@ -694,13 +635,8 @@
       "moveDown": "Mover para baixo"
     },
     "readOnlyNotice": "Você pode consultar as unidades produtivas, mas só membros master ou administrador podem criar ou editar cadastros hierárquicos.",
-    "createdNotice": "Unidade produtiva criada com sucesso.",
-    "deletedNotice": "Unidade produtiva apagada com sucesso.",
     "error": {
       "load": "Não foi possível carregar o diretório. Tente novamente.",
-      "save": "Não foi possível salvar. Tente novamente.",
-      "create": "Não foi possível criar. Tente novamente.",
-      "delete": "Não foi possível apagar. Tente novamente.",
       "move": "Não foi possível mover. Tente novamente.",
       "validation": "Este campo não pode ficar vazio.",
       "validationKind": "Selecione um tipo de unidade."
@@ -721,7 +657,6 @@
       "toggleAriaLabel": "Mostrar ou ocultar o painel de filtros da lista",
       "toggleLabel": "Filtro",
       "searchLabel": "Nome ou identificador",
-      "searchPlaceholder": "Nome ou identificador",
       "empty": "Nenhum licenciado encontrado para o filtro atual."
     },
     "section": {
@@ -750,7 +685,6 @@
     "toggleAriaLabel": "Mostrar ou ocultar o histórico do painel",
     "toggleLabel": "Histórico",
     "loading": "Carregando histórico...",
-    "empty": "Nenhum registro de histórico encontrado.",
     "unknownUser": "Usuário desconhecido",
     "entryLabel": "Registro #{id}",
     "metaLine": "{actor} em {moment}",
@@ -764,11 +698,7 @@
     "srDeletedValue": "Valor antes da exclusão: {value}.",
     "diffUnavailable": "Não foi possível comparar esta alteração com o registro anterior.",
     "diffEmpty": "Nenhuma diferença foi detectada em relação ao registro anterior.",
-    "deletedNote": "Este registro representa uma exclusão. O registro não inclui os dados da linha neste caso.",
     "action": {
-      "insert": "Inclusão",
-      "update": "Atualização",
-      "delete": "Exclusão",
       "loadMore": "Ver mais",
       "loadingMore": "Carregando..."
     },

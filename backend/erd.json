@@ -35,20 +35,6 @@
           "increment": false,
           "size": "",
           "values": []
-        },
-        {
-          "id": "display_name",
-          "name": "display_name",
-          "comment": "Nome do licenciado.",
-          "type": "TEXT",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "size": "",
-          "values": []
         }
       ],
       "indices": [],
@@ -59,7 +45,7 @@
       "name": "account",
       "comment": "Esta é a conta do usuário do sistema.",
       "x": 62.48793391485128,
-      "y": -265.17486115319656,
+      "y": -269.9600174031965,
       "locked": false,
       "fields": [
         {
@@ -80,20 +66,6 @@
           "id": "name",
           "name": "name",
           "comment": "Nome completo da conta do usuário.",
-          "type": "TEXT",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "size": "",
-          "values": []
-        },
-        {
-          "id": "display_name",
-          "name": "display_name",
-          "comment": "Nome do usuário da conta.",
           "type": "TEXT",
           "default": "",
           "check": "",
@@ -164,8 +136,8 @@
       "id": "member",
       "name": "member",
       "comment": "Usuário do sistema em um determinado licenciado.",
-      "x": -385.74428917946796,
-      "y": -445.0087080491322,
+      "x": -384.1492370961346,
+      "y": -412.3101403407989,
       "locked": false,
       "fields": [
         {
@@ -186,21 +158,6 @@
           "id": "name",
           "name": "name",
           "comment": "Nome completo do usuário.",
-          "type": "TEXT",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": false,
-          "nullIfEmpty": true,
-          "increment": false,
-          "size": "",
-          "values": []
-        },
-        {
-          "id": "display_name",
-          "name": "display_name",
-          "comment": "Nome do usuário.",
           "type": "TEXT",
           "default": "",
           "check": "",
@@ -342,20 +299,6 @@
           "values": []
         },
         {
-          "id": "display_name",
-          "name": "display_name",
-          "comment": "Descrição do escopo: Aves para produção de ovos, Soja em grãos, Leite...",
-          "type": "TEXT",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "size": "",
-          "values": []
-        },
-        {
           "id": "tenant_id",
           "name": "tenant_id",
           "comment": "Ligação do escopo ao licenciado.",
@@ -370,8 +313,8 @@
           "values": []
         }
       ],
-      "x": -920.3968755314401,
-      "y": 279.0266873986481
+      "x": -922.7894536564401,
+      "y": 237.55533323198142
     },
     {
       "id": "location",
@@ -398,20 +341,6 @@
           "id": "name",
           "name": "name",
           "comment": "Nome do local: Granja A, Unidade Sul, Aviário B, Subdivisão Tal...",
-          "type": "TEXT",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "size": "",
-          "values": []
-        },
-        {
-          "id": "display_name",
-          "name": "display_name",
-          "comment": "Descrição do local: Granja A para produção de ovos, Unidade Sul para produção de leite, Aviário B para produção de aves, Subdivisão Tal para produção de soja...",
           "type": "TEXT",
           "default": "",
           "check": "",
@@ -465,8 +394,8 @@
           "values": []
         }
       ],
-      "x": 65.0337615971049,
-      "y": 118.15499272495794
+      "x": 59.45107930543816,
+      "y": 114.16736251662459
     },
     {
       "id": "item",
@@ -663,8 +592,8 @@
       "id": "event",
       "name": "event",
       "comment": "É o momento em que determinada fórmula é aplicada.",
-      "x": 567.035758291158,
-      "y": 702.4714774657488,
+      "x": 605.3170082911582,
+      "y": 666.5828055907488,
       "locked": false,
       "fields": [
         {
@@ -678,6 +607,20 @@
           "unique": true,
           "notNull": true,
           "increment": true,
+          "size": "",
+          "values": []
+        },
+        {
+          "id": "unity_id",
+          "name": "unity_id",
+          "comment": "Indica a ligação com uma unidade específica. O evento, quando está ligado a uma unidade, é um fato, quando não está, é um padrão (standard).",
+          "type": "BIGINT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
           "size": "",
           "values": []
         },
@@ -949,8 +892,8 @@
       "id": "result",
       "name": "result",
       "comment": "Aqui ficam registrados os resultados das fórmulas aplicadas aos eventos em cada dia.",
-      "x": 938.0643015392461,
-      "y": 1449.3893053670179,
+      "x": 969.9653432059126,
+      "y": 1450.1868314086844,
       "locked": false,
       "fields": [
         {
@@ -1337,20 +1280,6 @@
           "increment": false,
           "size": "",
           "values": []
-        },
-        {
-          "id": "display_name",
-          "name": "display_name",
-          "comment": "Nome amigável do tipo de item. Pode ser um nome mais abreviado.",
-          "type": "TEXT",
-          "default": "",
-          "check": "",
-          "primary": false,
-          "unique": false,
-          "notNull": true,
-          "increment": false,
-          "size": "",
-          "values": []
         }
       ],
       "comment": "Aqui são guardados os tipos de itens. Exemplo: galinha, cobb, fêmea. Nome deve ser único por escopo.",
@@ -1359,10 +1288,6 @@
         {
           "name": "kind_scope_name_unique",
           "constraint": "UNIQUE (scope_id, name)"
-        },
-        {
-          "name": "kind_scope_display_name_unique",
-          "constraint": "UNIQUE (scope_id, display_name)"
         }
       ],
       "color": "#ff0000"
@@ -1370,8 +1295,8 @@
     {
       "id": "unity",
       "name": "unity",
-      "x": 636.7049047164622,
-      "y": 82.3445467650892,
+      "x": 639.8950088831288,
+      "y": 44.06329676508926,
       "locked": false,
       "fields": [
         {
@@ -1386,6 +1311,20 @@
           "unsigned": true,
           "notNull": true,
           "increment": true
+        },
+        {
+          "id": "name",
+          "name": "name",
+          "type": "TEXT",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": "Nome da unidade. Dê um nome curto que identifique o grupo, o lote, o talhão, etc.",
+          "size": "",
+          "values": []
         },
         {
           "id": "location_id",
@@ -1710,52 +1649,63 @@
       "cardinality": "one_to_many",
       "updateConstraint": "Cascade",
       "deleteConstraint": "Cascade"
+    },
+    {
+      "id": "event.unity_id",
+      "name": "event.unity_id",
+      "startTableId": "unity",
+      "startFieldId": "id",
+      "endTableId": "event",
+      "endFieldId": "unity_id",
+      "cardinality": "one_to_many",
+      "updateConstraint": "Cascade",
+      "deleteConstraint": "Restrict"
     }
   ],
   "notes": [
     {
       "id": 0,
-      "x": 960.4733665110291,
-      "y": 793.512138031759,
+      "x": 981.2090435943621,
+      "y": 714.5570599067589,
       "title": "formula.statement e field.id",
       "content": "Os tokens ${field:X} e ${input:X} mantêm um vínculo lógico com field.id = X.\nEssa relação não é uma FK explícita, pois está embutida na instrução textual, exigindo validação por parsing.\nA integridade deve ser garantida na aplicação (ou via validação prévia), assegurando que todo X referenciado exista em field.",
       "locked": false,
       "color": "#fcf7ac",
       "height": 258,
-      "width": 321.03470996432253
+      "width": 300
     },
     {
       "id": 1,
-      "x": 956.8729528581327,
-      "y": 1099.3474723535737,
+      "x": 984.7863643164662,
+      "y": 1049.1033317285737,
       "title": "formula.statement e tokens",
-      "content": "Os tokens `${field:X}` e `${input:X}` são identificadores estruturados usados para resolver valores durante a execução da fórmula.\nEles codificam dois aspectos: o `field_id` (X) e a origem do valor (`field` = estado, `input` = evento).\nDevem seguir um padrão rígido e ser validados por parsing, garantindo que sejam reconhecíveis e semanticamente consistentes.",
+      "content": "Os tokens `${field:X}` e `${input:X}` são identificadores estruturados usados para resolver valores is durante a execução da fórmula.\nEles codificam doaspectos: o `field_id` (X) e a origem do valor (`field` = estado, `input` = evento).\nDevem seguir um padrão rígido e ser validados por parsing, garantindo que sejam reconhecíveis e semanticamente consistentes.",
       "locked": false,
       "color": "#fcf7ac",
       "height": 306,
-      "width": 330.43702396194396
+      "width": 300
     },
     {
       "id": 2,
-      "x": -928.7247344793642,
-      "y": 831.7183161906721,
+      "x": -921.5470001043642,
+      "y": 832.5158422323389,
       "title": "label.field_id e label.action_id",
       "content": "field_id, action_id, ao menos 1 e no máximo 1 deve estar preenchido.",
       "locked": false,
       "color": "#fcf7ac",
       "height": 90,
-      "width": 329.2430793273256
+      "width": 300
     },
     {
       "id": 3,
-      "x": 1006.8367406539619,
+      "x": 982.1134333622954,
       "y": 88.03042767941963,
       "title": "unity.item_id_list",
       "content": "Observe que aqui temos a lista de item que estão compondo a unidade. Apenas estes tipos podem ser usados no eventos.",
       "locked": false,
       "color": "#fcf7ac",
-      "height": 186,
-      "width": 180
+      "height": 114,
+      "width": 300
     }
   ],
   "subjectAreas": [],

@@ -37,7 +37,7 @@ type Props = {
 };
 
 function resolveKindLabel(row: TenantKindRecord) {
-  return row.name.trim() || row.display_name.trim() || `#${row.id}`;
+  return row.name.trim() || `#${row.id}`;
 }
 
 function referenceCountOf(row: TenantKindRecord) {
@@ -105,8 +105,7 @@ export function KindSelectOrCreateField({
     }
     return kindList.filter((row) => {
       const name = normalizeTextForSearch(row.name);
-      const displayName = normalizeTextForSearch(row.display_name);
-      return name.includes(q) || displayName.includes(q);
+      return name.includes(q);
     });
   }, [inputValue, kindList, showAllSuggestions]);
 
@@ -117,8 +116,7 @@ export function KindSelectOrCreateField({
     }
     return kindList.some((row) => {
       const name = normalizeTextForSearch(row.name);
-      const displayName = normalizeTextForSearch(row.display_name);
-      return name === q || displayName === q;
+      return name === q;
     });
   }, [inputValue, kindList]);
 
@@ -173,7 +171,7 @@ export function KindSelectOrCreateField({
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, display_name: name })
+          body: JSON.stringify({ name })
         }
       );
       const data: unknown = await response.json().catch(() => ({}));

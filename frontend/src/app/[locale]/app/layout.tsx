@@ -13,12 +13,8 @@ type AppLayoutProps = {
   params: Promise<{ locale: string }>;
 };
 
-function getScopeDisplayName(scope: {
-  id: number;
-  name: string;
-  display_name: string;
-}) {
-  return scope.name.trim() || scope.display_name.trim() || `#${scope.id}`;
+function getScopeDisplayName(scope: { id: number; name: string }) {
+  return scope.name.trim() || `#${scope.id}`;
 }
 
 export default async function AppLayout({
@@ -45,8 +41,8 @@ export default async function AppLayout({
     null;
   const contentContextKey = `tenant:${authSession.tenant.id}:scope:${currentScopeId ?? "none"}`;
   const mobileWorkspaceLabel = currentScope
-    ? `${authSession.tenant.display_name} - ${getScopeDisplayName(currentScope)}`
-    : authSession.tenant.display_name;
+    ? `${authSession.tenant.name} - ${getScopeDisplayName(currentScope)}`
+    : authSession.tenant.name;
 
   const navigationItemList = [
     {
@@ -94,12 +90,12 @@ export default async function AppLayout({
   return (
     <AppShell
       productName={t("productName")}
-      workspaceLabel={authSession.tenant.display_name}
+      workspaceLabel={authSession.tenant.name}
       mobileWorkspaceLabel={mobileWorkspaceLabel}
       workspaceSlot={
         <WorkspaceContextMenu
           currentTenantId={authSession.tenant.id}
-          currentTenantName={authSession.tenant.display_name}
+          currentTenantName={authSession.tenant.name}
           initialScopeList={scopeDirectory?.item_list ?? []}
           initialCurrentScopeId={
             scopeDirectory?.current_scope_id ??
@@ -132,9 +128,7 @@ export default async function AppLayout({
           currentLocale={locale}
           localeList={[...routing.locales]}
           accountName={
-            authSession.member.display_name ||
             authSession.member.name ||
-            authSession.account.display_name ||
             authSession.account.name ||
             authSession.account.email
           }

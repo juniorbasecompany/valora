@@ -62,8 +62,6 @@ export default async function LocationConfigurationPage({
           filterToggleLabel: t("filter.toggleLabel"),
           nameLabel: t("section.identity.nameLabel"),
           nameHint: t("section.identity.nameHint"),
-          displayNameLabel: t("section.identity.displayNameLabel"),
-          displayNameHint: t("section.identity.displayNameHint"),
           dragHandleAria: t("dragHandleAria"),
           cancel: t("action.cancel"),
           directoryCreateLabel: t("action.new"),

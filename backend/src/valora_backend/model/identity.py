@@ -12,6 +12,7 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     Index,
     Integer,
+    JSON,
     Text,
     UniqueConstraint,
     text,
@@ -42,11 +43,6 @@ class Tenant(Base):
         nullable=False,
         comment="Nome completo do licenciado.",
     )
-    display_name: Mapped[str] = mapped_column(
-        Text,
-        nullable=False,
-        comment="Nome do licenciado.",
-    )
 
 
 class Scope(Base):
@@ -65,14 +61,6 @@ class Scope(Base):
         Text,
         nullable=False,
         comment="Nome do escopo: Aves, Soja, Leite...",
-    )
-    display_name: Mapped[str] = mapped_column(
-        Text,
-        nullable=False,
-        comment=(
-            "Descrição do escopo: Aves para produção de ovos, "
-            "Soja em grãos, Leite..."
-        ),
     )
     tenant_id: Mapped[int] = mapped_column(
         BIGINT_COMPAT,
@@ -106,11 +94,6 @@ class Account(Base):
         Text,
         nullable=False,
         comment="Nome completo da conta do usuário.",
-    )
-    display_name: Mapped[str] = mapped_column(
-        Text,
-        nullable=False,
-        comment="Nome do usuário da conta.",
     )
     email: Mapped[str] = mapped_column(
         Text,
@@ -162,12 +145,6 @@ class Member(Base):
         nullable=True,
         info={"null_if_empty": True},
         comment="Nome completo do usuário.",
-    )
-    display_name: Mapped[str | None] = mapped_column(
-        Text,
-        nullable=True,
-        info={"null_if_empty": True},
-        comment="Nome do usuário.",
     )
     email: Mapped[str] = mapped_column(
         Text,
@@ -266,11 +243,6 @@ class Location(Base):
             "Talhão 12, Aviário B..."
         ),
     )
-    display_name: Mapped[str] = mapped_column(
-        Text,
-        nullable=False,
-        comment="Descrição do local com mais contexto para a operação.",
-    )
     scope_id: Mapped[int] = mapped_column(
         BIGINT_COMPAT,
         ForeignKey("scope.id", onupdate="CASCADE", ondelete="RESTRICT"),
@@ -297,13 +269,10 @@ class Kind(Base):
     __tablename__ = "kind"
     __table_args__ = (
         UniqueConstraint("scope_id", "name", name="kind_scope_name_unique"),
-        UniqueConstraint(
-            "scope_id", "display_name", name="kind_scope_display_name_unique"
-        ),
         {
             "comment": (
                 "Tipos de itens por escopo (ex.: galinha, cobb, fêmea); "
-                "nome e display_name únicos por escopo."
+                "nome único por escopo."
             )
         },
     )
@@ -323,12 +292,7 @@ class Kind(Base):
     name: Mapped[str] = mapped_column(
         Text,
         nullable=False,
-        comment="Nome técnico do tipo de item.",
-    )
-    display_name: Mapped[str] = mapped_column(
-        Text,
-        nullable=False,
-        comment="Nome amigável do tipo de item.",
+        comment="Nome do tipo de item.",
     )
     item_list: Mapped[list["Item"]] = relationship(back_populates="kind")
 
@@ -427,7 +391,7 @@ class Unity(Base):
         comment="Localização da unidade.",
     )
     item_id_list: Mapped[list[int]] = mapped_column(
-        ARRAY(BIGINT_COMPAT),
+        ARRAY(BIGINT_COMPAT).with_variant(JSON(), "sqlite"),
         nullable=False,
         comment="Lista de IDs de item (catálogo) no escopo.",
     )

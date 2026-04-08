@@ -185,7 +185,7 @@ export function UnityConfigurationClient({
     for (const item of locationDirectory?.item_list ?? []) {
       const label = item.path_labels.length > 0
         ? item.path_labels.join(UI_TEXT_SEPARATOR)
-        : item.name.trim() || item.display_name.trim() || `#${item.id}`;
+        : item.name.trim() || `#${item.id}`;
       next.set(item.id, label);
     }
     return next;
@@ -551,7 +551,7 @@ export function UnityConfigurationClient({
   );
   const resolveUnityLocationPath = useCallback(
     (item: TenantUnityRecord) =>
-      locationPathById.get(item.location_id) ?? item.location_display_name,
+      locationPathById.get(item.location_id) ?? item.location_name,
     [locationPathById]
   );
   const resolveUnityItemHierarchyRows = useCallback(
@@ -570,7 +570,7 @@ export function UnityConfigurationClient({
           rows.push({
             id: row.id,
             depth: row.depth,
-            label: row.name.trim() || row.display_name.trim() || `#${row.id}`
+            label: row.name.trim() || `#${row.id}`
           });
           appendBranch(row.id);
         }
@@ -586,7 +586,7 @@ export function UnityConfigurationClient({
         rows.push({
           id: row.id,
           depth: row.depth,
-          label: row.name.trim() || row.display_name.trim() || `#${row.id}`
+          label: row.name.trim() || `#${row.id}`
         });
       }
 

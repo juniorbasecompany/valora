@@ -13,7 +13,6 @@ const UI_TEXT_SEPARATOR = "\u00A0\u00A0●\u00A0\u00A0";
 export type HierarchyDropdownFieldItemBase = {
   id: number;
   name: string;
-  display_name: string;
   depth: number;
   path_labels?: string[];
 };
@@ -82,7 +81,7 @@ function buildFilterHierarchyToneStyle(
 }
 
 function resolveItemLabel(item: HierarchyDropdownFieldItemBase) {
-  return item.name.trim() || item.display_name.trim() || `#${item.id}`;
+  return item.name.trim() || `#${item.id}`;
 }
 
 function resolveItemPathLabel(item: HierarchyDropdownFieldItemBase) {

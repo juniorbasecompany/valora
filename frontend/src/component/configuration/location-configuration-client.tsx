@@ -38,13 +38,11 @@ export function LocationConfigurationClient({
             historyTableName="location"
             formIds={{
                 nameInput: "location-name",
-                displayTextarea: "location-display-name",
                 historyHeading: "location-history-heading"
             }}
             getParentId={(item) => item.parent_location_id ?? null}
-            buildSavePayload={({ name, display_name, parentId }) => ({
+            buildSavePayload={({ name, parentId }) => ({
                 name,
-                display_name,
                 parent_location_id: parentId
             })}
         />

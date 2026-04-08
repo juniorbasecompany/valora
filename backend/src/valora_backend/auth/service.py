@@ -22,15 +22,14 @@ class LoginDecision:
     action: LoginAction
 
 
-def build_account_name(name: str | None, email: str) -> tuple[str, str]:
-    """Normaliza `name` e `display_name` mínimos para a conta autenticada."""
+def build_account_name(name: str | None, email: str) -> str:
+    """Normaliza o nome mínimo para a conta autenticada."""
     clean_name = (name or "").strip()
     if clean_name:
-        return clean_name, clean_name
+        return clean_name
 
     email_prefix = email.split("@", 1)[0].strip()
-    fallback_name = email_prefix or email
-    return fallback_name, fallback_name
+    return email_prefix or email
 
 
 def member_status_name(status: int) -> str:
@@ -54,11 +53,6 @@ def member_role_name(role: int) -> str:
 
 
 def member_display_name(member: Member) -> str:
-    if member.display_name:
-        display_name = member.display_name.strip()
-        if display_name:
-            return display_name
-
     if member.name:
         name = member.name.strip()
         if name:
@@ -68,11 +62,7 @@ def member_display_name(member: Member) -> str:
 
 
 def tenant_display_name(tenant: Tenant) -> str:
-    display_name = tenant.display_name.strip()
-    if display_name:
-        return display_name
-
-    return tenant.name
+    return tenant.name.strip()
 
 
 def decide_login_action(*, active_count: int, pending_count: int) -> LoginDecision:

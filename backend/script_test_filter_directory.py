@@ -137,12 +137,11 @@ def _assert_member_filters(ctx: TestContext) -> None:
 
     sample = item_list[0]
     name = str(sample.get("name") or "")
-    display_name = str(sample.get("display_name") or "")
     email = str(sample.get("email") or "")
     role_name = str(sample.get("role_name") or "").lower()
     status_name = str(sample.get("status") or "").lower()
 
-    q_source = display_name or name or email
+    q_source = name or email
     if q_source:
         q_value = q_source.strip().lower()[:4]
         filtered = _get_item_list(_request_json(ctx, path, {"q": q_value}), path)
@@ -150,7 +149,6 @@ def _assert_member_filters(ctx: TestContext) -> None:
             if not _contains_any(
                 [
                     str(row.get("name") or ""),
-                    str(row.get("display_name") or ""),
                     str(row.get("email") or ""),
                 ],
                 q_value,
@@ -232,13 +230,13 @@ def _assert_scope_filters(ctx: TestContext) -> dict[str, Any] | None:
         return None
 
     sample = item_list[0]
-    q_source = str(sample.get("name") or sample.get("display_name") or "")
+    q_source = str(sample.get("name") or "")
     if q_source:
         q_value = q_source.strip().lower()[:4]
         filtered = _get_item_list(_request_json(ctx, path, {"q": q_value}), path)
         for row in filtered:
             if not _contains_any(
-                [str(row.get("name") or ""), str(row.get("display_name") or "")], q_value
+                [str(row.get("name") or "")], q_value
             ):
                 raise AssertionError("scope q retornou item fora do filtro textual")
         _print_ok("scope q")
@@ -256,13 +254,13 @@ def _assert_location_filters(ctx: TestContext, scope_id: int) -> None:
         return
 
     sample = item_list[0]
-    q_source = str(sample.get("name") or sample.get("display_name") or "")
+    q_source = str(sample.get("name") or "")
     if q_source:
         q_value = q_source.strip().lower()[:4]
         filtered = _get_item_list(_request_json(ctx, path, {"q": q_value}), path)
         for row in filtered:
             if not _contains_any(
-                [str(row.get("name") or ""), str(row.get("display_name") or "")], q_value
+                [str(row.get("name") or "")], q_value
             ):
                 raise AssertionError("location q retornou item fora do filtro textual")
         _print_ok("location q")
@@ -293,13 +291,13 @@ def _assert_item_filters(ctx: TestContext, scope_id: int) -> None:
         return
 
     sample = item_list[0]
-    q_source = str(sample.get("name") or sample.get("display_name") or "")
+    q_source = str(sample.get("name") or "")
     if q_source:
         q_value = q_source.strip().lower()[:4]
         filtered = _get_item_list(_request_json(ctx, path, {"q": q_value}), path)
         for row in filtered:
             if not _contains_any(
-                [str(row.get("name") or ""), str(row.get("display_name") or "")], q_value
+                [str(row.get("name") or "")], q_value
             ):
                 raise AssertionError("item q retornou item fora do filtro textual")
         _print_ok("item q")
@@ -429,12 +427,11 @@ def _assert_event_filters(ctx: TestContext, scope_id: int) -> None:
 
 def _assert_tenant_local_filter_rule(ctx: TestContext) -> None:
     payload = _request_json(ctx, "/auth/tenant/current")
-    display_name = str(payload.get("display_name") or "")
-    legal_name = str(payload.get("name") or "")
+    tenant_name = str(payload.get("name") or "")
     tenant_id = str(payload.get("id") or "")
 
-    haystack = f"{display_name} {legal_name} {tenant_id}".lower()
-    positive_query = (display_name or legal_name or tenant_id).strip().lower()[:4]
+    haystack = f"{tenant_name} {tenant_id}".lower()
+    positive_query = (tenant_name or tenant_id).strip().lower()[:4]
     if positive_query:
         if positive_query not in haystack:
             raise AssertionError("tenant filtro local falhou no caso positivo")

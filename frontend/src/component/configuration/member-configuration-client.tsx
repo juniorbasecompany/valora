@@ -10,7 +10,7 @@ import {
 } from "@/component/configuration/configuration-directory-editor-policy";
 import { ConfigurationDirectoryEditorShell } from "@/component/configuration/configuration-directory-editor-shell";
 import { ConfigurationInfoSection } from "@/component/configuration/configuration-info-section";
-import { ConfigurationNameDisplayNameFields } from "@/component/configuration/configuration-name-display-name-fields";
+import { ConfigurationNameField } from "@/component/configuration/configuration-name-field";
 import { EditorPanelFlashOverlay } from "@/component/configuration/editor-panel-flash-overlay";
 import { ConfigurationDirectoryCreateButton } from "@/component/configuration/configuration-directory-create-button";
 import { ConfigurationDirectoryListToolbarRow } from "@/component/configuration/configuration-directory-list-toolbar-row";
@@ -51,8 +51,6 @@ export type MemberConfigurationCopy = {
   filterRoleLabel: string;
   filterStatusLabel: string;
   filterAll: string;
-  displayNameLabel: string;
-  displayNameHint: string;
   nameLabel: string;
   nameHint: string;
   sectionAccessTitle: string;
@@ -100,7 +98,7 @@ const memberStatusValueByKey: Record<MemberStatusKey, number> = {
 };
 
 function resolveMemberLabel(member: TenantMemberRecord) {
-  return member.display_name?.trim() || member.name?.trim() || member.email;
+  return member.name?.trim() || member.email;
 }
 
 function normalizeStatusKey(raw: string): MemberStatusKey {
@@ -233,18 +231,13 @@ export function MemberConfigurationClient({
   const [inviteEmailError, setInviteEmailError] = useState<string | undefined>();
   const [memberEmail, setMemberEmail] = useState(initialSelectedMember?.email ?? "");
   const [memberEmailError, setMemberEmailError] = useState<string | undefined>();
-  const [displayName, setDisplayName] = useState(
-    initialSelectedMember?.display_name ?? ""
-  );
   const [name, setName] = useState(initialSelectedMember?.name ?? "");
   const [baseline, setBaseline] = useState({
-    displayName: initialSelectedMember?.display_name ?? "",
     name: initialSelectedMember?.name ?? "",
     inviteEmail: "",
     memberEmail: initialSelectedMember?.email ?? ""
   });
   const [fieldError, setFieldError] = useState<{
-    displayName?: string;
     name?: string;
   }>({});
   const [requestErrorMessage, setRequestErrorMessage] = useState<string | null>(null);
@@ -310,7 +303,7 @@ export function MemberConfigurationClient({
       return null;
     }
 
-    return `id:${String(selectedMember.id)}:email:${selectedMember.email}:name:${selectedMember.name}:display:${selectedMember.display_name}`;
+    return `id:${String(selectedMember.id)}:email:${selectedMember.email}:name:${selectedMember.name}`;
   }, [isCreateMode, newIntentGeneration, selectedMember]);
 
   const isEditorFlashActive = useEditorPanelFlash(editorPanelElementRef, editorFlashKey);
@@ -347,14 +340,8 @@ export function MemberConfigurationClient({
         : (nextSelectedMember?.email ?? "");
       setMemberEmail(nextMemberEmail);
       setMemberEmailError(undefined);
-      setDisplayName(
-        nextSelection.isCreateMode ? "" : (nextSelectedMember?.display_name ?? "")
-      );
       setName(nextSelection.isCreateMode ? "" : (nextSelectedMember?.name ?? ""));
       setBaseline({
-        displayName: nextSelection.isCreateMode
-          ? ""
-          : (nextSelectedMember?.display_name ?? ""),
         name: nextSelection.isCreateMode ? "" : (nextSelectedMember?.name ?? ""),
         inviteEmail: "",
         memberEmail: nextMemberEmail
@@ -470,7 +457,6 @@ export function MemberConfigurationClient({
     if (isCreateMode) {
       return (
         inviteEmail.trim() !== baseline.inviteEmail.trim() ||
-        displayName.trim() !== baseline.displayName.trim() ||
         name.trim() !== baseline.name.trim()
       );
     }
@@ -478,16 +464,13 @@ export function MemberConfigurationClient({
     return (
       memberEmail.trim().toLowerCase() !==
       baseline.memberEmail.trim().toLowerCase() ||
-      displayName.trim() !== baseline.displayName.trim() ||
       name.trim() !== baseline.name.trim() ||
       isDeletePending
     );
   }, [
-    baseline.displayName,
     baseline.inviteEmail,
     baseline.memberEmail,
     baseline.name,
-    displayName,
     inviteEmail,
     isCreateMode,
     isDeletePending,
@@ -628,8 +611,7 @@ export function MemberConfigurationClient({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             email: inviteEmail.trim(),
-            name: name.trim(),
-            display_name: displayName.trim()
+            name: name.trim()
           })
         });
         const data: unknown = await response.json().catch(() => ({}));
@@ -669,7 +651,6 @@ export function MemberConfigurationClient({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               email: memberEmail.trim(),
-              display_name: displayName.trim(),
               name: name.trim(),
               role: selectedMember.role,
               status: memberStatusValueByKey[
@@ -720,7 +701,6 @@ export function MemberConfigurationClient({
     copy.createError,
     copy.deleteError,
     copy.saveError,
-    displayName,
     inviteEmail,
     isCreateMode,
     isDeletePending,
@@ -769,7 +749,6 @@ export function MemberConfigurationClient({
   const footerErrorMessage =
     requestErrorMessage ??
     fieldError.name ??
-    fieldError.displayName ??
     memberEmailError ??
     inviteEmailError ??
     null;
@@ -995,21 +974,17 @@ export function MemberConfigurationClient({
             </section>
           ) : null}
 
-          <ConfigurationNameDisplayNameFields
-            nameInputId="member-name"
-            displayTextareaId="member-display-name"
+          <ConfigurationNameField
+            inputId="member-name"
             name={name}
-            displayName={displayName}
             setName={setName}
-            setDisplayName={setDisplayName}
             setFieldError={setFieldError}
             fieldError={fieldError}
             disabled={isDeletePending || !canEditForm}
-            nameLabel={copy.nameLabel}
-            nameHint={copy.nameHint}
-            displayNameLabel={copy.displayNameLabel}
-            displayNameHint={copy.displayNameHint}
+            label={copy.nameLabel}
+            hint={copy.nameHint}
             onAfterFieldEdit={() => setRequestErrorMessage(null)}
+            multiline
           />
 
           {!isCreateMode && selectedMember ? (

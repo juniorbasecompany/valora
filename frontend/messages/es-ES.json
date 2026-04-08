@@ -89,7 +89,7 @@
     "cards": {
       "organization": {
         "title": "Licenciatario",
-        "description": "Es la organización contratante del espacio de trabajo: el nombre que ves en la barra superior, el selector de licenciatario y otras pantallas. Aquí alineas el nombre para mostrar (lo que la gente ve cada día) y el nombre completo o razón social cuando necesitas referencia formal. Los cambios aplican al licenciatario activo en tu sesión; si administras más de uno, cámbialo desde el menú antes de editar."
+        "description": "Es la organización contratante del espacio de trabajo: el nombre que ves en la barra superior, el selector de licenciatario y otras pantallas. Los cambios aplican al licenciatario activo en tu sesión; si administras más de uno, cámbialo desde el menú antes de editar."
       },
       "member": {
         "title": "Miembros",
@@ -130,10 +130,8 @@
     },
     "section": {
       "profile": {
-        "displayNameLabel": "Nombre para mostrar",
-        "displayNameHint": "Se usa en las superficies internas del licenciatario.",
-        "nameLabel": "Nombre completo",
-        "nameHint": "Usa el nombre más completo para la referencia administrativa."
+        "nameLabel": "Nombre",
+        "nameHint": "Nombre del miembro en las pantallas internas de este licenciatario."
       },
       "invite": {
         "emailFieldHint": "Indica el correo que recibirá la invitación. El primer acceso usa una cuenta de Google con esa misma dirección."
@@ -219,9 +217,7 @@
     "section": {
       "identity": {
         "nameLabel": "Nombre del alcance",
-        "nameHint": "Usa una etiqueta corta para identificar el alcance, como Aves, Soja o Leche.",
-        "displayNameLabel": "Descripción del alcance",
-        "displayNameHint": "Explica el recorte del alcance con más contexto, como Aves para producción de huevos."
+        "nameHint": "Identifica el recorte del alcance (por ejemplo Aves, Soja, Leche) con el contexto que necesite la operación."
       },
       "info": {
         "title": "Información",
@@ -670,9 +666,7 @@
     "section": {
       "identity": {
         "nameLabel": "Nombre de la ubicación",
-        "nameHint": "Usa un nombre corto para identificar esta ubicación. Por ejemplo: Rosal en lugar de Granja Rosal, Andevalo en lugar de Granja avícola Andevalo o Este en lugar de Parcela Este.",
-        "displayNameLabel": "Descripción de la ubicación",
-        "displayNameHint": "Indica el nombre completo de la ubicación. Por ejemplo: Granja Rosal en lugar de Rosal, Granja avícola Andevalo en lugar de Andevalo o Parcela Este en lugar de solo Este."
+        "nameHint": "Identifica la ubicación en la jerarquía con el detalle que necesite la operación (por ejemplo Granja Rosal, Granja avícola Andevalo, Parcela Este)."
       },
       "structure": {
         "title": "Información",
@@ -734,9 +728,7 @@
     "section": {
       "identity": {
         "nameLabel": "Nombre corto",
-        "nameHint": "Usa un nombre corto para identificar la unidad productiva en el día a día (por ejemplo: Blanca, Hembra, Núcleo).",
-        "displayNameLabel": "Descripción",
-        "displayNameHint": "Describe con más contexto qué representa esta unidad productiva en la operación."
+        "nameHint": "Identifica la unidad productiva en el día a día (por ejemplo Blanca, Hembra, Núcleo) con el contexto necesario."
       },
       "kind": {
         "selectLabel": "Tipo de unidad",
@@ -807,17 +799,9 @@
       "empty": "Ningún licenciatario coincide con el filtro actual."
     },
     "section": {
-      "display": {
-        "title": "Nombre en la interfaz",
-        "description": "Etiqueta corta mostrada en la aplicación para el licenciatario activo.",
-        "nameLabel": "Nombre para mostrar",
-        "nameHint": "Se usa en la barra superior, el selector de licenciatario y otras superficies de navegación."
-      },
-      "legal": {
-        "title": "Nombre legal completo",
-        "description": "Nombre oficial o completo de la organización contratante.",
-        "nameLabel": "Nombre completo",
-        "nameHint": "Usa la denominación formal; puede coincidir con el nombre para mostrar cuando no haya una etiqueta más corta."
+      "name": {
+        "nameLabel": "Nombre del licenciatario",
+        "nameHint": "Aparece en la barra superior, el selector de licenciatario y otras pantallas de esta organización."
       }
     },
     "action": {

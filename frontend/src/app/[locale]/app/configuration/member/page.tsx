@@ -34,8 +34,6 @@ export default async function MemberConfigurationPage({
     filterRoleLabel: t("filter.roleLabel"),
     filterStatusLabel: t("filter.statusLabel"),
     filterAll: t("filter.all"),
-    displayNameLabel: t("section.profile.displayNameLabel"),
-    displayNameHint: t("section.profile.displayNameHint"),
     nameLabel: t("section.profile.nameLabel"),
     nameHint: t("section.profile.nameHint"),
     sectionAccessTitle: t("section.access.title"),

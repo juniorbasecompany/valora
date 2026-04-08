@@ -76,7 +76,7 @@ function getRoleTone(role: number): "positive" | "neutral" | "construction" {
 }
 
 function getTenantDisplayName(option: TenantOption | InviteOption) {
-    return option.display_name || option.name;
+    return option.name;
 }
 
 export function TenantSelectionPanel({

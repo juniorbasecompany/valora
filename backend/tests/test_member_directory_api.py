@@ -47,10 +47,10 @@ from valora_backend.model.log import Log
 from valora_backend.model.rules import Action, Event, Field, Formula, Input, Result
 
 
-def _create_kind_via_api(client, scope_id: int, *, name: str, display_name: str) -> int:
+def _create_kind_via_api(client, scope_id: int, *, name: str) -> int:
     response = client.post(
         f"/auth/tenant/current/scopes/{scope_id}/kind",
-        json={"name": name, "display_name": display_name},
+        json={"name": name},
     )
     assert response.status_code == 200, response.text
     for row in response.json()["item_list"]:
@@ -105,27 +105,24 @@ def build_test_client(
     Base.metadata.create_all(engine)
 
     session = testing_session_local()
-    tenant = Tenant(name="Acme Agro Ltda.", display_name="Acme Agro")
+    tenant = Tenant(name="Acme Agro Ltda.")
     session.add(tenant)
     session.flush()
 
     master_account = Account(
         name="Master User",
-        display_name="Master User",
         email="master@example.com",
         provider="google",
         provider_subject="google-master",
     )
     admin_account = Account(
         name="Admin User",
-        display_name="Admin User",
         email="admin@example.com",
         provider="google",
         provider_subject="google-admin",
     )
     member_account = Account(
         name="Member User",
-        display_name="Member User",
         email="member@example.com",
         provider="google",
         provider_subject="google-member",
@@ -135,7 +132,6 @@ def build_test_client(
 
     master_member = Member(
         name="Master User",
-        display_name="Master User",
         email=master_account.email,
         tenant_id=tenant.id,
         account_id=master_account.id,
@@ -144,7 +140,6 @@ def build_test_client(
     )
     admin_member = Member(
         name="Admin User",
-        display_name="Admin User",
         email=admin_account.email,
         tenant_id=tenant.id,
         account_id=admin_account.id,
@@ -153,7 +148,6 @@ def build_test_client(
     )
     active_member = Member(
         name="Member User",
-        display_name="Member User",
         email=member_account.email,
         tenant_id=tenant.id,
         account_id=member_account.id,
@@ -162,7 +156,6 @@ def build_test_client(
     )
     pending_member = Member(
         name="Pending Invite",
-        display_name="Pending Invite",
         email="pending@example.com",
         tenant_id=tenant.id,
         account_id=None,
@@ -173,12 +166,10 @@ def build_test_client(
     if with_scopes:
         layer_scope = Scope(
             name="Aves",
-            display_name="Aves para producao de ovos",
             tenant_id=tenant.id,
         )
         grain_scope = Scope(
             name="Soja",
-            display_name="Soja em graos",
             tenant_id=tenant.id,
         )
         session.add_all([layer_scope, grain_scope])
@@ -291,7 +282,7 @@ def build_rules_session() -> Generator[tuple[Session, int], None, None]:
     )
 
     session = testing_session_local()
-    tenant = Tenant(name="Acme Agro Ltda.", display_name="Acme Agro")
+    tenant = Tenant(name="Acme Agro Ltda.")
     session.add(tenant)
     session.commit()
 
@@ -341,7 +332,6 @@ def test_member_directory_q_filter_ignores_case_and_accent() -> None:
             json={
                 "email": "uniao.member@example.com",
                 "name": "União Cadastro",
-                "display_name": "União Cadastro",
             },
         )
         assert create_response.status_code == 200
@@ -378,7 +368,6 @@ def test_master_can_invite_member_by_email() -> None:
             json={
                 "email": "novo.convite@example.com",
                 "name": "Novo Convidado",
-                "display_name": "Novo",
             },
         )
         session.expire_all()
@@ -407,7 +396,6 @@ def test_master_can_invite_member_with_empty_name_fields() -> None:
             json={
                 "email": "convite.sem.nome@example.com",
                 "name": "",
-                "display_name": "",
             },
         )
         session.expire_all()
@@ -418,7 +406,6 @@ def test_master_can_invite_member_with_empty_name_fields() -> None:
     assert response.status_code == 200
     assert created is not None
     assert created.name is None
-    assert created.display_name is None
 
 
 def test_invite_member_rejects_duplicate_email() -> None:
@@ -432,7 +419,6 @@ def test_invite_member_rejects_duplicate_email() -> None:
             json={
                 "email": "pending@example.com",
                 "name": "Dup",
-                "display_name": "Dup",
             },
         )
 
@@ -449,7 +435,6 @@ def test_member_cannot_invite() -> None:
             json={
                 "email": "x@example.com",
                 "name": "X",
-                "display_name": "X",
             },
         )
 
@@ -545,8 +530,7 @@ def test_admin_can_update_member_profile_without_changing_access() -> None:
             f"/auth/tenant/current/members/{member_id_by_key['member']}",
             json={
                 "email": "member@example.com",
-                "name": "Member Updated",
-                "display_name": "Updated Member",
+                "name": "Updated Member",
                 "role": 3,
                 "status": 1,
             },
@@ -556,13 +540,12 @@ def test_admin_can_update_member_profile_without_changing_access() -> None:
 
     assert response.status_code == 200
     assert updated_member is not None
-    assert updated_member.name == "Member Updated"
-    assert updated_member.display_name == "Updated Member"
+    assert updated_member.name == "Updated Member"
     assert updated_member.role == 3
     assert updated_member.status == 1
 
 
-def test_admin_can_clear_member_name_and_display_name() -> None:
+def test_admin_can_clear_member_name() -> None:
     with build_test_client(current_member_key="admin") as (
         client,
         session,
@@ -573,7 +556,6 @@ def test_admin_can_clear_member_name_and_display_name() -> None:
             json={
                 "email": "member@example.com",
                 "name": "",
-                "display_name": "   ",
                 "role": 3,
                 "status": 1,
             },
@@ -584,7 +566,6 @@ def test_admin_can_clear_member_name_and_display_name() -> None:
     assert response.status_code == 200
     assert updated_member is not None
     assert updated_member.name is None
-    assert updated_member.display_name is None
 
 
 def test_admin_can_change_member_email() -> None:
@@ -598,7 +579,6 @@ def test_admin_can_change_member_email() -> None:
             json={
                 "email": "member.renamed@example.com",
                 "name": "Member User",
-                "display_name": "Member User",
                 "role": 3,
                 "status": 1,
             },
@@ -622,7 +602,6 @@ def test_patch_member_rejects_duplicate_email() -> None:
             json={
                 "email": "admin@example.com",
                 "name": "Member User",
-                "display_name": "Member User",
                 "role": 3,
                 "status": 1,
             },
@@ -641,7 +620,6 @@ def test_admin_cannot_change_member_access() -> None:
             json={
                 "email": "member@example.com",
                 "name": "Member Updated",
-                "display_name": "Updated Member",
                 "role": 2,
                 "status": 1,
             },
@@ -664,7 +642,6 @@ def test_master_cannot_activate_member_without_linked_account() -> None:
             json={
                 "email": "pending@example.com",
                 "name": "Pending Invite",
-                "display_name": "Pending Invite",
                 "role": 3,
                 "status": 1,
             },
@@ -735,7 +712,6 @@ def test_admin_can_list_create_update_and_delete_scope_directory() -> None:
             "/auth/tenant/current/scopes",
             json={
                 "name": "Leite",
-                "display_name": "Leite para operacao primaria",
             },
         )
         session.expire_all()
@@ -744,8 +720,7 @@ def test_admin_can_list_create_update_and_delete_scope_directory() -> None:
         update_response = client.patch(
             f"/auth/tenant/current/scopes/{created_scope.id}",
             json={
-                "name": "Leite",
-                "display_name": "Leite e derivados",
+                "name": "Leite e derivados",
             },
         )
         delete_response = client.delete(
@@ -767,7 +742,7 @@ def test_admin_can_list_create_update_and_delete_scope_directory() -> None:
     assert update_response.status_code == 200
     update_payload = update_response.json()
     assert any(
-        item["display_name"] == "Leite e derivados"
+        item["name"] == "Leite e derivados"
         for item in update_payload["item_list"]
     )
 
@@ -781,7 +756,6 @@ def test_scope_directory_q_filter_ignores_case_and_accent() -> None:
             "/auth/tenant/current/scopes",
             json={
                 "name": "União",
-                "display_name": "União Produtiva",
             },
         )
         assert create_response.status_code == 200
@@ -811,7 +785,6 @@ def test_member_cannot_create_scope() -> None:
             "/auth/tenant/current/scopes",
             json={
                 "name": "Cafe",
-                "display_name": "Cafe em graos",
             },
         )
 
@@ -829,7 +802,6 @@ def test_admin_can_create_move_update_and_delete_locations() -> None:
             f"/auth/tenant/current/scopes/{scope_id}/locations",
             json={
                 "name": "Fazenda Norte",
-                "display_name": "Fazenda Norte principal",
                 "parent_location_id": None,
             },
         )
@@ -843,7 +815,6 @@ def test_admin_can_create_move_update_and_delete_locations() -> None:
             f"/auth/tenant/current/scopes/{scope_id}/locations",
             json={
                 "name": "Aviário B",
-                "display_name": "Aviário de postura B",
                 "parent_location_id": root_location.id,
             },
         )
@@ -863,8 +834,7 @@ def test_admin_can_create_move_update_and_delete_locations() -> None:
         update_response = client.patch(
             f"/auth/tenant/current/scopes/{scope_id}/locations/{child_location.id}",
             json={
-                "name": "Aviário B",
-                "display_name": "Aviário de postura reformado",
+                "name": "Aviário de postura reformado",
                 "parent_location_id": None,
             },
         )
@@ -902,7 +872,7 @@ def test_admin_can_create_move_update_and_delete_locations() -> None:
 
     assert update_response.status_code == 200
     assert updated_child is not None
-    assert updated_child.display_name == "Aviário de postura reformado"
+    assert updated_child.name == "Aviário de postura reformado"
 
     assert delete_response.status_code == 200
     assert deleted_root is None
@@ -917,7 +887,6 @@ def test_location_directory_q_filter_matches_accent_and_partial_text() -> None:
             f"/auth/tenant/current/scopes/{scope_id}/locations",
             json={
                 "name": "União",
-                "display_name": "Granja União",
                 "parent_location_id": None,
             },
         )
@@ -967,7 +936,6 @@ def test_location_directory_q_filter_keeps_ancestor_context_for_child_match() ->
             f"/auth/tenant/current/scopes/{scope_id}/locations",
             json={
                 "name": "BR",
-                "display_name": "Brasil",
                 "parent_location_id": None,
             },
         )
@@ -980,7 +948,6 @@ def test_location_directory_q_filter_keeps_ancestor_context_for_child_match() ->
             f"/auth/tenant/current/scopes/{scope_id}/locations",
             json={
                 "name": "União",
-                "display_name": "Granja União",
                 "parent_location_id": root_location.id,
             },
         )
@@ -1010,7 +977,6 @@ def test_location_delete_cascades_to_descendant_list() -> None:
             f"/auth/tenant/current/scopes/{scope_id}/locations",
             json={
                 "name": "Granja Sul",
-                "display_name": "Granja Sul",
                 "parent_location_id": None,
             },
         )
@@ -1024,7 +990,6 @@ def test_location_delete_cascades_to_descendant_list() -> None:
             f"/auth/tenant/current/scopes/{scope_id}/locations",
             json={
                 "name": "Núcleo 1",
-                "display_name": "Núcleo 1",
                 "parent_location_id": parent_location.id,
             },
         )
@@ -1060,7 +1025,6 @@ def test_location_move_cannot_create_cycle() -> None:
             f"/auth/tenant/current/scopes/{scope_id}/locations",
             json={
                 "name": "Unidade Oeste",
-                "display_name": "Unidade Oeste",
                 "parent_location_id": None,
             },
         )
@@ -1074,7 +1038,6 @@ def test_location_move_cannot_create_cycle() -> None:
             f"/auth/tenant/current/scopes/{scope_id}/locations",
             json={
                 "name": "Setor A",
-                "display_name": "Setor A",
                 "parent_location_id": parent_location.id,
             },
         )
@@ -1107,7 +1070,6 @@ def test_scope_delete_is_blocked_when_scope_has_locations() -> None:
             f"/auth/tenant/current/scopes/{scope_id}/locations",
             json={
                 "name": "Matriz",
-                "display_name": "Matriz operacional",
                 "parent_location_id": None,
             },
         )
@@ -1129,7 +1091,6 @@ def test_member_cannot_create_location() -> None:
             f"/auth/tenant/current/scopes/{scope_id}/locations",
             json={
                 "name": "Base",
-                "display_name": "Base",
                 "parent_location_id": None,
             },
         )
@@ -1167,12 +1128,11 @@ def test_member_can_select_current_scope_and_auth_me_exposes_it() -> None:
 
 def test_member_cannot_select_scope_from_another_tenant() -> None:
     with build_test_client(current_member_key="member") as (client, session, _):
-        other_tenant = Tenant(name="Other Tenant", display_name="Other Tenant")
+        other_tenant = Tenant(name="Other Tenant")
         session.add(other_tenant)
         session.flush()
         other_scope = Scope(
             name="Leite",
-            display_name="Leite e derivados",
             tenant_id=other_tenant.id,
         )
         session.add(other_scope)
@@ -1196,13 +1156,11 @@ def test_admin_can_create_move_update_and_delete_items() -> None:
             client,
             scope_id,
             name="Galinha",
-            display_name="Unidade avícola postura",
         )
         kind_branca_id = _create_kind_via_api(
             client,
             scope_id,
             name="Branca",
-            display_name="Linhagem branca",
         )
 
         list_response = client.get(f"/auth/tenant/current/scopes/{scope_id}/items")
@@ -1237,12 +1195,12 @@ def test_admin_can_create_move_update_and_delete_items() -> None:
         )
         update_response = client.patch(
             f"/auth/tenant/current/scopes/{scope_id}/kind/{kind_branca_id}",
-            json={"display_name": "Linhagem branca leve"},
+            json={"name": "Linhagem branca leve"},
         )
         assert update_response.status_code == 200
         branca_kind = session.get(Kind, kind_branca_id)
         assert branca_kind is not None
-        assert branca_kind.display_name == "Linhagem branca leve"
+        assert branca_kind.name == "Linhagem branca leve"
 
         delete_response = client.delete(
             f"/auth/tenant/current/scopes/{scope_id}/items/{root_item.id}"
@@ -1290,7 +1248,6 @@ def test_item_directory_q_filter_matches_accent_and_partial_text() -> None:
             client,
             scope_id,
             name="União",
-            display_name="Núcleo União",
         )
         create_response = client.post(
             f"/auth/tenant/current/scopes/{scope_id}/items",
@@ -1345,7 +1302,6 @@ def test_item_directory_q_filter_keeps_ancestor_context_for_child_match() -> Non
             client,
             scope_id,
             name="BR",
-            display_name="Brasil",
         )
         root_response = client.post(
             f"/auth/tenant/current/scopes/{scope_id}/items",
@@ -1363,7 +1319,6 @@ def test_item_directory_q_filter_keeps_ancestor_context_for_child_match() -> Non
             client,
             scope_id,
             name="União",
-            display_name="Núcleo União",
         )
         child_response = client.post(
             f"/auth/tenant/current/scopes/{scope_id}/items",
@@ -1395,7 +1350,7 @@ def test_item_delete_cascades_to_descendant_list() -> None:
         assert scope_id is not None
 
         kind_matriz_id = _create_kind_via_api(
-            client, scope_id, name="Matriz", display_name="Matriz"
+            client, scope_id, name="Matriz"
         )
         client.post(
             f"/auth/tenant/current/scopes/{scope_id}/items",
@@ -1409,7 +1364,7 @@ def test_item_delete_cascades_to_descendant_list() -> None:
         assert parent_item is not None
 
         kind_filial_id = _create_kind_via_api(
-            client, scope_id, name="Filial", display_name="Filial"
+            client, scope_id, name="Filial"
         )
         client.post(
             f"/auth/tenant/current/scopes/{scope_id}/items",
@@ -1442,7 +1397,7 @@ def test_item_move_cannot_create_cycle() -> None:
         assert scope_id is not None
 
         kind_a_id = _create_kind_via_api(
-            client, scope_id, name="Nivel A", display_name="Nivel A"
+            client, scope_id, name="Nivel A"
         )
         client.post(
             f"/auth/tenant/current/scopes/{scope_id}/items",
@@ -1456,7 +1411,7 @@ def test_item_move_cannot_create_cycle() -> None:
         assert parent_item is not None
 
         kind_b_id = _create_kind_via_api(
-            client, scope_id, name="Nivel B", display_name="Nivel B"
+            client, scope_id, name="Nivel B"
         )
         client.post(
             f"/auth/tenant/current/scopes/{scope_id}/items",
@@ -1489,7 +1444,7 @@ def test_scope_delete_is_blocked_when_scope_has_items() -> None:
         assert scope_id is not None
 
         kind_tipo_a_id = _create_kind_via_api(
-            client, scope_id, name="Tipo A", display_name="Tipo A"
+            client, scope_id, name="Tipo A"
         )
         client.post(
             f"/auth/tenant/current/scopes/{scope_id}/items",
@@ -1512,7 +1467,7 @@ def test_member_cannot_create_item() -> None:
         scope_id = session.scalar(select(Scope.id).where(Scope.name == "Aves"))
         assert scope_id is not None
 
-        kind_x = Kind(scope_id=scope_id, name="X", display_name="X")
+        kind_x = Kind(scope_id=scope_id, name="X")
         session.add(kind_x)
         session.commit()
 
@@ -1534,7 +1489,7 @@ def test_kind_list_includes_reference_count() -> None:
         assert scope_id is not None
 
         kind_id = _create_kind_via_api(
-            client, scope_id, name="RefCnt", display_name="RefCnt"
+            client, scope_id, name="RefCnt"
         )
         list_before = client.get(f"/auth/tenant/current/scopes/{scope_id}/kind")
         assert list_before.status_code == 200
@@ -1556,7 +1511,7 @@ def test_delete_kind_blocked_when_referenced_by_item() -> None:
         assert scope_id is not None
 
         kind_id = _create_kind_via_api(
-            client, scope_id, name="InUse", display_name="InUse"
+            client, scope_id, name="InUse"
         )
         client.post(
             f"/auth/tenant/current/scopes/{scope_id}/items",
@@ -1578,7 +1533,7 @@ def test_delete_kind_succeeds_when_unused() -> None:
         assert scope_id is not None
 
         kind_id = _create_kind_via_api(
-            client, scope_id, name="Orphan", display_name="Orphan"
+            client, scope_id, name="Orphan"
         )
         response = client.delete(
             f"/auth/tenant/current/scopes/{scope_id}/kind/{kind_id}"
@@ -1943,8 +1898,7 @@ def test_tenant_history_endpoint_returns_latest_scope_logs_with_diff() -> None:
             row_id=scope_id,
             row_payload={
                 "id": scope_id,
-                "name": "Aves",
-                "display_name": "Aves para producao de ovos",
+                "name": "Aves para producao de ovos",
                 "tenant_id": tenant.id,
             },
             moment_utc=base_time,
@@ -1958,8 +1912,7 @@ def test_tenant_history_endpoint_returns_latest_scope_logs_with_diff() -> None:
             row_id=scope_id,
             row_payload={
                 "id": scope_id,
-                "name": "Aves",
-                "display_name": "Aves postura",
+                "name": "Aves postura",
                 "tenant_id": tenant.id,
             },
             moment_utc=base_time.replace(minute=5),
@@ -1973,8 +1926,7 @@ def test_tenant_history_endpoint_returns_latest_scope_logs_with_diff() -> None:
             row_id=scope_id,
             row_payload={
                 "id": scope_id,
-                "name": "Aves",
-                "display_name": "Aves especiais",
+                "name": "Aves especiais",
                 "tenant_id": tenant.id,
             },
             moment_utc=base_time.replace(minute=10),
@@ -1996,7 +1948,7 @@ def test_tenant_history_endpoint_returns_latest_scope_logs_with_diff() -> None:
             table_name="member",
             action_type="U",
             row_id=999,
-            row_payload={"id": 999, "display_name": "Ignored"},
+            row_payload={"id": 999},
             moment_utc=base_time.replace(minute=20),
         )
         session.commit()
@@ -2023,8 +1975,7 @@ def test_tenant_history_endpoint_returns_latest_scope_logs_with_diff() -> None:
     assert tenant_id_value is not None
     assert delete_item["row"] == {
         "id": scope_id,
-        "name": "Aves",
-        "display_name": "Aves especiais",
+        "name": "Aves especiais",
         "tenant_id": tenant_id_value,
     }
     assert delete_item["diff_state"] == "not_applicable"
@@ -2033,7 +1984,7 @@ def test_tenant_history_endpoint_returns_latest_scope_logs_with_diff() -> None:
     assert latest_update["diff_state"] == "ready"
     assert latest_update["field_change_list"] == [
         {
-            "field_name": "display_name",
+            "field_name": "name",
             "previous_value": "Aves postura",
             "current_value": "Aves especiais",
         }
@@ -2042,7 +1993,7 @@ def test_tenant_history_endpoint_returns_latest_scope_logs_with_diff() -> None:
     assert previous_update["diff_state"] == "ready"
     assert previous_update["field_change_list"] == [
         {
-            "field_name": "display_name",
+            "field_name": "name",
             "previous_value": "Aves para producao de ovos",
             "current_value": "Aves postura",
         }
@@ -2076,7 +2027,7 @@ def test_tenant_history_endpoint_supports_actor_filter_and_pagination() -> None:
             table_name="scope",
             action_type="I",
             row_id=scope_id,
-            row_payload={"id": scope_id, "name": "Aves", "display_name": "Aves A"},
+            row_payload={"id": scope_id, "name": "Aves"},
             moment_utc=base_time,
         )
         _seed_log(
@@ -2086,7 +2037,7 @@ def test_tenant_history_endpoint_supports_actor_filter_and_pagination() -> None:
             table_name="scope",
             action_type="U",
             row_id=scope_id,
-            row_payload={"id": scope_id, "name": "Aves", "display_name": "Aves B"},
+            row_payload={"id": scope_id, "name": "Aves"},
             moment_utc=base_time.replace(minute=10),
         )
         _seed_log(
@@ -2096,7 +2047,7 @@ def test_tenant_history_endpoint_supports_actor_filter_and_pagination() -> None:
             table_name="scope",
             action_type="U",
             row_id=scope_id,
-            row_payload={"id": scope_id, "name": "Aves", "display_name": "Aves C"},
+            row_payload={"id": scope_id, "name": "Aves"},
             moment_utc=base_time.replace(minute=20),
         )
         session.commit()
@@ -2228,7 +2179,6 @@ def test_calculate_scope_current_age_executes_formulas_in_order_and_stops_at_fin
     with build_rules_session() as (session, tenant_id):
         scope = Scope(
             name="Aves",
-            display_name="Aves para producao de ovos",
             tenant_id=tenant_id,
         )
         session.add(scope)
@@ -2236,12 +2186,11 @@ def test_calculate_scope_current_age_executes_formulas_in_order_and_stops_at_fin
 
         location = Location(
             name="Granja A",
-            display_name="Granja A",
             scope_id=scope.id,
             parent_location_id=None,
             sort_order=0,
         )
-        kind = Kind(scope_id=scope.id, name="lote", display_name="Lote")
+        kind = Kind(scope_id=scope.id, name="lote")
         anchor_action = Action(scope_id=scope.id, sort_order=0)
         current_action = Action(scope_id=scope.id, sort_order=1)
         initial_field = Field(
@@ -2512,7 +2461,6 @@ def test_read_scope_current_age_reads_existing_results_without_recalculation() -
     with build_rules_session() as (session, tenant_id):
         scope = Scope(
             name="Aves",
-            display_name="Aves para producao de ovos",
             tenant_id=tenant_id,
         )
         session.add(scope)
@@ -2520,12 +2468,11 @@ def test_read_scope_current_age_reads_existing_results_without_recalculation() -
 
         location = Location(
             name="Granja A",
-            display_name="Granja A",
             scope_id=scope.id,
             parent_location_id=None,
             sort_order=0,
         )
-        kind = Kind(scope_id=scope.id, name="lote", display_name="Lote")
+        kind = Kind(scope_id=scope.id, name="lote")
         action = Action(scope_id=scope.id, sort_order=0)
         field = Field(
             scope_id=scope.id,
@@ -2623,7 +2570,6 @@ def test_delete_scope_current_age_removes_results_in_selected_period() -> None:
     with build_rules_session() as (session, tenant_id):
         scope = Scope(
             name="Aves",
-            display_name="Aves para producao de ovos",
             tenant_id=tenant_id,
         )
         session.add(scope)
@@ -2631,12 +2577,11 @@ def test_delete_scope_current_age_removes_results_in_selected_period() -> None:
 
         location = Location(
             name="Granja A",
-            display_name="Granja A",
             scope_id=scope.id,
             parent_location_id=None,
             sort_order=0,
         )
-        kind = Kind(scope_id=scope.id, name="lote", display_name="Lote")
+        kind = Kind(scope_id=scope.id, name="lote")
         action = Action(scope_id=scope.id, sort_order=0)
         field = Field(
             scope_id=scope.id,
@@ -2743,7 +2688,6 @@ def test_calculate_scope_current_age_uses_action_sort_order_within_same_day() ->
     with build_rules_session() as (session, tenant_id):
         scope = Scope(
             name="Aves",
-            display_name="Aves para producao de ovos",
             tenant_id=tenant_id,
         )
         session.add(scope)
@@ -2751,12 +2695,11 @@ def test_calculate_scope_current_age_uses_action_sort_order_within_same_day() ->
 
         location = Location(
             name="Granja A",
-            display_name="Granja A",
             scope_id=scope.id,
             parent_location_id=None,
             sort_order=0,
         )
-        kind = Kind(scope_id=scope.id, name="lote", display_name="Lote")
+        kind = Kind(scope_id=scope.id, name="lote")
         anchor_action = Action(scope_id=scope.id, sort_order=0)
         plus_action = Action(scope_id=scope.id, sort_order=10)
         double_action = Action(scope_id=scope.id, sort_order=20)
@@ -2911,7 +2854,6 @@ def test_calculate_scope_current_age_rounds_numeric_result_to_field_scale_half_u
     with build_rules_session() as (session, tenant_id):
         scope = Scope(
             name="Aves",
-            display_name="Aves para producao de ovos",
             tenant_id=tenant_id,
         )
         session.add(scope)
@@ -2919,12 +2861,11 @@ def test_calculate_scope_current_age_rounds_numeric_result_to_field_scale_half_u
 
         location = Location(
             name="Granja A",
-            display_name="Granja A",
             scope_id=scope.id,
             parent_location_id=None,
             sort_order=0,
         )
-        kind = Kind(scope_id=scope.id, name="lote", display_name="Lote")
+        kind = Kind(scope_id=scope.id, name="lote")
         anchor_action = Action(scope_id=scope.id, sort_order=0)
         calc_action = Action(scope_id=scope.id, sort_order=1)
         session.add_all([location, kind, anchor_action, calc_action])
@@ -3108,7 +3049,6 @@ def test_calculate_scope_current_age_keeps_processing_remaining_events_in_final_
     with build_rules_session() as (session, tenant_id):
         scope = Scope(
             name="Aves",
-            display_name="Aves para producao de ovos",
             tenant_id=tenant_id,
         )
         session.add(scope)
@@ -3116,12 +3056,11 @@ def test_calculate_scope_current_age_keeps_processing_remaining_events_in_final_
 
         location = Location(
             name="Granja A",
-            display_name="Granja A",
             scope_id=scope.id,
             parent_location_id=None,
             sort_order=0,
         )
-        kind = Kind(scope_id=scope.id, name="lote", display_name="Lote")
+        kind = Kind(scope_id=scope.id, name="lote")
         anchor_action = Action(scope_id=scope.id, sort_order=0)
         final_day_first_action = Action(scope_id=scope.id, sort_order=1)
         final_day_last_action = Action(scope_id=scope.id, sort_order=2)
@@ -3302,7 +3241,6 @@ def test_calculate_scope_current_age_defaults_missing_result_state_by_field_type
     with build_rules_session() as (session, tenant_id):
         scope = Scope(
             name="Aves",
-            display_name="Aves para producao de ovos",
             tenant_id=tenant_id,
         )
         session.add(scope)
@@ -3310,12 +3248,11 @@ def test_calculate_scope_current_age_defaults_missing_result_state_by_field_type
 
         location = Location(
             name="Granja A",
-            display_name="Granja A",
             scope_id=scope.id,
             parent_location_id=None,
             sort_order=0,
         )
-        kind = Kind(scope_id=scope.id, name="lote", display_name="Lote")
+        kind = Kind(scope_id=scope.id, name="lote")
         anchor_action = Action(scope_id=scope.id, sort_order=0)
         current_action = Action(scope_id=scope.id, sort_order=1)
         initial_field = Field(
@@ -3500,7 +3437,6 @@ def test_calculate_scope_current_age_opens_window_from_age_inputs_and_keeps_futu
     with build_rules_session() as (session, tenant_id):
         scope = Scope(
             name="Aves",
-            display_name="Aves para producao de ovos",
             tenant_id=tenant_id,
         )
         session.add(scope)
@@ -3508,12 +3444,11 @@ def test_calculate_scope_current_age_opens_window_from_age_inputs_and_keeps_futu
 
         location = Location(
             name="Granja A",
-            display_name="Granja A",
             scope_id=scope.id,
             parent_location_id=None,
             sort_order=0,
         )
-        kind = Kind(scope_id=scope.id, name="lote", display_name="Lote")
+        kind = Kind(scope_id=scope.id, name="lote")
         anchor_action = Action(scope_id=scope.id, sort_order=0)
         current_action = Action(scope_id=scope.id, sort_order=1)
         initial_field = Field(
@@ -3657,7 +3592,6 @@ def test_calculate_scope_current_age_repeats_recurrent_event_on_following_days()
     with build_rules_session() as (session, tenant_id):
         scope = Scope(
             name="Aves",
-            display_name="Aves para producao de ovos",
             tenant_id=tenant_id,
         )
         session.add(scope)
@@ -3665,12 +3599,11 @@ def test_calculate_scope_current_age_repeats_recurrent_event_on_following_days()
 
         location = Location(
             name="Granja A",
-            display_name="Granja A",
             scope_id=scope.id,
             parent_location_id=None,
             sort_order=0,
         )
-        kind = Kind(scope_id=scope.id, name="lote", display_name="Lote")
+        kind = Kind(scope_id=scope.id, name="lote")
         anchor_action = Action(scope_id=scope.id, sort_order=0)
         recurrent_age_action = Action(scope_id=scope.id, sort_order=1, is_recurrent=True)
         initial_field = Field(
@@ -3803,7 +3736,6 @@ def test_calculate_scope_current_age_ignores_age_input_without_formula_target() 
     with build_rules_session() as (session, tenant_id):
         scope = Scope(
             name="Aves",
-            display_name="Aves para producao de ovos",
             tenant_id=tenant_id,
         )
         session.add(scope)
@@ -3811,12 +3743,11 @@ def test_calculate_scope_current_age_ignores_age_input_without_formula_target() 
 
         location = Location(
             name="Granja A",
-            display_name="Granja A",
             scope_id=scope.id,
             parent_location_id=None,
             sort_order=0,
         )
-        kind = Kind(scope_id=scope.id, name="lote", display_name="Lote")
+        kind = Kind(scope_id=scope.id, name="lote")
         anchor_action = Action(scope_id=scope.id, sort_order=0)
         unrelated_action = Action(scope_id=scope.id, sort_order=1, is_recurrent=False)
         recurrent_age_action = Action(scope_id=scope.id, sort_order=2, is_recurrent=True)
@@ -3965,7 +3896,6 @@ def test_calculate_scope_current_age_does_not_repeat_non_recurrent_event_on_foll
     with build_rules_session() as (session, tenant_id):
         scope = Scope(
             name="Aves",
-            display_name="Aves para producao de ovos",
             tenant_id=tenant_id,
         )
         session.add(scope)
@@ -3973,12 +3903,11 @@ def test_calculate_scope_current_age_does_not_repeat_non_recurrent_event_on_foll
 
         location = Location(
             name="Granja A",
-            display_name="Granja A",
             scope_id=scope.id,
             parent_location_id=None,
             sort_order=0,
         )
-        kind = Kind(scope_id=scope.id, name="lote", display_name="Lote")
+        kind = Kind(scope_id=scope.id, name="lote")
         anchor_action = Action(scope_id=scope.id, sort_order=0)
         single_age_action = Action(scope_id=scope.id, sort_order=1, is_recurrent=False)
         initial_field = Field(
@@ -4110,7 +4039,6 @@ def test_calculate_scope_current_age_does_not_mix_different_location_item_groups
     with build_rules_session() as (session, tenant_id):
         scope = Scope(
             name="Aves",
-            display_name="Aves para producao de ovos",
             tenant_id=tenant_id,
         )
         session.add(scope)
@@ -4118,19 +4046,17 @@ def test_calculate_scope_current_age_does_not_mix_different_location_item_groups
 
         location_a = Location(
             name="Granja A",
-            display_name="Granja A",
             scope_id=scope.id,
             parent_location_id=None,
             sort_order=0,
         )
         location_b = Location(
             name="Granja B",
-            display_name="Granja B",
             scope_id=scope.id,
             parent_location_id=None,
             sort_order=1,
         )
-        kind = Kind(scope_id=scope.id, name="lote", display_name="Lote")
+        kind = Kind(scope_id=scope.id, name="lote")
         anchor_action = Action(scope_id=scope.id, sort_order=0)
         current_action = Action(scope_id=scope.id, sort_order=1)
         initial_field = Field(

@@ -33,8 +33,6 @@ export default async function ScopeConfigurationPage({
     filterToggleLabel: t("filter.toggleLabel"),
     nameLabel: t("section.identity.nameLabel"),
     nameHint: t("section.identity.nameHint"),
-    displayNameLabel: t("section.identity.displayNameLabel"),
-    displayNameHint: t("section.identity.displayNameHint"),
     cancel: t("action.cancel"),
     directoryCreateLabel: t("action.new"),
     delete: t("action.delete"),

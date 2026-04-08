@@ -56,11 +56,11 @@ function ChevronDownIcon({ className }: { className?: string }) {
 }
 
 function getTenantDisplayName(tenant: TenantOption) {
-  return tenant.display_name || tenant.name;
+  return tenant.name;
 }
 
 function getScopeDisplayName(scope: TenantScopeRecord) {
-  return scope.name.trim() || scope.display_name.trim() || `#${scope.id}`;
+  return scope.name.trim() || `#${scope.id}`;
 }
 
 export function WorkspaceContextMenu({

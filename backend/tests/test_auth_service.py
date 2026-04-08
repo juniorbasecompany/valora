@@ -26,15 +26,13 @@ def test_decide_login_action_for_selection() -> None:
 
 
 def test_build_account_name_uses_google_name_when_present() -> None:
-    name, display_name = build_account_name("Maria Silva", "maria@example.com")
+    name = build_account_name("Maria Silva", "maria@example.com")
     assert name == "Maria Silva"
-    assert display_name == "Maria Silva"
 
 
 def test_build_account_name_uses_email_prefix_as_fallback() -> None:
-    name, display_name = build_account_name("", "maria.silva@example.com")
+    name = build_account_name("", "maria.silva@example.com")
     assert name == "maria.silva"
-    assert display_name == "maria.silva"
 
 
 def test_member_status_name_maps_supported_statuses() -> None:

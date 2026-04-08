@@ -23,18 +23,11 @@ def hierarchy_item_label(item: Any) -> str:
         name = kind.name.strip()
         if name:
             return name
-        display_name = kind.display_name.strip()
-        if display_name:
-            return display_name
         return f"#{item.id}"
 
     name = item.name.strip()
     if name:
         return name
-
-    display_name = item.display_name.strip()
-    if display_name:
-        return display_name
 
     return f"#{item.id}"
 

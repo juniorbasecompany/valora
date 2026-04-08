@@ -399,7 +399,7 @@ export function EventConfigurationClient({
     for (const item of initialLocationDirectory?.item_list ?? []) {
       const label = item.path_labels.length > 0
         ? item.path_labels.join(UI_TEXT_SEPARATOR)
-        : item.name.trim() || item.display_name.trim() || `#${item.id}`;
+        : item.name.trim() || `#${item.id}`;
       map.set(item.id, label);
     }
     return map;
@@ -410,7 +410,7 @@ export function EventConfigurationClient({
     for (const item of initialItemDirectory?.item_list ?? []) {
       const label = item.path_labels.length > 0
         ? item.path_labels.join(UI_TEXT_SEPARATOR)
-        : item.name.trim() || item.display_name.trim() || `#${item.id}`;
+        : item.name.trim() || `#${item.id}`;
       map.set(item.id, label);
     }
     return map;

@@ -111,7 +111,6 @@ class GoogleSelectTenantRequest(SelectTenantRequest):
 class TenantOption(BaseModel):
     tenant_id: int
     name: str
-    display_name: str
     role: int
 
 
@@ -119,7 +118,6 @@ class InviteOption(BaseModel):
     member_id: int
     tenant_id: int
     name: str
-    display_name: str
     role: int
     status: str
 
@@ -153,7 +151,6 @@ class SessionAccount(BaseModel):
     id: int
     email: str
     name: str
-    display_name: str
     provider: str
 
 
@@ -162,7 +159,6 @@ class SessionMember(BaseModel):
     role: int
     status: str
     name: str | None
-    display_name: str | None
     email: str
     current_scope_id: int | None
 
@@ -170,13 +166,11 @@ class SessionMember(BaseModel):
 class SessionTenant(BaseModel):
     id: int
     name: str
-    display_name: str
 
 
 class TenantCurrentResponse(BaseModel):
     id: int
     name: str
-    display_name: str
     can_edit: bool
     can_delete: bool
 
@@ -187,9 +181,8 @@ class TenantDeleteResponse(BaseModel):
 
 class TenantUpdateRequest(BaseModel):
     name: str
-    display_name: str
 
-    @field_validator("name", "display_name")
+    @field_validator("name")
     @classmethod
     def strip_non_empty(cls, value: str) -> str:
         cleaned = value.strip()
@@ -201,7 +194,6 @@ class TenantUpdateRequest(BaseModel):
 class TenantMemberRecord(BaseModel):
     id: int
     name: str | None
-    display_name: str | None
     email: str
     role: int
     role_name: str
@@ -226,7 +218,6 @@ class TenantMemberInviteEmailResponse(BaseModel):
 class TenantMemberCreateRequest(BaseModel):
     email: str
     name: str
-    display_name: str
 
     @field_validator("email")
     @classmethod
@@ -236,7 +227,7 @@ class TenantMemberCreateRequest(BaseModel):
             raise ValueError("invalid email")
         return cleaned
 
-    @field_validator("name", "display_name")
+    @field_validator("name")
     @classmethod
     def strip_optional_invite_name(cls, value: str) -> str:
         return value.strip()
@@ -245,7 +236,6 @@ class TenantMemberCreateRequest(BaseModel):
 class TenantMemberUpdateRequest(BaseModel):
     email: str
     name: str
-    display_name: str
     role: int
     status: int
 
@@ -257,7 +247,7 @@ class TenantMemberUpdateRequest(BaseModel):
             raise ValueError("invalid email")
         return cleaned
 
-    @field_validator("name", "display_name")
+    @field_validator("name")
     @classmethod
     def strip_optional_member_name(cls, value: str) -> str:
         return value.strip()
@@ -280,7 +270,6 @@ class TenantMemberUpdateRequest(BaseModel):
 class TenantScopeRecord(BaseModel):
     id: int
     name: str
-    display_name: str
     can_edit: bool
     can_delete: bool
 
@@ -294,9 +283,8 @@ class TenantScopeDirectoryResponse(BaseModel):
 
 class TenantScopeUpsertRequest(BaseModel):
     name: str
-    display_name: str
 
-    @field_validator("name", "display_name")
+    @field_validator("name")
     @classmethod
     def strip_non_empty_scope_value(cls, value: str) -> str:
         cleaned = value.strip()
@@ -324,7 +312,6 @@ class TenantLocationRecord(BaseModel):
     id: int
     parent_location_id: int | None
     name: str
-    display_name: str
     sort_order: int
     depth: int
     path_labels: list[str] = Field(default_factory=list)
@@ -339,7 +326,6 @@ class TenantLocationRecord(BaseModel):
 class TenantLocationDirectoryResponse(BaseModel):
     scope_id: int
     scope_name: str
-    scope_display_name: str
     can_edit: bool
     can_create: bool
     item_list: list[TenantLocationRecord] = Field(default_factory=list)
@@ -347,10 +333,9 @@ class TenantLocationDirectoryResponse(BaseModel):
 
 class TenantLocationUpsertRequest(BaseModel):
     name: str
-    display_name: str
     parent_location_id: int | None = None
 
-    @field_validator("name", "display_name")
+    @field_validator("name")
     @classmethod
     def strip_non_empty_location_value(cls, value: str) -> str:
         cleaned = value.strip()
@@ -388,7 +373,6 @@ class TenantLocationMoveRequest(BaseModel):
 class TenantKindRecord(BaseModel):
     id: int
     name: str
-    display_name: str
     reference_count: int
 
 
@@ -399,9 +383,8 @@ class TenantKindListResponse(BaseModel):
 
 class TenantKindCreateRequest(BaseModel):
     name: str
-    display_name: str
 
-    @field_validator("name", "display_name")
+    @field_validator("name")
     @classmethod
     def strip_non_empty_kind_value(cls, value: str) -> str:
         cleaned = value.strip()
@@ -412,9 +395,8 @@ class TenantKindCreateRequest(BaseModel):
 
 class TenantKindPatchRequest(BaseModel):
     name: str | None = None
-    display_name: str | None = None
 
-    @field_validator("name", "display_name")
+    @field_validator("name")
     @classmethod
     def strip_kind_optional(cls, value: str | None) -> str | None:
         if value is None:
@@ -430,7 +412,6 @@ class TenantItemRecord(BaseModel):
     parent_item_id: int | None
     kind_id: int
     name: str
-    display_name: str
     sort_order: int
     depth: int
     path_labels: list[str] = Field(default_factory=list)
@@ -445,7 +426,6 @@ class TenantItemRecord(BaseModel):
 class TenantItemDirectoryResponse(BaseModel):
     scope_id: int
     scope_name: str
-    scope_display_name: str
     can_edit: bool
     can_create: bool
     kind_list: list[TenantKindRecord] = Field(default_factory=list)
@@ -493,7 +473,7 @@ class TenantItemMoveRequest(BaseModel):
 class TenantUnityRecord(BaseModel):
     id: int
     location_id: int
-    location_display_name: str
+    location_name: str
     item_id_list: list[int]
     item_display_label_list: list[str]
     creation_utc: datetime
@@ -504,7 +484,6 @@ class TenantUnityRecord(BaseModel):
 class TenantUnityDirectoryResponse(BaseModel):
     scope_id: int
     scope_name: str
-    scope_display_name: str
     can_edit: bool
     can_create: bool
     item_list: list[TenantUnityRecord] = Field(default_factory=list)
@@ -564,15 +543,11 @@ class TenantHistoryResponse(BaseModel):
 
 
 def _sync_account_name(account: Account, identity: GoogleIdentity) -> bool:
-    name, display_name = build_account_name(identity.name, identity.email)
+    name = build_account_name(identity.name, identity.email)
     changed = False
 
     if account.name != name:
         account.name = name
-        changed = True
-
-    if account.display_name != display_name:
-        account.display_name = display_name
         changed = True
 
     if account.email != identity.email:
@@ -634,11 +609,10 @@ def _find_or_create_account(
             session.refresh(account)
         return account
 
-    name, display_name = build_account_name(identity.name, identity.email)
+    name = build_account_name(identity.name, identity.email)
     account = Account(
         id=_preallocate_bigint_pk_if_postgresql(session, table_name="account"),
         name=name,
-        display_name=display_name,
         email=identity.email,
         provider=GOOGLE_PROVIDER,
         provider_subject=identity.provider_subject,
@@ -663,10 +637,6 @@ def _sync_member_identity(member: Member, account: Account) -> bool:
 
     if not member.name:
         member.name = account.name
-        changed = True
-
-    if not member.display_name:
-        member.display_name = account.display_name
         changed = True
 
     # Email do vínculo (convite / identificação) é editável na API; não espelhar account.email após o vínculo.
@@ -720,8 +690,7 @@ def _list_active_tenant_option_list(
         tenant_option_list.append(
             TenantOption(
                 tenant_id=tenant.id,
-                name=tenant.name,
-                display_name=tenant_display_name(tenant),
+                name=tenant_display_name(tenant),
                 role=member.role,
             )
         )
@@ -753,8 +722,7 @@ def _list_pending_invite_option_list(
             InviteOption(
                 member_id=member.id,
                 tenant_id=tenant.id,
-                name=tenant.name,
-                display_name=tenant_display_name(tenant),
+                name=tenant_display_name(tenant),
                 role=member.role,
                 status=member_status_name(member.status),
             )
@@ -831,8 +799,7 @@ def _create_initial_tenant_member(
     set_request_audit_state(request, tenant_id=None, account_id=account.id)
     tenant = Tenant(
         id=_preallocate_bigint_pk_if_postgresql(session, table_name="tenant"),
-        name=account.display_name,
-        display_name=account.display_name,
+        name=account.name,
     )
     session.add(tenant)
     if tenant.id is None:
@@ -844,7 +811,6 @@ def _create_initial_tenant_member(
     set_request_audit_state(request, tenant_id=tenant.id, account_id=account.id)
     member = Member(
         name=account.name,
-        display_name=account.display_name,
         email=account.email,
         tenant_id=tenant.id,
         account_id=account.id,
@@ -1100,7 +1066,6 @@ def _serialize_tenant_member(actor: Member, target: Member) -> TenantMemberRecor
     return TenantMemberRecord(
         id=target.id,
         name=target.name,
-        display_name=target.display_name,
         email=target.email,
         role=target.role,
         role_name=member_role_name(target.role),
@@ -1117,7 +1082,6 @@ def _serialize_tenant_scope(actor: Member, target: Scope) -> TenantScopeRecord:
     return TenantScopeRecord(
         id=target.id,
         name=target.name,
-        display_name=target.display_name,
         can_edit=can_edit_scope,
         can_delete=_member_can_delete_scope(actor),
     )
@@ -1198,9 +1162,6 @@ def _build_tenant_member_directory(
             query = query.where(
                 or_(
                     _normalize_expression_for_search(Member.name).contains(query_term_expression),
-                    _normalize_expression_for_search(Member.display_name).contains(
-                        query_term_expression
-                    ),
                     _normalize_expression_for_search(Member.email).contains(query_term_expression),
                 )
             )
@@ -1230,17 +1191,12 @@ def _build_tenant_scope_directory(
     query_term_expression = _query_term_expression_for_search(q)
     if query_term_expression is not None:
             query = query.where(
-                or_(
-                    _normalize_expression_for_search(Scope.name).contains(query_term_expression),
-                    _normalize_expression_for_search(Scope.display_name).contains(
-                        query_term_expression
-                    ),
-                )
+                _normalize_expression_for_search(Scope.name).contains(query_term_expression)
             )
 
     scope_list = list(session.scalars(query))
     scope_list.sort(
-        key=lambda item: (item.name.lower(), item.display_name.lower(), item.id)
+        key=lambda item: (item.name.lower(), item.id)
     )
     return TenantScopeDirectoryResponse(
         can_edit=_member_can_edit_scope(actor),
@@ -1277,12 +1233,7 @@ def _get_scope_location_list(
     query_term_expression = _query_term_expression_for_search(q)
     if query_term_expression is not None:
             query = query.where(
-                or_(
-                    _normalize_expression_for_search(Location.name).contains(query_term_expression),
-                    _normalize_expression_for_search(Location.display_name).contains(
-                        query_term_expression
-                    ),
-                )
+                _normalize_expression_for_search(Location.name).contains(query_term_expression)
             )
 
     return list(
@@ -1442,7 +1393,6 @@ def _build_tenant_location_directory(
             id=location.id,
             parent_location_id=location.parent_location_id,
             name=location.name,
-            display_name=location.display_name,
             sort_order=location.sort_order,
             depth=depth,
             path_labels=path_labels,
@@ -1476,7 +1426,6 @@ def _build_tenant_location_directory(
     return TenantLocationDirectoryResponse(
         scope_id=scope.id,
         scope_name=scope.name,
-        scope_display_name=scope.display_name,
         can_edit=can_edit_hierarchy,
         can_create=can_edit_hierarchy,
         item_list=item_list,
@@ -1502,13 +1451,8 @@ def _get_scope_item_list(
     query_term_expression = _query_term_expression_for_search(q)
     if query_term_expression is not None:
         query = query.where(
-            or_(
-                _normalize_expression_for_search(Kind.name).contains(
-                    query_term_expression
-                ),
-                _normalize_expression_for_search(Kind.display_name).contains(
-                    query_term_expression
-                ),
+            _normalize_expression_for_search(Kind.name).contains(
+                query_term_expression
             )
         )
 
@@ -1558,7 +1502,6 @@ def _tenant_kind_record_list_for_scope(
         TenantKindRecord(
             id=kind.id,
             name=kind.name,
-            display_name=kind.display_name,
             reference_count=int(ref_count),
         )
         for kind, ref_count in rows
@@ -1637,7 +1580,6 @@ def _build_tenant_item_directory(
             parent_item_id=item_row.parent_item_id,
             kind_id=item_row.kind_id,
             name=item_row.kind.name,
-            display_name=item_row.kind.display_name,
             sort_order=item_row.sort_order,
             depth=depth,
             path_labels=path_labels,
@@ -1672,7 +1614,6 @@ def _build_tenant_item_directory(
     return TenantItemDirectoryResponse(
         scope_id=scope.id,
         scope_name=scope.name,
-        scope_display_name=scope.display_name,
         can_edit=can_edit_hierarchy,
         can_create=can_edit_hierarchy,
         kind_list=kind_list,
@@ -1746,13 +1687,8 @@ def _build_tenant_unity_directory(
     query_term_expression = _query_term_expression_for_search(q)
     if query_term_expression is not None:
         query = query.where(
-            or_(
-                _normalize_expression_for_search(Location.name).contains(
-                    query_term_expression
-                ),
-                _normalize_expression_for_search(Location.display_name).contains(
-                    query_term_expression
-                ),
+            _normalize_expression_for_search(Location.name).contains(
+                query_term_expression
             )
         )
     unity_rows = session.execute(
@@ -1771,7 +1707,7 @@ def _build_tenant_unity_directory(
             TenantUnityRecord(
                 id=unity_row.id,
                 location_id=unity_row.location_id,
-                location_display_name=location_row.display_name,
+                location_name=location_row.name,
                 item_id_list=iid_list,
                 item_display_label_list=labels,
                 creation_utc=unity_row.creation_utc,
@@ -1783,7 +1719,6 @@ def _build_tenant_unity_directory(
     return TenantUnityDirectoryResponse(
         scope_id=scope.id,
         scope_name=scope.name,
-        scope_display_name=scope.display_name,
         can_edit=can_edit,
         can_create=can_edit,
         item_list=out_list,
@@ -1817,11 +1752,10 @@ def _validate_history_table_name(table_name: str) -> str:
 
 def _resolve_history_actor_name(
     *,
-    display_name: str | None,
     name: str | None,
     email: str | None,
 ) -> str | None:
-    for candidate in (display_name, name, email):
+    for candidate in (name, email):
         if candidate and candidate.strip():
             return candidate.strip()
     return None
@@ -1958,7 +1892,6 @@ def _build_tenant_history_response(
             Log.action_type.label("action_type"),
             Log.row_id.label("row_id"),
             Log.row_payload.label("row_payload"),
-            Account.display_name.label("actor_display_name"),
             Account.name.label("actor_name"),
             Account.email.label("actor_email"),
         )
@@ -1977,9 +1910,6 @@ def _build_tenant_history_response(
     if actor_query_term_expression is not None:
         history_query = history_query.where(
             or_(
-                _normalize_expression_for_search(Account.display_name).contains(
-                    actor_query_term_expression
-                ),
                 _normalize_expression_for_search(Account.name).contains(
                     actor_query_term_expression
                 ),
@@ -2045,7 +1975,6 @@ def _build_tenant_history_response(
                 id=int(history_row["id"]),
                 moment_utc=history_row["moment_utc"],
                 actor_name=_resolve_history_actor_name(
-                    display_name=history_row["actor_display_name"],
                     name=history_row["actor_name"],
                     email=history_row["actor_email"],
                 ),
@@ -2072,7 +2001,6 @@ def get_current_tenant_detail(
     return TenantCurrentResponse(
         id=tenant.id,
         name=tenant.name,
-        display_name=tenant.display_name,
         can_edit=_member_can_edit_tenant(member),
         can_delete=_member_can_delete_tenant(member),
     )
@@ -2130,7 +2058,6 @@ def create_current_tenant_member(
 
     invited = Member(
         name=body.name,
-        display_name=body.display_name,
         email=body.email,
         tenant_id=tenant.id,
         account_id=None,
@@ -2291,7 +2218,6 @@ def patch_current_tenant(
         )
 
     tenant.name = body.name
-    tenant.display_name = body.display_name
     session.add(tenant)
     _apply_member_audit_context(session, member)
     commit_session_with_null_if_empty(session)
@@ -2300,7 +2226,6 @@ def patch_current_tenant(
     return TenantCurrentResponse(
         id=tenant.id,
         name=tenant.name,
-        display_name=tenant.display_name,
         can_edit=_member_can_edit_tenant(member),
         can_delete=_member_can_delete_tenant(member),
     )
@@ -2386,11 +2311,9 @@ def patch_current_tenant_member(
                 detail="A member with this email already exists for this tenant",
             )
 
-    # Sempre gravar como name/display_name; evita divergência se a comparação acima falhar por edge case.
     target_member.email = body.email
 
     target_member.name = body.name
-    target_member.display_name = body.display_name
     session.add(target_member)
     _apply_member_audit_context(session, current_member)
     commit_session_with_null_if_empty(session)
@@ -2416,7 +2339,6 @@ def create_current_tenant_scope(
 
     scope = Scope(
         name=body.name,
-        display_name=body.display_name,
         tenant_id=tenant.id,
     )
     session.add(scope)
@@ -2450,7 +2372,6 @@ def patch_current_tenant_scope(
         )
 
     target_scope.name = body.name
-    target_scope.display_name = body.display_name
     session.add(target_scope)
     _apply_member_audit_context(session, current_member)
     commit_session_with_null_if_empty(session)
@@ -2605,7 +2526,6 @@ def create_current_scope_location(
     )
     location = Location(
         name=body.name,
-        display_name=body.display_name,
         scope_id=target_scope.id,
         parent_location_id=body.parent_location_id,
         sort_order=sum(
@@ -2661,7 +2581,6 @@ def patch_current_scope_location(
         )
 
     target_location.name = body.name
-    target_location.display_name = body.display_name
     session.add(target_location)
     _apply_member_audit_context(session, current_member)
     commit_session_with_null_if_empty(session)
@@ -2801,7 +2720,6 @@ def create_current_scope_kind(
     row = Kind(
         scope_id=target_scope.id,
         name=body.name,
-        display_name=body.display_name,
     )
     session.add(row)
     _apply_member_audit_context(session, current_member)
@@ -2838,9 +2756,7 @@ def patch_current_scope_kind(
     row = _get_scope_kind_or_404(session, scope_id=target_scope.id, kind_id=kind_id)
     if body.name is not None:
         row.name = body.name
-    if body.display_name is not None:
-        row.display_name = body.display_name
-    if body.name is None and body.display_name is None:
+    else:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No fields to update",
@@ -3263,7 +3179,6 @@ def auth_me(
             id=account.id,
             email=account.email,
             name=account.name,
-            display_name=account.display_name,
             provider=account.provider,
         ),
         member=SessionMember(
@@ -3271,14 +3186,12 @@ def auth_me(
             role=member.role,
             status=member_status_name(member.status),
             name=member.name,
-            display_name=member.display_name,
             email=member.email,
             current_scope_id=_resolve_member_current_scope_id(session, actor=member),
         ),
         tenant=SessionTenant(
             id=tenant.id,
-            name=tenant.name,
-            display_name=tenant_display_name(tenant),
+            name=tenant_display_name(tenant),
         ),
     )
 

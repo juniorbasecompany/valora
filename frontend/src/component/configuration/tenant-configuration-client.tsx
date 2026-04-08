@@ -16,7 +16,7 @@ import {
   DirectoryFilterTextField
 } from "@/component/configuration/directory-filter-panel";
 import { TrashIconButton } from "@/component/ui/trash-icon-button";
-import { ConfigurationNameDisplayNameFields } from "@/component/configuration/configuration-name-display-name-fields";
+import { ConfigurationNameField } from "@/component/configuration/configuration-name-field";
 import { useEditorPanelFlash } from "@/component/configuration/use-editor-panel-flash";
 import { useEditorNewIntentGeneration } from "@/component/configuration/use-editor-new-intent-generation";
 import { useFocusFirstEditorFieldAfterFlash } from "@/component/configuration/use-focus-first-editor-field-after-flash";
@@ -36,10 +36,8 @@ export type TenantConfigurationCopy = {
   filterToggleAriaLabel: string;
   filterToggleLabel: string;
   filterEmpty: string;
-  legalNameLabel: string;
-  legalNameHint: string;
-  displayNameLabel: string;
-  displayNameHint: string;
+  nameLabel: string;
+  nameHint: string;
   cancel: string;
   delete: string;
   undoDelete: string;
@@ -60,14 +58,10 @@ type TenantConfigurationClientProps = {
   copy: TenantConfigurationCopy;
 };
 
-function resolveAsideTitle(displayName: string, legalName: string, tenantId: number) {
-  const display = displayName.trim();
-  if (display) {
-    return display;
-  }
-  const legal = legalName.trim();
-  if (legal) {
-    return legal;
+function resolveAsideTitle(name: string, tenantId: number) {
+  const trimmed = name.trim();
+  if (trimmed) {
+    return trimmed;
   }
   return `#${tenantId}`;
 }
@@ -87,14 +81,11 @@ export function TenantConfigurationClient({
   const [editorContext, setEditorContext] = useState<TenantEditorContext>(() =>
     initialTenant.can_edit ? "new" : "none"
   );
-  const [displayName, setDisplayName] = useState("");
-  const [legalName, setLegalName] = useState("");
+  const [name, setName] = useState("");
   const [baseline, setBaseline] = useState({
-    displayName: "",
-    legalName: ""
+    name: ""
   });
   const [fieldError, setFieldError] = useState<{
-    displayName?: string;
     name?: string;
   }>({});
   const [requestErrorMessage, setRequestErrorMessage] = useState<string | null>(null);
@@ -109,11 +100,9 @@ export function TenantConfigurationClient({
     setRequestErrorMessage(null);
     setIsDeletePending(false);
     if (editorContext === "edit") {
-      setDisplayName(initialTenant.display_name);
-      setLegalName(initialTenant.name);
+      setName(initialTenant.name);
       setBaseline({
-        displayName: initialTenant.display_name,
-        legalName: initialTenant.name
+        name: initialTenant.name
       });
     }
   }, [editorContext, initialTenant]);
@@ -125,8 +114,8 @@ export function TenantConfigurationClient({
     if (editorContext === "new") {
       return `new:${String(newIntentGeneration)}`;
     }
-    return `id:${String(tenant.id)}:legal:${tenant.name}:display:${tenant.display_name}`;
-  }, [editorContext, newIntentGeneration, tenant.display_name, tenant.id, tenant.name]);
+    return `id:${String(tenant.id)}:name:${tenant.name}`;
+  }, [editorContext, newIntentGeneration, tenant.id, tenant.name]);
   const isEditorFlashActive = useEditorPanelFlash(editorPanelElementRef, editorFlashKey);
   useFocusFirstEditorFieldAfterFlash(
     editorPanelElementRef,
@@ -136,23 +125,19 @@ export function TenantConfigurationClient({
 
   const isDirty = useMemo(() => {
     return (
-      displayName.trim() !== baseline.displayName.trim() ||
-      legalName.trim() !== baseline.legalName.trim() ||
+      name.trim() !== baseline.name.trim() ||
       isDeletePending
     );
-  }, [baseline.displayName, baseline.legalName, displayName, isDeletePending, legalName]);
+  }, [baseline.name, name, isDeletePending]);
 
   const validate = useCallback(() => {
-    const nextError: { displayName?: string; name?: string } = {};
-    if (!displayName.trim()) {
-      nextError.displayName = copy.validationError;
-    }
-    if (!legalName.trim()) {
+    const nextError: { name?: string } = {};
+    if (!name.trim()) {
       nextError.name = copy.validationError;
     }
     setFieldError(nextError);
     return Object.keys(nextError).length === 0;
-  }, [copy.validationError, displayName, legalName]);
+  }, [copy.validationError, name]);
 
   const handleToggleDelete = useCallback(() => {
     if (!tenant.can_delete || isSaving) {
@@ -164,22 +149,19 @@ export function TenantConfigurationClient({
 
   const loadEditFromTenant = useCallback(() => {
     setEditorContext("edit");
-    setDisplayName(tenant.display_name);
-    setLegalName(tenant.name);
+    setName(tenant.name);
     setBaseline({
-      displayName: tenant.display_name,
-      legalName: tenant.name
+      name: tenant.name
     });
     setFieldError({});
     setRequestErrorMessage(null);
     setIsDeletePending(false);
-  }, [tenant.display_name, tenant.name]);
+  }, [tenant.name]);
 
   const collapseToNone = useCallback(() => {
     setEditorContext("none");
-    setDisplayName("");
-    setLegalName("");
-    setBaseline({ displayName: "", legalName: "" });
+    setName("");
+    setBaseline({ name: "" });
     setFieldError({});
     setRequestErrorMessage(null);
     setIsDeletePending(false);
@@ -205,9 +187,8 @@ export function TenantConfigurationClient({
     bumpNewIntent();
     if (editorContext !== "new") {
       setEditorContext("new");
-      setDisplayName("");
-      setLegalName("");
-      setBaseline({ displayName: "", legalName: "" });
+      setName("");
+      setBaseline({ name: "" });
       setFieldError({});
       setRequestErrorMessage(null);
       setIsDeletePending(false);
@@ -234,8 +215,7 @@ export function TenantConfigurationClient({
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              display_name: displayName.trim(),
-              name: legalName.trim()
+              name: name.trim()
             })
           }
       );
@@ -261,16 +241,13 @@ export function TenantConfigurationClient({
       setIsDeletePending(false);
       if (updated.can_edit) {
         bumpNewIntent();
-        setDisplayName("");
-        setLegalName("");
-        setBaseline({ displayName: "", legalName: "" });
+        setName("");
+        setBaseline({ name: "" });
         setEditorContext("new");
       } else {
-        setDisplayName(updated.display_name);
-        setLegalName(updated.name);
+        setName(updated.name);
         setBaseline({
-          displayName: updated.display_name,
-          legalName: updated.name
+          name: updated.name
         });
         setEditorContext("edit");
       }
@@ -285,10 +262,9 @@ export function TenantConfigurationClient({
     bumpNewIntent,
     copy.deleteError,
     copy.saveError,
-    displayName,
+    name,
     editorContext,
     isDeletePending,
-    legalName,
     locale,
     router,
     validate
@@ -302,20 +278,20 @@ export function TenantConfigurationClient({
   });
 
   const footerErrorMessage =
-    requestErrorMessage ?? fieldError.name ?? fieldError.displayName ?? null;
+    requestErrorMessage ?? fieldError.name ?? null;
 
-  const asideTitle = resolveAsideTitle(tenant.display_name, tenant.name, tenant.id);
-  const asideCaption = tenant.name.trim() || `#${tenant.id}`;
+  const asideTitle = resolveAsideTitle(tenant.name, tenant.id);
+  const asideCaption = `#${tenant.id}`;
   const tenantMatchesFilter = useMemo(() => {
     const normalizedQuery = normalizeTextForSearch(filterQuery);
     if (!normalizedQuery) {
       return true;
     }
     const candidateText = normalizeTextForSearch(
-      `${tenant.display_name} ${tenant.name} ${String(tenant.id)}`
+      `${tenant.name} ${String(tenant.id)}`
     );
     return candidateText.includes(normalizedQuery);
-  }, [filterQuery, tenant.display_name, tenant.id, tenant.name]);
+  }, [filterQuery, tenant.id, tenant.name]);
 
   return (
     <ConfigurationDirectoryEditorShell
@@ -393,22 +369,18 @@ export function TenantConfigurationClient({
       }
       editorForm={
         <>
-          <ConfigurationNameDisplayNameFields
-            nameInputId="tenant-legal-name"
-            displayTextareaId="tenant-display-name"
-            name={legalName}
-            displayName={displayName}
-            setName={setLegalName}
-            setDisplayName={setDisplayName}
+          <ConfigurationNameField
+            inputId="tenant-name"
+            name={name}
+            setName={setName}
             setFieldError={setFieldError}
             fieldError={fieldError}
             disabled={isDeletePending || !tenant.can_edit}
-            nameLabel={copy.legalNameLabel}
-            nameHint={copy.legalNameHint}
-            displayNameLabel={copy.displayNameLabel}
-            displayNameHint={copy.displayNameHint}
+            label={copy.nameLabel}
+            hint={copy.nameHint}
             flashActive={isEditorFlashActive}
             onAfterFieldEdit={() => setRequestErrorMessage(null)}
+            multiline
           />
 
         </>

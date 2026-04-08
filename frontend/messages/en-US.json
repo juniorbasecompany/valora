@@ -89,7 +89,7 @@
     "cards": {
       "organization": {
         "title": "Tenant",
-        "description": "The contracting organization for this workspace: the name shown in the top bar, tenant switcher, and other surfaces. Here you align display name (what people see every day) and full legal or formal name when you need an official reference. Changes apply to the tenant active in your session; if you manage more than one, switch from the menu before editing."
+        "description": "The contracting organization for this workspace: the name shown in the top bar, tenant switcher, and other surfaces. Changes apply to the tenant active in your session; if you manage more than one, switch from the menu before editing."
       },
       "member": {
         "title": "Members",
@@ -130,10 +130,8 @@
     },
     "section": {
       "profile": {
-        "displayNameLabel": "Display name",
-        "displayNameHint": "Used across the tenant's internal surfaces.",
-        "nameLabel": "Full name",
-        "nameHint": "Use the most complete name for administrative reference."
+        "nameLabel": "Name",
+        "nameHint": "Member name shown across this tenant's internal surfaces."
       },
       "invite": {
         "emailFieldHint": "Enter the email that will receive the invite. First sign-in uses a Google account with that same address."
@@ -219,9 +217,7 @@
     "section": {
       "identity": {
         "nameLabel": "Scope name",
-        "nameHint": "Use a short label to identify the scope, such as Poultry, Soy, or Milk.",
-        "displayNameLabel": "Scope description",
-        "displayNameHint": "Explain the scope slice with more context, such as Poultry for egg production."
+        "nameHint": "Identify the scope slice (for example Poultry, Soy, Milk) with the context your operation needs."
       },
       "info": {
         "title": "Information",
@@ -672,9 +668,7 @@
     "section": {
       "identity": {
         "nameLabel": "Location name",
-        "nameHint": "Use a short name to identify this location. For example: Willow instead of Willow Farm, Brookside instead of Brookside Poultry, or East instead of East Field.",
-        "displayNameLabel": "Location description",
-        "displayNameHint": "Enter the full name of the location. For example: Willow Farm instead of Willow, Brookside Poultry instead of Brookside, or East Field instead of just East."
+        "nameHint": "Identify this location in the hierarchy with the detail your operation needs (for example Willow Farm, Brookside Poultry, East Field)."
       },
       "structure": {
         "title": "Information",
@@ -738,9 +732,7 @@
     "section": {
       "identity": {
         "nameLabel": "Short name",
-        "nameHint": "Use a short label you will recognize in daily work (for example: White, Female, Core).",
-        "displayNameLabel": "Description",
-        "displayNameHint": "Describe what this productive unit represents in the operation with a bit more context."
+        "nameHint": "Label this productive unit for daily work (for example White, Female, Core) with the context you need."
       },
       "kind": {
         "selectLabel": "Unit type",
@@ -811,17 +803,9 @@
       "empty": "No tenant matches the current filter."
     },
     "section": {
-      "display": {
-        "title": "Interface name",
-        "description": "Short label shown across the application for the active tenant.",
-        "nameLabel": "Display name",
-        "nameHint": "Used in the top bar, tenant switcher, and other navigation surfaces."
-      },
-      "legal": {
-        "title": "Full legal name",
-        "description": "Official or complete name of the contracting organization.",
-        "nameLabel": "Full name",
-        "nameHint": "Use the formal name; it can match the display name when no shorter label is needed."
+      "name": {
+        "nameLabel": "Tenant name",
+        "nameHint": "Shown in the top bar, tenant switcher, and other screens for this organization."
       }
     },
     "action": {

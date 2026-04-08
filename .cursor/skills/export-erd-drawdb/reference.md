@@ -59,7 +59,7 @@ Regras de coerência (JSON / diagrama):
 1. Cada item **tem** as duas chaves `name` e `constraint` (não omitir uma delas; não usar outro nome de chave).
 2. Valores **string**; evitar `name` ou `constraint` vazios após remoção de espaços, salvo convenção explícita do projeto.
 3. **Unicidade:** não duplicar o mesmo `name` em dois objetos da mesma lista `constraints` da mesma tabela.
-4. **Alinhamento com colunas:** dentro de `constraint`, referir colunas pelos **mesmos** nomes que em `fields[].name` dessa tabela (ex.: `display_name`, não um alias inventado só no JSON).
+4. **Alinhamento com colunas:** dentro de `constraint`, referir colunas pelos **mesmos** nomes que em `fields[].name` dessa tabela (ex.: `tenant_id`, não um alias inventado só no JSON).
 5. **Prefixo do `name` com o nome da tabela:** cada `name` de constraint deve começar pelo `name` da tabela (normalizado se necessário) + `_` + sufixo, para evitar colisões globais no catálogo do banco e manter rastreabilidade.
 6. **`constraint` apenas SQL/DDL:** o valor de `constraint` deve conter **somente** a expressão SQL/DDL (ex.: `CHECK (...)`, `UNIQUE (...)`, `UNIQUE (...) WHERE ...`), **sem** descrições em português, explicações, comentários ou prefixos como "DDL sugerido (PostgreSQL):". A documentação textual da regra fica no campo `comment` da tabela ou em `fields[].check` quando aplicável.
 7. **`fields[].check`:** para regra que cita uma única coluna, pode bastar o `check` do field; quando a regra envolve **mais de uma** coluna da tabela, usar `constraints` e, se quiser, um `check` curto na(s) coluna(s) a remeter à entrada em `constraints`.

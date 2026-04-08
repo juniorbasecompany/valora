@@ -35,7 +35,6 @@ export function ItemConfigurationClient({
       historyTableName="item"
       formIds={{
         nameInput: "item-name",
-        displayTextarea: "item-display-name",
         historyHeading: "item-history-heading"
       }}
       getParentId={(row) => row.parent_item_id ?? null}

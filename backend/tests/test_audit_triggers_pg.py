@@ -44,7 +44,6 @@ def pg_session() -> Session:
 def _create_account(pg_session: Session, *, suffix: str) -> Account:
     account = Account(
         name="Audit Actor",
-        display_name="Audit Actor",
         email=f"audit-{suffix}@example.com",
         provider="test",
         provider_subject=f"audit-{suffix}",
@@ -58,7 +57,6 @@ def _create_account(pg_session: Session, *, suffix: str) -> Account:
 def _create_tenant(pg_session: Session, *, suffix: str, account: Account) -> Tenant:
     tenant = Tenant(
         name=f"Audit Tenant {suffix}",
-        display_name=f"Audit Tenant {suffix}",
     )
     pg_session.add(tenant)
     apply_audit_gucs_for_session(pg_session, None, account.id)
@@ -73,11 +71,9 @@ def _create_scope(
     tenant: Tenant,
     account: Account,
     name: str,
-    display_name: str,
 ) -> Scope:
     scope = Scope(
         name=name,
-        display_name=display_name,
         tenant_id=tenant.id,
     )
     pg_session.add(scope)
@@ -130,7 +126,6 @@ def test_audit_log_after_insert_scope_with_set_config(pg_session: Session) -> No
             tenant=tenant,
             account=account,
             name="s1",
-            display_name="Scope audit",
         )
 
         row = pg_session.scalar(
@@ -175,7 +170,6 @@ def test_audit_log_delete_has_null_row(pg_session: Session) -> None:
         tenant=tenant,
         account=account,
         name="to-del",
-        display_name="del",
     )
     scope_id = scope.id
     try:
@@ -216,7 +210,6 @@ def test_audit_scope_insert_without_context_fails(pg_session: Session) -> None:
         pg_session.add(
             Scope(
                 name="missing-context",
-                display_name="missing-context",
                 tenant_id=tenant.id,
             )
         )
@@ -237,7 +230,7 @@ def test_audit_account_update_clears_stale_tenant_context(pg_session: Session) -
     try:
         apply_audit_gucs_for_session(pg_session, tenant.id, account.id)
         apply_audit_gucs_for_session(pg_session, None, account.id)
-        account.display_name = "Audit Actor Updated"
+        account.name = "Audit Actor Updated"
         pg_session.add(account)
         pg_session.commit()
 
@@ -272,7 +265,6 @@ def test_audit_log_keeps_historical_ids_after_parent_delete(
             tenant=tenant,
             account=account,
             name="history-scope",
-            display_name="history-scope",
         )
         historical_row = pg_session.scalar(
             select(Log)
@@ -326,7 +318,6 @@ def test_audit_session_reapplies_context_before_flush_when_request_state_arrives
         tenant=tenant,
         account=account,
         name="late-context",
-        display_name="late-context",
     )
 
     request = SimpleNamespace(state=SimpleNamespace())

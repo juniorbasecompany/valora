@@ -8,7 +8,7 @@ import {
   directoryEditorSaveDisabled
 } from "@/component/configuration/configuration-directory-editor-policy";
 import { ConfigurationDirectoryEditorShell } from "@/component/configuration/configuration-directory-editor-shell";
-import { ConfigurationNameDisplayNameFields } from "@/component/configuration/configuration-name-display-name-fields";
+import { ConfigurationNameField } from "@/component/configuration/configuration-name-field";
 import { ConfigurationDirectoryCreateButton } from "@/component/configuration/configuration-directory-create-button";
 import { ConfigurationDirectoryListToolbarRow } from "@/component/configuration/configuration-directory-list-toolbar-row";
 import {
@@ -38,8 +38,6 @@ export type ScopeConfigurationCopy = {
   filterToggleLabel: string;
   nameLabel: string;
   nameHint: string;
-  displayNameLabel: string;
-  displayNameHint: string;
   cancel: string;
   directoryCreateLabel: string;
   delete: string;
@@ -63,7 +61,7 @@ type ScopeConfigurationClientProps = {
 type ScopeSelectionKey = number | "new" | null;
 
 function resolveScopeLabel(scope: TenantScopeRecord) {
-  return scope.name.trim() || scope.display_name.trim() || "-";
+  return scope.name.trim() || "-";
 }
 
 function parseSelectedScopeKey(raw: string | null): ScopeSelectionKey {
@@ -138,16 +136,11 @@ export function ScopeConfigurationClient({
   );
   const [isCreateMode, setIsCreateMode] = useState(initialSelectedScopeKey === "new");
   const [name, setName] = useState(initialSelectedScope?.name ?? "");
-  const [displayName, setDisplayName] = useState(
-    initialSelectedScope?.display_name ?? ""
-  );
   const [baseline, setBaseline] = useState({
-    name: initialSelectedScope?.name ?? "",
-    displayName: initialSelectedScope?.display_name ?? ""
+    name: initialSelectedScope?.name ?? ""
   });
   const [fieldError, setFieldError] = useState<{
     name?: string;
-    displayName?: string;
   }>({});
   const [requestErrorMessage, setRequestErrorMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -192,7 +185,7 @@ export function ScopeConfigurationClient({
       return null;
     }
 
-    return `id:${String(selectedScope.id)}:name:${selectedScope.name}:display:${selectedScope.display_name}`;
+    return `id:${String(selectedScope.id)}:name:${selectedScope.name}`;
   }, [isCreateMode, newIntentGeneration, selectedScope]);
 
   const isEditorFlashActive = useEditorPanelFlash(editorPanelElementRef, editorFlashKey);
@@ -223,10 +216,8 @@ export function ScopeConfigurationClient({
       setIsCreateMode(nextKey === "new");
       setSelectedScopeId(typeof nextKey === "number" ? nextKey : null);
       setName(nextSelectedScope?.name ?? "");
-      setDisplayName(nextSelectedScope?.display_name ?? "");
       setBaseline({
-        name: nextSelectedScope?.name ?? "",
-        displayName: nextSelectedScope?.display_name ?? ""
+        name: nextSelectedScope?.name ?? ""
       });
       setFieldError({});
       setRequestErrorMessage(null);
@@ -285,25 +276,20 @@ export function ScopeConfigurationClient({
   const isDirty = useMemo(() => {
     return (
       name.trim() !== baseline.name.trim() ||
-      displayName.trim() !== baseline.displayName.trim() ||
       isDeletePending
     );
-  }, [baseline.displayName, baseline.name, displayName, isDeletePending, name]);
+  }, [baseline.name, isDeletePending, name]);
 
   const validate = useCallback(() => {
-    const nextError: { name?: string; displayName?: string } = {};
+    const nextError: { name?: string } = {};
 
     if (!name.trim()) {
       nextError.name = copy.validationError;
     }
 
-    if (!displayName.trim()) {
-      nextError.displayName = copy.validationError;
-    }
-
     setFieldError(nextError);
     return Object.keys(nextError).length === 0;
-  }, [copy.validationError, displayName, name]);
+  }, [copy.validationError, name]);
 
   const handleStartCreate = useCallback(() => {
     if (!directory.can_create || isSaving) {
@@ -350,8 +336,7 @@ export function ScopeConfigurationClient({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            name: name.trim(),
-            display_name: displayName.trim()
+            name: name.trim()
           })
         });
         const data: unknown = await response.json().catch(() => ({}));
@@ -383,8 +368,7 @@ export function ScopeConfigurationClient({
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              name: name.trim(),
-              display_name: displayName.trim()
+              name: name.trim()
             })
           }
       );
@@ -414,7 +398,6 @@ export function ScopeConfigurationClient({
     copy.createError,
     copy.deleteError,
     copy.saveError,
-    displayName,
     isCreateMode,
     isDeletePending,
     name,
@@ -433,7 +416,7 @@ export function ScopeConfigurationClient({
     canEdit: selectedScope?.can_edit ?? false
   });
   const footerErrorMessage =
-    requestErrorMessage ?? fieldError.name ?? fieldError.displayName ?? null;
+    requestErrorMessage ?? fieldError.name ?? null;
 
   return (
     <ConfigurationDirectoryEditorShell
@@ -498,7 +481,7 @@ export function ScopeConfigurationClient({
                   {resolveScopeLabel(item)}
                 </p>
                 <p className="ui-directory-caption-wrap">
-                  {item.display_name}
+                  {`#${item.id}`}
                 </p>
               </button>
             ))}
@@ -513,22 +496,18 @@ export function ScopeConfigurationClient({
       }
       editorForm={
         <>
-          <ConfigurationNameDisplayNameFields
-            nameInputId="scope-name"
-            displayTextareaId="scope-display-name"
+          <ConfigurationNameField
+            inputId="scope-name"
             name={name}
-            displayName={displayName}
             setName={setName}
-            setDisplayName={setDisplayName}
             setFieldError={setFieldError}
             fieldError={fieldError}
             disabled={isDeletePending || !canEditForm}
-            nameLabel={copy.nameLabel}
-            nameHint={copy.nameHint}
-            displayNameLabel={copy.displayNameLabel}
-            displayNameHint={copy.displayNameHint}
+            label={copy.nameLabel}
+            hint={copy.nameHint}
             flashActive={isEditorFlashActive}
             onAfterFieldEdit={() => setRequestErrorMessage(null)}
+            multiline
           />
         </>
       }

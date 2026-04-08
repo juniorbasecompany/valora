@@ -62,8 +62,6 @@ export default async function ItemConfigurationPage({
           filterToggleLabel: t("filter.toggleLabel"),
           nameLabel: t("section.identity.nameLabel"),
           nameHint: t("section.identity.nameHint"),
-          displayNameLabel: t("section.identity.displayNameLabel"),
-          displayNameHint: t("section.identity.displayNameHint"),
           kindSelectLabel: t("section.kind.selectLabel"),
           kindSelectHint: t("section.kind.selectHint"),
           kindSelectPlaceholder: t("section.kind.selectPlaceholder"),

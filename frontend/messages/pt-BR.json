@@ -89,7 +89,7 @@
     "cards": {
       "organization": {
         "title": "Licenciado",
-        "description": "É a organização contratante do ambiente: o nome que aparece na barra superior, no seletor de licenciado e em outras telas. Aqui você alinha nome de exibição (o que as pessoas veem no dia a dia) e nome completo ou razão social quando precisar de referência formal. As alterações valem para o licenciado ativo na sua sessão; se você administra mais de um, troque pelo menu antes de editar."
+        "description": "É a organização contratante do ambiente: o nome que aparece na barra superior, no seletor de licenciado e em outras telas. As alterações valem para o licenciado ativo na sua sessão; se você administra mais de um, troque pelo menu antes de editar."
       },
       "member": {
         "title": "Membros",
@@ -130,10 +130,8 @@
     },
     "section": {
       "profile": {
-        "displayNameLabel": "Nome de exibição",
-        "displayNameHint": "Usado nas áreas internas do licenciado.",
-        "nameLabel": "Nome completo",
-        "nameHint": "Use o nome mais completo para referência administrativa."
+        "nameLabel": "Nome",
+        "nameHint": "Nome do membro nas telas e referências internas deste licenciado."
       },
       "invite": {
         "emailFieldHint": "Informe o email que receberá o convite. O primeiro acesso usa uma conta Google com esse mesmo endereço."
@@ -211,9 +209,7 @@
     "section": {
       "identity": {
         "nameLabel": "Nome do escopo",
-        "nameHint": "Use um rótulo curto para identificar o escopo, como Aves, Soja ou Leite.",
-        "displayNameLabel": "Descrição do escopo",
-        "displayNameHint": "Explique o recorte do escopo com mais contexto, como Aves para produção de ovos."
+        "nameHint": "Identifique o recorte do escopo (ex.: Aves, Soja, Leite) com o contexto necessário para a operação."
       }
     },
     "action": {
@@ -620,9 +616,7 @@
     "section": {
       "identity": {
         "nameLabel": "Nome do local",
-        "nameHint": "Use um nome curto para identificar este local. Por exemplo: Rio Verde em vez de Fazenda Rio Verde, Piratini em vez de Aviário Piratini ou Oeste em vez de Talhão Oeste.",
-        "displayNameLabel": "Descrição do local",
-        "displayNameHint": "Informe o nome completo do local. Por exemplo: Fazenda Rio Verde em vez de Rio Verde, Aviário Piratini em vez de Piratini ou Talhão Oeste em vez de apenas Oeste."
+        "nameHint": "Identifique o local na hierarquia com o nível de detalhe necessário para a operação (ex.: Fazenda Rio Verde, Aviário Piratini, Talhão Oeste)."
       }
     },
     "dragHandleAria": "Arrastar para reordenar ou mudar o nível",
@@ -672,9 +666,7 @@
     "section": {
       "identity": {
         "nameLabel": "Nome curto",
-        "nameHint": "Use um nome curto para identificar a unidade produtiva no dia a dia (ex.: Branca, Fêmea, Matriz).",
-        "displayNameLabel": "Descrição",
-        "displayNameHint": "Descreva com mais contexto o que essa unidade produtiva representa na operação."
+        "nameHint": "Identifique a unidade produtiva no dia a dia (ex.: Branca, Fêmea, Matriz) com o contexto necessário."
       },
       "kind": {
         "selectLabel": "Tipo de unidade",
@@ -733,17 +725,9 @@
       "empty": "Nenhum licenciado encontrado para o filtro atual."
     },
     "section": {
-      "display": {
-        "title": "Nome na interface",
-        "description": "Rótulo curto exibido na aplicação para o licenciado ativo.",
-        "nameLabel": "Nome de exibição",
-        "nameHint": "Usado na barra superior, na troca de licenciado e em outras áreas de navegação."
-      },
-      "legal": {
-        "title": "Nome completo oficial",
-        "description": "Nome oficial ou completo da organização contratante.",
-        "nameLabel": "Nome completo",
-        "nameHint": "Use a denominação formal; pode coincidir com o nome de exibição quando não houver um rótulo mais curto."
+      "name": {
+        "nameLabel": "Nome do licenciado",
+        "nameHint": "Aparece na barra superior, no seletor de licenciado e em outras telas desta organização."
       }
     },
     "action": {

@@ -29,7 +29,6 @@ def test_member_column_info_marks_null_if_empty_fields() -> None:
     column_map = {column.key: column for column in member_mapper.columns}
 
     assert column_map["name"].info["null_if_empty"] is True
-    assert column_map["display_name"].info["null_if_empty"] is True
     assert column_map["account_id"].info.get("null_if_empty") is None
     assert column_map["email"].info.get("null_if_empty") is None
 
@@ -37,7 +36,6 @@ def test_member_column_info_marks_null_if_empty_fields() -> None:
 def test_normalize_model_null_if_empty_reads_metadata_from_orm() -> None:
     member = Member(
         name="",
-        display_name="",
         email="maria@example.com",
         tenant_id=1,
         account_id=0,
@@ -49,14 +47,12 @@ def test_normalize_model_null_if_empty_reads_metadata_from_orm() -> None:
 
     assert changed is True
     assert member.name is None
-    assert member.display_name is None
     assert member.account_id == 0
 
 
 def test_normalize_session_null_if_empty_converts_member_empty_value() -> None:
     member = Member(
         name="",
-        display_name="",
         email="maria@example.com",
         tenant_id=1,
         account_id=0,
@@ -68,14 +64,12 @@ def test_normalize_session_null_if_empty_converts_member_empty_value() -> None:
     normalize_session_null_if_empty(session)
 
     assert member.name is None
-    assert member.display_name is None
     assert member.account_id == 0
 
 
 def test_commit_session_with_null_if_empty_normalizes_before_commit() -> None:
     member = Member(
         name="",
-        display_name="Maria",
         email="maria@example.com",
         tenant_id=1,
         account_id=0,

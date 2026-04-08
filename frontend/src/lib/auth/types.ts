@@ -3,7 +3,6 @@ export type LoginAction = "issue_token" | "select_tenant" | "create_tenant";
 export type TenantOption = {
   tenant_id: number;
   name: string;
-  display_name: string;
   role: number;
 };
 
@@ -11,7 +10,6 @@ export type InviteOption = {
   member_id: number;
   tenant_id: number;
   name: string;
-  display_name: string;
   role: number;
   status: string;
 };
@@ -33,7 +31,6 @@ export type TenantListResponse = {
 export type TenantCurrentResponse = {
   id: number;
   name: string;
-  display_name: string;
   can_edit: boolean;
   can_delete: boolean;
 };
@@ -45,7 +42,6 @@ export type TenantDeleteResponse = {
 export type TenantMemberRecord = {
   id: number;
   name?: string | null;
-  display_name?: string | null;
   email: string;
   role: number;
   role_name: string;
@@ -66,7 +62,6 @@ export type TenantMemberDirectoryResponse = {
 export type TenantScopeRecord = {
   id: number;
   name: string;
-  display_name: string;
   can_edit: boolean;
   can_delete: boolean;
 };
@@ -82,7 +77,6 @@ export type TenantScopeDirectoryResponse = {
 export type TenantScopeHierarchyItemBase = {
   id: number;
   name: string;
-  display_name: string;
   sort_order: number;
   depth: number;
   path_labels: string[];
@@ -101,7 +95,6 @@ export type TenantLocationRecord = TenantScopeHierarchyItemBase & {
 export type TenantLocationDirectoryResponse = {
   scope_id: number;
   scope_name: string;
-  scope_display_name: string;
   can_edit: boolean;
   can_create: boolean;
   item_list: TenantLocationRecord[];
@@ -110,7 +103,6 @@ export type TenantLocationDirectoryResponse = {
 export type TenantKindRecord = {
   id: number;
   name: string;
-  display_name: string;
   /** Itens no escopo com `item.kind_id` igual a este tipo. */
   reference_count: number;
 };
@@ -128,7 +120,6 @@ export type TenantItemRecord = TenantScopeHierarchyItemBase & {
 export type TenantItemDirectoryResponse = {
   scope_id: number;
   scope_name: string;
-  scope_display_name: string;
   can_edit: boolean;
   can_create: boolean;
   kind_list: TenantKindRecord[];
@@ -138,7 +129,7 @@ export type TenantItemDirectoryResponse = {
 export type TenantUnityRecord = {
   id: number;
   location_id: number;
-  location_display_name: string;
+  location_name: string;
   item_id_list: number[];
   item_display_label_list: string[];
   creation_utc: string;
@@ -149,7 +140,6 @@ export type TenantUnityRecord = {
 export type TenantUnityDirectoryResponse = {
   scope_id: number;
   scope_name: string;
-  scope_display_name: string;
   can_edit: boolean;
   can_create: boolean;
   item_list: TenantUnityRecord[];
@@ -307,7 +297,6 @@ export type AuthSessionResponse = {
     id: number;
     email: string;
     name: string;
-    display_name: string;
     provider: string;
   };
   member: {
@@ -315,14 +304,12 @@ export type AuthSessionResponse = {
     role: number;
     status: string;
     name?: string | null;
-    display_name?: string | null;
     email: string;
     current_scope_id?: number | null;
   };
   tenant: {
     id: number;
     name: string;
-    display_name: string;
   };
 };
 

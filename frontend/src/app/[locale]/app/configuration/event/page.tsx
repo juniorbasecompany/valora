@@ -9,7 +9,8 @@ import {
   getTenantScopeActionDirectory,
   getTenantScopeDirectory,
   getTenantScopeEventDirectory,
-  getTenantItemDirectory
+  getTenantItemDirectory,
+  getTenantUnityDirectory
 } from "@/lib/auth/server-session";
 import { mapAppLocaleToLabelLang } from "@/lib/i18n/label-lang";
 
@@ -34,15 +35,16 @@ export default async function EventConfigurationPage({ params }: EventConfigurat
     ) ?? null;
   const labelLang = mapAppLocaleToLabelLang(locale);
 
-  const [eventDirectory, locationDirectory, itemDirectory, actionDirectory] =
+  const [eventDirectory, locationDirectory, itemDirectory, actionDirectory, unityDirectory] =
     currentScope != null
       ? await Promise.all([
         getTenantScopeEventDirectory(currentScope.id, { label_lang: labelLang }),
         getTenantLocationDirectory(currentScope.id),
         getTenantItemDirectory(currentScope.id),
-        getTenantScopeActionDirectory(currentScope.id, labelLang)
+        getTenantScopeActionDirectory(currentScope.id, labelLang),
+        getTenantUnityDirectory(currentScope.id)
       ])
-      : [null, null, null, null];
+      : [null, null, null, null, null];
 
   const t = await getTranslations("EventConfigurationPage");
   const tState = await getTranslations("State");
@@ -64,6 +66,7 @@ export default async function EventConfigurationPage({ params }: EventConfigurat
         initialLocationDirectory={locationDirectory}
         initialItemDirectory={itemDirectory}
         initialActionDirectory={actionDirectory}
+        initialUnityDirectory={unityDirectory}
         copy={{
           title: t("title"),
           description: t("description"),
@@ -74,6 +77,8 @@ export default async function EventConfigurationPage({ params }: EventConfigurat
           historyDescription: t("history.description"),
           momentLabel: t("section.moment.label"),
           momentHint: t("section.moment.hint"),
+          unityLabel: t("section.unity.label"),
+          unityHint: t("section.unity.hint"),
           locationLabel: t("section.location.label"),
           locationHint: t("section.location.hint"),
           itemLabel: t("section.item.label"),

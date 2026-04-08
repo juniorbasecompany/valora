@@ -443,27 +443,6 @@ def _item_in_scope_or_404(
     return row
 
 
-def _validate_event_unity_for_scope_or_400(
-    session: Session,
-    *,
-    scope_id: int,
-    unity_id: int,
-    location_id: int,
-    item_id: int,
-) -> None:
-    unity = _get_scope_unity_or_404(session, scope_id=scope_id, unity_id=unity_id)
-    if unity.location_id != location_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Event location_id must match the selected unity location",
-        )
-    if item_id not in list(unity.item_id_list):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Event item_id must be among the unity item_id_list",
-        )
-
-
 def _event_in_scope_or_404(
     session: Session, *, scope_id: int, event_id: int
 ) -> Event:
@@ -2373,13 +2352,7 @@ def create_scope_event(
     if moment.tzinfo is not None:
         moment = moment.astimezone(UTC).replace(tzinfo=None)
     if body.unity_id is not None:
-        _validate_event_unity_for_scope_or_400(
-            session,
-            scope_id=scope_id,
-            unity_id=body.unity_id,
-            location_id=body.location_id,
-            item_id=body.item_id,
-        )
+        _get_scope_unity_or_404(session, scope_id=scope_id, unity_id=body.unity_id)
     row = Event(
         unity_id=body.unity_id,
         location_id=body.location_id,
@@ -2436,13 +2409,7 @@ def patch_scope_event(
     if "unity_id" in body.model_fields_set:
         row.unity_id = body.unity_id
     if row.unity_id is not None:
-        _validate_event_unity_for_scope_or_400(
-            session,
-            scope_id=scope_id,
-            unity_id=row.unity_id,
-            location_id=row.location_id,
-            item_id=row.item_id,
-        )
+        _get_scope_unity_or_404(session, scope_id=scope_id, unity_id=row.unity_id)
     session.add(row)
     _apply_member_audit_context(session, member)
     commit_session_with_null_if_empty(session)

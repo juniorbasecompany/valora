@@ -446,6 +446,10 @@
         "label": "Data e hora do evento",
         "hint": "Informe o momento em que o evento aconteceu. O sistema salva em UTC e exibe no seu horário local."
       },
+      "unity": {
+        "label": "Unidade",
+        "hint": "Selecione a unidade relacionada ao evento, se houver."
+      },
       "location": {
         "label": "Local",
         "hint": "Selecione o local onde o evento aconteceu."

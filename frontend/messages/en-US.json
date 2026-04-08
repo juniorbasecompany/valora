@@ -446,6 +446,10 @@
         "label": "Event date and time",
         "hint": "Enter when the event happened. The system stores UTC and shows your local time."
       },
+      "unity": {
+        "label": "Unity",
+        "hint": "Select the unity related to the event, if any."
+      },
       "location": {
         "label": "Location",
         "hint": "Choose where the event happened."

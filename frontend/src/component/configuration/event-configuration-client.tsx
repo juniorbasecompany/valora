@@ -30,7 +30,8 @@ import type {
   TenantScopeEventRecord,
   TenantScopeFieldDirectoryResponse,
   TenantScopeRecord,
-  TenantItemDirectoryResponse
+  TenantItemDirectoryResponse,
+  TenantUnityDirectoryResponse
 } from "@/lib/auth/types";
 import { parseErrorDetail } from "@/lib/api/parse-error-detail";
 import type { LabelLang } from "@/lib/i18n/label-lang";
@@ -51,6 +52,8 @@ export type EventConfigurationCopy = {
   historyDescription: string;
   momentLabel: string;
   momentHint: string;
+  unityLabel: string;
+  unityHint: string;
   locationLabel: string;
   locationHint: string;
   itemLabel: string;
@@ -104,6 +107,7 @@ type EventConfigurationClientProps = {
   initialLocationDirectory: TenantLocationDirectoryResponse | null;
   initialItemDirectory: TenantItemDirectoryResponse | null;
   initialActionDirectory: TenantScopeActionDirectoryResponse | null;
+  initialUnityDirectory: TenantUnityDirectoryResponse | null;
   copy: EventConfigurationCopy;
 };
 
@@ -317,9 +321,9 @@ function updateEventDirectoryInputSummary(
     item_list: directory.item_list.map((item) =>
       item.id === eventId
         ? {
-            ...item,
-            input_summary: inputSummary
-          }
+          ...item,
+          input_summary: inputSummary
+        }
         : item
     )
   };
@@ -378,6 +382,7 @@ export function EventConfigurationClient({
   initialLocationDirectory,
   initialItemDirectory,
   initialActionDirectory,
+  initialUnityDirectory,
   copy
 }: EventConfigurationClientProps) {
   const router = useRouter();
@@ -441,16 +446,25 @@ export function EventConfigurationClient({
     [initialActionDirectory?.item_list]
   );
 
+  const unityOptionList = useMemo(
+    () =>
+      (initialUnityDirectory?.item_list ?? []).map((item) => ({
+        id: item.id,
+        label: item.name.trim() || `#${item.id}`
+      })),
+    [initialUnityDirectory?.item_list]
+  );
+
   const [directory, setDirectory] = useState<TenantScopeEventDirectoryResponse | null>(() =>
     initialEventDirectory == null
       ? null
       : {
-          ...initialEventDirectory,
-          item_list: sortEventDirectoryItemListOldestFirst(
-            initialEventDirectory.item_list,
-            actionSortOrderById
-          )
-        }
+        ...initialEventDirectory,
+        item_list: sortEventDirectoryItemListOldestFirst(
+          initialEventDirectory.item_list,
+          actionSortOrderById
+        )
+      }
   );
 
   const initialSelectedEventKey =
@@ -475,6 +489,9 @@ export function EventConfigurationClient({
       ? toLocalMomentInputFromUtc(initialSelectedEvent.moment_utc)
       : nowLocalMomentInput()
   );
+  const [unityId, setUnityId] = useState<number | null>(
+    initialSelectedEvent?.unity_id ?? null
+  );
   const [locationId, setLocationId] = useState<number | null>(
     initialSelectedEvent?.location_id ?? null
   );
@@ -488,6 +505,7 @@ export function EventConfigurationClient({
     momentInput: initialSelectedEvent
       ? toLocalMomentInputFromUtc(initialSelectedEvent.moment_utc)
       : nowLocalMomentInput(),
+    unityId: initialSelectedEvent?.unity_id ?? null,
     locationId: initialSelectedEvent?.location_id ?? null,
     itemId: initialSelectedEvent?.item_id ?? null,
     actionId: initialSelectedEvent?.action_id ?? null
@@ -582,11 +600,13 @@ export function EventConfigurationClient({
         setSelectedEventId(null);
         const nextMomentInput = nowLocalMomentInput();
         setMomentInput(nextMomentInput);
+        setUnityId(null);
         setLocationId(null);
         setItemId(null);
         setActionId(null);
         setBaseline({
           momentInput: nextMomentInput,
+          unityId: null,
           locationId: null,
           itemId: null,
           actionId: null
@@ -619,6 +639,7 @@ export function EventConfigurationClient({
       const nextMomentInput = nextSelectedEvent
         ? toLocalMomentInputFromUtc(nextSelectedEvent.moment_utc)
         : nowLocalMomentInput();
+      const nextUnityId = nextSelectedEvent?.unity_id ?? null;
       const nextLocationId = nextSelectedEvent?.location_id ?? null;
       const nextItemId = nextSelectedEvent?.item_id ?? null;
       const nextActionId = nextSelectedEvent?.action_id ?? null;
@@ -627,11 +648,13 @@ export function EventConfigurationClient({
       setIsCreateMode(nextKey === "new");
       setSelectedEventId(typeof nextKey === "number" ? nextKey : null);
       setMomentInput(nextMomentInput);
+      setUnityId(nextUnityId);
       setLocationId(nextLocationId);
       setItemId(nextItemId);
       setActionId(nextActionId);
       setBaseline({
         momentInput: nextMomentInput,
+        unityId: nextUnityId,
         locationId: nextLocationId,
         itemId: nextItemId,
         actionId: nextActionId
@@ -693,52 +716,52 @@ export function EventConfigurationClient({
   }, [loadScopeFieldOptionList]);
 
   const loadEventDirectory = useCallback(async () => {
-      if (scopeId == null) {
-        syncFromDirectory(null, null);
+    if (scopeId == null) {
+      syncFromDirectory(null, null);
+      return;
+    }
+
+    const fetchGenerationAtStart = captureGenerationAtFetchStart();
+    const query = new URLSearchParams();
+    const filterMomentFromUtc = toUtcIsoFromLocalInput(filterMomentFromInput);
+    const filterMomentToUtc = toUtcIsoFromLocalInput(filterMomentToInput);
+    if (filterMomentFromUtc) {
+      query.set("moment_from_utc", filterMomentFromUtc);
+    }
+    if (filterMomentToUtc) {
+      query.set("moment_to_utc", filterMomentToUtc);
+    }
+    for (const locationId of filterLocationIdList) {
+      query.append("location_id", String(locationId));
+    }
+    for (const itemId of filterItemIdList) {
+      query.append("item_id", String(itemId));
+    }
+    if (filterActionId != null) {
+      query.set("action_id", String(filterActionId));
+    }
+    query.set("label_lang", labelLang);
+
+    try {
+      const response = await fetch(
+        `/api/auth/tenant/current/scopes/${scopeId}/events?${query.toString()}`
+      );
+      const data: unknown = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setRequestErrorMessage(parseErrorDetail(data, copy.loadError) ?? copy.loadError);
         return;
       }
-
-      const fetchGenerationAtStart = captureGenerationAtFetchStart();
-      const query = new URLSearchParams();
-      const filterMomentFromUtc = toUtcIsoFromLocalInput(filterMomentFromInput);
-      const filterMomentToUtc = toUtcIsoFromLocalInput(filterMomentToInput);
-      if (filterMomentFromUtc) {
-        query.set("moment_from_utc", filterMomentFromUtc);
+      if (isFetchResultStale(fetchGenerationAtStart)) {
+        return;
       }
-      if (filterMomentToUtc) {
-        query.set("moment_to_utc", filterMomentToUtc);
-      }
-      for (const locationId of filterLocationIdList) {
-        query.append("location_id", String(locationId));
-      }
-      for (const itemId of filterItemIdList) {
-        query.append("item_id", String(itemId));
-      }
-      if (filterActionId != null) {
-        query.set("action_id", String(filterActionId));
-      }
-      query.set("label_lang", labelLang);
-
-      try {
-        const response = await fetch(
-          `/api/auth/tenant/current/scopes/${scopeId}/events?${query.toString()}`
-        );
-        const data: unknown = await response.json().catch(() => ({}));
-        if (!response.ok) {
-          setRequestErrorMessage(parseErrorDetail(data, copy.loadError) ?? copy.loadError);
-          return;
-        }
-        if (isFetchResultStale(fetchGenerationAtStart)) {
-          return;
-        }
-        syncFromDirectory(
-          data as TenantScopeEventDirectoryResponse,
-          selectedEventKeyRef.current
-        );
-      } catch {
-        setRequestErrorMessage(copy.loadError);
-      }
-    },
+      syncFromDirectory(
+        data as TenantScopeEventDirectoryResponse,
+        selectedEventKeyRef.current
+      );
+    } catch {
+      setRequestErrorMessage(copy.loadError);
+    }
+  },
     [
       captureGenerationAtFetchStart,
       copy.loadError,
@@ -925,6 +948,7 @@ export function EventConfigurationClient({
   const isDirty = useMemo(
     () =>
       momentInput.trim() !== baseline.momentInput.trim() ||
+      unityId !== baseline.unityId ||
       locationId !== baseline.locationId ||
       itemId !== baseline.itemId ||
       actionId !== baseline.actionId ||
@@ -936,11 +960,13 @@ export function EventConfigurationClient({
       baseline.locationId,
       baseline.momentInput,
       baseline.itemId,
+      baseline.unityId,
       eventActionInputDirty,
       isDeletePending,
       locationId,
       momentInput,
-      itemId
+      itemId,
+      unityId
     ]
   );
 
@@ -1198,6 +1224,7 @@ export function EventConfigurationClient({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            unity_id: unityId,
             location_id: locationId,
             item_id: itemId,
             action_id: actionId,
@@ -1241,6 +1268,7 @@ export function EventConfigurationClient({
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
+              unity_id: unityId,
               location_id: locationId,
               item_id: itemId,
               action_id: actionId,
@@ -1322,6 +1350,7 @@ export function EventConfigurationClient({
     persistEventActionInputDraftList,
     refreshSavedEventActionInputState,
     itemId,
+    unityId,
     validate
   ]);
 
@@ -1459,6 +1488,33 @@ export function EventConfigurationClient({
           <>
             <section className="ui-card ui-form-section ui-border-accent">
               <EditorPanelFlashOverlay active={isEditorFlashActive} />
+              <div className="ui-field">
+                <label className="ui-field-label" htmlFor="event-unity">
+                  {copy.unityLabel}
+                </label>
+                <select
+                  id="event-unity"
+                  className="ui-input ui-input-select"
+                  value={unityId == null ? "" : String(unityId)}
+                  onChange={(event) => {
+                    const raw = event.target.value;
+                    setUnityId(raw === "" ? null : parseNumericFilter(raw));
+                    setRequestErrorMessage(null);
+                  }}
+                  disabled={isDeletePending || !canEditForm}
+                >
+                  <option value="" aria-label={copy.filterAllAria}></option>
+                  {unityOptionList.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+                <p className="ui-field-hint">{copy.unityHint}</p>
+              </div>
+            </section>
+
+            <section className="ui-card ui-form-section ui-border-accent">
               <HierarchySingleSelectField
                 id="event-location"
                 label={copy.locationLabel}

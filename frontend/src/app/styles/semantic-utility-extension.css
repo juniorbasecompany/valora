@@ -697,9 +697,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: normal;
   line-height: 1.15rem;
+  color: var(--color-text-subtle);
+}
+
+.ui-directory-hierarchy-row span {
+  font-weight: inherit;
+  color: inherit;
 }
 
 .ui-directory-date {

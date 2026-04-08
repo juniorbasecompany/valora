@@ -284,6 +284,15 @@ class Event(Base):
         autoincrement=True,
         comment="Identificador do evento.",
     )
+    unity_id: Mapped[int | None] = mapped_column(
+        BIGINT_COMPAT,
+        ForeignKey("unity.id", onupdate="CASCADE", ondelete="RESTRICT"),
+        nullable=True,
+        comment=(
+            "Ligação opcional ao lote (unidade). Se preenchido, deve ser consistente "
+            "com location_id e item_id."
+        ),
+    )
     location_id: Mapped[int] = mapped_column(
         BIGINT_COMPAT,
         ForeignKey("location.id", onupdate="CASCADE", ondelete="RESTRICT"),

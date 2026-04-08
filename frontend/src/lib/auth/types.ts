@@ -128,6 +128,7 @@ export type TenantItemDirectoryResponse = {
 
 export type TenantUnityRecord = {
   id: number;
+  name: string;
   location_id: number;
   location_name: string;
   item_id_list: number[];
@@ -178,6 +179,7 @@ export type TenantScopeActionDirectoryResponse = {
 
 export type TenantScopeEventRecord = {
   id: number;
+  unity_id?: number | null;
   location_id: number;
   item_id: number;
   action_id: number;

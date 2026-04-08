@@ -393,6 +393,10 @@
       "confirm": "Ok"
     },
     "section": {
+      "name": {
+        "label": "Name",
+        "hint": "Short label for the batch or group (for example house A, batch 12)."
+      },
       "location": {
         "label": "Location",
         "hint": "Operational location where this unit is allocated."
@@ -417,7 +421,8 @@
       "delete": "Could not delete the unit. Try again.",
       "validationItem": "Select at least one catalog item.",
       "validationLocation": "Add a location to the scope before creating a unit.",
-      "validationLocationSelect": "Select a location."
+      "validationLocationSelect": "Select a location.",
+      "validationName": "Enter a name for the unit."
     },
     "discardConfirm": "Discard unsaved changes?"
   },

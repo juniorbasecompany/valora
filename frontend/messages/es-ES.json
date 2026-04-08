@@ -393,6 +393,10 @@
       "confirm": "Ok"
     },
     "section": {
+      "name": {
+        "label": "Nombre",
+        "hint": "Nombre corto para identificar el lote o grupo (por ejemplo galpón A, lote 12)."
+      },
       "location": {
         "label": "Ubicación",
         "hint": "Ubicación operativa donde está asignada esta unidad."
@@ -417,7 +421,8 @@
       "delete": "No se pudo eliminar la unidad. Inténtalo de nuevo.",
       "validationItem": "Selecciona al menos un ítem del catálogo.",
       "validationLocation": "Registra una ubicación en el alcance antes de crear una unidad.",
-      "validationLocationSelect": "Selecciona una ubicación."
+      "validationLocationSelect": "Selecciona una ubicación.",
+      "validationName": "Introduce un nombre para la unidad."
     },
     "discardConfirm": "¿Descartar cambios no guardados?"
   },

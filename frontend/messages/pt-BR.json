@@ -393,6 +393,10 @@
       "confirm": "Ok"
     },
     "section": {
+      "name": {
+        "label": "Nome",
+        "hint": "Nome curto para identificar o lote ou grupo (ex.: aviário A, lote 12)."
+      },
       "location": {
         "label": "Local",
         "hint": "Local da operação onde esta unidade está alocada."
@@ -417,7 +421,8 @@
       "delete": "Não foi possível apagar a unidade. Tente novamente.",
       "validationItem": "Selecione pelo menos um item do catálogo.",
       "validationLocation": "Cadastre um local no escopo antes de criar uma unidade.",
-      "validationLocationSelect": "Selecione um local."
+      "validationLocationSelect": "Selecione um local.",
+      "validationName": "Informe um nome para a unidade."
     },
     "discardConfirm": "Descartar alterações não salvas?"
   },

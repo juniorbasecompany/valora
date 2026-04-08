@@ -472,6 +472,7 @@ class TenantItemMoveRequest(BaseModel):
 
 class TenantUnityRecord(BaseModel):
     id: int
+    name: str
     location_id: int
     location_name: str
     item_id_list: list[int]
@@ -490,8 +491,17 @@ class TenantUnityDirectoryResponse(BaseModel):
 
 
 class TenantUnityUpsertRequest(BaseModel):
+    name: str
     location_id: int
     item_id_list: list[int]
+
+    @field_validator("name")
+    @classmethod
+    def validate_unity_name(cls, value: str) -> str:
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError("name must not be empty")
+        return stripped
 
     @field_validator("location_id")
     @classmethod
@@ -1706,6 +1716,7 @@ def _build_tenant_unity_directory(
         out_list.append(
             TenantUnityRecord(
                 id=unity_row.id,
+                name=unity_row.name,
                 location_id=unity_row.location_id,
                 location_name=location_row.name,
                 item_id_list=iid_list,
@@ -3073,6 +3084,7 @@ def create_current_scope_unity(
     )
 
     unity_row = Unity(
+        name=body.name,
         location_id=body.location_id,
         item_id_list=body.item_id_list,
     )
@@ -3119,6 +3131,7 @@ def patch_current_scope_unity(
         session, scope_id=target_scope.id, item_id_list=body.item_id_list
     )
 
+    target_unity.name = body.name
     target_unity.location_id = body.location_id
     target_unity.item_id_list = body.item_id_list
     session.add(target_unity)

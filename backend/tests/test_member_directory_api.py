@@ -42,6 +42,7 @@ from valora_backend.model.identity import (
     Scope,
     Tenant,
     Item,
+    Unity,
 )
 from valora_backend.model.log import Log
 from valora_backend.model.rules import Action, Event, Field, Formula, Input, Result
@@ -272,6 +273,7 @@ def build_rules_session() -> Generator[tuple[Session, int], None, None]:
             Location.__table__,
             Kind.__table__,
             Item.__table__,
+            Unity.__table__,
             Field.__table__,
             Action.__table__,
             Formula.__table__,

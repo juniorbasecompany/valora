@@ -4,6 +4,7 @@ import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import type { CSSProperties } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+import { ConfigurationNameField } from "@/component/configuration/configuration-name-field";
 import { ConfigurationDirectoryCreateButton } from "@/component/configuration/configuration-directory-create-button";
 import { ConfigurationDirectoryListToolbarRow } from "@/component/configuration/configuration-directory-list-toolbar-row";
 import {
@@ -61,6 +62,9 @@ export type UnityConfigurationCopy = {
   validationItem: string;
   validationLocation: string;
   validationLocationSelect: string;
+  nameLabel: string;
+  nameHint: string;
+  validationName: string;
   cancel: string;
   directoryCreateLabel: string;
   delete: string;
@@ -200,6 +204,7 @@ export function UnityConfigurationClient({
       : (directory?.item_list.find((row) => row.id === selectedUnityId) ?? null);
   }, [directory?.item_list, isCreateMode, selectedUnityId]);
 
+  const [unityName, setUnityName] = useState(selectedUnity?.name ?? "");
   const [locationId, setLocationId] = useState(selectedUnity?.location_id ?? 0);
   const [pickedItemIdList, setPickedItemIdList] = useState<number[]>(() =>
     selectedUnity
@@ -208,14 +213,17 @@ export function UnityConfigurationClient({
   );
 
   const [baseline, setBaseline] = useState<{
+    name: string;
     locationId: number;
     itemIdList: number[];
   }>({
+    name: selectedUnity?.name ?? "",
     locationId: selectedUnity?.location_id ?? 0,
     itemIdList: selectedUnity ? [...selectedUnity.item_id_list] : []
   });
 
   const [fieldError, setFieldError] = useState<{
+    name?: string;
     location?: string;
     item?: string;
   }>({});
@@ -249,9 +257,11 @@ export function UnityConfigurationClient({
         setDirectory(null);
         setIsCreateMode(false);
         setSelectedUnityId(null);
+        setUnityName("");
         setLocationId(0);
         setPickedItemIdList([]);
         setBaseline({
+          name: "",
           locationId: 0,
           itemIdList: []
         });
@@ -272,6 +282,7 @@ export function UnityConfigurationClient({
           ? (nextDirectory.item_list.find((row) => row.id === nextKey) ?? null)
           : null;
 
+      const nextName = nextRow != null ? nextRow.name : "";
       const nextLoc = nextRow != null ? nextRow.location_id : 0;
       const nextStoredList = nextRow ? [...nextRow.item_id_list] : [];
       const nextPickedList = sanitizeUnityItemIdListForScope(nextStoredList, itemById);
@@ -279,9 +290,11 @@ export function UnityConfigurationClient({
       setDirectory(nextDirectory);
       setIsCreateMode(nextKey === "new");
       setSelectedUnityId(typeof nextKey === "number" ? nextKey : null);
+      setUnityName(nextName);
       setLocationId(nextLoc);
       setPickedItemIdList(nextPickedList);
       setBaseline({
+        name: nextName,
         locationId: nextLoc,
         itemIdList: nextStoredList
       });
@@ -386,16 +399,22 @@ export function UnityConfigurationClient({
   const isDirty = useMemo(() => {
     const itemEqual = areItemIdSetsEqual(expandedItemIdListForSave, baseline.itemIdList);
     return (
+      unityName.trim() !== baseline.name.trim() ||
       locationId !== baseline.locationId ||
       !itemEqual ||
       isDeletePending
     );
-  }, [baseline, expandedItemIdListForSave, isDeletePending, locationId]);
+  }, [baseline, expandedItemIdListForSave, isDeletePending, locationId, unityName]);
 
   const validate = useCallback(() => {
+    if (!unityName.trim()) {
+      setFieldError({ name: copy.validationName });
+      return false;
+    }
     if (locationId < 1) {
       const hasLocationList = (locationDirectory?.item_list.length ?? 0) > 0;
       setFieldError({
+        name: undefined,
         location: hasLocationList ? copy.validationLocationSelect : copy.validationLocation
       });
       return false;
@@ -410,9 +429,11 @@ export function UnityConfigurationClient({
     copy.validationItem,
     copy.validationLocation,
     copy.validationLocationSelect,
+    copy.validationName,
     locationDirectory?.item_list.length,
     pickedItemIdList.length,
-    locationId
+    locationId,
+    unityName
   ]);
 
   const scopeId = currentScope?.id;
@@ -432,6 +453,7 @@ export function UnityConfigurationClient({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            name: unityName.trim(),
             location_id: locationId,
             item_id_list: expandedItemIdListForSave
           })
@@ -462,6 +484,7 @@ export function UnityConfigurationClient({
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
+              name: unityName.trim(),
               location_id: locationId,
               item_id_list: expandedItemIdListForSave
             })
@@ -509,6 +532,7 @@ export function UnityConfigurationClient({
     scopeId,
     selectedUnity,
     syncFromDirectory,
+    unityName,
     validate
   ]);
 
@@ -535,20 +559,6 @@ export function UnityConfigurationClient({
       : copy.emptyScope
     : copy.loadError;
 
-  const formatCreationDate = useCallback(
-    (value: string) => {
-      const parsed = new Date(value);
-      if (Number.isNaN(parsed.getTime())) {
-        return value;
-      }
-      return new Intl.DateTimeFormat(locale, {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-      }).format(parsed);
-    },
-    [locale]
-  );
   const resolveUnityLocationPath = useCallback(
     (item: TenantUnityRecord) =>
       locationPathById.get(item.location_id) ?? item.location_name,
@@ -662,13 +672,14 @@ export function UnityConfigurationClient({
                     }
                   >
                     <p className="ui-directory-title-wrap ui-directory-title-emphasis">
-                      {resolveUnityLocationPath(item)}
+                      {item.name.trim() || `#${item.id}`}
                     </p>
+                    <p className="ui-directory-caption">{resolveUnityLocationPath(item)}</p>
                     <div className="ui-directory-hierarchy" aria-hidden>
                       {resolveUnityItemHierarchyRows(item).map((row) => (
                         <p
                           key={`${item.id}:${row.id}`}
-                          className="ui-directory-hierarchy-row ui-directory-title-emphasis"
+                          className="ui-directory-hierarchy-row"
                           style={
                             {
                               "--ui-directory-hierarchy-depth": String(row.depth)
@@ -679,9 +690,6 @@ export function UnityConfigurationClient({
                         </p>
                       ))}
                     </div>
-                    <p className="ui-directory-caption">
-                      {formatCreationDate(item.creation_utc)}
-                    </p>
                   </button>
                 </Fragment>
               ))
@@ -698,6 +706,18 @@ export function UnityConfigurationClient({
       editorForm={
         directory ? (
           <>
+            <ConfigurationNameField
+              inputId="unity-name"
+              name={unityName}
+              setName={setUnityName}
+              setFieldError={setFieldError}
+              fieldError={fieldError}
+              disabled={isDeletePending || !canEditForm}
+              label={copy.nameLabel}
+              hint={copy.nameHint}
+              onAfterFieldEdit={() => setRequestErrorMessage(null)}
+            />
+
             <section className="ui-card ui-form-section ui-border-accent">
               <HierarchySingleSelectField
                 id="unity-location"

@@ -384,6 +384,14 @@ class Unity(Base):
         autoincrement=True,
         comment="Identificador da unidade.",
     )
+    name: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+        comment=(
+            "Nome curto da unidade (lote, grupo). Dados migrados podem usar o padrão "
+            "'#<id>'."
+        ),
+    )
     location_id: Mapped[int] = mapped_column(
         BIGINT_COMPAT,
         ForeignKey("location.id", onupdate="CASCADE", ondelete="RESTRICT"),

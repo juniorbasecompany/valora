@@ -32,6 +32,7 @@ from valora_backend.model.rules import (
 )
 from valora_backend.api.auth import (
     _apply_member_audit_context,
+    _get_scope_unity_or_404,
     _normalize_expression_for_search,
     _query_term_expression_for_search,
 )
@@ -440,6 +441,27 @@ def _item_in_scope_or_404(
             detail="Item not found for current scope",
         )
     return row
+
+
+def _validate_event_unity_for_scope_or_400(
+    session: Session,
+    *,
+    scope_id: int,
+    unity_id: int,
+    location_id: int,
+    item_id: int,
+) -> None:
+    unity = _get_scope_unity_or_404(session, scope_id=scope_id, unity_id=unity_id)
+    if unity.location_id != location_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Event location_id must match the selected unity location",
+        )
+    if item_id not in list(unity.item_id_list):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Event item_id must be among the unity item_id_list",
+        )
 
 
 def _event_in_scope_or_404(
@@ -1833,6 +1855,7 @@ def _event_input_summary_by_event_id(
 
 class ScopeEventRecord(BaseModel):
     id: int
+    unity_id: int | None = None
     location_id: int
     item_id: int
     action_id: int
@@ -1850,6 +1873,7 @@ class ScopeEventCreateRequest(BaseModel):
     item_id: int
     action_id: int
     moment_utc: datetime | None = None
+    unity_id: int | None = None
 
 
 class ScopeEventPatchRequest(BaseModel):
@@ -1857,6 +1881,7 @@ class ScopeEventPatchRequest(BaseModel):
     item_id: int | None = None
     action_id: int | None = None
     moment_utc: datetime | None = None
+    unity_id: int | None = None
 
 
 class ScopeCurrentAgeCalculationRequest(BaseModel):
@@ -2315,6 +2340,7 @@ def list_scope_events(
         item_list=[
             ScopeEventRecord(
                 id=r.id,
+                unity_id=r.unity_id,
                 location_id=r.location_id,
                 item_id=r.item_id,
                 action_id=r.action_id,
@@ -2346,7 +2372,16 @@ def create_scope_event(
     moment = body.moment_utc or datetime.now(UTC)
     if moment.tzinfo is not None:
         moment = moment.astimezone(UTC).replace(tzinfo=None)
+    if body.unity_id is not None:
+        _validate_event_unity_for_scope_or_400(
+            session,
+            scope_id=scope_id,
+            unity_id=body.unity_id,
+            location_id=body.location_id,
+            item_id=body.item_id,
+        )
     row = Event(
+        unity_id=body.unity_id,
         location_id=body.location_id,
         item_id=body.item_id,
         action_id=action.id,
@@ -2398,6 +2433,16 @@ def patch_scope_event(
         if moment.tzinfo is not None:
             moment = moment.astimezone(UTC).replace(tzinfo=None)
         row.moment_utc = moment
+    if "unity_id" in body.model_fields_set:
+        row.unity_id = body.unity_id
+    if row.unity_id is not None:
+        _validate_event_unity_for_scope_or_400(
+            session,
+            scope_id=scope_id,
+            unity_id=row.unity_id,
+            location_id=row.location_id,
+            item_id=row.item_id,
+        )
     session.add(row)
     _apply_member_audit_context(session, member)
     commit_session_with_null_if_empty(session)

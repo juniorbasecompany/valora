@@ -449,7 +449,7 @@
       },
       "unity": {
         "label": "Unity",
-        "hint": "Select the unity related to the event, if any."
+        "hint": "Select the unity when the event records a fact about it.\nLeave unity empty when the event refers to a pattern."
       },
       "location": {
         "label": "Location",

@@ -449,7 +449,7 @@
       },
       "unity": {
         "label": "Unidade",
-        "hint": "Selecione a unidade relacionada ao evento, se houver."
+        "hint": "Selecione a unidade se o evento registra um fato sobre ela.\nDeixe a unidade vazia se o evento se refere a um padrão."
       },
       "location": {
         "label": "Local",

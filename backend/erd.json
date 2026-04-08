@@ -613,7 +613,7 @@
         {
           "id": "unity_id",
           "name": "unity_id",
-          "comment": "Indica a ligação com uma unidade específica. O evento, quando está ligado a uma unidade, é um fato, quando não está, é um padrão (standard).",
+          "comment": "Indica a ligação com uma unidade específica. Quando preenchido, location_id deve ser igual a unity.location_id e item_id deve pertencer a unity.item_id_list. O evento ligado a uma unidade é um fato; quando não está, é um padrão (standard).",
           "type": "BIGINT",
           "default": "",
           "check": "",
@@ -1701,7 +1701,7 @@
       "x": 982.1134333622954,
       "y": 88.03042767941963,
       "title": "unity.item_id_list",
-      "content": "Observe que aqui temos a lista de item que estão compondo a unidade. Apenas estes tipos podem ser usados no eventos.",
+      "content": "Observe que aqui temos a lista de item que estão compondo a unidade. Quando o evento está ligado a uma unidade, location_id deve coincidir com unity.location_id e item_id deve pertencer a esta lista.",
       "locked": false,
       "color": "#fcf7ac",
       "height": 114,

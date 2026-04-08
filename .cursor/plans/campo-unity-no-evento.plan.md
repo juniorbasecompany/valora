@@ -1,5 +1,15 @@
 # Campo dropdown de Unity no painel de Eventos (atualizado)
 
+> **Revisão (2026-04-08) -- regra de consistência reinstaurada.**
+> A proibição das seções "Decisão de produto" e "Backend (regra de produto)" abaixo
+> foi revertida. A partir desta data, quando `event.unity_id` está preenchido:
+> - `event.location_id` deve ser igual a `unity.location_id`.
+> - `event.item_id` deve pertencer a `unity.item_id_list`.
+>
+> A regra é aplicada via trigger PostgreSQL (`event_unity_consistency_trg`)
+> e o frontend filtra os dropdowns de local e item com base na unidade selecionada.
+> Ver migração `a2b3c4d5e6f7_event_unity_consistency_trigger.py`.
+
 ## Pedido confirmado
 
 - Dropdown **simples** com **nome** das unidades cadastradas.

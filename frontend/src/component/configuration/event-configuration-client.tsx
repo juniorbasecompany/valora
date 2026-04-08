@@ -31,7 +31,8 @@ import type {
   TenantScopeFieldDirectoryResponse,
   TenantScopeRecord,
   TenantItemDirectoryResponse,
-  TenantUnityDirectoryResponse
+  TenantUnityDirectoryResponse,
+  TenantUnityRecord
 } from "@/lib/auth/types";
 import { parseErrorDetail } from "@/lib/api/parse-error-detail";
 import type { LabelLang } from "@/lib/i18n/label-lang";
@@ -455,13 +456,21 @@ export function EventConfigurationClient({
     [initialUnityDirectory?.item_list]
   );
 
-  const unityMap = useMemo(() => {
-    const map = new Map<number, string>();
+  const unityRecordById = useMemo(() => {
+    const map = new Map<number, TenantUnityRecord>();
     for (const item of initialUnityDirectory?.item_list ?? []) {
-      map.set(item.id, item.name.trim() || `#${item.id}`);
+      map.set(item.id, item);
     }
     return map;
   }, [initialUnityDirectory?.item_list]);
+
+  const unityMap = useMemo(() => {
+    const map = new Map<number, string>();
+    for (const [id, record] of unityRecordById) {
+      map.set(id, record.name.trim() || `#${id}`);
+    }
+    return map;
+  }, [unityRecordById]);
 
   const [directory, setDirectory] = useState<TenantScopeEventDirectoryResponse | null>(() =>
     initialEventDirectory == null
@@ -568,6 +577,48 @@ export function EventConfigurationClient({
   }, [directory?.item_list, isCreateMode, selectedEventId]);
 
   const selectedEventKey: EventSelectionKey = isCreateMode ? "new" : selectedEvent?.id ?? null;
+
+  const selectedUnityRecord = useMemo(
+    () => (unityId == null ? null : unityRecordById.get(unityId) ?? null),
+    [unityId, unityRecordById]
+  );
+
+  const filteredLocationItemList = useMemo(() => {
+    const fullList = initialLocationDirectory?.item_list ?? [];
+    if (selectedUnityRecord == null) {
+      return fullList;
+    }
+    const allowedId = selectedUnityRecord.location_id;
+    const ancestorIdSet = new Set<number>();
+    const byId = new Map(fullList.map((item) => [item.id, item]));
+    let current = byId.get(allowedId);
+    while (current) {
+      ancestorIdSet.add(current.id);
+      const parentId = current.parent_location_id ?? null;
+      current = parentId == null ? undefined : byId.get(parentId);
+    }
+    return fullList.filter((item) => ancestorIdSet.has(item.id));
+  }, [initialLocationDirectory?.item_list, selectedUnityRecord]);
+
+  const filteredItemItemList = useMemo(() => {
+    const fullList = initialItemDirectory?.item_list ?? [];
+    if (selectedUnityRecord == null) {
+      return fullList;
+    }
+    const allowedIdSet = new Set(selectedUnityRecord.item_id_list);
+    const byId = new Map(fullList.map((item) => [item.id, item]));
+    const resultIdSet = new Set<number>();
+    for (const id of allowedIdSet) {
+      let current = byId.get(id);
+      while (current) {
+        if (resultIdSet.has(current.id)) break;
+        resultIdSet.add(current.id);
+        const parentId = current.parent_item_id ?? null;
+        current = parentId == null ? undefined : byId.get(parentId);
+      }
+    }
+    return fullList.filter((item) => resultIdSet.has(item.id));
+  }, [initialItemDirectory?.item_list, selectedUnityRecord]);
 
   useReplaceConfigurationPath(
     eventPath,
@@ -1521,7 +1572,18 @@ export function EventConfigurationClient({
                   value={unityId == null ? "" : String(unityId)}
                   onChange={(event) => {
                     const raw = event.target.value;
-                    setUnityId(raw === "" ? null : parseNumericFilter(raw));
+                    const nextUnityId = raw === "" ? null : parseNumericFilter(raw);
+                    setUnityId(nextUnityId);
+                    if (nextUnityId != null) {
+                      const record = unityRecordById.get(nextUnityId);
+                      if (record) {
+                        setLocationId(record.location_id);
+                        setFieldError((prev) => ({ ...prev, location: undefined }));
+                        if (itemId != null && !record.item_id_list.includes(itemId)) {
+                          setItemId(null);
+                        }
+                      }
+                    }
                     setRequestErrorMessage(null);
                   }}
                   disabled={isDeletePending || !canEditForm}
@@ -1541,7 +1603,7 @@ export function EventConfigurationClient({
               <HierarchySingleSelectField
                 id="event-location"
                 label={copy.locationLabel}
-                itemList={initialLocationDirectory?.item_list ?? []}
+                itemList={filteredLocationItemList}
                 primaryField
                 value={locationId}
                 onChange={(nextValue) => {
@@ -1551,7 +1613,7 @@ export function EventConfigurationClient({
                 }}
                 getParentId={(item) => item.parent_location_id ?? null}
                 allLabel={copy.filterAll}
-                disabled={isDeletePending || !canEditForm}
+                disabled={isDeletePending || !canEditForm || selectedUnityRecord != null}
                 ariaInvalid={Boolean(fieldError.location)}
               />
               <p className="ui-field-hint">{copy.locationHint}</p>
@@ -1564,7 +1626,7 @@ export function EventConfigurationClient({
               <HierarchySingleSelectField
                 id="event-item"
                 label={copy.itemLabel}
-                itemList={initialItemDirectory?.item_list ?? []}
+                itemList={filteredItemItemList}
                 value={itemId}
                 onChange={(nextValue) => {
                   setItemId(nextValue);

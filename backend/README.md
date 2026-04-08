@@ -20,7 +20,7 @@ A fonte de verdade do diagrama entidade-relacionamento (JSON drawDB) é [`erd.js
 | `action`  | idem | Ação por escopo, com `sort_order` e flag `is_recurrent` para distinguir efeitos pontuais de efeitos recorrentes. |
 | `formula` | idem | Passos de fórmula por ação (`step`, `statement`). |
 | `label`   | idem | Rótulo i18n ligado a `field` **ou** `action`. |
-| `event`   | idem | Evento operacional (`location_id`, `item_id`, `action_id`, `moment_utc`). |
+| `event`   | idem | Evento operacional (`unity_id`, `location_id`, `item_id`, `action_id`, `moment_utc`). Quando `unity_id` preenchido, `location_id` = `unity.location_id` e `item_id` ∈ `unity.item_id_list`. |
 | `input`   | idem | Entrada por evento e campo. |
 | `result`  | idem | Resultado por evento e campo, com valor tipado em `text_value`, `boolean_value` ou `numeric_value`, além de rastreio da fórmula via `formula_id` e `formula_order`. |
 

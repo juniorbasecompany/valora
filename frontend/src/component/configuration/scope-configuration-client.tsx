@@ -480,9 +480,6 @@ export function ScopeConfigurationClient({
                 <p className="ui-directory-title">
                   {resolveScopeLabel(item)}
                 </p>
-                <p className="ui-directory-caption-wrap">
-                  {`#${item.id}`}
-                </p>
               </button>
             ))}
 

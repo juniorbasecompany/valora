@@ -281,7 +281,6 @@ export function TenantConfigurationClient({
     requestErrorMessage ?? fieldError.name ?? null;
 
   const asideTitle = resolveAsideTitle(tenant.name, tenant.id);
-  const asideCaption = `#${tenant.id}`;
   const tenantMatchesFilter = useMemo(() => {
     const normalizedQuery = normalizeTextForSearch(filterQuery);
     if (!normalizedQuery) {
@@ -355,7 +354,6 @@ export function TenantConfigurationClient({
                 <div className="ui-row-between">
                   <div className="ui-min-w-0">
                     <p className="ui-directory-title">{asideTitle}</p>
-                    <p className="ui-directory-caption">{asideCaption}</p>
                   </div>
                 </div>
               </button>

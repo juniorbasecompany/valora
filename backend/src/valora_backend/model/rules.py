@@ -291,25 +291,16 @@ class Event(Base):
         comment=(
             "Ligação opcional ao lote (unidade). Quando preenchido, location_id deve "
             "coincidir com unity.location_id e item_id deve pertencer a "
-            "unity.item_id_list. Evento com unity_id é um fato; sem, é um padrão "
-            "(standard) e estará ligado ao age_field_id."
+            "unity.item_id_list. Evento com unity_id é um fato; sem unity_id é um "
+            "padrão (standard). Paridade obrigatória com moment_utc (CHECK no banco)."
         ),
     )
     moment_utc: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=False),
         nullable=True,
         comment=(
-            "Momento do evento ou da medição. Presente apenas quando unity_id é "
-            "informado (fato). NULL para eventos-padrão (standard)."
-        ),
-    )
-    age_field_id: Mapped[int | None] = mapped_column(
-        BIGINT_COMPAT,
-        ForeignKey("field.id", onupdate="CASCADE", ondelete="RESTRICT"),
-        nullable=True,
-        comment=(
-            "Campo de idade usado em eventos-padrão (standard). Quando presente, "
-            "o evento não tem unity_id nem moment_utc."
+            "Momento do fato. Presente apenas quando unity_id é informado. NULL em "
+            "eventos-padrão (standard), sem unity_id."
         ),
     )
     location_id: Mapped[int] = mapped_column(
@@ -410,8 +401,9 @@ class Result(Base):
         DateTime(timezone=False),
         nullable=False,
         comment=(
-            "Data referente ao evento. Para fatos, vem do evento. Para padrões, "
-            "é a data derivada do age_field_id que determina a idade da unidade."
+            "Data referente ao resultado. Para fato (evento com unity_id), alinha-se "
+            "ao evento. Para padrão (standard), vem do fluxo que usa o campo de idade "
+            "atual do escopo (field.is_current_age), não de coluna no evento."
         ),
     )
     field_id: Mapped[int] = mapped_column(

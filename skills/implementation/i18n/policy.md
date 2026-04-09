@@ -52,6 +52,7 @@ Planos de trabalho temporários em `.cursor/plans/` podem referenciar este fiche
 ## Decisões tomadas
 
 - Tradução automática de rótulos em BD (`label` / `field` / `action`): **DeepL API** (detalhes na secção **Tradução assistida para metadado em base de dados**).
+- **Terminologia de domínio (regras / eventos):** em português usa-se **«padrão»** para o tipo de evento sem `unity_id` na linha do `event`; em **inglês** (API, código, documentação técnica) a tradução fixa é **`standard`**, não *pattern*, *default* nem *template*.
 
 ---
 

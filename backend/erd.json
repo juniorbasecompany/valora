@@ -591,7 +591,7 @@
     {
       "id": "event",
       "name": "event",
-      "comment": "É o momento em que determinada fórmula é aplicada.",
+      "comment": "É o momento em que determinada fórmula é aplicada. Fato: unity_id e moment_utc preenchidos (momento do fato). Padrão (standard): ambos NULL. Em inglês técnico, «padrão» neste sentido é sempre standard.",
       "x": 659.182571345967,
       "y": 631.7946294511843,
       "locked": false,
@@ -613,7 +613,7 @@
         {
           "id": "unity_id",
           "name": "unity_id",
-          "comment": "Indica a ligação com uma unidade específica. Quando preenchido, location_id deve ser igual a unity.location_id e item_id deve pertencer a unity.item_id_list. O evento ligado a uma unidade é um fato; quando não está, é um padrão (standard).",
+          "comment": "Indica a ligação com uma unidade específica. Quando preenchido, location_id deve ser igual a unity.location_id e item_id deve pertencer a unity.item_id_list. O evento ligado a uma unidade é um fato; quando não está, é um padrão (standard). Deve estar em paridade com moment_utc (ver constraints da tabela).",
           "type": "BIGINT",
           "default": "",
           "check": "",
@@ -627,10 +627,10 @@
         {
           "id": "moment_utc",
           "name": "moment_utc",
-          "comment": "Momento do evento ou da medição, que só existe quando unity_id é informada, ou seja, é um fato que ocorreu em determinado momento.",
+          "comment": "Momento do fato; só existe quando unity_id está preenchido. Paridade obrigatória com unity_id (CHECK event_unity_moment_pair).",
           "type": "TIMESTAMP",
           "default": "",
-          "check": "",
+          "check": "Ver event_unity_moment_pair em constraints.",
           "primary": false,
           "unique": false,
           "notNull": false,
@@ -679,6 +679,12 @@
           "comment": "",
           "size": "",
           "values": []
+        }
+      ],
+      "constraints": [
+        {
+          "name": "event_unity_moment_pair",
+          "constraint": "CHECK ((unity_id IS NULL AND moment_utc IS NULL) OR (unity_id IS NOT NULL AND moment_utc IS NOT NULL))"
         }
       ],
       "indices": [],
@@ -941,7 +947,7 @@
         {
           "id": "moment_utc",
           "name": "moment_utc",
-          "comment": "Esta é a data referente ao evento. Quando o resultado refere-se a um fato, esta data vem do evento. Quando o resultado refere-se a um padrão, esta data é igual a data do age_field_id que é usado para determinar a idade do unity.",
+          "comment": "Data referente ao resultado. Para fato (evento com unity_id), alinha-se ao moment_utc do evento. Para padrão (standard, evento sem unity_id), vem do fluxo de cálculo que usa o campo de idade atual do escopo (field.is_current_age), não de uma coluna no evento.",
           "type": "TIMESTAMP",
           "default": "",
           "check": "",
@@ -1737,7 +1743,7 @@
       "x": 1124.1182857662716,
       "y": 1082.68974073678,
       "title": "result - cálculo",
-      "content": "O resultado do cálculo provêm de duas fonte:\nfato: quando o evento tem unity_id\npadrão: quando o evento não tem unity_id - neste caso, deverá ser rastreado o campo que indica a idade atual do lote (field.is_current_age), para então saber em que dia será gravado o resultado.",
+      "content": "O resultado do cálculo provém de duas fontes:\nfato: quando o evento tem unity_id (e moment_utc)\npadrão (standard): quando o evento não tem unity_id — rastrear o campo que indica a idade atual do lote (field.is_current_age) para saber em que dia gravar o resultado.\nEm inglês técnico, «padrão» neste domínio traduz-se sempre por standard.",
       "locked": false,
       "color": "#fcf7ac",
       "height": 256,

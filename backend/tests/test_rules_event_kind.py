@@ -1,4 +1,4 @@
-"""Listagem e criação de eventos com `event_kind` e validação de age_field (is_current_age)."""
+"""Listagem e criação de eventos com `event_kind` e paridade unity_id / moment_utc."""
 
 from __future__ import annotations
 
@@ -127,7 +127,6 @@ def client_session_master() -> tuple[TestClient, Session, int, int]:
         item_id=item.id,
         action_id=action.id,
         moment_utc=moment,
-        age_field_id=None,
     )
     ev_std = Event(
         unity_id=None,
@@ -135,7 +134,6 @@ def client_session_master() -> tuple[TestClient, Session, int, int]:
         item_id=item.id,
         action_id=action.id,
         moment_utc=None,
-        age_field_id=field_current.id,
     )
     session.add_all([ev_fact, ev_std])
     session.commit()
@@ -182,10 +180,10 @@ def test_list_scope_events_event_kind_filters(
     assert ids_fact.isdisjoint(ids_std)
 
 
-def test_create_scope_event_rejects_non_current_age_field(
+def test_create_scope_event_rejects_moment_without_unity(
     client_session_master: tuple[TestClient, Session, int, int],
 ) -> None:
-    client, session, scope_id, other_field_id = client_session_master
+    client, session, scope_id, _other_field_id = client_session_master
 
     row = session.scalars(select(Location).where(Location.scope_id == scope_id)).first()
     assert row is not None
@@ -201,28 +199,27 @@ def test_create_scope_event_rejects_non_current_age_field(
             "location_id": location_id,
             "item_id": item.id,
             "action_id": action.id,
-            "age_field_id": other_field_id,
+            "moment_utc": "2026-04-03T12:00:00",
         },
     )
     assert response.status_code == 400
-    assert "current age" in response.json()["detail"].lower()
+    detail = response.json()["detail"]
+    if isinstance(detail, dict):
+        assert detail.get("code") == "event_standard_moment_forbidden"
+    else:
+        assert "standard" in detail.lower() or "moment" in detail.lower()
 
 
-def test_create_scope_event_standard_with_current_age_field(
+def test_create_scope_event_standard_without_unity(
     client_session_master: tuple[TestClient, Session, int, int],
 ) -> None:
     client, session, scope_id, _other_field_id = client_session_master
-
-    field_current = session.scalars(
-        select(Field).where(Field.scope_id == scope_id, Field.is_current_age.is_(True))
-    ).first()
-    assert field_current is not None
 
     location_id = session.scalars(select(Location).where(Location.scope_id == scope_id)).first().id
     item_id = session.scalars(select(Item).where(Item.scope_id == scope_id)).first().id
     action_id = session.scalars(select(Action).where(Action.scope_id == scope_id)).first().id
 
-    before = session.scalars(select(Event).where(Event.age_field_id.isnot(None))).all()
+    before = session.scalars(select(Event)).all()
     before_ids = {e.id for e in before}
 
     response = client.post(
@@ -231,16 +228,14 @@ def test_create_scope_event_standard_with_current_age_field(
             "location_id": location_id,
             "item_id": item_id,
             "action_id": action_id,
-            "age_field_id": field_current.id,
         },
     )
     assert response.status_code == 200, response.text
     payload = response.json()
-    assert all(row["id"] not in before_ids or row["id"] in before_ids for row in payload["item_list"])
     new_row = next(
         (row for row in payload["item_list"] if row["id"] not in before_ids),
         None,
     )
     assert new_row is not None
-    assert new_row["age_field_id"] == field_current.id
+    assert new_row["unity_id"] is None
     assert new_row["moment_utc"] is None

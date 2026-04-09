@@ -111,7 +111,7 @@ export type EventConfigurationCopy = {
 type EventConfigurationClientProps = {
   locale: string;
   labelLang: LabelLang;
-  /** Fatos: data e unidade opcional. Padrão: age_field_id do campo de idade atual. */
+  /** Fatos: data e unidade. Padrão (standard): sem unity_id nem moment_utc; o escopo deve ter campo de idade atual. */
   variant: "fact" | "standard";
   /** Base da rota para query `?event=`, ex. `/${locale}/app/configuration/event/fact`. */
   basePath: string;
@@ -1366,11 +1366,9 @@ export function EventConfigurationClient({
               moment_utc: momentUtc
             }
             : {
-              unity_id: null,
               location_id: locationId,
               item_id: itemId,
-              action_id: actionId,
-              age_field_id: currentAgeField!.id
+              action_id: actionId
             };
         const response = await fetch(`/api/auth/tenant/current/scopes/${scopeId}/events`, {
           method: "POST",
@@ -1416,11 +1414,11 @@ export function EventConfigurationClient({
             moment_utc: momentUtc
           }
           : {
-            unity_id: null,
             location_id: locationId,
             item_id: itemId,
             action_id: actionId,
-            age_field_id: currentAgeField!.id
+            unity_id: null,
+            moment_utc: null
           };
       const response = await fetch(
         `/api/auth/tenant/current/scopes/${scopeId}/events/${selectedEvent.id}`,

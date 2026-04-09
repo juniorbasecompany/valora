@@ -7,7 +7,8 @@ import { usePathname } from "next/navigation";
 import {
     ActionChecklistIcon,
     DashboardIcon,
-    EventPathIcon,
+    EventFactPathIcon,
+    EventStandardPathIcon,
     ItemIcon,
     LocationIcon,
     RulerIcon,
@@ -77,9 +78,10 @@ function SidebarNavigationIcon({
         case "unity":
             return <UnityIcon className={className} />;
         case "event":
-        case "eventStandard":
         case "eventFact":
-            return <EventPathIcon className={className} />;
+            return <EventFactPathIcon className={className} />;
+        case "eventStandard":
+            return <EventStandardPathIcon className={className} />;
         case "calculation":
             return <CalculationIcon className={className} />;
         default:

@@ -270,8 +270,35 @@ export function MilestonePathIcon({ className }: IconProps) {
     );
 }
 
-/** Cópia do ícone de action para uso exclusivo de event. */
-export function EventPathIcon({ className }: IconProps) {
+/** Geometria partilhada do fluxo em S (ícones de evento standard vs fact). */
+const EVENT_FLOW_PATH_D =
+    "M 20 18 L 5 18 A 2 2 0 0 1 3 16 A 2 2 0 0 1 5 14 L 20 14 C 21.105 14 22 13.105 22 12 C 22 10.895 21.105 10 20 10 L 3.25 10";
+
+/** Evento padrão (standard): fluxo com traço pontilhado, sem marcos sobre o traçado. */
+export function EventStandardPathIcon({ className }: IconProps) {
+    const sw = 2;
+    return (
+        <svg
+            className={mergeClassName(className)}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={sw}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+        >
+            <g transform="translate(24, 0) scale(-1, 1)">
+                <path d={EVENT_FLOW_PATH_D} strokeDasharray="1.75 3.25" />
+            </g>
+            <path d="M 14.95 2.1 L 20.3 2.1 L 18.65 4.05 L 20.3 6 L 14.95 6 Z" />
+            <line x1="14.5" y1="10.35" x2="14.5" y2="1.65" />
+        </svg>
+    );
+}
+
+/** Evento fato (fact): marcos com traço contínuo. */
+export function EventFactPathIcon({ className }: IconProps) {
     const sw = 2;
     const nodeR = 1.2;
     return (
@@ -286,7 +313,7 @@ export function EventPathIcon({ className }: IconProps) {
             aria-hidden
         >
             <g transform="translate(24, 0) scale(-1, 1)">
-                <path d="M 20 18 L 5 18 A 2 2 0 0 1 3 16 A 2 2 0 0 1 5 14 L 20 14 C 21.105 14 22 13.105 22 12 C 22 10.895 21.105 10 20 10 L 3.25 10" />
+                <path d={EVENT_FLOW_PATH_D} />
                 <circle cx="20" cy="18" r={nodeR} fill="currentColor" stroke="none" />
                 <circle cx="12.5" cy="18" r={nodeR} fill="currentColor" stroke="none" />
                 <circle cx="5" cy="18" r={nodeR} fill="currentColor" stroke="none" />
@@ -556,7 +583,7 @@ export function NavigationIcon({
         case "unity":
             return <UnityIcon className={className} />;
         case "event":
-            return <EventPathIcon className={className} />;
+            return <EventFactPathIcon className={className} />;
         default:
             return <DashboardIcon className={className} />;
     }

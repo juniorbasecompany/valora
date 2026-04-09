@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { TenantCalendar } from "@/component/ui/tenant-calendar";
@@ -88,7 +88,11 @@ export function TenantDateTimePicker({
     return getAmPm(new Date().getHours());
   });
   const [isMounted, setIsMounted] = useState(false);
-  const [popoverStyle, setPopoverStyle] = useState<{ top: number; left: number }>({
+  const [popoverStyle, setPopoverStyle] = useState<{
+    top: number;
+    left: number;
+    maxHeight?: number;
+  }>({
     top: 0,
     left: 0
   });
@@ -96,39 +100,90 @@ export function TenantDateTimePicker({
   const containerRef = useRef<HTMLDivElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
 
-  const calculatePopoverPosition = () => {
+  const calculatePopoverPosition = useCallback(() => {
     if (!containerRef.current) {
       return;
     }
-    const rect = containerRef.current.getBoundingClientRect();
-    const popoverWidth = 700;
-    const popoverPadding = 8;
+    const triggerRect = containerRef.current.getBoundingClientRect();
+    const pad = 8;
+    const gap = 4;
     const viewportWidth = window.innerWidth;
-    const leftCandidate = rect.left;
-    const leftMax = viewportWidth - popoverWidth - popoverPadding;
-    const left = Math.max(popoverPadding, Math.min(leftCandidate, leftMax));
+    const viewportHeight = window.innerHeight;
+
+    const popEl = popoverRef.current;
+    const measuredW = popEl?.offsetWidth;
+    const measuredH = popEl?.offsetHeight;
+    const popoverWidth = measuredW && measuredW > 0 ? measuredW : 700;
+    const popoverHeight = measuredH && measuredH > 0 ? measuredH : 520;
+
+    const leftCandidate = triggerRect.left;
+    const leftMax = viewportWidth - popoverWidth - pad;
+    const left = Math.max(pad, Math.min(leftCandidate, leftMax));
+
+    const bottomIfBelow = triggerRect.bottom + gap + popoverHeight;
+    const topIfAbove = triggerRect.top - gap - popoverHeight;
+
+    let top: number;
+    let maxHeight: number | undefined;
+
+    if (bottomIfBelow <= viewportHeight - pad) {
+      top = triggerRect.bottom + gap;
+    } else if (topIfAbove >= pad) {
+      top = topIfAbove;
+    } else {
+      top = pad;
+      maxHeight = Math.max(160, viewportHeight - 2 * pad);
+    }
+
     setPopoverStyle({
-      top: Math.round(rect.bottom + 4),
-      left: Math.round(left)
+      top: Math.round(top),
+      left: Math.round(left),
+      maxHeight
     });
-  };
+  }, []);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isOpen) {
       return;
     }
     calculatePopoverPosition();
+    const id = requestAnimationFrame(() => {
+      calculatePopoverPosition();
+    });
+    return () => {
+      cancelAnimationFrame(id);
+    };
+  }, [isOpen, calculatePopoverPosition]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
     window.addEventListener("resize", calculatePopoverPosition);
     window.addEventListener("scroll", calculatePopoverPosition, true);
     return () => {
       window.removeEventListener("resize", calculatePopoverPosition);
       window.removeEventListener("scroll", calculatePopoverPosition, true);
     };
-  }, [isOpen]);
+  }, [isOpen, calculatePopoverPosition]);
+
+  useEffect(() => {
+    if (!isOpen || !popoverRef.current) {
+      return;
+    }
+    const el = popoverRef.current;
+    const ro = new ResizeObserver(() => {
+      calculatePopoverPosition();
+    });
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+    };
+  }, [isOpen, calculatePopoverPosition]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -354,8 +409,14 @@ export function TenantDateTimePicker({
       {isOpen && isMounted ? createPortal(
         <div
           ref={popoverRef}
-          className="fixed z-[130] bg-white border border-gray-200 rounded-lg shadow-lg p-4 flex flex-col lg:flex-row gap-6 max-w-[calc(100vw-2rem)]"
-          style={{ top: popoverStyle.top, left: popoverStyle.left }}
+          className={`fixed z-[130] bg-white border border-gray-200 rounded-lg shadow-lg p-4 flex flex-col lg:flex-row gap-6 max-w-[calc(100vw-2rem)] ${
+            popoverStyle.maxHeight !== undefined ? "min-h-0 overflow-y-auto overflow-x-hidden" : ""
+          }`}
+          style={{
+            top: popoverStyle.top,
+            left: popoverStyle.left,
+            maxHeight: popoverStyle.maxHeight
+          }}
         >
           <TenantCalendar
             selectedDate={value}

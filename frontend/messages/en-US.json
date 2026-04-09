@@ -493,7 +493,7 @@
   },
   "EventConfigurationPageStandard": {
     "title": "Pattern",
-    "description": "Pattern events define rules by location, item, and action using the scope current age field. Unity and event date or time are empty; batch current age comes from the field marked in field settings.",
+    "description": "Pattern events define rules by location, item, and action using the scope current age field.",
     "list": {
       "emptyScope": "Create a scope before recording pattern events.",
       "missingCurrentScope": "Select an active scope in the header before recording pattern events.",

@@ -493,7 +493,7 @@
   },
   "EventConfigurationPageStandard": {
     "title": "Padrão",
-    "description": "Eventos padrão definem regras por local, item e ação usando o campo de idade atual do escopo. Unidade e data ou hora do evento ficam vazios; a idade atual do lote vem do campo marcado no cadastro de campos.",
+    "description": "Eventos padrão definem regras por local, item e ação usando o campo de idade atual do escopo.",
     "list": {
       "emptyScope": "Crie um escopo antes de registrar eventos padrão.",
       "missingCurrentScope": "Defina um escopo ativo no seletor do cabeçalho antes de registrar eventos padrão.",

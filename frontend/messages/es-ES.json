@@ -493,7 +493,7 @@
   },
   "EventConfigurationPageStandard": {
     "title": "Patrón",
-    "description": "Los eventos patrón definen reglas por ubicación, ítem y acción usando el campo de edad actual del alcance. Unidad y fecha u hora del evento quedan vacías; la edad actual del lote sale del campo marcado en la configuración de campos.",
+    "description": "Los eventos patrón definen reglas por ubicación, ítem y acción usando el campo de edad actual del alcance.",
     "list": {
       "emptyScope": "Crea un alcance antes de registrar eventos patrón.",
       "missingCurrentScope": "Define un alcance activo en el encabezado antes de registrar eventos patrón.",

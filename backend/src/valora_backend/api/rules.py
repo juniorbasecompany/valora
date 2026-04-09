@@ -490,13 +490,13 @@ def _event_in_scope_or_404(
 
 
 def _event_unity_moment_pair_or_400(row: Event) -> None:
-    """unity_id e moment_utc: ambos NULL (padrão) ou ambos preenchidos (fato)."""
+    """Padrão (standard): `unity_id` e `moment_utc` nulos. Fato (fact): ambos obrigatórios (não nulos)."""
     if (row.unity_id is None) ^ (row.moment_utc is None):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={
                 "code": "event_unity_moment_mismatch",
-                "message": "unity_id and moment_utc must both be null or both be set",
+                "message": "Standard events require unity_id and moment_utc to be null; facts require both to be set.",
             },
         )
 
@@ -2409,7 +2409,7 @@ def create_scope_event(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={
                 "code": "event_standard_moment_forbidden",
-                "message": "Standard events cannot include a timestamp; omit the date or choose a unity for a fact.",
+                "message": "Standard events require unity_id and moment_utc to be null; omit the timestamp.",
             },
         )
     moment: datetime | None = None
@@ -2483,7 +2483,7 @@ def patch_scope_event(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail={
                         "code": "event_fact_moment_required",
-                        "message": "Cannot clear the timestamp while a unity is selected; remove the unity or keep a date and time.",
+                        "message": "Facts require unity_id and moment_utc; remove the unity first to clear the timestamp.",
                     },
                 )
             row.moment_utc = None
@@ -2493,7 +2493,7 @@ def patch_scope_event(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail={
                         "code": "event_moment_requires_unity",
-                        "message": "Select a unity before setting the event date and time.",
+                        "message": "Facts require unity_id and moment_utc; add a unity or remove the timestamp for a standard event.",
                     },
                 )
             moment = body.moment_utc

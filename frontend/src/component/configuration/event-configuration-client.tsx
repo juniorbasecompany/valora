@@ -103,6 +103,7 @@ export type EventConfigurationCopy = {
   deleteError: string;
   deleteBlockedDetail: string;
   momentRequired?: string;
+  unityRequired?: string;
   locationRequired: string;
   itemRequired: string;
   actionRequired: string;
@@ -130,7 +131,7 @@ function resolveScopeEventHttpErrorMessage(
 type EventConfigurationClientProps = {
   locale: string;
   labelLang: LabelLang;
-  /** Fatos: data e unidade. Padrão (standard): sem unity_id nem moment_utc; o escopo deve ter campo de idade atual. */
+  /** Fatos: `unity_id` e `moment_utc` obrigatórios. Padrão (standard): ambos NULL; o escopo deve ter campo de idade atual. */
   variant: "fact" | "standard";
   /** Base da rota para query `?event=`, ex. `/${locale}/app/configuration/event/fact`. */
   basePath: string;
@@ -189,7 +190,7 @@ function sortEventDirectoryItemListOldestFirst(
   });
 }
 
-/** Eventos padrão sem `moment_utc`: local, item, ordem da ação, id. */
+/** Eventos padrão: `unity_id` e `moment_utc` nulos; ordenação por local, item, ação e id. */
 function sortEventDirectoryItemListStandardFirst(
   itemList: TenantScopeEventRecord[],
   actionSortOrderById: Map<number, number>
@@ -604,6 +605,7 @@ export function EventConfigurationClient({
   });
   const [fieldError, setFieldError] = useState<{
     moment?: string;
+    unity?: string;
     location?: string;
     item?: string;
     action?: string;
@@ -1113,6 +1115,7 @@ export function EventConfigurationClient({
   const validate = useCallback(() => {
     const nextError: {
       moment?: string;
+      unity?: string;
       location?: string;
       item?: string;
       action?: string;
@@ -1120,6 +1123,9 @@ export function EventConfigurationClient({
     } = {};
 
     if (variant === "fact") {
+      if (unityId == null) {
+        nextError.unity = copy.unityRequired;
+      }
       if (!toUtcIsoFromLocalInput(momentInput)) {
         nextError.moment = copy.momentRequired;
       }
@@ -1144,11 +1150,13 @@ export function EventConfigurationClient({
     copy.currentAgeFieldMissing,
     copy.locationRequired,
     copy.momentRequired,
+    copy.unityRequired,
     copy.itemRequired,
     currentAgeField,
     itemId,
     locationId,
     momentInput,
+    unityId,
     variant
   ]);
 
@@ -1546,6 +1554,7 @@ export function EventConfigurationClient({
   const footerErrorMessage =
     requestErrorMessage ??
     fieldError.moment ??
+    fieldError.unity ??
     fieldError.currentAge ??
     fieldError.location ??
     fieldError.item ??
@@ -1692,10 +1701,12 @@ export function EventConfigurationClient({
                     id="event-unity"
                     className="ui-input ui-input-select"
                     value={unityId == null ? "" : String(unityId)}
+                    aria-invalid={Boolean(fieldError.unity)}
                     onChange={(event) => {
                       const raw = event.target.value;
                       const nextUnityId = raw === "" ? null : parseNumericFilter(raw);
                       setUnityId(nextUnityId);
+                      setFieldError((prev) => ({ ...prev, unity: undefined }));
                       if (nextUnityId != null) {
                         const record = unityRecordById.get(nextUnityId);
                         if (record) {
@@ -1718,6 +1729,9 @@ export function EventConfigurationClient({
                     ))}
                   </select>
                   <p className="ui-field-hint">{copy.unityHint}</p>
+                  {fieldError.unity ? (
+                    <p className="ui-field-error">{fieldError.unity}</p>
+                  ) : null}
                 </div>
               </section>
             ) : null}

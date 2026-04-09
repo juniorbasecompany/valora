@@ -408,7 +408,7 @@
   },
   "EventConfigurationPageFact": {
     "title": "Facts",
-    "description": "Record events with a timestamp and, when relevant, a unity (batch). Each row is a fact in time: filter by period, location, item, and action, and edit action inputs in the same flow.",
+    "description": "Record facts with a unity (batch) and an event date and time, both required. Each row is a fact in time: filter by period, location, item, and action, and edit action inputs in the same flow.",
     "list": {
       "emptyScope": "Create a scope before recording events.",
       "missingCurrentScope": "Select an active scope in the header before recording events.",
@@ -429,7 +429,7 @@
       },
       "unity": {
         "label": "Unity",
-        "hint": "Select the unity when the fact refers to a batch.\nLeave empty when the event is not tied to a unity."
+        "hint": "Select the batch unity. For facts, both a unity and a timestamp are required."
       },
       "location": {
         "label": "Location",
@@ -479,20 +479,21 @@
       "delete": "Could not delete the event. Try again.",
       "deleteBlockedDetail": "The event cannot be deleted while results still reference it.",
       "momentRequired": "Enter the event date and time.",
+      "unityRequired": "Select a unity. Facts require both a unity and a timestamp.",
       "locationRequired": "Select a location.",
       "itemRequired": "Select an item.",
       "actionRequired": "Select an action.",
       "api": {
-        "event_moment_requires_unity": "To set a date and time, select a unity first. Facts tie the timestamp to a batch.",
-        "event_standard_moment_forbidden": "Pattern events do not use a date or unity. Clear the date or select a unity to record a fact.",
-        "event_fact_moment_required": "When a unity is selected, enter a date and time, or remove the unity to change the timestamp."
+        "event_moment_requires_unity": "Facts require a unity and a timestamp. Standard events leave both empty. Remove the date and time or add a unity to record a fact.",
+        "event_standard_moment_forbidden": "Standard events require unity_id and moment_utc to be empty. Remove the date and time, or record a fact with a unity and timestamp.",
+        "event_fact_moment_required": "Facts require a unity and a timestamp. To clear the date and time, remove the unity (standard event)."
       }
     },
     "discardConfirm": "Discard unsaved changes?"
   },
   "EventConfigurationPageStandard": {
     "title": "Pattern",
-    "description": "Pattern events define rules by location, item, and action using the scope current age field. There is no date or unity: the link is to the field marked as the batch current age.",
+    "description": "Pattern events define rules by location, item, and action using the scope current age field. Unity and event date or time are empty; batch current age comes from the field marked in field settings.",
     "list": {
       "emptyScope": "Create a scope before recording pattern events.",
       "missingCurrentScope": "Select an active scope in the header before recording pattern events.",
@@ -563,9 +564,9 @@
       "itemRequired": "Select an item.",
       "actionRequired": "Select an action.",
       "api": {
-        "event_moment_requires_unity": "To set a date and time, select a unity first. Facts tie the timestamp to a batch.",
-        "event_standard_moment_forbidden": "Pattern events do not use a date or unity. Clear the date or select a unity to record a fact.",
-        "event_fact_moment_required": "When a unity is selected, enter a date and time, or remove the unity to change the timestamp."
+        "event_moment_requires_unity": "Facts require a unity and a timestamp. Standard events leave both empty. Remove the date and time or add a unity to record a fact.",
+        "event_standard_moment_forbidden": "Standard events require unity_id and moment_utc to be empty. Remove the date and time, or record a fact with a unity and timestamp.",
+        "event_fact_moment_required": "Facts require a unity and a timestamp. To clear the date and time, remove the unity (standard event)."
       }
     },
     "discardConfirm": "Discard unsaved changes?"

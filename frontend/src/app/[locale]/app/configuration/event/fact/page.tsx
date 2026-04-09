@@ -124,6 +124,7 @@ export default async function EventFactConfigurationPage({
           deleteError: t("error.delete"),
           deleteBlockedDetail: t("error.deleteBlockedDetail"),
           momentRequired: t("error.momentRequired"),
+          unityRequired: t("error.unityRequired"),
           locationRequired: t("error.locationRequired"),
           itemRequired: t("error.itemRequired"),
           actionRequired: t("error.actionRequired"),

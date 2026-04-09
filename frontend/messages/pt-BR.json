@@ -408,7 +408,7 @@
   },
   "EventConfigurationPageFact": {
     "title": "Fatos",
-    "description": "Registre eventos com data e, se aplicável, unidade (lote). Cada linha é um fato no tempo: filtre por período, local, item e ação, e edite entradas da ação no mesmo fluxo.",
+    "description": "Registre fatos com unidade (lote) e data ou hora do evento, ambos obrigatórios. Cada linha é um fato no tempo: filtre por período, local, item e ação, e edite entradas da ação no mesmo fluxo.",
     "list": {
       "emptyScope": "Crie um escopo antes de registrar eventos.",
       "missingCurrentScope": "Defina um escopo ativo no seletor do cabeçalho antes de registrar eventos.",
@@ -429,7 +429,7 @@
       },
       "unity": {
         "label": "Unidade",
-        "hint": "Selecione a unidade quando o fato se refere a um lote.\nDeixe vazio se o evento não estiver vinculado a uma unidade."
+        "hint": "Selecione a unidade do lote. Em fatos, unidade e data ou hora são obrigatórios."
       },
       "location": {
         "label": "Local",
@@ -479,20 +479,21 @@
       "delete": "Não foi possível apagar o evento. Tente novamente.",
       "deleteBlockedDetail": "Não é possível apagar o evento enquanto resultados ainda o referenciam.",
       "momentRequired": "Informe a data e hora do evento.",
+      "unityRequired": "Selecione uma unidade. Em fatos, unidade e data ou hora são obrigatórios.",
       "locationRequired": "Selecione um local.",
       "itemRequired": "Selecione um item.",
       "actionRequired": "Selecione uma ação.",
       "api": {
-        "event_moment_requires_unity": "Para informar data e hora, selecione uma unidade. Em fatos, o momento fica vinculado ao lote.",
-        "event_standard_moment_forbidden": "Eventos padrão não usam data nem unidade. Limpe a data ou selecione uma unidade para registrar um fato.",
-        "event_fact_moment_required": "Com unidade selecionada, informe data e hora, ou remova a unidade para alterar o momento."
+        "event_moment_requires_unity": "Em fatos, unidade e data ou hora são obrigatórios. Em padrão, os dois ficam vazios. Remova data e hora ou inclua unidade para registrar um fato.",
+        "event_standard_moment_forbidden": "Em padrão, unidade e data ou hora devem ficar vazios. Remova data e hora ou registre um fato com unidade e momento.",
+        "event_fact_moment_required": "Em fatos, unidade e data ou hora são obrigatórios. Para limpar data e hora, remova a unidade (evento padrão)."
       }
     },
     "discardConfirm": "Descartar alterações não salvas?"
   },
   "EventConfigurationPageStandard": {
     "title": "Padrão",
-    "description": "Eventos padrão definem regras por local, item e ação usando o campo de idade atual do escopo. Não há data nem unidade: o vínculo é ao campo marcado como idade atual do lote.",
+    "description": "Eventos padrão definem regras por local, item e ação usando o campo de idade atual do escopo. Unidade e data ou hora do evento ficam vazios; a idade atual do lote vem do campo marcado no cadastro de campos.",
     "list": {
       "emptyScope": "Crie um escopo antes de registrar eventos padrão.",
       "missingCurrentScope": "Defina um escopo ativo no seletor do cabeçalho antes de registrar eventos padrão.",
@@ -563,9 +564,9 @@
       "itemRequired": "Selecione um item.",
       "actionRequired": "Selecione uma ação.",
       "api": {
-        "event_moment_requires_unity": "Para informar data e hora, selecione uma unidade. Em fatos, o momento fica vinculado ao lote.",
-        "event_standard_moment_forbidden": "Eventos padrão não usam data nem unidade. Limpe a data ou selecione uma unidade para registrar um fato.",
-        "event_fact_moment_required": "Com unidade selecionada, informe data e hora, ou remova a unidade para alterar o momento."
+        "event_moment_requires_unity": "Em fatos, unidade e data ou hora são obrigatórios. Em padrão, os dois ficam vazios. Remova data e hora ou inclua unidade para registrar um fato.",
+        "event_standard_moment_forbidden": "Em padrão, unidade e data ou hora devem ficar vazios. Remova data e hora ou registre um fato com unidade e momento.",
+        "event_fact_moment_required": "Em fatos, unidade e data ou hora são obrigatórios. Para limpar data e hora, remova a unidade (evento padrão)."
       }
     },
     "discardConfirm": "Descartar alterações não salvas?"

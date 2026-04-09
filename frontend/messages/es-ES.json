@@ -408,7 +408,7 @@
   },
   "EventConfigurationPageFact": {
     "title": "Hechos",
-    "description": "Registra eventos con fecha y, si aplica, unidad (lote). Cada fila es un hecho en el tiempo: filtra por período, ubicación, ítem y acción, y edita las entradas de la acción en el mismo flujo.",
+    "description": "Registra hechos con unidad (lote) y fecha u hora del evento, ambos obligatorios. Cada fila es un hecho en el tiempo: filtra por período, ubicación, ítem y acción, y edita las entradas de la acción en el mismo flujo.",
     "list": {
       "emptyScope": "Crea un alcance antes de registrar eventos.",
       "missingCurrentScope": "Define un alcance activo en el encabezado antes de registrar eventos.",
@@ -429,7 +429,7 @@
       },
       "unity": {
         "label": "Unidad",
-        "hint": "Selecciona la unidad cuando el hecho se refiera a un lote.\nDeja vacío si el evento no está vinculado a una unidad."
+        "hint": "Selecciona la unidad del lote. En hechos, unidad y fecha u hora son obligatorias."
       },
       "location": {
         "label": "Ubicación",
@@ -479,20 +479,21 @@
       "delete": "No se pudo eliminar el evento. Inténtalo de nuevo.",
       "deleteBlockedDetail": "No es posible eliminar el evento mientras resultados aún lo referencian.",
       "momentRequired": "Indica la fecha y hora del evento.",
+      "unityRequired": "Selecciona una unidad. En hechos, unidad y fecha u hora son obligatorias.",
       "locationRequired": "Selecciona una ubicación.",
       "itemRequired": "Selecciona un ítem.",
       "actionRequired": "Selecciona una acción.",
       "api": {
-        "event_moment_requires_unity": "Para indicar fecha y hora, selecciona primero una unidad. En hechos, el momento queda vinculado al lote.",
-        "event_standard_moment_forbidden": "Los eventos patrón no usan fecha ni unidad. Borra la fecha o selecciona una unidad para registrar un hecho.",
-        "event_fact_moment_required": "Con unidad seleccionada, indica fecha y hora, o quita la unidad para cambiar el momento."
+        "event_moment_requires_unity": "En hechos, unidad y fecha u hora son obligatorias. En patrón, ambas quedan vacías. Quita fecha y hora o añade unidad para registrar un hecho.",
+        "event_standard_moment_forbidden": "En patrón, unidad y fecha u hora deben quedar vacías. Quita fecha y hora o registra un hecho con unidad y momento.",
+        "event_fact_moment_required": "En hechos, unidad y fecha u hora son obligatorias. Para borrar fecha y hora, quita la unidad (evento patrón)."
       }
     },
     "discardConfirm": "¿Descartar los cambios no guardados?"
   },
   "EventConfigurationPageStandard": {
     "title": "Patrón",
-    "description": "Los eventos patrón definen reglas por ubicación, ítem y acción usando el campo de edad actual del alcance. No hay fecha ni unidad: el vínculo es al campo marcado como edad actual del lote.",
+    "description": "Los eventos patrón definen reglas por ubicación, ítem y acción usando el campo de edad actual del alcance. Unidad y fecha u hora del evento quedan vacías; la edad actual del lote sale del campo marcado en la configuración de campos.",
     "list": {
       "emptyScope": "Crea un alcance antes de registrar eventos patrón.",
       "missingCurrentScope": "Define un alcance activo en el encabezado antes de registrar eventos patrón.",
@@ -563,9 +564,9 @@
       "itemRequired": "Selecciona un ítem.",
       "actionRequired": "Selecciona una acción.",
       "api": {
-        "event_moment_requires_unity": "Para indicar fecha y hora, selecciona primero una unidad. En hechos, el momento queda vinculado al lote.",
-        "event_standard_moment_forbidden": "Los eventos patrón no usan fecha ni unidad. Borra la fecha o selecciona una unidad para registrar un hecho.",
-        "event_fact_moment_required": "Con unidad seleccionada, indica fecha y hora, o quita la unidad para cambiar el momento."
+        "event_moment_requires_unity": "En hechos, unidad y fecha u hora son obligatorias. En patrón, ambas quedan vacías. Quita fecha y hora o añade unidad para registrar un hecho.",
+        "event_standard_moment_forbidden": "En patrón, unidad y fecha u hora deben quedar vacías. Quita fecha y hora o registra un hecho con unidad y momento.",
+        "event_fact_moment_required": "En hechos, unidad y fecha u hora son obligatorias. Para borrar fecha y hora, quita la unidad (evento patrón)."
       }
     },
     "discardConfirm": "¿Descartar los cambios no guardados?"

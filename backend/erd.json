@@ -591,7 +591,7 @@
     {
       "id": "event",
       "name": "event",
-      "comment": "É o momento em que determinada fórmula é aplicada. Fato: unity_id e moment_utc preenchidos (momento do fato). Padrão (standard): ambos NULL. Em inglês técnico, «padrão» neste sentido é sempre standard.",
+      "comment": "Registro em que a fórmula da ação se aplica. Fato: unity_id e moment_utc obrigatórios (não nulos). Padrão (standard): unity_id e moment_utc devem ser NULL. Em inglês técnico, «padrão» neste sentido é sempre standard.",
       "x": 659.182571345967,
       "y": 631.7946294511843,
       "locked": false,
@@ -613,7 +613,7 @@
         {
           "id": "unity_id",
           "name": "unity_id",
-          "comment": "Indica a ligação com uma unidade específica. Quando preenchido, location_id deve ser igual a unity.location_id e item_id deve pertencer a unity.item_id_list. O evento ligado a uma unidade é um fato; quando não está, é um padrão (standard). Deve estar em paridade com moment_utc (ver constraints da tabela).",
+          "comment": "NULL em evento padrão (standard); obrigatório em fato. Quando preenchido, location_id = unity.location_id e item_id ∈ unity.item_id_list. Em paridade com moment_utc (CHECK event_unity_moment_pair).",
           "type": "BIGINT",
           "default": "",
           "check": "",
@@ -627,7 +627,7 @@
         {
           "id": "moment_utc",
           "name": "moment_utc",
-          "comment": "Momento do fato; só existe quando unity_id está preenchido. Paridade obrigatória com unity_id (CHECK event_unity_moment_pair).",
+          "comment": "NULL em evento padrão (standard); obrigatório em fato. Paridade com unity_id (CHECK event_unity_moment_pair).",
           "type": "TIMESTAMP",
           "default": "",
           "check": "Ver event_unity_moment_pair em constraints.",

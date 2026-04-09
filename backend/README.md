@@ -21,7 +21,7 @@ A fonte de verdade do diagrama entidade-relacionamento (JSON drawDB) é [`erd.js
 | `action`  | idem | Ação por escopo, com `sort_order` e flag `is_recurrent` para distinguir efeitos pontuais de efeitos recorrentes. |
 | `formula` | idem | Passos de fórmula por ação (`sort_order`, `statement`). |
 | `label`   | idem | Rótulo i18n ligado a `field` **ou** `action`. |
-| `event`   | idem | Evento operacional (`unity_id`, `moment_utc`, `location_id`, `item_id`, `action_id`). **Fato:** `unity_id` e `moment_utc` preenchidos (momento do fato); **padrão (standard):** ambos NULL. O par é obrigatório no banco (`CHECK event_unity_moment_pair`). Quando `unity_id` está preenchido, `location_id` = `unity.location_id` e `item_id` ∈ `unity.item_id_list`. Em inglês técnico, traduza **«padrão»** neste sentido sempre **standard** (não *pattern*, *default*, etc.). |
+| `event`   | idem | Evento operacional (`unity_id`, `moment_utc`, `location_id`, `item_id`, `action_id`). **Fato:** `unity_id` e `moment_utc` obrigatórios (não nulos). **Padrão (standard):** `unity_id` e `moment_utc` devem ser NULL. O `CHECK event_unity_moment_pair` impede só um dos dois preenchido. Com `unity_id` preenchido, `location_id` = `unity.location_id` e `item_id` ∈ `unity.item_id_list`. Em inglês técnico, traduza **«padrão»** neste sentido sempre **standard** (não *pattern*, *default*, etc.). |
 | `input`   | idem | Entrada por evento e campo. |
 | `result`  | idem | Resultado por evento e campo; `unity_id` (obrigatório) identifica a unidade mesmo para eventos-padrão. Valor tipado em `text_value`, `boolean_value` ou `numeric_value`, além de rastreio da fórmula via `formula_id` e `formula_order`. |
 

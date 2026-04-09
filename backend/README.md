@@ -13,16 +13,17 @@ A fonte de verdade do diagrama entidade-relacionamento (JSON drawDB) é [`erd.js
 | `member`  | idem | Vínculo conta ↔ tenant; papel, status, `current_scope_id`. |
 | `scope`   | idem | Escopo operacional por tenant. |
 | `location`| idem | Hierarquia por escopo (`parent_location_id`, `sort_order`). |
-| `item`    | idem | Hierarquia por escopo (`parent_item_id`, `sort_order`). |
+| `item`    | idem | Hierarquia por escopo (`parent_item_id`, `sort_order`); cada item tem um `kind_id`. |
+| `kind`    | idem | Tipo de item por escopo (ex.: galinha, cobb, fêmea); nome único por escopo (`UNIQUE (scope_id, name)`). |
 | `unity`   | idem | Unidade alocada (lote) por local; referencia `item_id_list` do catálogo no escopo. |
 | `log`     | [`model/log.py`](src/valora_backend/model/log.py) | Auditoria (`table_name`, `action_type`, `row_id`, `row`, `moment_utc`). |
 | `field`   | [`model/rules.py`](src/valora_backend/model/rules.py) | Definição de campo por escopo; coluna SQL `type` e flags `is_initial_age` / `is_current_age` / `is_final_age` para marcar os campos de idade do lote. |
 | `action`  | idem | Ação por escopo, com `sort_order` e flag `is_recurrent` para distinguir efeitos pontuais de efeitos recorrentes. |
-| `formula` | idem | Passos de fórmula por ação (`step`, `statement`). |
+| `formula` | idem | Passos de fórmula por ação (`sort_order`, `statement`). |
 | `label`   | idem | Rótulo i18n ligado a `field` **ou** `action`. |
-| `event`   | idem | Evento operacional (`unity_id`, `location_id`, `item_id`, `action_id`, `moment_utc`). Quando `unity_id` preenchido, `location_id` = `unity.location_id` e `item_id` ∈ `unity.item_id_list`. |
+| `event`   | idem | Evento operacional (`unity_id`, `moment_utc`, `age_field_id`, `location_id`, `item_id`, `action_id`). Dois tipos: **fato** (`unity_id` preenchido, `moment_utc` obrigatório) e **padrão/standard** (`age_field_id` preenchido, `moment_utc` NULL). Quando `unity_id` preenchido, `location_id` = `unity.location_id` e `item_id` ∈ `unity.item_id_list`. |
 | `input`   | idem | Entrada por evento e campo. |
-| `result`  | idem | Resultado por evento e campo, com valor tipado em `text_value`, `boolean_value` ou `numeric_value`, além de rastreio da fórmula via `formula_id` e `formula_order`. |
+| `result`  | idem | Resultado por evento e campo; `unity_id` (obrigatório) identifica a unidade mesmo para eventos-padrão. Valor tipado em `text_value`, `boolean_value` ou `numeric_value`, além de rastreio da fórmula via `formula_id` e `formula_order`. |
 
 Convenções e extensões do JSON (por exemplo `constraints`, `nullIfEmpty` em campos) estão descritas na skill [`.cursor/skills/export-erd-drawdb/SKILL.md`](../.cursor/skills/export-erd-drawdb/SKILL.md).
 
@@ -73,7 +74,7 @@ Documentação interativa OpenAPI: ao subir o servidor, **`/docs`** (Swagger).
 - `POST .../scopes/{scope_id}/events/read-current-age` (lê os `result` já materializados no período informado usando `result.moment_utc` como dia de referência da linha diária)
 - `POST .../scopes/{scope_id}/events/calculate-current-age` (recalcula o período informado apagando antes os `result` materializados nesse intervalo; cada ação executa no dia do evento e, se `action.is_recurrent = true`, volta a executar em cada dia seguinte até o próximo evento da mesma ação ou até a idade atual atingir a idade final; a janela de idade só considera eventos que materializam os campos de idade por fórmula, mesmo quando a fórmula lê o valor a partir de `input`; os resultados persistem uma linha por `evento + fórmula + dia materializado`, com o dia gravado em `result.moment_utc`)
 - `.../events/{event_id}/inputs` e `.../inputs/{input_id}`
-- `.../events/{event_id}/results` e `.../results/{result_id}` (`result` segue o ERD atual: `text_value`, `boolean_value`, `numeric_value`, `moment_utc`, `formula_id`, `formula_order`)
+- `.../events/{event_id}/results` e `.../results/{result_id}` (`result` segue o ERD atual: `unity_id`, `text_value`, `boolean_value`, `numeric_value`, `moment_utc`, `formula_id`, `formula_order`)
 
 Edição das regras por escopo exige papel **master** ou **admin** no `member`; leitura segue o acesso ao tenant.
 
@@ -183,7 +184,7 @@ Política atual de auditoria:
 
 - `pyproject.toml`: dependências e configuração do projeto Python.
 - `src/valora_backend/config.py`: configuração via `pydantic-settings`.
-- `src/valora_backend/model/`: metadados SQLAlchemy — [`identity.py`](src/valora_backend/model/identity.py) (`tenant`, `account`, `member`, `scope`, `location`, `item`), [`log.py`](src/valora_backend/model/log.py) (`log`), [`rules.py`](src/valora_backend/model/rules.py) (`field`, `action`, `formula`, `label`, `event`, `input`, `result`); [`__init__.py`](src/valora_backend/model/__init__.py) importa tudo para o Alembic.
+- `src/valora_backend/model/`: metadados SQLAlchemy — [`identity.py`](src/valora_backend/model/identity.py) (`tenant`, `account`, `member`, `scope`, `location`, `item`, `kind`, `unity`), [`log.py`](src/valora_backend/model/log.py) (`log`), [`rules.py`](src/valora_backend/model/rules.py) (`field`, `action`, `formula`, `label`, `event`, `input`, `result`); [`__init__.py`](src/valora_backend/model/__init__.py) importa tudo para o Alembic.
 - `src/valora_backend/api/`: [`auth.py`](src/valora_backend/api/auth.py), [`rules.py`](src/valora_backend/api/rules.py).
 - `alembic/`: migrations; `env.py` usa `Base.metadata` e a mesma URL que o backend.
 - `erd.json`: ERD drawDB (fonte de verdade do diagrama).

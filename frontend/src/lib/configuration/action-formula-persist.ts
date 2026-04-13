@@ -14,12 +14,20 @@ export class FormulaPersistError extends Error {
     readonly code: string | null;
     /** Ordem (1..n) quando a API devolve validação 422 com `detail.sort_order`. */
     readonly sort_order: number | null;
+    /** Corpo JSON da resposta para mapear `error.db.*` e mensagens estruturadas. */
+    readonly apiPayload: unknown | null;
 
-    constructor(message: string, code: string | null, sort_order: number | null = null) {
+    constructor(
+        message: string,
+        code: string | null,
+        sort_order: number | null = null,
+        apiPayload: unknown | null = null
+    ) {
         super(message);
         this.name = "FormulaPersistError";
         this.code = code;
         this.sort_order = sort_order;
+        this.apiPayload = apiPayload;
     }
 }
 
@@ -35,7 +43,8 @@ function throwPersistFailure(
     throw new FormulaPersistError(
         parseErrorDetail(body, fallback) ?? fallback,
         parseErrorCode(body),
-        sort_order
+        sort_order,
+        body
     );
 }
 

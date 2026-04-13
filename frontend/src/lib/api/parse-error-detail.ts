@@ -47,6 +47,41 @@ export function parseErrorCode(payload: unknown): string | null {
     return null;
 }
 
+/** Código estável para erros de banco sem regra dedicada (mensagem original em `detail.message`). */
+export const API_ERROR_DB_UNHANDLED_CODE = "error.db.unhandled";
+
+/**
+ * Mensagem para o usuário: prioriza i18n em `error.db.*` quando `detail.code` existe;
+ * para `error.db.unhandled` ou sem tradução, usa `detail.message` ou fallback.
+ */
+export function resolveApiErrorUserMessage(
+    payload: unknown,
+    tError: (key: string) => string,
+    fallback: string
+): string {
+    const code = parseErrorCode(payload);
+    const detailMessage = parseErrorDetail(payload, null);
+
+    if (!code || code === API_ERROR_DB_UNHANDLED_CODE) {
+        return detailMessage ?? fallback;
+    }
+
+    if (code.startsWith("error.db.")) {
+        const relativeKey = code.slice("error.".length);
+        try {
+            const translated = tError(relativeKey);
+            if (translated && translated !== relativeKey) {
+                return translated;
+            }
+        } catch {
+            /* chave ausente no catálogo */
+        }
+        return detailMessage ?? fallback;
+    }
+
+    return detailMessage ?? fallback;
+}
+
 /** Ordem da fórmula na lista (1..n) quando a API devolve `detail.sort_order`. */
 export function parseErrorStep(payload: unknown): number | null {
     if (!payload || typeof payload !== "object") {

@@ -837,6 +837,12 @@
     "backToLogin": "Back to sign in",
     "genericError": "Could not complete this action right now. Try again."
   },
+  "error": {
+    "db": {
+      "foreign_key_result_references_formula": "This formula cannot be deleted because there are still results linked to it.",
+      "foreign_key_violation": "This operation cannot be completed because it would break a reference to another record."
+    }
+  },
   "State": {
     "loadingAriaLabel": "Loading workspace",
     "errorTitle": "Could not load this area.",

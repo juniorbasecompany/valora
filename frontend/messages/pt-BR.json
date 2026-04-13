@@ -837,6 +837,12 @@
     "backToLogin": "Voltar para a entrada",
     "genericError": "Não foi possível concluir esta ação agora. Tente novamente."
   },
+  "error": {
+    "db": {
+      "foreign_key_result_references_formula": "Não é possível excluir esta fórmula porque ainda existem resultados vinculados a ela.",
+      "foreign_key_violation": "Esta operação não pode ser concluída porque viola uma referência a outro registro."
+    }
+  },
   "State": {
     "loadingAriaLabel": "Carregando área de trabalho",
     "errorTitle": "Não foi possível carregar esta área.",

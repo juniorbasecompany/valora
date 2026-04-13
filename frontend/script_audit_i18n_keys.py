@@ -53,6 +53,9 @@ EXTRA_KEYS: set[str] = {
     # configuration-history-panel: t(srKey) com srKey em srInsertedValue | srDeletedValue
     "AuditHistory.srInsertedValue",
     "AuditHistory.srDeletedValue",
+    # resolveApiErrorUserMessage: tError(relativeKey) com code da API error.db.*
+    "error.db.foreign_key_result_references_formula",
+    "error.db.foreign_key_violation",
 }
 
 

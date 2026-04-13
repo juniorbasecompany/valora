@@ -50,7 +50,7 @@ import type {
   TenantScopeRecord
 } from "@/lib/auth/types";
 import type { LabelLang } from "@/lib/i18n/label-lang";
-import { parseErrorDetail } from "@/lib/api/parse-error-detail";
+import { parseErrorDetail, resolveApiErrorUserMessage } from "@/lib/api/parse-error-detail";
 import {
   applyConfigurationSelectionToWindowHistory,
   preferredSelectionKeyAfterEditSave
@@ -187,6 +187,7 @@ function isFormulaValidationCode(code: string): code is FormulaValidationCode {
 function userMessageForFormulaPersistFailure(
   error: unknown,
   tActionPage: (key: string, values?: Record<string, string | number>) => string,
+  tError: (key: string) => string,
   fallback: string
 ): string {
   if (error instanceof FormulaPersistError) {
@@ -200,14 +201,18 @@ function userMessageForFormulaPersistFailure(
       }
       return description;
     }
+    const resolved =
+      error.apiPayload != null
+        ? resolveApiErrorUserMessage(error.apiPayload, tError, error.message.trim() || fallback)
+        : error.message.trim() || fallback;
     if (error.sort_order != null) {
-      const description = error.message.trim() || fallback;
+      const description = resolved;
       return tActionPage("formulas.validationError.whichFormula", {
         step: error.sort_order,
         description
       });
     }
-    return error.message;
+    return resolved;
   }
   return error instanceof Error ? error.message : fallback;
 }
@@ -240,6 +245,7 @@ export function ActionConfigurationClient({
   copy
 }: ActionConfigurationClientProps) {
   const tPage = useTranslations("ActionConfigurationPage");
+  const tError = useTranslations("error");
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialSearchActionKey = parseSelectedActionKey(searchParams.get("action"));
@@ -760,7 +766,7 @@ export function ActionConfigurationClient({
             applySyncFromHandlers(updatedDirectory, created.id);
             setFormulasCanEdit(updatedDirectory.can_edit);
             setRequestErrorMessage(
-              userMessageForFormulaPersistFailure(error, tPage, copy.saveError)
+              userMessageForFormulaPersistFailure(error, tPage, tError, copy.saveError)
             );
             setHistoryRefreshKey((previous) => previous + 1);
             return;
@@ -852,7 +858,7 @@ export function ActionConfigurationClient({
           });
         } catch (error) {
           setRequestErrorMessage(
-            userMessageForFormulaPersistFailure(error, tPage, copy.saveError)
+            userMessageForFormulaPersistFailure(error, tPage, tError, copy.saveError)
           );
           return;
         }

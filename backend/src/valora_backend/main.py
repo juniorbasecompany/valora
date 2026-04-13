@@ -15,6 +15,11 @@ from valora_backend.api.rules import router as scope_rules_router
 from valora_backend.config import Settings
 from valora_backend.db import dispose_engine, get_session
 from valora_backend.middleware.audit_request_context import AuditRequestContextMiddleware
+from valora_backend.pg_error_response import (
+    build_unhandled_db_error_response,
+    build_unhandled_detail_from_blob,
+    try_build_pg_registry_error_response,
+)
 
 
 def _db_exception_message_blob(exc: BaseException) -> str:
@@ -168,15 +173,14 @@ def create_app() -> FastAPI:
     )
     app.add_middleware(AuditRequestContextMiddleware)
 
-    _generic_db_error_detail = (
-        "Falha ao comunicar com o banco de dados. "
-        "Verifique os logs do servidor e a conexao ao Postgres "
-        "(DATABASE_URL, migracoes aplicadas)."
-    )
-
     async def handle_sqlalchemy_db_error(
         _request: Request, exc: DBAPIError
     ) -> JSONResponse:
+        response = try_build_pg_registry_error_response(exc)
+        if response is not None:
+            blob = _db_exception_message_blob(exc)
+            print(f"VALORA_DB_MAPPED_PG_REGISTRY {blob[:2000]}", file=sys.stderr, flush=True)
+            return response
         response = try_build_audit_db_error_response(exc)
         if response is not None:
             return response
@@ -188,10 +192,7 @@ def create_app() -> FastAPI:
         blob = _db_exception_message_blob(exc)
         print(f"VALORA_DB_UNMAPPED {blob[:4000]}", file=sys.stderr, flush=True)
         traceback.print_exception(exc, file=sys.stderr)
-        return JSONResponse(
-            {"detail": _generic_db_error_detail},
-            status_code=500,
-        )
+        return build_unhandled_db_error_response(exc, status_code=500)
 
     @app.exception_handler(StatementError)
     async def handle_statement_error(_request: Request, exc: StatementError):
@@ -210,7 +211,7 @@ def create_app() -> FastAPI:
         print(f"VALORA_STATEMENT_ERROR {blob[:4000]}", file=sys.stderr, flush=True)
         traceback.print_exception(exc, file=sys.stderr)
         return JSONResponse(
-            {"detail": _generic_db_error_detail},
+            {"detail": build_unhandled_detail_from_blob(blob)},
             status_code=500,
         )
 

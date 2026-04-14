@@ -87,6 +87,8 @@ Valores abaixo devem ser copiados do DDL já definido nos modelos/migrações (n
 
 ## Checklist de validação (para você)
 
-- [ ] Cada constraint/índice listado no changelog aparece no `erd.json` ou em `notes[]` (triggers).
-- [ ] Nenhuma tabela/campo/relacionamento sumiu do JSON.
-- [ ] Import no drawDB abre sem erro e o diagrama mantém o layout esperado.
+- [x] Cada constraint/índice listado no changelog aparece no `erd.json` ou em `notes[]` (triggers).
+- [x] Nenhuma tabela/campo/relacionamento sumiu do JSON.
+- [ ] Import no drawDB abre sem erro e o diagrama mantém o layout esperado (validação manual pelo autor).
+
+**Execução:** enriquecimento aplicado em `backend/erd.json` e registo em `backend/erd.enrichment-changelog.md` (2026-04-14).

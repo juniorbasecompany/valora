@@ -320,7 +320,18 @@
       "id": "location",
       "name": "location",
       "comment": "Local onde ocorre a operação: Granja, Unidade, Aviário, Subdivisão...",
-      "indices": [],
+      "indices": [
+        {
+          "name": "location_scope_parent_sort_idx",
+          "unique": false,
+          "fields": ["scope_id", "parent_location_id", "sort_order", "id"]
+        },
+        {
+          "name": "location_scope_parent_name_idx",
+          "unique": false,
+          "fields": ["scope_id", "parent_location_id", "name"]
+        }
+      ],
       "color": "#ff0000",
       "fields": [
         {
@@ -394,6 +405,20 @@
           "values": []
         }
       ],
+      "constraints": [
+        {
+          "name": "location_parent_self_chk",
+          "constraint": "CHECK (parent_location_id IS NULL OR parent_location_id <> id)"
+        },
+        {
+          "name": "location_scope_id_unique",
+          "constraint": "UNIQUE (scope_id, id)"
+        },
+        {
+          "name": "location_parent_same_scope_fk",
+          "constraint": "FOREIGN KEY (scope_id, parent_location_id) REFERENCES location (scope_id, id) ON UPDATE CASCADE ON DELETE CASCADE"
+        }
+      ],
       "x": 59.45107930543816,
       "y": 114.16736251662459
     },
@@ -402,7 +427,18 @@
       "name": "item",
       "comment": "Use para cadastrar o item. Pode ser, por exemplo: galinha, fêmea, branca, vermelha.",
       "color": "#ff0000",
-      "indices": [],
+      "indices": [
+        {
+          "name": "item_scope_parent_sort_idx",
+          "unique": false,
+          "fields": ["scope_id", "parent_item_id", "sort_order", "id"]
+        },
+        {
+          "name": "item_scope_parent_kind_idx",
+          "unique": false,
+          "fields": ["scope_id", "parent_item_id", "kind_id"]
+        }
+      ],
       "fields": [
         {
           "id": "id",
@@ -473,6 +509,20 @@
           "comment": "",
           "size": "",
           "values": []
+        }
+      ],
+      "constraints": [
+        {
+          "name": "item_parent_self_chk",
+          "constraint": "CHECK (parent_item_id IS NULL OR parent_item_id <> id)"
+        },
+        {
+          "name": "item_scope_id_unique",
+          "constraint": "UNIQUE (scope_id, id)"
+        },
+        {
+          "name": "item_parent_same_scope_fk",
+          "constraint": "FOREIGN KEY (scope_id, parent_item_id) REFERENCES item (scope_id, id) ON UPDATE CASCADE ON DELETE CASCADE"
         }
       ],
       "x": -92.51991009760508,
@@ -583,6 +633,24 @@
           "increment": false,
           "size": "",
           "values": []
+        }
+      ],
+      "constraints": [
+        {
+          "name": "field_age_flags_not_both_chk",
+          "constraint": "CHECK (NOT (is_initial_age AND is_final_age))"
+        },
+        {
+          "name": "field_scope_initial_age_unique",
+          "constraint": "UNIQUE (scope_id) WHERE (is_initial_age IS TRUE)"
+        },
+        {
+          "name": "field_scope_final_age_unique",
+          "constraint": "UNIQUE (scope_id) WHERE (is_final_age IS TRUE)"
+        },
+        {
+          "name": "field_scope_current_age_unique",
+          "constraint": "UNIQUE (scope_id) WHERE (is_current_age IS TRUE)"
         }
       ],
       "indices": [],
@@ -753,6 +821,12 @@
           "increment": false,
           "size": "",
           "values": []
+        }
+      ],
+      "constraints": [
+        {
+          "name": "formula_action_sort_order_unique",
+          "constraint": "UNIQUE (action_id, sort_order)"
         }
       ],
       "indices": [],
@@ -1139,6 +1213,20 @@
           "values": []
         }
       ],
+      "constraints": [
+        {
+          "name": "label_field_xor_action_chk",
+          "constraint": "CHECK ((field_id IS NOT NULL AND action_id IS NULL) OR (field_id IS NULL AND action_id IS NOT NULL))"
+        },
+        {
+          "name": "label_unique_lang_field",
+          "constraint": "UNIQUE (lang, field_id) WHERE field_id IS NOT NULL"
+        },
+        {
+          "name": "label_unique_lang_action",
+          "constraint": "UNIQUE (lang, action_id) WHERE action_id IS NOT NULL"
+        }
+      ],
       "indices": [],
       "color": "#00aa00"
     },
@@ -1260,6 +1348,12 @@
           "increment": false,
           "size": "",
           "values": []
+        }
+      ],
+      "constraints": [
+        {
+          "name": "log_row_payload_by_action_chk",
+          "constraint": "CHECK ((action_type = 'D' AND \"row\" IS NULL) OR (action_type IN ('I', 'U') AND \"row\" IS NOT NULL))"
         }
       ],
       "x": -929.2716296167907,
@@ -1762,6 +1856,17 @@
       "color": "#fcf7ac",
       "height": 306,
       "width": 298.95311841270455
+    },
+    {
+      "id": 5,
+      "x": 350,
+      "y": 620,
+      "title": "event: trigger de consistência com unity",
+      "content": "Além de FKs e do CHECK event_unity_moment_pair, o PostgreSQL aplica a função validate_event_unity_consistency() via trigger event_unity_consistency_trg na tabela event (migration alembic a2b3c4d5e6f7_event_unity_consistency_trigger.py). Quando event.unity_id está preenchido, exige event.location_id = unity.location_id e event.item_id contido em unity.item_id_list.",
+      "locked": false,
+      "color": "#fcf7ac",
+      "height": 220,
+      "width": 300
     }
   ],
   "subjectAreas": [],

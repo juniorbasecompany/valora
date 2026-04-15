@@ -27,6 +27,34 @@ def test_valid_assignment_multiply() -> None:
     )
 
 
+def test_valid_division_two_numeric_fields_stub_zero() -> None:
+    """Stubs numéricos são 0; divisão por zero no dry-run deve resultar em 0, não erro."""
+    session = _session_with_scope_fields([(1, "INTEGER"), (2, "INTEGER"), (3, "INTEGER")])
+    validate_formula_statement_for_scope(
+        session,
+        scope_id=10,
+        statement="${field:1} = ${field:2} / ${field:3}",
+    )
+
+
+def test_valid_floor_division_stub_zero() -> None:
+    session = _session_with_scope_fields([(1, "INTEGER"), (2, "INTEGER"), (3, "INTEGER")])
+    validate_formula_statement_for_scope(
+        session,
+        scope_id=10,
+        statement="${field:1} = ${field:2} // ${field:3}",
+    )
+
+
+def test_valid_modulo_stub_zero() -> None:
+    session = _session_with_scope_fields([(1, "INTEGER"), (2, "INTEGER"), (3, "INTEGER")])
+    validate_formula_statement_for_scope(
+        session,
+        scope_id=10,
+        statement="${field:1} = ${field:2} % ${field:3}",
+    )
+
+
 def test_valid_numeric_only_rhs() -> None:
     session = _session_with_scope_fields([(5, "INTEGER")])
     validate_formula_statement_for_scope(

@@ -386,6 +386,35 @@ def _formula_in_action_or_404(
     return row
 
 
+def _input_field_id_set_for_action(session: Session, *, action_id: int) -> set[int]:
+    """União dos `field_id` referenciados como `${input:id}` em todas as fórmulas da ação."""
+    rows = list(
+        session.scalars(select(Formula).where(Formula.action_id == action_id))
+    )
+    result: set[int] = set()
+    for r in rows:
+        parsed = parse_formula_statement(r.statement)
+        result |= parsed.input_id_in_rhs
+    return result
+
+
+def _delete_scope_event_inputs_for_removed_input_field_refs(
+    session: Session,
+    *,
+    action_id: int,
+    removed_input_field_id_set: set[int],
+) -> None:
+    """Remove linhas em `input` para eventos desta ação quando o `field_id` deixa de ser referido."""
+    if not removed_input_field_id_set:
+        return
+    session.execute(
+        delete(Input).where(
+            Input.field_id.in_(removed_input_field_id_set),
+            Input.event_id.in_(select(Event.id).where(Event.action_id == action_id)),
+        )
+    )
+
+
 def _field_is_referenced_by_scope_formula(
     session: Session, *, scope_id: int, field_id: int
 ) -> bool:
@@ -1613,6 +1642,9 @@ def patch_scope_action_formula(
     _get_tenant_scope(session, actor=member, scope_id=scope_id)
     _action_in_scope_or_404(session, scope_id=scope_id, action_id=action_id)
     row = _formula_in_action_or_404(session, action_id=action_id, formula_id=formula_id)
+    old_input_field_id_set: set[int] | None = None
+    if body.statement is not None:
+        old_input_field_id_set = _input_field_id_set_for_action(session, action_id=action_id)
     if body.sort_order is not None:
         row.sort_order = body.sort_order
     if body.statement is not None:
@@ -1633,6 +1665,17 @@ def patch_scope_action_formula(
             ) from None
         row.statement = body.statement.strip()
     session.add(row)
+    if old_input_field_id_set is not None:
+        session.flush()
+        new_input_field_id_set = _input_field_id_set_for_action(
+            session, action_id=action_id
+        )
+        removed = old_input_field_id_set - new_input_field_id_set
+        _delete_scope_event_inputs_for_removed_input_field_refs(
+            session,
+            action_id=action_id,
+            removed_input_field_id_set=removed,
+        )
     _apply_member_audit_context(session, member)
     try:
         commit_session_with_null_if_empty(session)
@@ -1660,7 +1703,16 @@ def delete_scope_action_formula(
     _get_tenant_scope(session, actor=member, scope_id=scope_id)
     _action_in_scope_or_404(session, scope_id=scope_id, action_id=action_id)
     row = _formula_in_action_or_404(session, action_id=action_id, formula_id=formula_id)
+    old_input_field_id_set = _input_field_id_set_for_action(session, action_id=action_id)
     session.delete(row)
+    session.flush()
+    new_input_field_id_set = _input_field_id_set_for_action(session, action_id=action_id)
+    removed = old_input_field_id_set - new_input_field_id_set
+    _delete_scope_event_inputs_for_removed_input_field_refs(
+        session,
+        action_id=action_id,
+        removed_input_field_id_set=removed,
+    )
     _apply_member_audit_context(session, member)
     session.commit()
     return list_scope_action_formulas(scope_id, action_id, member, session)

@@ -90,3 +90,11 @@ Demais tabelas e relacionamentos permanecem como antes deste commit; em particul
 1. Importar `backend/erd.json` no drawDB (File > Import) e confirmar que o diagrama abre sem erro.
 2. Conferir na UI as novas entradas em **constraints** / **indices** nas tabelas listadas acima e a nota **id 5**.
 3. Opcional: comparar com `information_schema` / `\d+` no PostgreSQL se quiser validação contra um banco já migrado.
+
+## Documentação: sincronização `input` com `${input:…}` (2026-04-14)
+
+**Arquivo alterado:** [`backend/erd.json`](erd.json)
+
+- Notas no canvas (ids 0 e 3) e `comment` da tabela `input`: documentam que, quando nenhuma fórmula da mesma ação referencia mais `${input:X}`, a aplicação remove linhas em `input` com `field_id = X` para eventos dessa ação (regra na API, não FK declarativa).
+
+**Referência no código:** [`valora_backend/api/rules.py`](src/valora_backend/api/rules.py) (`patch_scope_action_formula`, `delete_scope_action_formula`).

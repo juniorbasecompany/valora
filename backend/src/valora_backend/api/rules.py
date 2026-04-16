@@ -2296,6 +2296,25 @@ def _build_execution_occurrence_list(
             next_same_action_day_by_event_id[row.id] = next_day_by_action_id.get(row.action_id)
             next_day_by_action_id[row.action_id] = row_day
 
+    # Dias civis em que já existe fato (evento real) por unidade e ação. Evita duplicar o último
+    # dia da janela: recorrência a partir de idade menor gera sintético no period_end e um segundo
+    # fato com event.age nesse mesmo dia gera outra ocorrência real no mesmo execution_day.
+    actual_unity_action_day: set[tuple[int, int, date]] = set()
+    for row in event_row_list:
+        if row.id not in window_meta_by_event_id or row.unity_id is None:
+            continue
+        unity_meta = unity_by_id.get(row.unity_id)
+        if unity_meta is None:
+            continue
+        creation_meta = unity_meta.creation_utc.date()
+        actual_unity_action_day.add(
+            (row.unity_id, row.action_id, creation_meta + timedelta(days=row.age))
+        )
+
+    # Uma ocorrência real por (unidade, ação, dia civil): vários fatos com a mesma ação no
+    # mesmo dia geravam duas linhas de resultado (ex.: idade 20 duas vezes).
+    actual_occurrence_key_seen: set[tuple[int, int, date]] = set()
+
     for row in event_row_list:
         if row.id not in window_meta_by_event_id:
             continue
@@ -2310,15 +2329,18 @@ def _build_execution_occurrence_list(
         period_end_day = creation_day + timedelta(days=source_final_age)
         action_row = action_by_id[row.action_id]
         event_day = creation_day + timedelta(days=row.age)
-        occurrence_list.append(
-            {
-                "source_event": row,
-                "execution_day": event_day,
-                "current_age_action_priority": 0 if row.action_id in current_age_action_id_set else 1,
-                "action_sort_order": action_row.sort_order,
-                "is_actual_event_day": True,
-            }
-        )
+        actual_key = (row.unity_id, row.action_id, event_day)
+        if actual_key not in actual_occurrence_key_seen:
+            actual_occurrence_key_seen.add(actual_key)
+            occurrence_list.append(
+                {
+                    "source_event": row,
+                    "execution_day": event_day,
+                    "current_age_action_priority": 0 if row.action_id in current_age_action_id_set else 1,
+                    "action_sort_order": action_row.sort_order,
+                    "is_actual_event_day": True,
+                }
+            )
         if not action_row.is_recurrent:
             continue
         next_same_action_day = next_same_action_day_by_event_id.get(row.id)
@@ -2330,6 +2352,13 @@ def _build_execution_occurrence_list(
             )
         next_execution_day = event_day + timedelta(days=1)
         while next_execution_day <= recurrence_last_day:
+            if (
+                row.unity_id,
+                row.action_id,
+                next_execution_day,
+            ) in actual_unity_action_day:
+                next_execution_day += timedelta(days=1)
+                continue
             occurrence_list.append(
                 {
                     "source_event": row,
@@ -2352,6 +2381,30 @@ def _build_execution_occurrence_list(
             item["current_age_action_priority"],
             item["source_event"].id,
         )
+    )
+
+    # Uma ocorrência por (evento, dia civil). Evita duas linhas idênticas em `result` quando
+    # o mesmo fato entra duas vezes (ex.: real + sintético no último dia ou bug de borda).
+    occurrence_by_event_day: dict[tuple[int, date], dict[str, Any]] = {}
+    for item in occurrence_list:
+        ev = item["source_event"]
+        day = item["execution_day"]
+        key = (ev.id, day)
+        prev = occurrence_by_event_day.get(key)
+        if prev is None:
+            occurrence_by_event_day[key] = item
+            continue
+        if not prev["is_actual_event_day"] and item["is_actual_event_day"]:
+            occurrence_by_event_day[key] = item
+    occurrence_list = sorted(
+        occurrence_by_event_day.values(),
+        key=lambda item: (
+            item["source_event"].unity_id or 0,
+            item["execution_day"],
+            item["action_sort_order"],
+            item["current_age_action_priority"],
+            item["source_event"].id,
+        ),
     )
     return occurrence_list
 
@@ -2929,6 +2982,9 @@ def calculate_scope_current_age(
     result_row_list: list[
         tuple[Result, Event, Literal["created", "updated", "unchanged"] | None]
     ] = []
+    # Evita duas linhas idênticas em `result` quando o teto na idade atual faz dois dias
+    # civis distintos persistirem o mesmo `age` (ex.: 19→20 e 20→20 após clamp).
+    persisted_result_identity_seen: set[tuple[int, int, int, int]] = set()
 
     for (unity_id_day, execution_day_key), day_occurrence_iter in groupby(
         occurrence_list,
@@ -3074,6 +3130,15 @@ def calculate_scope_current_age(
                         f"Event {row.id}: current age must be an integer for result rows"
                     ),
                 )
+                result_identity_key = (
+                    row.id,
+                    target_field.id,
+                    formula_row.id,
+                    persisted_age,
+                )
+                if result_identity_key in persisted_result_identity_seen:
+                    continue
+                persisted_result_identity_seen.add(result_identity_key)
                 current_result = Result(
                     unity_id=row.unity_id,
                     age=persisted_age,

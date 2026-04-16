@@ -2957,8 +2957,20 @@ def calculate_scope_current_age(
             pending_close = close_after_day_by_group.get(group_key)
             if pending_close is not None and pending_close["window"] == active_window:
                 if execution_day > pending_close["close_after_day"]:
-                    current_window_by_group.pop(group_key, None)
-                    continue
+                    unity_row = unity_by_id.get(group_key)
+                    period_end_day = (
+                        unity_row.creation_utc.date()
+                        + timedelta(days=active_window["source_final_age"])
+                        if unity_row is not None
+                        else None
+                    )
+                    # Ao atingir o teto no fim do dia N, close_after_day fica em N; o último dia
+                    # civil da janela (creation + idade final) ainda precisa ser processado.
+                    if not (
+                        period_end_day is not None and execution_day == period_end_day
+                    ):
+                        current_window_by_group.pop(group_key, None)
+                        continue
 
             group_state = state_by_group[group_key]
             for field_id, runtime_value in age_source_runtime_by_event_id.get(row.id, {}).items():
@@ -3022,6 +3034,26 @@ def calculate_scope_current_age(
                     formula_id=formula_row.id,
                     formula_order=formula_row.sort_order,
                 )
+                if target_field.id == current_field.id:
+                    age_cap = active_window["source_final_age"]
+                    try:
+                        cur_i = _parse_integer_value_or_400(
+                            typed_payload["runtime_value"],
+                            detail=(
+                                f"Event {row.id}: current age field must evaluate to an integer"
+                            ),
+                        )
+                    except HTTPException:
+                        pass
+                    else:
+                        if cur_i > age_cap:
+                            typed_payload = _coerce_formula_output_to_result_payload_or_400(
+                                age_cap,
+                                field=target_field,
+                                event_id=row.id,
+                                formula_id=formula_row.id,
+                                formula_order=formula_row.sort_order,
+                            )
                 group_state[target_field.id] = typed_payload["runtime_value"]
 
                 age_val = group_state.get(current_field.id)

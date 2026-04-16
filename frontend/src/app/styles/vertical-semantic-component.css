@@ -2388,7 +2388,7 @@ button.ui-location-nest-create:disabled {
 .ui-nav-item::before {
   content: "";
   position: absolute;
-  left: 0.9rem;
+  right: 0.9rem;
   top: 0.7rem;
   bottom: 0.7rem;
   width: 3px;

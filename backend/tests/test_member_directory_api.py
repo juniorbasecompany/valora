@@ -13,7 +13,7 @@ import pytest
 from fastapi import HTTPException
 from pydantic import ValidationError
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, event, select
+from sqlalchemy import create_engine, event, func, select
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -5589,3 +5589,523 @@ def test_calculate_scope_current_age_does_not_mix_different_location_item_groups
             )
             .limit(1)
         ) is None
+
+
+def test_calculate_scope_current_age_materializes_standard_event_on_applicable_unities_by_descendancy() -> None:
+    """Eventos-padrão (unity_id NULL) com action recorrente geram Result por unidade compatível
+    (descendência de location + descendência de item) e seguem a regra de janela definida
+    pelo evento-fato. Também valida consumo via seed de campo-padrão por fórmula de fato."""
+    with build_rules_session() as (session, tenant_id):
+        scope = Scope(name="Aves", tenant_id=tenant_id)
+        session.add(scope)
+        session.flush()
+
+        parent_location = Location(
+            name="Granja",
+            scope_id=scope.id,
+            parent_location_id=None,
+            sort_order=0,
+        )
+        session.add(parent_location)
+        session.flush()
+        child_location = Location(
+            name="Barracao",
+            scope_id=scope.id,
+            parent_location_id=parent_location.id,
+            sort_order=0,
+        )
+        unrelated_location = Location(
+            name="Fabrica",
+            scope_id=scope.id,
+            parent_location_id=None,
+            sort_order=1,
+        )
+        session.add_all([child_location, unrelated_location])
+        session.flush()
+
+        kind = Kind(scope_id=scope.id, name="lote")
+        session.add(kind)
+        session.flush()
+        parent_item = Item(
+            scope_id=scope.id,
+            kind_id=kind.id,
+            parent_item_id=None,
+            sort_order=0,
+        )
+        session.add(parent_item)
+        session.flush()
+        child_item = Item(
+            scope_id=scope.id,
+            kind_id=kind.id,
+            parent_item_id=parent_item.id,
+            sort_order=0,
+        )
+        unrelated_item = Item(
+            scope_id=scope.id,
+            kind_id=kind.id,
+            parent_item_id=None,
+            sort_order=1,
+        )
+        session.add_all([child_item, unrelated_item])
+        session.flush()
+
+        anchor_action = Action(scope_id=scope.id, sort_order=0)
+        idade_action = Action(scope_id=scope.id, sort_order=1, is_recurrent=True)
+        mortdd_action = Action(scope_id=scope.id, sort_order=2, is_recurrent=True)
+        initial_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=0,
+            is_initial_age=True,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        current_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=1,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=True,
+        )
+        final_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=2,
+            is_initial_age=False,
+            is_final_age=True,
+            is_current_age=False,
+        )
+        mortdd_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=3,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        mirror_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=4,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        session.add_all(
+            [
+                anchor_action,
+                idade_action,
+                mortdd_action,
+                initial_field,
+                current_field,
+                final_field,
+                mortdd_field,
+                mirror_field,
+            ]
+        )
+        session.flush()
+
+        anchor_initial_formula = Formula(
+            action_id=anchor_action.id,
+            sort_order=0,
+            statement=f"${{field:{initial_field.id}}} = ${{input:{initial_field.id}}}",
+        )
+        anchor_current_formula = Formula(
+            action_id=anchor_action.id,
+            sort_order=1,
+            statement=f"${{field:{current_field.id}}} = ${{field:{initial_field.id}}}",
+        )
+        anchor_final_formula = Formula(
+            action_id=anchor_action.id,
+            sort_order=2,
+            statement=f"${{field:{final_field.id}}} = ${{input:{final_field.id}}}",
+        )
+        idade_formula = Formula(
+            action_id=idade_action.id,
+            sort_order=0,
+            statement=f"${{field:{current_field.id}}} = ${{field:{current_field.id}}} + 1",
+        )
+        mortdd_formula = Formula(
+            action_id=mortdd_action.id,
+            sort_order=0,
+            statement=f"${{field:{mortdd_field.id}}} = ${{input:{mortdd_field.id}}}",
+        )
+        mirror_formula = Formula(
+            action_id=idade_action.id,
+            sort_order=1,
+            statement=f"${{field:{mirror_field.id}}} = ${{field:{mortdd_field.id}}}",
+        )
+        session.add_all(
+            [
+                anchor_initial_formula,
+                anchor_current_formula,
+                anchor_final_formula,
+                idade_formula,
+                mortdd_formula,
+                mirror_formula,
+            ]
+        )
+        session.flush()
+
+        unity_match_child = Unity(
+            name="Lote Barracao",
+            location_id=child_location.id,
+            item_id_list=[child_item.id],
+            creation_utc=datetime(2026, 4, 1, 0, 0, 0),
+        )
+        unity_match_parent = Unity(
+            name="Lote Granja",
+            location_id=parent_location.id,
+            item_id_list=[parent_item.id],
+            creation_utc=datetime(2026, 4, 1, 0, 0, 0),
+        )
+        unity_out_location = Unity(
+            name="Lote Fabrica",
+            location_id=unrelated_location.id,
+            item_id_list=[child_item.id],
+            creation_utc=datetime(2026, 4, 1, 0, 0, 0),
+        )
+        unity_out_item = Unity(
+            name="Lote Barracao Item Estranho",
+            location_id=child_location.id,
+            item_id_list=[unrelated_item.id],
+            creation_utc=datetime(2026, 4, 1, 0, 0, 0),
+        )
+        session.add_all(
+            [
+                unity_match_child,
+                unity_match_parent,
+                unity_out_location,
+                unity_out_item,
+            ]
+        )
+        session.flush()
+
+        # Fato alojamento por unidade (event.age=0); janela de idade corrente [0, 3].
+        fact_event_list: list[Event] = []
+        for unity_row, location_row, item_row in (
+            (unity_match_child, child_location, child_item),
+            (unity_match_parent, parent_location, parent_item),
+            (unity_out_location, unrelated_location, child_item),
+            (unity_out_item, child_location, unrelated_item),
+        ):
+            alojamento = Event(
+                unity_id=unity_row.id,
+                location_id=location_row.id,
+                item_id=item_row.id,
+                action_id=anchor_action.id,
+                age=0,
+            )
+            idade = Event(
+                unity_id=unity_row.id,
+                location_id=location_row.id,
+                item_id=item_row.id,
+                action_id=idade_action.id,
+                age=0,
+            )
+            session.add_all([alojamento, idade])
+            session.flush()
+            session.add_all(
+                [
+                    Input(
+                        event_id=alojamento.id,
+                        field_id=initial_field.id,
+                        value="0",
+                    ),
+                    Input(
+                        event_id=alojamento.id,
+                        field_id=final_field.id,
+                        value="3",
+                    ),
+                ]
+            )
+            fact_event_list.append(alojamento)
+
+        # Eventos-padrão (unity_id NULL) em (parent_location, parent_item): 2 @ age 1, 5 @ age 2.
+        standard_event_age_1 = Event(
+            unity_id=None,
+            location_id=parent_location.id,
+            item_id=parent_item.id,
+            action_id=mortdd_action.id,
+            age=1,
+        )
+        standard_event_age_2 = Event(
+            unity_id=None,
+            location_id=parent_location.id,
+            item_id=parent_item.id,
+            action_id=mortdd_action.id,
+            age=2,
+        )
+        session.add_all([standard_event_age_1, standard_event_age_2])
+        session.flush()
+        session.add_all(
+            [
+                Input(
+                    event_id=standard_event_age_1.id,
+                    field_id=mortdd_field.id,
+                    value="2",
+                ),
+                Input(
+                    event_id=standard_event_age_2.id,
+                    field_id=mortdd_field.id,
+                    value="5",
+                ),
+            ]
+        )
+        session.commit()
+
+        response = calculate_scope_current_age(
+            scope_id=scope.id,
+            body=ScopeCurrentAgeCalculationRequest(),
+            member=SimpleNamespace(role=2, tenant_id=tenant_id, account_id=1),
+            session=session,
+        )
+
+        # Resultados persistidos do padrão, agrupados por unidade destinatária.
+        standard_result_list = list(
+            session.scalars(
+                select(Result)
+                .where(
+                    Result.event_id.in_(
+                        [standard_event_age_1.id, standard_event_age_2.id]
+                    )
+                )
+                .order_by(
+                    Result.unity_id.asc(),
+                    Result.age.asc(),
+                    Result.event_id.asc(),
+                )
+            )
+        )
+        standard_values_by_unity: dict[int, list[tuple[int, int, int]]] = defaultdict(list)
+        for row in standard_result_list:
+            standard_values_by_unity[row.unity_id].append(
+                (row.event_id, row.age, int(row.numeric_value))
+            )
+
+        # Duas unidades compatíveis por descendência recebem Result do padrão.
+        # A fórmula padrão roda antes da ação de idade no mesmo dia, então o
+        # `current_age` persistido é a idade do evento (1 para event@age=1,
+        # 2 para event@age=2). A recorrência do segundo padrão até o fim da janela
+        # (final_age=3) também materializa Result em age=3.
+        assert standard_values_by_unity[unity_match_child.id] == [
+            (standard_event_age_1.id, 1, 2),
+            (standard_event_age_2.id, 2, 5),
+            (standard_event_age_2.id, 3, 5),
+        ]
+        assert standard_values_by_unity[unity_match_parent.id] == [
+            (standard_event_age_1.id, 1, 2),
+            (standard_event_age_2.id, 2, 5),
+            (standard_event_age_2.id, 3, 5),
+        ]
+        # Unidades fora do matching não recebem Result do padrão.
+        assert unity_out_location.id not in standard_values_by_unity
+        assert unity_out_item.id not in standard_values_by_unity
+
+        # Fórmula de fato `mirror_field = mortdd_field` lê o estado populado pelo
+        # padrão no mesmo dia (ordenação padrão-antes-fato garante que mortdd_field
+        # já foi setado quando a fórmula mirror roda).
+        mirror_result_list = list(
+            session.scalars(
+                select(Result)
+                .where(
+                    Result.unity_id == unity_match_child.id,
+                    Result.field_id == mirror_field.id,
+                )
+                .order_by(Result.age.asc())
+            )
+        )
+        mirror_value_by_age = {row.age: int(row.numeric_value) for row in mirror_result_list}
+        # Em idade 2, mirror lê mortdd=2 (padrão dia 1 rodou antes da idade).
+        # Em idade 3, mirror lê mortdd=5 (padrão dia 2 rodou antes da idade).
+        assert mirror_value_by_age[2] == 2
+        assert mirror_value_by_age[3] == 5
+
+        response_standard_pair_list = [
+            (row.event_id, row.result_age, int(row.numeric_value))
+            for row in response.item_list
+            if row.event_id in (standard_event_age_1.id, standard_event_age_2.id)
+        ]
+        assert (standard_event_age_1.id, 1, 2) in response_standard_pair_list
+        assert (standard_event_age_2.id, 2, 5) in response_standard_pair_list
+        assert (standard_event_age_2.id, 3, 5) in response_standard_pair_list
+
+
+def test_delete_scope_current_age_removes_standard_event_results_alongside_fact_results() -> None:
+    """Delete remove Result tanto de eventos-fato quanto de eventos-padrão alcançados
+    pelos predicados de location/item; filtro por unity_id aplica-se a Result.unity_id
+    para padrões."""
+    with build_rules_session() as (session, tenant_id):
+        scope = Scope(name="Aves", tenant_id=tenant_id)
+        session.add(scope)
+        session.flush()
+
+        location = Location(
+            name="Granja",
+            scope_id=scope.id,
+            parent_location_id=None,
+            sort_order=0,
+        )
+        session.add(location)
+        session.flush()
+        kind = Kind(scope_id=scope.id, name="lote")
+        session.add(kind)
+        session.flush()
+        item = Item(
+            scope_id=scope.id,
+            kind_id=kind.id,
+            parent_item_id=None,
+            sort_order=0,
+        )
+        session.add(item)
+        session.flush()
+
+        anchor_action = Action(scope_id=scope.id, sort_order=0)
+        mortdd_action = Action(scope_id=scope.id, sort_order=1, is_recurrent=True)
+        initial_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=0,
+            is_initial_age=True,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        current_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=1,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=True,
+        )
+        final_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=2,
+            is_initial_age=False,
+            is_final_age=True,
+            is_current_age=False,
+        )
+        mortdd_field = Field(
+            scope_id=scope.id,
+            type="INTEGER",
+            sort_order=3,
+            is_initial_age=False,
+            is_final_age=False,
+            is_current_age=False,
+        )
+        session.add_all(
+            [
+                anchor_action,
+                mortdd_action,
+                initial_field,
+                current_field,
+                final_field,
+                mortdd_field,
+            ]
+        )
+        session.flush()
+
+        session.add_all(
+            [
+                Formula(
+                    action_id=anchor_action.id,
+                    sort_order=0,
+                    statement=f"${{field:{initial_field.id}}} = ${{input:{initial_field.id}}}",
+                ),
+                Formula(
+                    action_id=anchor_action.id,
+                    sort_order=1,
+                    statement=f"${{field:{current_field.id}}} = ${{field:{initial_field.id}}}",
+                ),
+                Formula(
+                    action_id=anchor_action.id,
+                    sort_order=2,
+                    statement=f"${{field:{final_field.id}}} = ${{input:{final_field.id}}}",
+                ),
+                Formula(
+                    action_id=mortdd_action.id,
+                    sort_order=0,
+                    statement=f"${{field:{mortdd_field.id}}} = ${{input:{mortdd_field.id}}}",
+                ),
+            ]
+        )
+        session.flush()
+
+        unity = Unity(
+            name="Lote 1",
+            location_id=location.id,
+            item_id_list=[item.id],
+            creation_utc=datetime(2026, 4, 1, 0, 0, 0),
+        )
+        session.add(unity)
+        session.flush()
+
+        alojamento = Event(
+            unity_id=unity.id,
+            location_id=location.id,
+            item_id=item.id,
+            action_id=anchor_action.id,
+            age=0,
+        )
+        session.add(alojamento)
+        session.flush()
+        session.add_all(
+            [
+                Input(event_id=alojamento.id, field_id=initial_field.id, value="0"),
+                Input(event_id=alojamento.id, field_id=final_field.id, value="1"),
+            ]
+        )
+
+        standard_event = Event(
+            unity_id=None,
+            location_id=location.id,
+            item_id=item.id,
+            action_id=mortdd_action.id,
+            age=0,
+        )
+        session.add(standard_event)
+        session.flush()
+        session.add(
+            Input(
+                event_id=standard_event.id,
+                field_id=mortdd_field.id,
+                value="7",
+            )
+        )
+        session.commit()
+
+        calculate_scope_current_age(
+            scope_id=scope.id,
+            body=ScopeCurrentAgeCalculationRequest(),
+            member=SimpleNamespace(role=2, tenant_id=tenant_id, account_id=1),
+            session=session,
+        )
+
+        assert session.scalar(
+            select(func.count(Result.id)).where(Result.event_id == standard_event.id)
+        ) > 0
+        assert session.scalar(
+            select(func.count(Result.id)).where(Result.event_id == alojamento.id)
+        ) > 0
+
+        delete_scope_current_age(
+            scope_id=scope.id,
+            body=ScopeCurrentAgeCalculationRequest(unity_id=unity.id),
+            member=SimpleNamespace(role=2, tenant_id=tenant_id, account_id=1),
+            session=session,
+        )
+
+        assert (
+            session.scalar(
+                select(func.count(Result.id)).where(Result.event_id == standard_event.id)
+            )
+            == 0
+        )
+        assert (
+            session.scalar(
+                select(func.count(Result.id)).where(Result.event_id == alojamento.id)
+            )
+            == 0
+        )

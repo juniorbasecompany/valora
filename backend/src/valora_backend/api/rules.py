@@ -13,7 +13,7 @@ from typing import Any, Annotated, Literal, Self, TypeAlias
 import requests
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field as PydanticField, model_validator
-from sqlalchemy import Date, asc, cast, func, or_, select, text, true
+from sqlalchemy import Date, and_, asc, cast, func, or_, select, text, true
 from sqlalchemy import delete
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -537,6 +537,71 @@ def _current_age_event_filter_predicates_for_scope_event_query(
         )
         predicates.append(Event.item_id.in_(expanded_item_id_list))
     return predicates
+
+
+def _current_age_standard_event_filter_predicates_for_scope_event_query(
+    session: Session,
+    *,
+    scope_id: int,
+    location_id: int | None,
+    item_id: int | None,
+) -> list[Any]:
+    """Predicados SQLAlchemy para eventos-padrão (unity_id NULL). O filtro por unity_id do
+    pedido não elimina padrões (que não têm unidade própria) — a restrição por unidade
+    destinatária é aplicada depois por `_applicable_unity_id_list_for_standard_event`."""
+    predicates: list[Any] = []
+    if location_id is not None:
+        _location_in_scope_or_404(session, scope_id=scope_id, location_id=location_id)
+        expanded_location_id_list = _expand_scope_location_id_list_with_descendants(
+            session, scope_id=scope_id, location_id_list=[location_id]
+        )
+        predicates.append(Event.location_id.in_(expanded_location_id_list))
+    if item_id is not None:
+        _item_in_scope_or_404(session, scope_id=scope_id, item_id=item_id)
+        expanded_item_id_list = _expand_scope_item_id_list_with_descendants(
+            session, scope_id=scope_id, item_id_list=[item_id]
+        )
+        predicates.append(Event.item_id.in_(expanded_item_id_list))
+    return predicates
+
+
+def _applicable_unity_id_list_for_standard_event(
+    session: Session,
+    *,
+    scope_id: int,
+    event_location_id: int,
+    event_item_id: int,
+    filter_unity_id: int | None,
+) -> list[int]:
+    """Unidades destinatárias de um evento-padrão: descendência de location cruzada com
+    descendência de item do próprio padrão (mesma regra da cascata de UI em event-configuration).
+    Quando `filter_unity_id` é passado, restringe o resultado a ela."""
+    expanded_location_id_list = _expand_scope_location_id_list_with_descendants(
+        session, scope_id=scope_id, location_id_list=[event_location_id]
+    )
+    expanded_item_id_list = _expand_scope_item_id_list_with_descendants(
+        session, scope_id=scope_id, item_id_list=[event_item_id]
+    )
+    if not expanded_location_id_list or not expanded_item_id_list:
+        return []
+    unity_query = (
+        select(Unity)
+        .join(Location, Unity.location_id == Location.id)
+        .where(
+            Location.scope_id == scope_id,
+            Unity.location_id.in_(expanded_location_id_list),
+        )
+    )
+    if filter_unity_id is not None:
+        unity_query = unity_query.where(Unity.id == filter_unity_id)
+    candidate_unity_list = list(session.scalars(unity_query))
+    item_id_set = set(expanded_item_id_list)
+    applicable_unity_id_list: list[int] = []
+    for unity_row in candidate_unity_list:
+        unity_item_id_list = unity_row.item_id_list or []
+        if any(unity_item_id in item_id_set for unity_item_id in unity_item_id_list):
+            applicable_unity_id_list.append(unity_row.id)
+    return applicable_unity_id_list
 
 
 def _event_in_scope_or_404(
@@ -2087,6 +2152,25 @@ def _list_scope_current_age_results(
         location_id=location_id,
         item_id=item_id,
     )
+    # Resultados de evento-padrão têm `Event.unity_id IS NULL`; o filtro de unidade
+    # aplica-se em `Result.unity_id` (unidade destinatária gravada durante o cálculo),
+    # enquanto location/item continuam no próprio evento.
+    standard_event_predicates = (
+        _current_age_standard_event_filter_predicates_for_scope_event_query(
+            session,
+            scope_id=scope_id,
+            location_id=location_id,
+            item_id=item_id,
+        )
+    )
+    fact_origin_predicate = and_(Event.unity_id.isnot(None), *event_predicates)
+    standard_origin_predicate_list: list[Any] = [
+        Event.unity_id.is_(None),
+        *standard_event_predicates,
+    ]
+    if unity_id is not None:
+        standard_origin_predicate_list.append(Result.unity_id == unity_id)
+    standard_origin_predicate = and_(*standard_origin_predicate_list)
     query = (
         select(Result, Event)
         .join(Event, Result.event_id == Event.id)
@@ -2094,7 +2178,7 @@ def _list_scope_current_age_results(
         .join(Action, Event.action_id == Action.id)
         .where(
             Action.scope_id == scope_id,
-            *event_predicates,
+            or_(fact_origin_predicate, standard_origin_predicate),
         )
     )
     exec_date_expr = _result_execution_calendar_date_sql_expr(session)
@@ -2276,6 +2360,7 @@ def _build_execution_occurrence_list(
     window_meta_by_event_id: dict[int, dict[str, int]],
     unity_by_id: dict[int, Unity],
     current_age_action_id_set: set[int],
+    standard_event_id_set: set[int] | None = None,
 ) -> list[dict[str, Any]]:
     occurrence_list: list[dict[str, Any]] = []
     event_row_list_by_group: defaultdict[int, list[Event]] = defaultdict(list)
@@ -2370,6 +2455,24 @@ def _build_execution_occurrence_list(
             )
             next_execution_day += timedelta(days=1)
 
+    # Ocorrências de eventos-padrão rodam antes das de evento-fato no mesmo (unity, dia),
+    # para que o `current_age` persistido pelo padrão reflita a idade do evento (ex.: 10)
+    # em vez da idade já incrementada pela ação recorrente de idade (ex.: 11).
+    # Exceção: a ocorrência do evento-âncora no próprio dia de criação precisa rodar
+    # antes de qualquer padrão para inicializar `current_field` em `state_by_group`.
+    standard_id_set = standard_event_id_set or set()
+
+    def _origin_priority(item: dict[str, Any]) -> int:
+        ev = item["source_event"]
+        window = window_meta_by_event_id.get(ev.id)
+        if (
+            window is not None
+            and item["is_actual_event_day"]
+            and window.get("source_initial_event_id") == ev.id
+        ):
+            return 0
+        return 1 if ev.id in standard_id_set else 2
+
     # Ordena primeiro por action_sort_order para respeitar a sequência configurada no escopo
     # (ex.: mortalidade antes do incremento da idade no mesmo dia). A prioridade de fórmulas
     # que atualizam o campo de idade atual só desempata entre ações com o mesmo sort_order.
@@ -2377,6 +2480,7 @@ def _build_execution_occurrence_list(
         key=lambda item: (
             item["source_event"].unity_id or 0,
             item["execution_day"],
+            _origin_priority(item),
             item["action_sort_order"],
             item["current_age_action_priority"],
             item["source_event"].id,
@@ -2401,6 +2505,7 @@ def _build_execution_occurrence_list(
         key=lambda item: (
             item["source_event"].unity_id or 0,
             item["execution_day"],
+            _origin_priority(item),
             item["action_sort_order"],
             item["current_age_action_priority"],
             item["source_event"].id,
@@ -2694,18 +2799,42 @@ def delete_scope_current_age(
         location_id=body.location_id,
         item_id=body.item_id,
     )
-    event_id_list = list(
+    # Fatos: já restringidos por location/item/unity via `event_predicates`.
+    fact_event_id_list = list(
         session.scalars(
             select(Event.id)
             .join(Action, Event.action_id == Action.id)
             .where(
                 Action.scope_id == scope_id,
+                Event.unity_id.isnot(None),
                 *event_predicates,
             )
         )
     )
+    # Padrões: restrição por location/item do próprio padrão. O filtro por unity_id do
+    # pedido não elimina padrões; aplica-se a `Result.unity_id` (unidade destinatária)
+    # mais abaixo.
+    standard_event_predicates = (
+        _current_age_standard_event_filter_predicates_for_scope_event_query(
+            session,
+            scope_id=scope_id,
+            location_id=body.location_id,
+            item_id=body.item_id,
+        )
+    )
+    standard_event_id_list = list(
+        session.scalars(
+            select(Event.id)
+            .join(Action, Event.action_id == Action.id)
+            .where(
+                Action.scope_id == scope_id,
+                Event.unity_id.is_(None),
+                *standard_event_predicates,
+            )
+        )
+    )
     calculated_moment_utc = datetime.now(UTC).replace(tzinfo=None)
-    if not event_id_list:
+    if not fact_event_id_list and not standard_event_id_list:
         return ScopeCurrentAgeCalculationResponse(
             can_edit=True,
             calculated_moment_utc=calculated_moment_utc,
@@ -2717,12 +2846,22 @@ def delete_scope_current_age(
         )
 
     _apply_member_audit_context(session, member)
-    result_id_subq = select(Result.id).where(Result.event_id.in_(event_id_list))
-    deleted_result = session.execute(delete(Result).where(Result.id.in_(result_id_subq)))
+    or_branch_list: list[Any] = []
+    if fact_event_id_list:
+        or_branch_list.append(Result.event_id.in_(fact_event_id_list))
+    if standard_event_id_list:
+        standard_branch = [Result.event_id.in_(standard_event_id_list)]
+        if body.unity_id is not None:
+            standard_branch.append(Result.unity_id == body.unity_id)
+        or_branch_list.append(and_(*standard_branch))
+    if or_branch_list:
+        deleted_result = session.execute(
+            delete(Result).where(or_(*or_branch_list))
+        )
 
-    if (deleted_result.rowcount or 0) > 0:
-        _apply_member_audit_context(session, member)
-        commit_session_with_null_if_empty(session)
+        if (deleted_result.rowcount or 0) > 0:
+            _apply_member_audit_context(session, member)
+            commit_session_with_null_if_empty(session)
 
     return ScopeCurrentAgeCalculationResponse(
         can_edit=True,
@@ -2768,8 +2907,8 @@ def calculate_scope_current_age(
     )
     field_by_id = {row.id: row for row in field_row_list}
 
-    # Apenas fatos (unity_id preenchido); idade na linha do evento (`event.age`).
-    event_row_list_raw = list(
+    # Fatos (unity_id preenchido); idade na linha do evento (`event.age`).
+    fact_event_row_list_raw = list(
         session.scalars(
             select(Event)
             .join(Action, Event.action_id == Action.id)
@@ -2780,6 +2919,66 @@ def calculate_scope_current_age(
             )
         )
     )
+
+    # Eventos-padrão (unity_id NULL): materializados como eventos virtuais por unidade
+    # destinatária (descendência de location + descendência de item), para entrar na mesma
+    # pipeline da fase de fato. O filtro por unity_id do pedido não elimina padrões;
+    # restringe apenas a lista final de unidades destinatárias via
+    # `_applicable_unity_id_list_for_standard_event`.
+    standard_event_predicates = (
+        _current_age_standard_event_filter_predicates_for_scope_event_query(
+            session,
+            scope_id=scope_id,
+            location_id=body.location_id,
+            item_id=body.item_id,
+        )
+    )
+    standard_event_row_list_raw = list(
+        session.scalars(
+            select(Event)
+            .join(Action, Event.action_id == Action.id)
+            .where(
+                Action.scope_id == scope_id,
+                Event.unity_id.is_(None),
+                *standard_event_predicates,
+            )
+        )
+    )
+
+    applicable_unity_id_list_by_standard_id: dict[int, list[int]] = {}
+    for standard_row in standard_event_row_list_raw:
+        applicable_unity_id_list_by_standard_id[standard_row.id] = (
+            _applicable_unity_id_list_for_standard_event(
+                session,
+                scope_id=scope_id,
+                event_location_id=standard_row.location_id,
+                event_item_id=standard_row.item_id,
+                filter_unity_id=body.unity_id,
+            )
+        )
+
+    virtual_event_row_list: list[Event] = []
+    virtual_to_real_standard_event_id: dict[int, int] = {}
+    real_standard_event_by_id: dict[int, Event] = {
+        row.id: row for row in standard_event_row_list_raw
+    }
+    next_virtual_event_id = -1
+    for standard_row in standard_event_row_list_raw:
+        for target_unity_id in applicable_unity_id_list_by_standard_id[standard_row.id]:
+            virtual = Event(
+                unity_id=target_unity_id,
+                age=standard_row.age,
+                location_id=standard_row.location_id,
+                item_id=standard_row.item_id,
+                action_id=standard_row.action_id,
+            )
+            virtual.id = next_virtual_event_id
+            virtual_event_row_list.append(virtual)
+            virtual_to_real_standard_event_id[next_virtual_event_id] = standard_row.id
+            next_virtual_event_id -= 1
+
+    event_row_list_raw = fact_event_row_list_raw + virtual_event_row_list
+
     unity_id_set_for_sort = {
         row.unity_id for row in event_row_list_raw if row.unity_id is not None
     }
@@ -2816,7 +3015,13 @@ def calculate_scope_current_age(
             item_list=[],
         )
 
+    # `event_id_list` inclui ids virtuais (negativos) só usados em memória; para consultas
+    # SQL (Input, Result) usamos `real_event_id_list`, que é o conjunto de ids persistidos
+    # (fatos + padrões reais).
     event_id_list = [row.id for row in event_row_list]
+    real_event_id_list = [row.id for row in fact_event_row_list_raw] + [
+        row.id for row in standard_event_row_list_raw
+    ]
     formula_row_list = list(
         session.scalars(
             select(Formula)
@@ -2857,7 +3062,7 @@ def calculate_scope_current_age(
     )
     for input_row in session.scalars(
         select(Input)
-        .where(Input.event_id.in_(event_id_list))
+        .where(Input.event_id.in_(real_event_id_list))
         .order_by(Input.event_id.asc(), Input.id.asc())
     ):
         input_field = field_by_id.get(input_row.field_id)
@@ -2870,6 +3075,14 @@ def calculate_scope_current_age(
                 event_id=input_row.event_id,
             )
         )
+
+    # Cada evento virtual compartilha inputs do padrão real correspondente — a leitura em
+    # `event_input_runtime` passa a encontrar os mesmos campos pelo id virtual.
+    for virtual_event_id, real_standard_id in virtual_to_real_standard_event_id.items():
+        if real_standard_id in input_runtime_by_event_id:
+            input_runtime_by_event_id[virtual_event_id] = input_runtime_by_event_id[
+                real_standard_id
+            ]
 
     initial_age_by_event_id: dict[int, int] = {}
     final_age_by_event_id: dict[int, int] = {}
@@ -2909,7 +3122,7 @@ def calculate_scope_current_age(
     for row in session.scalars(
         select(Result)
         .join(Unity, Result.unity_id == Unity.id)
-        .where(Result.event_id.in_(event_id_list))
+        .where(Result.event_id.in_(real_event_id_list))
         .order_by(
             Result.event_id.asc(),
             asc(exec_date_ord),
@@ -2943,6 +3156,22 @@ def calculate_scope_current_age(
                 )
             continue
 
+    # Propaga idades de janela resolvidas no padrão real para cada evento virtual
+    # correspondente (caso raro de padrão carregar idade inicial/final).
+    for virtual_event_id, real_standard_id in virtual_to_real_standard_event_id.items():
+        if real_standard_id in initial_age_by_event_id:
+            initial_age_by_event_id[virtual_event_id] = initial_age_by_event_id[
+                real_standard_id
+            ]
+        if real_standard_id in final_age_by_event_id:
+            final_age_by_event_id[virtual_event_id] = final_age_by_event_id[
+                real_standard_id
+            ]
+        if real_standard_id in age_source_runtime_by_event_id:
+            age_source_runtime_by_event_id[virtual_event_id] = (
+                age_source_runtime_by_event_id[real_standard_id]
+            )
+
     window_meta_by_event_id = _build_window_meta_by_event_id(
         event_row_list=event_row_list,
         initial_age_by_event_id=initial_age_by_event_id,
@@ -2961,7 +3190,7 @@ def calculate_scope_current_age(
         )
 
     _apply_member_audit_context(session, member)
-    result_id_subq_calc = select(Result.id).where(Result.event_id.in_(event_id_list))
+    result_id_subq_calc = select(Result.id).where(Result.event_id.in_(real_event_id_list))
     deleted_result = session.execute(delete(Result).where(Result.id.in_(result_id_subq_calc)))
     deleted_result_count = deleted_result.rowcount or 0
 
@@ -2971,6 +3200,7 @@ def calculate_scope_current_age(
         window_meta_by_event_id=window_meta_by_event_id,
         unity_by_id=unity_by_id,
         current_age_action_id_set=current_age_action_id_set,
+        standard_event_id_set=set(virtual_to_real_standard_event_id.keys()),
     )
 
     state_by_group: defaultdict[int, dict[int, FormulaRuntimePrimitive]] = defaultdict(dict)
@@ -3130,8 +3360,12 @@ def calculate_scope_current_age(
                         f"Event {row.id}: current age must be an integer for result rows"
                     ),
                 )
+                persisted_event_id = virtual_to_real_standard_event_id.get(
+                    row.id, row.id
+                )
                 result_identity_key = (
-                    row.id,
+                    persisted_event_id,
+                    row.unity_id,
                     target_field.id,
                     formula_row.id,
                     persisted_age,
@@ -3142,7 +3376,7 @@ def calculate_scope_current_age(
                 current_result = Result(
                     unity_id=row.unity_id,
                     age=persisted_age,
-                    event_id=row.id,
+                    event_id=persisted_event_id,
                     field_id=target_field.id,
                     formula_id=formula_row.id,
                     formula_order=formula_row.sort_order,
@@ -3151,7 +3385,12 @@ def calculate_scope_current_age(
                     numeric_value=typed_payload["numeric_value"],
                 )
                 session.add(current_result)
-                result_row_list.append((current_result, row, "created"))
+                # Evento virtual (padrão expandido): representa na resposta o padrão real
+                # para `event_id` / `event_age` refletirem o evento persistido.
+                response_event = real_standard_event_by_id.get(
+                    persisted_event_id, row
+                )
+                result_row_list.append((current_result, response_event, "created"))
                 created_count += 1
 
             current_age_state = group_state.get(current_field.id)

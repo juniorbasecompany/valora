@@ -3448,58 +3448,185 @@ def calculate_scope_current_age(
             }
 
     # Propagação (carry-forward) em memória → gravação do resultado final: para cada
-    # (unity, janela, field) com ao menos uma linha real, preenche as ages restantes
-    # da janela reutilizando event_id / formula_id / formula_order e os três campos
-    # de valor (text/boolean/numeric) da linha real imediatamente anterior. Assim o
-    # valor se propaga até o fim da janela (ex.: `inicial=10` da age 10 aparece até
-    # `source_final_age`) sem precisar de coluna extra no modelo.
+    # (unity, janela) com ao menos uma linha real, preenche as ages restantes da
+    # janela reutilizando event_id / formula_id / formula_order da linha real
+    # imediatamente anterior por field. Fórmulas com `${input}` (e a idade atual,
+    # gerenciada pela recorrência do laço principal) propagam o valor persistido;
+    # fórmulas sem `${input}` são re-avaliadas usando o `working_state` da janela,
+    # que encadeia inputs propagados (ex.: mortes) com derivados (ex.: plantel).
     real_event_lookup_by_id: dict[int, Event] = {
         **real_standard_event_by_id,
         **{e.id: e for e in fact_event_row_list_raw},
     }
+    carry_group_rows_by_field: defaultdict[
+        tuple[int, tuple[int, int, int, int]], dict[int, list[Result]]
+    ] = defaultdict(dict)
     for (
         carry_unity_id,
         carry_window_key,
         carry_field_id,
     ), real_row_list_for_group in real_result_list_by_group_window_field.items():
-        sorted_real_row_list = sorted(
-            real_row_list_for_group,
-            key=lambda result_row_for_sort: (
-                result_row_for_sort.age,
-                result_row_for_sort.formula_order,
-                id(result_row_for_sort),
-            ),
+        carry_group_rows_by_field[(carry_unity_id, carry_window_key)][carry_field_id] = (
+            real_row_list_for_group
         )
-        age_set_with_real_row = {real_row.age for real_row in sorted_real_row_list}
-        first_real_age = sorted_real_row_list[0].age
+
+    for (
+        carry_unity_id,
+        carry_window_key,
+    ), rows_by_field_for_window in carry_group_rows_by_field.items():
         source_final_age_for_window = carry_window_key[3]
-        source_cursor_index = 0
-        for age_to_fill in range(first_real_age + 1, source_final_age_for_window + 1):
-            while (
-                source_cursor_index + 1 < len(sorted_real_row_list)
-                and sorted_real_row_list[source_cursor_index + 1].age <= age_to_fill
-            ):
-                source_cursor_index += 1
-            if age_to_fill in age_set_with_real_row:
-                continue
-            source_row = sorted_real_row_list[source_cursor_index]
-            carry_response_event = real_event_lookup_by_id.get(source_row.event_id)
-            if carry_response_event is None:
-                continue
-            carry_result_row = Result(
-                unity_id=source_row.unity_id,
-                age=age_to_fill,
-                event_id=source_row.event_id,
-                field_id=source_row.field_id,
-                formula_id=source_row.formula_id,
-                formula_order=source_row.formula_order,
-                text_value=source_row.text_value,
-                boolean_value=source_row.boolean_value,
-                numeric_value=source_row.numeric_value,
+        sorted_rows_by_field: dict[int, list[Result]] = {}
+        cursor_index_by_field: dict[int, int] = {}
+        first_real_age_in_window: int | None = None
+        for field_id, row_list in rows_by_field_for_window.items():
+            sorted_row_list_for_field = sorted(
+                row_list,
+                key=lambda result_row_for_sort: (
+                    result_row_for_sort.age,
+                    result_row_for_sort.formula_order,
+                    id(result_row_for_sort),
+                ),
             )
-            session.add(carry_result_row)
-            result_row_list.append((carry_result_row, carry_response_event, "created"))
-            created_count += 1
+            sorted_rows_by_field[field_id] = sorted_row_list_for_field
+            cursor_index_by_field[field_id] = 0
+            earliest_age_for_field = sorted_row_list_for_field[0].age
+            if (
+                first_real_age_in_window is None
+                or earliest_age_for_field < first_real_age_in_window
+            ):
+                first_real_age_in_window = earliest_age_for_field
+        if first_real_age_in_window is None:
+            continue
+
+        # `working_state` acompanha o último valor conhecido por field ao varrer as
+        # idades da janela; seed a partir das linhas reais que começam na idade inicial.
+        working_state: dict[int, FormulaRuntimePrimitive] = {}
+        for field_id, sorted_row_list_for_field in sorted_rows_by_field.items():
+            earliest_row = sorted_row_list_for_field[0]
+            if earliest_row.age != first_real_age_in_window:
+                continue
+            seed_runtime_value = _extract_result_runtime_value_or_none(
+                earliest_row,
+                field_by_id[field_id],
+                event_id=earliest_row.event_id,
+            )
+            if seed_runtime_value is None:
+                seed_runtime_value = _default_runtime_value_for_field(field_by_id[field_id])
+            working_state[field_id] = seed_runtime_value
+
+        for age_to_fill in range(
+            first_real_age_in_window + 1, source_final_age_for_window + 1
+        ):
+            per_age_action_list: list[tuple[int, int, Result, bool]] = []
+            for field_id, sorted_row_list_for_field in sorted_rows_by_field.items():
+                cursor_index = cursor_index_by_field[field_id]
+                while (
+                    cursor_index + 1 < len(sorted_row_list_for_field)
+                    and sorted_row_list_for_field[cursor_index + 1].age <= age_to_fill
+                ):
+                    cursor_index += 1
+                cursor_index_by_field[field_id] = cursor_index
+                cursor_row = sorted_row_list_for_field[cursor_index]
+                if cursor_row.age > age_to_fill:
+                    continue
+                has_real_row_at_age = cursor_row.age == age_to_fill
+                per_age_action_list.append(
+                    (cursor_row.formula_order, field_id, cursor_row, has_real_row_at_age)
+                )
+
+            per_age_action_list.sort(key=lambda item: (item[0], item[1]))
+
+            for _formula_order, field_id, cursor_row, has_real_row_at_age in per_age_action_list:
+                if has_real_row_at_age:
+                    synced_runtime_value = _extract_result_runtime_value_or_none(
+                        cursor_row,
+                        field_by_id[field_id],
+                        event_id=cursor_row.event_id,
+                    )
+                    if synced_runtime_value is None:
+                        synced_runtime_value = _default_runtime_value_for_field(
+                            field_by_id[field_id]
+                        )
+                    working_state[field_id] = synced_runtime_value
+                    continue
+
+                source_row = cursor_row
+                carry_response_event = real_event_lookup_by_id.get(source_row.event_id)
+                if carry_response_event is None:
+                    continue
+                parsed_formula = parsed_formula_by_id.get(source_row.formula_id)
+                should_copy_source_value = (
+                    parsed_formula is None
+                    or bool(parsed_formula.input_id_in_rhs)
+                    or parsed_formula.target_field_id == current_field.id
+                )
+                if should_copy_source_value:
+                    carry_text_value = source_row.text_value
+                    carry_boolean_value = source_row.boolean_value
+                    carry_numeric_value = source_row.numeric_value
+                    carry_runtime_value = _extract_result_runtime_value_or_none(
+                        source_row,
+                        field_by_id[field_id],
+                        event_id=source_row.event_id,
+                    )
+                    if carry_runtime_value is None:
+                        carry_runtime_value = _default_runtime_value_for_field(
+                            field_by_id[field_id]
+                        )
+                else:
+                    evaluator_names: dict[str, Any] = {}
+                    for referenced_field_id in parsed_formula.field_id_in_rhs:
+                        referenced_runtime_value = working_state.get(referenced_field_id)
+                        if referenced_runtime_value is None:
+                            referenced_runtime_value = _default_runtime_value_for_field(
+                                field_by_id[referenced_field_id]
+                            )
+                            working_state[referenced_field_id] = referenced_runtime_value
+                        evaluator_names[f"f_{referenced_field_id}"] = (
+                            referenced_runtime_value
+                        )
+                    try:
+                        carry_formula_value = build_formula_simple_eval(evaluator_names).eval(
+                            parsed_formula.transformed_rhs
+                        )
+                    except Exception as exc:  # noqa: BLE001
+                        raise HTTPException(
+                            status_code=status.HTTP_400_BAD_REQUEST,
+                            detail=(
+                                f"Event {source_row.event_id} formula {source_row.formula_id} "
+                                f"(sort_order {source_row.formula_order}) could not be "
+                                f"evaluated during carry-forward at age {age_to_fill}: {exc}"
+                            ),
+                        ) from exc
+                    carry_typed_payload = _coerce_formula_output_to_result_payload_or_400(
+                        carry_formula_value,
+                        field=field_by_id[parsed_formula.target_field_id],
+                        event_id=source_row.event_id,
+                        formula_id=source_row.formula_id,
+                        formula_order=source_row.formula_order,
+                    )
+                    carry_text_value = carry_typed_payload["text_value"]
+                    carry_boolean_value = carry_typed_payload["boolean_value"]
+                    carry_numeric_value = carry_typed_payload["numeric_value"]
+                    carry_runtime_value = carry_typed_payload["runtime_value"]
+
+                working_state[field_id] = carry_runtime_value
+                carry_result_row = Result(
+                    unity_id=source_row.unity_id,
+                    age=age_to_fill,
+                    event_id=source_row.event_id,
+                    field_id=source_row.field_id,
+                    formula_id=source_row.formula_id,
+                    formula_order=source_row.formula_order,
+                    text_value=carry_text_value,
+                    boolean_value=carry_boolean_value,
+                    numeric_value=carry_numeric_value,
+                )
+                session.add(carry_result_row)
+                result_row_list.append(
+                    (carry_result_row, carry_response_event, "created")
+                )
+                created_count += 1
 
     if not result_row_list and deleted_result_count == 0:
         return ScopeCurrentAgeCalculationResponse(

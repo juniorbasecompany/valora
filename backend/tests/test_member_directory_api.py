@@ -3661,10 +3661,12 @@ def test_calculate_scope_current_age_rounds_numeric_result_to_field_scale_half_u
             session=session,
         )
 
+        # O teste foca no arredondamento da fórmula em si (age 10). Linhas em ages
+        # subsequentes são carry-forward com o mesmo valor arredondado.
         assert [
             (row.field_id, Decimal(str(row.numeric_value)))
             for row in response.item_list
-            if row.event_id == calc_event.id
+            if row.event_id == calc_event.id and row.result_age == 10
         ] == [
             (rounded_field.id, Decimal("1.24")),
             (mirrored_field.id, Decimal("1.24")),
@@ -3673,7 +3675,10 @@ def test_calculate_scope_current_age_rounds_numeric_result_to_field_scale_half_u
         persisted_result_list = list(
             session.scalars(
                 select(Result)
-                .where(Result.event_id == calc_event.id)
+                .where(
+                    Result.event_id == calc_event.id,
+                    Result.age == 10,
+                )
                 .order_by(Result.formula_order.asc(), Result.id.asc())
             )
         )
@@ -4240,7 +4245,11 @@ def test_calculate_scope_current_age_opens_window_from_age_inputs_and_keeps_futu
             session=session,
         )
 
-        assert response.created_count == 4
+        # Janela = [10..20]. Linhas reais: 3 do alojamento (age 10) + 1 do idade (age 11).
+        # Carry-forward propaga em memória até `source_final_age`: initial_field e
+        # final_field ganham ages 11..20 reusando a fórmula do alojamento; current_field
+        # ganha ages 12..20 reusando (idade, increment, 11). 4 reais + 29 propagadas = 33.
+        assert response.created_count == 33
         assert response.updated_count == 0
         assert response.unchanged_count == 0
         assert [
@@ -4249,14 +4258,27 @@ def test_calculate_scope_current_age_opens_window_from_age_inputs_and_keeps_futu
                 row.formula_id,
                 row.formula_order,
                 int(row.numeric_value) if row.numeric_value is not None else None,
+                row.result_age,
                 row.status,
             )
             for row in response.item_list
         ] == [
-            (alojamento_event.id, initial_from_input_formula.id, 0, 10, "created"),
-            (alojamento_event.id, current_from_initial_formula.id, 1, 10, "created"),
-            (alojamento_event.id, final_from_input_formula.id, 2, 20, "created"),
-            (idade_event.id, increment_formula.id, 0, 11, "created"),
+            (alojamento_event.id, initial_from_input_formula.id, 0, 10, 10, "created"),
+            (alojamento_event.id, current_from_initial_formula.id, 1, 10, 10, "created"),
+            (alojamento_event.id, final_from_input_formula.id, 2, 20, 10, "created"),
+            (idade_event.id, increment_formula.id, 0, 11, 11, "created"),
+            *[
+                (alojamento_event.id, initial_from_input_formula.id, 0, 10, age, "created")
+                for age in range(11, 21)
+            ],
+            *[
+                (idade_event.id, increment_formula.id, 0, 11, age, "created")
+                for age in range(12, 21)
+            ],
+            *[
+                (alojamento_event.id, final_from_input_formula.id, 2, 20, age, "created")
+                for age in range(11, 21)
+            ],
         ]
 
 
@@ -4395,6 +4417,9 @@ def test_calculate_scope_current_age_repeats_recurrent_event_on_following_days()
             session=session,
         )
 
+        # Janela = [10..12]. Linhas reais: 3 do alojamento (age 10) + 2 do idade
+        # recorrente (ages 11, 12). Carry-forward propaga initial_field e final_field
+        # do alojamento para ages 11 e 12 (current_field já tem linha real em todas).
         assert [
             (
                 row.event_id,
@@ -4409,6 +4434,10 @@ def test_calculate_scope_current_age_repeats_recurrent_event_on_following_days()
             (alojamento_event.id, anchor_final_formula.id, 12, 10),
             (idade_event.id, recurrent_increment_formula.id, 11, 11),
             (idade_event.id, recurrent_increment_formula.id, 12, 12),
+            (alojamento_event.id, anchor_initial_formula.id, 10, 11),
+            (alojamento_event.id, anchor_initial_formula.id, 10, 12),
+            (alojamento_event.id, anchor_final_formula.id, 12, 11),
+            (alojamento_event.id, anchor_final_formula.id, 12, 12),
         ]
 
 
@@ -5235,6 +5264,8 @@ def test_calculate_scope_current_age_ignores_age_input_without_formula_target() 
             session=session,
         )
 
+        # Janela = [10..12]. 6 linhas reais + 4 carry (initial e final propagados para
+        # ages 11 e 12; current já tem linha real em todas as ages).
         assert [
             (
                 row.event_id,
@@ -5250,6 +5281,10 @@ def test_calculate_scope_current_age_ignores_age_input_without_formula_target() 
             (unrelated_event.id, unrelated_formula.id, 10, 10),
             (idade_event.id, recurrent_increment_formula.id, 11, 11),
             (idade_event.id, recurrent_increment_formula.id, 12, 12),
+            (alojamento_event.id, anchor_initial_formula.id, 10, 11),
+            (alojamento_event.id, anchor_initial_formula.id, 10, 12),
+            (alojamento_event.id, anchor_final_formula.id, 12, 11),
+            (alojamento_event.id, anchor_final_formula.id, 12, 12),
         ]
 
 
@@ -5388,6 +5423,9 @@ def test_calculate_scope_current_age_does_not_repeat_non_recurrent_event_on_foll
             session=session,
         )
 
+        # Janela = [10..20]. idade_event (não recorrente) só fica ativo no dia 1 (age 11).
+        # Carry-forward preenche o restante da janela para cada field reusando o último
+        # real: initial e final do alojamento, current do idade_event.
         assert [
             (
                 row.event_id,
@@ -5401,6 +5439,18 @@ def test_calculate_scope_current_age_does_not_repeat_non_recurrent_event_on_foll
             (alojamento_event.id, anchor_current_formula.id, 10, 10),
             (alojamento_event.id, anchor_final_formula.id, 20, 10),
             (idade_event.id, single_increment_formula.id, 11, 11),
+            *[
+                (alojamento_event.id, anchor_initial_formula.id, 10, age)
+                for age in range(11, 21)
+            ],
+            *[
+                (idade_event.id, single_increment_formula.id, 11, age)
+                for age in range(12, 21)
+            ],
+            *[
+                (alojamento_event.id, anchor_final_formula.id, 20, age)
+                for age in range(11, 21)
+            ],
         ]
 
 

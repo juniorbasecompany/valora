@@ -3970,3 +3970,145 @@ def delete_scope_event_result(
     _apply_member_audit_context(session, member)
     session.commit()
     return list_scope_event_results(scope_id, event_id, member, session)
+
+
+# -----------------------------------------------------------------------------
+# Home dashboard chart series (plantel, mortalidade, ...)
+# -----------------------------------------------------------------------------
+
+HOME_CHART_SERIES_MAX_FIELD_COUNT = 4
+
+
+class ScopeHomeChartSeriesPoint(BaseModel):
+    age: int
+    numeric_value: Decimal
+
+
+class ScopeHomeChartSeries(BaseModel):
+    field_id: int
+    point_list: list[ScopeHomeChartSeriesPoint]
+
+
+class ScopeHomeChartSeriesResponse(BaseModel):
+    series_list: list[ScopeHomeChartSeries]
+
+
+@router.get(
+    "/scopes/{scope_id}/home/chart-series",
+    response_model=ScopeHomeChartSeriesResponse,
+)
+def list_scope_home_chart_series(
+    scope_id: int,
+    unity_id: Annotated[
+        int,
+        Query(description="Unidade para restringir os dados dos gráficos."),
+    ],
+    field_id_list: Annotated[
+        list[int],
+        Query(
+            description=(
+                "Ids dos campos a retornar na série. Aceita de 1 a "
+                f"{HOME_CHART_SERIES_MAX_FIELD_COUNT} ids; duplicados são ignorados."
+            ),
+        ),
+    ],
+    member: Member = Depends(get_current_member),
+    session: Session = Depends(get_session),
+):
+    _get_tenant_scope(session, actor=member, scope_id=scope_id)
+    _get_scope_unity_or_404(session, scope_id=scope_id, unity_id=unity_id)
+    if not field_id_list:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Provide at least one field_id",
+        )
+    # Preservar ordem da requisição e remover duplicados.
+    unique_field_id_list: list[int] = []
+    for field_id in field_id_list:
+        if field_id not in unique_field_id_list:
+            unique_field_id_list.append(field_id)
+    if len(unique_field_id_list) > HOME_CHART_SERIES_MAX_FIELD_COUNT:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                f"A chamada aceita no máximo {HOME_CHART_SERIES_MAX_FIELD_COUNT} "
+                "field_id"
+            ),
+        )
+    valid_field_id_set = set(
+        session.scalars(
+            select(Field.id).where(
+                Field.scope_id == scope_id,
+                Field.id.in_(unique_field_id_list),
+            )
+        )
+    )
+    invalid_field_id_list = [
+        fid for fid in unique_field_id_list if fid not in valid_field_id_set
+    ]
+    if invalid_field_id_list:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Field not in scope: {invalid_field_id_list[0]}",
+        )
+    # Um ponto por (field_id, age): selecionamos o resultado com maior formula_order
+    # (e id como desempate), ou seja, o valor final da cadeia de fórmulas para aquele
+    # dia. Origem fact = evento com Event.unity_id = unity_id. Origem std = evento sem
+    # unity_id (padrão) com Result.unity_id = unity_id (unidade destinatária gravada).
+    fact_origin_predicate = Event.unity_id == unity_id
+    standard_origin_predicate = and_(
+        Event.unity_id.is_(None),
+        Result.unity_id == unity_id,
+    )
+    row_number_expr = (
+        func.row_number()
+        .over(
+            partition_by=(Result.field_id, Result.age),
+            order_by=(Result.formula_order.desc(), Result.id.desc()),
+        )
+        .label("rn")
+    )
+    ranked_subquery = (
+        select(
+            Result.field_id.label("field_id"),
+            Result.age.label("age"),
+            Result.numeric_value.label("numeric_value"),
+            row_number_expr,
+        )
+        .join(Event, Result.event_id == Event.id)
+        .join(Action, Event.action_id == Action.id)
+        .where(
+            Action.scope_id == scope_id,
+            Result.field_id.in_(unique_field_id_list),
+            Result.numeric_value.isnot(None),
+            or_(fact_origin_predicate, standard_origin_predicate),
+        )
+        .subquery()
+    )
+    query = (
+        select(
+            ranked_subquery.c.field_id,
+            ranked_subquery.c.age,
+            ranked_subquery.c.numeric_value,
+        )
+        .where(ranked_subquery.c.rn == 1)
+        .order_by(
+            ranked_subquery.c.field_id.asc(),
+            ranked_subquery.c.age.asc(),
+        )
+    )
+    point_list_by_field_id: dict[int, list[ScopeHomeChartSeriesPoint]] = {
+        field_id: [] for field_id in unique_field_id_list
+    }
+    for row in session.execute(query):
+        point_list_by_field_id[row.field_id].append(
+            ScopeHomeChartSeriesPoint(age=row.age, numeric_value=row.numeric_value)
+        )
+    series_list = [
+        ScopeHomeChartSeries(
+            field_id=field_id,
+            point_list=point_list_by_field_id[field_id],
+        )
+        for field_id in unique_field_id_list
+    ]
+    return ScopeHomeChartSeriesResponse(series_list=series_list)

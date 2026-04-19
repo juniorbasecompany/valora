@@ -68,6 +68,35 @@
         "title": "Estructura de ubicaciones",
         "description": "Organiza la operación por unidades y niveles de jerarquía para tener una visión clara del conjunto."
       }
+    },
+    "chart": {
+      "plantel": {
+        "title": "Plantel",
+        "description": "Compara el plantel de la unidad con el plantel estándar, por edad."
+      },
+      "mortalidade": {
+        "title": "Mortalidad",
+        "description": "Compara la mortalidad de la unidad con la mortalidad estándar, por edad."
+      },
+      "filter": {
+        "unityLabel": "Unidad",
+        "plantelFactLabel": "Campo de plantel (barras)",
+        "plantelStdLabel": "Campo de plantel estándar (línea)",
+        "mortalidadeFactLabel": "Campo de mortalidad (barras)",
+        "mortalidadeStdLabel": "Campo de mortalidad estándar (línea)"
+      },
+      "legend": {
+        "fact": "Unidad",
+        "std": "Estándar"
+      },
+      "empty": "No hay alcance activo para mostrar los gráficos de la home.",
+      "emptyScope": "Crea al menos un alcance para habilitar los gráficos de la home.",
+      "incompleteSelection": "Selecciona la unidad y los campos de plantel y mortalidad en el panel de filtros para ver los gráficos.",
+      "loadError": "No se pudieron cargar los datos de los gráficos.",
+      "filterToggleAriaLabel": "Mostrar u ocultar el panel de filtros de los gráficos de la home",
+      "filterToggleLabel": "Filtro",
+      "ageAxisLabel": "Edad (días)",
+      "filterAllAria": "Ninguno seleccionado"
     }
   },
   "MemberConfigurationPage": {

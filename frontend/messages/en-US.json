@@ -68,6 +68,35 @@
         "title": "Location structure",
         "description": "Organize your operation by units and hierarchy levels to keep a clear view of the whole."
       }
+    },
+    "chart": {
+      "plantel": {
+        "title": "Flock size",
+        "description": "Compare the unit flock size against the standard flock size, by age."
+      },
+      "mortalidade": {
+        "title": "Mortality",
+        "description": "Compare the unit mortality against the standard mortality, by age."
+      },
+      "filter": {
+        "unityLabel": "Unit",
+        "plantelFactLabel": "Flock size field (bars)",
+        "plantelStdLabel": "Standard flock size field (line)",
+        "mortalidadeFactLabel": "Mortality field (bars)",
+        "mortalidadeStdLabel": "Standard mortality field (line)"
+      },
+      "legend": {
+        "fact": "Unit",
+        "std": "Standard"
+      },
+      "empty": "No active scope to display the home charts.",
+      "emptyScope": "Create at least one scope to enable the home charts.",
+      "incompleteSelection": "Select the unit and the flock size and mortality fields in the filter panel to see the charts.",
+      "loadError": "Could not load the chart data.",
+      "filterToggleAriaLabel": "Show or hide the filter panel for the home charts",
+      "filterToggleLabel": "Filter",
+      "ageAxisLabel": "Age (days)",
+      "filterAllAria": "None selected"
     }
   },
   "MemberConfigurationPage": {

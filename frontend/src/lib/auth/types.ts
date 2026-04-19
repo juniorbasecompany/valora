@@ -235,6 +235,21 @@ export type ScopeCurrentAgeCalculationResponse = {
   item_list: ScopeCurrentAgeCalculationRecord[];
 };
 
+export type ScopeHomeChartSeriesPoint = {
+  age: number;
+  /** Numérico em string (precisão) ou número; o cliente converte antes de plotar. */
+  numeric_value: number | string;
+};
+
+export type ScopeHomeChartSeries = {
+  field_id: number;
+  point_list: ScopeHomeChartSeriesPoint[];
+};
+
+export type ScopeHomeChartSeriesResponse = {
+  series_list: ScopeHomeChartSeries[];
+};
+
 export type ScopeFormulaRecord = {
   id: number;
   action_id: number;

@@ -3557,11 +3557,65 @@ def calculate_scope_current_age(
 
             for _formula_order, field_id, cursor_row, has_real_row_at_age in per_age_action_list:
                 if has_real_row_at_age:
-                    synced_runtime_value = _extract_result_runtime_value_or_none(
-                        cursor_row,
-                        field_by_id[field_id],
-                        event_id=cursor_row.event_id,
+                    # Fórmulas auto-referentes (target aparece no RHS) avaliadas por eventos
+                    # descontínuos (ex.: eventos-padrão) não são roladas no laço principal
+                    # entre suas ocorrências — o `state_by_group` fica estagnado. Aqui, com o
+                    # `working_state` refletindo o estado rolado até `age_to_fill - 1`,
+                    # re-avaliamos a fórmula usando inputs do próprio evento real e
+                    # sobrescrevemos a linha `Result` gerada no laço principal.
+                    parsed_formula_for_sync = parsed_formula_by_id.get(cursor_row.formula_id)
+                    is_self_referential = (
+                        parsed_formula_for_sync is not None
+                        and parsed_formula_for_sync.target_field_id
+                        in parsed_formula_for_sync.field_id_in_rhs
+                        and parsed_formula_for_sync.target_field_id != current_field.id
                     )
+                    synced_runtime_value: FormulaRuntimePrimitive | None = None
+                    if is_self_referential:
+                        sync_evaluator_names: dict[str, Any] = {}
+                        for ref_field_id in parsed_formula_for_sync.field_id_in_rhs:
+                            ref_value = working_state.get(ref_field_id)
+                            if ref_value is None:
+                                ref_value = _default_runtime_value_for_field(
+                                    field_by_id[ref_field_id]
+                                )
+                                working_state[ref_field_id] = ref_value
+                            sync_evaluator_names[f"f_{ref_field_id}"] = ref_value
+                        sync_event_inputs = input_runtime_by_event_id.get(
+                            cursor_row.event_id, {}
+                        )
+                        for ref_input_field_id in parsed_formula_for_sync.input_id_in_rhs:
+                            sync_evaluator_names[f"i_{ref_input_field_id}"] = (
+                                sync_event_inputs.get(ref_input_field_id)
+                            )
+                        try:
+                            sync_formula_value = build_formula_simple_eval(
+                                sync_evaluator_names
+                            ).eval(parsed_formula_for_sync.transformed_rhs)
+                            sync_typed_payload = (
+                                _coerce_formula_output_to_result_payload_or_400(
+                                    sync_formula_value,
+                                    field=field_by_id[
+                                        parsed_formula_for_sync.target_field_id
+                                    ],
+                                    event_id=cursor_row.event_id,
+                                    formula_id=cursor_row.formula_id,
+                                    formula_order=cursor_row.formula_order,
+                                )
+                            )
+                        except Exception:  # noqa: BLE001
+                            synced_runtime_value = None
+                        else:
+                            cursor_row.text_value = sync_typed_payload["text_value"]
+                            cursor_row.boolean_value = sync_typed_payload["boolean_value"]
+                            cursor_row.numeric_value = sync_typed_payload["numeric_value"]
+                            synced_runtime_value = sync_typed_payload["runtime_value"]
+                    if synced_runtime_value is None:
+                        synced_runtime_value = _extract_result_runtime_value_or_none(
+                            cursor_row,
+                            field_by_id[field_id],
+                            event_id=cursor_row.event_id,
+                        )
                     if synced_runtime_value is None:
                         synced_runtime_value = _default_runtime_value_for_field(
                             field_by_id[field_id]

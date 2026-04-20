@@ -161,8 +161,12 @@ function parseSelectedEventKey(raw: string | null): EventSelectionKey {
   return parsed;
 }
 
-/** Lista do diretório: menor `age` primeiro (mesma regra da API `list_scope_events`). */
-function sortEventDirectoryItemListOldestFirst(
+/**
+ * Ordenação do diretório: idade, ação (`sort_order`) e id.
+ * Espelha a ordem de execução do motor de cálculo
+ * (`_event_execution_sort_key` em `rules.py`), aplicada a ambas as variantes.
+ */
+function sortEventDirectoryItemListByExecutionOrder(
   itemList: TenantScopeEventRecord[],
   actionSortOrderById: Map<number, number>
 ): TenantScopeEventRecord[] {
@@ -170,40 +174,6 @@ function sortEventDirectoryItemListOldestFirst(
     const byAge = left.age - right.age;
     if (byAge !== 0) {
       return byAge;
-    }
-    const byActionSortOrder =
-      (actionSortOrderById.get(left.action_id) ?? Number.MAX_SAFE_INTEGER)
-      - (actionSortOrderById.get(right.action_id) ?? Number.MAX_SAFE_INTEGER);
-    if (byActionSortOrder !== 0) {
-      return byActionSortOrder;
-    }
-    return left.id - right.id;
-  });
-}
-
-/** Eventos padrão: ordenação por idade, local, item, ação e id. */
-function sortEventDirectoryItemListStandardFirst(
-  itemList: TenantScopeEventRecord[],
-  actionSortOrderById: Map<number, number>,
-  locationSortOrderById: Map<number, number>,
-  itemSortOrderById: Map<number, number>
-): TenantScopeEventRecord[] {
-  return [...itemList].sort((left, right) => {
-    const byAge = left.age - right.age;
-    if (byAge !== 0) {
-      return byAge;
-    }
-    const byLoc =
-      (locationSortOrderById.get(left.location_id) ?? Number.MAX_SAFE_INTEGER)
-      - (locationSortOrderById.get(right.location_id) ?? Number.MAX_SAFE_INTEGER);
-    if (byLoc !== 0) {
-      return byLoc;
-    }
-    const byItem =
-      (itemSortOrderById.get(left.item_id) ?? Number.MAX_SAFE_INTEGER)
-      - (itemSortOrderById.get(right.item_id) ?? Number.MAX_SAFE_INTEGER);
-    if (byItem !== 0) {
-      return byItem;
     }
     const byActionSortOrder =
       (actionSortOrderById.get(left.action_id) ?? Number.MAX_SAFE_INTEGER)
@@ -472,22 +442,6 @@ export function EventConfigurationClient({
     return map;
   }, [initialActionDirectory?.item_list]);
 
-  const locationSortOrderById = useMemo(() => {
-    const map = new Map<number, number>();
-    (initialLocationDirectory?.item_list ?? []).forEach((item, index) => {
-      map.set(item.id, index);
-    });
-    return map;
-  }, [initialLocationDirectory?.item_list]);
-
-  const itemSortOrderById = useMemo(() => {
-    const map = new Map<number, number>();
-    (initialItemDirectory?.item_list ?? []).forEach((item, index) => {
-      map.set(item.id, index);
-    });
-    return map;
-  }, [initialItemDirectory?.item_list]);
-
   const actionOptionList = useMemo(
     () =>
       (initialActionDirectory?.item_list ?? []).map((item) => ({
@@ -527,18 +481,10 @@ export function EventConfigurationClient({
       ? null
       : {
         ...initialEventDirectory,
-        item_list:
-          variant === "fact"
-            ? sortEventDirectoryItemListOldestFirst(
-              initialEventDirectory.item_list,
-              actionSortOrderById
-            )
-            : sortEventDirectoryItemListStandardFirst(
-              initialEventDirectory.item_list,
-              actionSortOrderById,
-              locationSortOrderById,
-              itemSortOrderById
-            )
+        item_list: sortEventDirectoryItemListByExecutionOrder(
+          initialEventDirectory.item_list,
+          actionSortOrderById
+        )
       }
   );
 
@@ -726,18 +672,10 @@ export function EventConfigurationClient({
 
     const directoryWithSortedList: TenantScopeEventDirectoryResponse = {
         ...nextDirectory,
-        item_list:
-          variant === "fact"
-            ? sortEventDirectoryItemListOldestFirst(
-              nextDirectory.item_list,
-              actionSortOrderById
-            )
-            : sortEventDirectoryItemListStandardFirst(
-              nextDirectory.item_list,
-              actionSortOrderById,
-              locationSortOrderById,
-              itemSortOrderById
-            )
+        item_list: sortEventDirectoryItemListByExecutionOrder(
+          nextDirectory.item_list,
+          actionSortOrderById
+        )
       };
 
       const nextKey = resolveSelectedEventKey(
@@ -785,7 +723,7 @@ export function EventConfigurationClient({
 
       return nextKey;
     },
-    [actionSortOrderById, itemSortOrderById, locationSortOrderById, variant]
+    [actionSortOrderById, variant]
   );
 
   const applySyncFromHandlers = useCallback(

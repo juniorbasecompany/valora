@@ -86,7 +86,6 @@ export function ConfigurationPrimaryTextFieldSection({
             />
           )}
           <p className="ui-field-hint">{hint}</p>
-          {error ? <p className="ui-field-error">{error}</p> : null}
         </div>
         {children}
       </div>

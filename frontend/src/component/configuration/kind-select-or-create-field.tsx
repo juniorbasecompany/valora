@@ -500,7 +500,6 @@ export function KindSelectOrCreateField({
 
           {createError ? <p className="ui-field-error">{createError}</p> : null}
           {deleteError ? <p className="ui-field-error">{deleteError}</p> : null}
-          {fieldError ? <p className="ui-field-error">{fieldError}</p> : null}
         </div>
       </div>
     </section>

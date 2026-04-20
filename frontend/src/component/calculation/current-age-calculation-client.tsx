@@ -10,7 +10,6 @@ import {
 } from "@/component/configuration/directory-filter-panel";
 import { ConfigurationEditorFooter } from "@/component/configuration/configuration-editor-footer";
 import { ConfigurationPanelVisibilitySwitch } from "@/component/configuration/configuration-panel-visibility-switch";
-import { AppBusyInline } from "@/component/ui/app-busy-fallback";
 import { HierarchySingleSelectField } from "@/component/configuration/hierarchy-dropdown-field";
 import { StatusPanel } from "@/component/app-shell/status-panel";
 import type {
@@ -529,12 +528,6 @@ export function CurrentAgeCalculationClient({
   const emptyResultMessage = useMemo(() => (
     resolveEmptyResultMessage(result?.empty_reason, copy)
   ), [copy, result?.empty_reason]);
-  const footerNoticeMessage = useMemo(() => (
-    result != null && result.item_list.length === 0
-      ? emptyResultMessage
-      : null
-  ), [emptyResultMessage, result]);
-
   const asideEmptyMessage = !currentScope
     ? hasAnyScope
       ? copy.missingCurrentScope
@@ -543,6 +536,16 @@ export function CurrentAgeCalculationClient({
 
   const showResultBusy =
     !requestErrorMessage && (isReading || isCalculating || isDeleting);
+
+  const footerNoticeMessage = useMemo(() => {
+    if (showResultBusy) {
+      return copy.resultTableBusyAriaLabel;
+    }
+    if (result != null && result.item_list.length === 0) {
+      return emptyResultMessage;
+    }
+    return null;
+  }, [copy.resultTableBusyAriaLabel, emptyResultMessage, result, showResultBusy]);
 
   /** Erros de API (cálculo, leitura, etc.): sempre no footer. */
   const combinedFooterError: ReactNode | null =
@@ -916,17 +919,7 @@ export function CurrentAgeCalculationClient({
           </div>
 
           <section className="ui-page-stack">
-            {showResultBusy ? (
-              <div
-                className="ui-current-age-table-shell ui-panel"
-                aria-busy="true"
-                aria-label={copy.resultTableBusyAriaLabel}
-              >
-                <div className="ui-current-age-table-scroll" style={{ padding: "0.75rem" }}>
-                  <AppBusyInline label={copy.resultTableBusyAriaLabel} />
-                </div>
-              </div>
-            ) : result == null || result.item_list.length === 0 ? null : (
+            {result == null || result.item_list.length === 0 ? null : (
               <>
                 <div className="ui-current-age-table-view-toggle">
                   <ConfigurationPanelVisibilitySwitch

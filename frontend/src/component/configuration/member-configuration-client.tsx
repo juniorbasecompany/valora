@@ -911,9 +911,6 @@ export function MemberConfigurationClient({
                         aria-invalid={Boolean(inviteEmailError)}
                       />
                       <p className="ui-field-hint">{copy.inviteEmailHint}</p>
-                      {inviteEmailError ? (
-                        <p className="ui-field-error">{inviteEmailError}</p>
-                      ) : null}
                     </>
                   ) : (
                     <>
@@ -936,9 +933,6 @@ export function MemberConfigurationClient({
                         aria-invalid={Boolean(memberEmailError)}
                       />
                       <p className="ui-field-hint">{copy.memberEmailHint}</p>
-                      {memberEmailError ? (
-                        <p className="ui-field-error">{memberEmailError}</p>
-                      ) : null}
                     </>
                   )}
                 </div>

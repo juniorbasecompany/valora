@@ -549,6 +549,7 @@ export function UnityConfigurationClient({
 
   const footerErrorMessage =
     requestErrorMessage ??
+    fieldError.name ??
     fieldError.location ??
     fieldError.item ??
     null;
@@ -736,9 +737,6 @@ export function UnityConfigurationClient({
                 ariaInvalid={Boolean(fieldError.location)}
               />
               <p className="ui-field-hint">{copy.locationHint}</p>
-              {fieldError.location ? (
-                <p className="ui-field-error">{fieldError.location}</p>
-              ) : null}
             </section>
 
             <section className="ui-card ui-form-section ui-border-accent">
@@ -759,7 +757,6 @@ export function UnityConfigurationClient({
                 disabled={isDeletePending || !canEditForm}
               />
               <p className="ui-field-hint">{copy.itemHint}</p>
-              {fieldError.item ? <p className="ui-field-error">{fieldError.item}</p> : null}
             </section>
           </>
         ) : (

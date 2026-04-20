@@ -1027,9 +1027,6 @@ export function FieldConfigurationClient({
                   ) : null}
                 </select>
                 <p className="ui-field-hint">{t("fieldType.hint")}</p>
-                {fieldError.form ? (
-                  <p className="ui-field-error">{fieldError.form}</p>
-                ) : null}
               </div>
 
               {showScaleField ? (
@@ -1125,9 +1122,6 @@ export function FieldConfigurationClient({
                   <span>{t("ageFlags.final.label")}</span>
                 </label>
                 <p className="ui-field-hint">{t("ageFlags.final.hint")}</p>
-                {fieldError.ageFlag ? (
-                  <p className="ui-field-error">{fieldError.ageFlag}</p>
-                ) : null}
               </div>
             </section>
 

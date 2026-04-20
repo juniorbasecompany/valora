@@ -101,9 +101,6 @@ export function EventActionField({
         ))}
       </select>
       <p className="ui-field-hint">{copy.actionHint}</p>
-      {actionErrorMessage ? (
-        <p className="ui-field-error">{actionErrorMessage}</p>
-      ) : null}
     </div>
   );
 

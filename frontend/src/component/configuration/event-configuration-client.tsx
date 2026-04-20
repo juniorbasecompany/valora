@@ -1673,9 +1673,6 @@ export function EventConfigurationClient({
                     ))}
                   </select>
                   <p className="ui-field-hint">{copy.unityHint}</p>
-                  {fieldError.unity ? (
-                    <p className="ui-field-error">{fieldError.unity}</p>
-                  ) : null}
                 </div>
               </section>
             ) : null}
@@ -1701,9 +1698,6 @@ export function EventConfigurationClient({
                 ariaInvalid={Boolean(fieldError.location)}
               />
               <p className="ui-field-hint">{copy.locationHint}</p>
-              {fieldError.location ? (
-                <p className="ui-field-error">{fieldError.location}</p>
-              ) : null}
             </section>
 
             <section className="ui-card ui-form-section ui-border-accent">
@@ -1723,9 +1717,6 @@ export function EventConfigurationClient({
                 ariaInvalid={Boolean(fieldError.item)}
               />
               <p className="ui-field-hint">{copy.itemHint}</p>
-              {fieldError.item ? (
-                <p className="ui-field-error">{fieldError.item}</p>
-              ) : null}
             </section>
 
             <section className="ui-card ui-form-section ui-border-accent">
@@ -1781,9 +1772,6 @@ export function EventConfigurationClient({
                   aria-invalid={Boolean(fieldError.age)}
                 />
                 <p className="ui-field-hint">{copy.ageHint}</p>
-                {fieldError.age ? (
-                  <p className="ui-field-error">{fieldError.age}</p>
-                ) : null}
               </div>
             </section>
 

@@ -9,6 +9,7 @@ import {
   DirectoryFilterPanel
 } from "@/component/configuration/directory-filter-panel";
 import { ConfigurationEditorFooter } from "@/component/configuration/configuration-editor-footer";
+import { ConfigurationPanelVisibilitySwitch } from "@/component/configuration/configuration-panel-visibility-switch";
 import { AppBusyInline } from "@/component/ui/app-busy-fallback";
 import { HierarchySingleSelectField } from "@/component/configuration/hierarchy-dropdown-field";
 import { StatusPanel } from "@/component/app-shell/status-panel";
@@ -21,6 +22,7 @@ import type {
   TenantLocationDirectoryResponse,
   TenantScopeActionDirectoryResponse,
   TenantScopeFieldDirectoryResponse,
+  TenantScopeFieldRecord,
   TenantScopeRecord,
   TenantUnityDirectoryResponse,
   TenantUnityRecord
@@ -68,6 +70,8 @@ type CurrentAgeCalculationCopy = {
   formulaLabel: string;
   emptyValue: string;
   fallbackAction: string;
+  detailedViewLabel: string;
+  detailedViewAriaLabel: string;
   cancel: string;
   discardConfirm: string;
   resultTableBusyAriaLabel: string;
@@ -363,6 +367,7 @@ export function CurrentAgeCalculationClient({
   const [isCalculating, setIsCalculating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [result, setResult] = useState<ScopeCurrentAgeCalculationResponse | null>(null);
+  const [isGroupedView, setIsGroupedView] = useState(true);
   const [activeDropdown, setActiveDropdown] = useState<{
     resultId: number;
     top: number;
@@ -489,6 +494,13 @@ export function CurrentAgeCalculationClient({
       || left.result_id - right.result_id
     ));
   }, [actionOrderById, fieldSortOrderById, result]);
+
+  const executionRowList = useMemo<ScopeCurrentAgeCalculationRecord[]>(() => {
+    if (!result) {
+      return [];
+    }
+    return result.item_list;
+  }, [result]);
 
   const dayRowList = useMemo(() => {
     const dayByAge = new Map<number, {
@@ -737,6 +749,65 @@ export function CurrentAgeCalculationClient({
     }
   }
 
+  function renderValueCell(
+    item: ScopeCurrentAgeCalculationRecord,
+    field: TenantScopeFieldRecord,
+    key: string
+  ) {
+    const isExpanded = activeDropdown?.resultId === item.result_id;
+    const isStandardOrigin = item.event_unity_id == null;
+    const isInputBacked = formulaHasInputToken(
+      formulaRawStatementById.get(item.formula_id)
+    );
+    const isDirectResult = item.result_age === item.event_age;
+    const inputBackedClass = isInputBacked && isDirectResult
+      ? isStandardOrigin
+        ? "ui-current-age-table-value-cell-input-standard"
+        : "ui-current-age-table-value-cell-input-unity"
+      : null;
+    const valueCellClassName = [
+      "ui-current-age-table-value-cell",
+      inputBackedClass
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    return (
+      <td key={key} className={valueCellClassName}>
+        <div className="ui-current-age-table-value-dropdown">
+          <button
+            type="button"
+            className="ui-current-age-table-value-button"
+            data-current-age-dropdown-anchor
+            onClick={(event) => {
+              if (isExpanded) {
+                setActiveDropdown(null);
+                return;
+              }
+
+              const rect = event.currentTarget.getBoundingClientRect();
+              const dropdownWidth = 352;
+              const viewportPadding = 12;
+              const left = Math.min(
+                Math.max(viewportPadding, rect.left),
+                window.innerWidth - dropdownWidth - viewportPadding
+              );
+
+              setActiveDropdown({
+                resultId: item.result_id,
+                top: rect.bottom + 6,
+                left
+              });
+            }}
+            aria-expanded={isExpanded}
+          >
+            {formatPersistedValue(item, copy.emptyValue, field.sql_type)}
+          </button>
+        </div>
+      </td>
+    );
+  }
+
   return (
     <section className="ui-page-stack ui-page-stack-footer">
       <PageHeader
@@ -856,9 +927,18 @@ export function CurrentAgeCalculationClient({
                 </div>
               </div>
             ) : result == null || result.item_list.length === 0 ? null : (
-              <div className="ui-current-age-table-shell ui-panel">
-                <div className="ui-current-age-table-scroll">
-                  <table className="ui-current-age-table">
+              <>
+                <div className="ui-current-age-table-view-toggle">
+                  <ConfigurationPanelVisibilitySwitch
+                    checked={!isGroupedView}
+                    ariaLabel={copy.detailedViewAriaLabel}
+                    label={copy.detailedViewLabel}
+                    onToggle={() => setIsGroupedView((prev) => !prev)}
+                  />
+                </div>
+                <div className="ui-current-age-table-shell ui-panel">
+                  <div className="ui-current-age-table-scroll">
+                    <table className="ui-current-age-table">
                     <caption className="ui-sr-only">{copy.title}</caption>
                     <colgroup>
                       <col className="ui-current-age-table-column-date" />
@@ -883,87 +963,55 @@ export function CurrentAgeCalculationClient({
                       </tr>
                     </thead>
                     <tbody>
-                      {dayRowList.map(({ resultAge, recordByFieldId }, dayIndex) => {
-                        const rowClassName = dayIndex % 2 === 0
-                          ? "ui-current-age-table-day-band-even"
-                          : "ui-current-age-table-day-band-odd";
+                      {isGroupedView
+                        ? dayRowList.map(({ resultAge, recordByFieldId }, dayIndex) => {
+                          const rowClassName = dayIndex % 2 === 0
+                            ? "ui-current-age-table-day-band-even"
+                            : "ui-current-age-table-day-band-odd";
 
-                        return (
-                          <tr
-                            key={resultAge}
-                            className={rowClassName}
-                          >
-                            <td>{String(resultAge)}</td>
-                            {fieldList.map((field) => {
-                              const item = recordByFieldId.get(field.id);
-                              if (!item) {
-                                return <td key={`${resultAge}-${field.id}`}></td>;
-                              }
+                          return (
+                            <tr
+                              key={resultAge}
+                              className={rowClassName}
+                            >
+                              <td>{String(resultAge)}</td>
+                              {fieldList.map((field) => {
+                                const item = recordByFieldId.get(field.id);
+                                if (!item) {
+                                  return <td key={`${resultAge}-${field.id}`}></td>;
+                                }
+                                return renderValueCell(item, field, `${resultAge}-${field.id}`);
+                              })}
+                              <td aria-hidden="true" className="ui-current-age-table-spacer-cell"></td>
+                            </tr>
+                          );
+                        })
+                        : executionRowList.map((item, rowIndex) => {
+                          const rowClassName = rowIndex % 2 === 0
+                            ? "ui-current-age-table-day-band-even"
+                            : "ui-current-age-table-day-band-odd";
 
-                              const isExpanded = activeDropdown?.resultId === item.result_id;
-                              const isStandardOrigin = item.event_unity_id == null;
-                              const isInputBacked = formulaHasInputToken(
-                                formulaRawStatementById.get(item.formula_id)
-                              );
-                              const isDirectResult = item.result_age === item.event_age;
-                              const inputBackedClass = isInputBacked && isDirectResult
-                                ? isStandardOrigin
-                                  ? "ui-current-age-table-value-cell-input-standard"
-                                  : "ui-current-age-table-value-cell-input-unity"
-                                : null;
-                              const valueCellClassName = [
-                                "ui-current-age-table-value-cell",
-                                inputBackedClass
-                              ]
-                                .filter(Boolean)
-                                .join(" ");
-
-                              return (
-                                <td
-                                  key={`${resultAge}-${field.id}`}
-                                  className={valueCellClassName}
-                                >
-                                  <div className="ui-current-age-table-value-dropdown">
-                                    <button
-                                      type="button"
-                                      className="ui-current-age-table-value-button"
-                                      data-current-age-dropdown-anchor
-                                      onClick={(event) => {
-                                        if (isExpanded) {
-                                          setActiveDropdown(null);
-                                          return;
-                                        }
-
-                                        const rect = event.currentTarget.getBoundingClientRect();
-                                        const dropdownWidth = 352;
-                                        const viewportPadding = 12;
-                                        const left = Math.min(
-                                          Math.max(viewportPadding, rect.left),
-                                          window.innerWidth - dropdownWidth - viewportPadding
-                                        );
-
-                                        setActiveDropdown({
-                                          resultId: item.result_id,
-                                          top: rect.bottom + 6,
-                                          left
-                                        });
-                                      }}
-                                      aria-expanded={isExpanded}
-                                    >
-                                      {formatPersistedValue(item, copy.emptyValue, field.sql_type)}
-                                    </button>
-                                  </div>
-                                </td>
-                              );
-                            })}
-                            <td aria-hidden="true" className="ui-current-age-table-spacer-cell"></td>
-                          </tr>
-                        );
-                      })}
+                          return (
+                            <tr
+                              key={item.result_id}
+                              className={rowClassName}
+                            >
+                              <td>{String(item.result_age)}</td>
+                              {fieldList.map((field) => {
+                                if (field.id !== item.field_id) {
+                                  return <td key={`${item.result_id}-${field.id}`}></td>;
+                                }
+                                return renderValueCell(item, field, `${item.result_id}-${field.id}`);
+                              })}
+                              <td aria-hidden="true" className="ui-current-age-table-spacer-cell"></td>
+                            </tr>
+                          );
+                        })}
                     </tbody>
                   </table>
+                  </div>
                 </div>
-              </div>
+              </>
             )}
           </section>
 

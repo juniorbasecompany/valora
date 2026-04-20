@@ -628,7 +628,9 @@
       "actionLabel": "Ação",
       "formulaLabel": "Fórmula",
       "emptyValue": "Sem valor",
-      "fallbackAction": "Ação indisponível"
+      "fallbackAction": "Ação indisponível",
+      "detailedViewLabel": "Detalhado",
+      "detailedViewAriaLabel": "Mostrar um resultado por linha na ordem de execução"
     },
     "buttons": {
       "cancel": "Cancelar"

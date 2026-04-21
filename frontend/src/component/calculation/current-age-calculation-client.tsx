@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import {
   Fragment,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -399,9 +400,15 @@ export function CurrentAgeCalculationClient({
   const [isGroupedView, setIsGroupedView] = useState(true);
   const [activeDropdown, setActiveDropdown] = useState<{
     resultId: number;
-    top: number;
+    anchorTop: number;
+    anchorBottom: number;
     left: number;
   } | null>(null);
+  const [dropdownPlacement, setDropdownPlacement] = useState<{
+    top: number;
+    maxHeight: number | null;
+  } | null>(null);
+  const dropdownPanelRef = useRef<HTMLDivElement | null>(null);
   const [inputListByEventId, setInputListByEventId] = useState<
     Record<number, ScopeInputRecord[]>
   >({});
@@ -707,6 +714,62 @@ export function CurrentAgeCalculationClient({
     setEditingFormulaStatementByFormulaId({});
     setInputSaveError(null);
   }, [activeDropdown?.resultId]);
+
+  useLayoutEffect(() => {
+    if (!activeDropdown) {
+      return;
+    }
+    const panel = dropdownPanelRef.current;
+    if (!panel) {
+      return;
+    }
+
+    function recomputePlacement() {
+      if (!activeDropdown || !panel) {
+        return;
+      }
+      const viewportPadding = 12;
+      const anchorOffset = 6;
+      const viewportHeight = window.innerHeight;
+      const panelHeight = panel.offsetHeight;
+
+      const spaceBelow =
+        viewportHeight - activeDropdown.anchorBottom - viewportPadding;
+      const spaceAbove = activeDropdown.anchorTop - viewportPadding;
+
+      let nextTop: number;
+      let nextMaxHeight: number | null = null;
+
+      if (panelHeight + anchorOffset <= spaceBelow) {
+        nextTop = activeDropdown.anchorBottom + anchorOffset;
+      } else if (panelHeight + anchorOffset <= spaceAbove) {
+        nextTop = activeDropdown.anchorTop - panelHeight - anchorOffset;
+      } else if (spaceBelow >= spaceAbove) {
+        nextTop = activeDropdown.anchorBottom + anchorOffset;
+        nextMaxHeight = Math.max(spaceBelow - anchorOffset, viewportPadding);
+      } else {
+        nextMaxHeight = Math.max(spaceAbove - anchorOffset, viewportPadding);
+        nextTop = activeDropdown.anchorTop - nextMaxHeight - anchorOffset;
+      }
+
+      setDropdownPlacement((prev) => {
+        if (prev && prev.top === nextTop && prev.maxHeight === nextMaxHeight) {
+          return prev;
+        }
+        return { top: nextTop, maxHeight: nextMaxHeight };
+      });
+    }
+
+    recomputePlacement();
+
+    const observer = new ResizeObserver(() => {
+      recomputePlacement();
+    });
+    observer.observe(panel);
+    return () => {
+      observer.disconnect();
+    };
+  }, [activeDropdown]);
 
   useEffect(() => {
     if (activeDropdown == null || !currentScope) {
@@ -1136,7 +1199,8 @@ export function CurrentAgeCalculationClient({
 
               setActiveDropdown({
                 resultId: item.result_id,
-                top: rect.bottom + 6,
+                anchorTop: rect.top,
+                anchorBottom: rect.bottom,
                 left
               });
             }}
@@ -1409,9 +1473,18 @@ export function CurrentAgeCalculationClient({
               return null;
             }
 
+            const resolvedTop =
+              dropdownPlacement?.top ?? activeDropdown.anchorBottom + 6;
             const dropdownStyle = {
-              "--ui-current-age-dropdown-top": `${activeDropdown.top}px`,
-              "--ui-current-age-dropdown-left": `${activeDropdown.left}px`
+              "--ui-current-age-dropdown-top": `${resolvedTop}px`,
+              "--ui-current-age-dropdown-left": `${activeDropdown.left}px`,
+              visibility: dropdownPlacement == null ? "hidden" : undefined,
+              maxHeight:
+                dropdownPlacement?.maxHeight != null
+                  ? `${dropdownPlacement.maxHeight}px`
+                  : undefined,
+              overflowY:
+                dropdownPlacement?.maxHeight != null ? "auto" : undefined
             } as CSSProperties;
 
             const rawStatement =
@@ -1432,6 +1505,7 @@ export function CurrentAgeCalculationClient({
 
             return (
               <div
+                ref={dropdownPanelRef}
                 className="ui-current-age-table-dropdown-panel"
                 data-current-age-dropdown-panel
                 style={dropdownStyle}

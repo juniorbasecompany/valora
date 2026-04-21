@@ -678,6 +678,9 @@ export function CurrentAgeCalculationClient({
       if (target.closest("[data-current-age-dropdown-panel]")) {
         return;
       }
+      if (target.closest(".cm-tooltip")) {
+        return;
+      }
       if (isSavingInput) {
         return;
       }
@@ -690,7 +693,19 @@ export function CurrentAgeCalculationClient({
       }
     }
 
-    function handleViewportChange() {
+    function handleScroll(event: Event) {
+      if (isSavingInput) {
+        return;
+      }
+      const target = event.target;
+      if (target instanceof Element
+        && target.closest("[data-current-age-dropdown-panel]")) {
+        return;
+      }
+      setActiveDropdown(null);
+    }
+
+    function handleResize() {
       if (isSavingInput) {
         return;
       }
@@ -699,13 +714,13 @@ export function CurrentAgeCalculationClient({
 
     document.addEventListener("mousedown", handlePointerDown);
     window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("resize", handleViewportChange);
-    window.addEventListener("scroll", handleViewportChange, true);
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("scroll", handleScroll, true);
     return () => {
       document.removeEventListener("mousedown", handlePointerDown);
       window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("resize", handleViewportChange);
-      window.removeEventListener("scroll", handleViewportChange, true);
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("scroll", handleScroll, true);
     };
   }, [activeDropdown, isSavingInput]);
 
